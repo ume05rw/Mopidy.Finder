@@ -1,0 +1,39 @@
+{
+    "name": "music_front",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "npm run test:build && npm run test:exec",
+        "test:build": "tsc --project tsconfig.commonjs.json --listEmittedFiles --locale ja-JP",
+        "test:exec": "mocha tests/**/*.test.js",
+        "build:prod": "webpack --config webpack.config.prod.js",
+        "build:dev": "npm run build:devTs && npm run build:devWp",
+        "build:devTs": "tsc --project tsconfig.dev.json --listEmittedFiles --locale ja-JP",
+        "build:devWp": "webpack --config webpack.config.dev.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/chai": "^4.1.7",
+        "@types/lodash": "^4.14.134",
+        "@types/mocha": "^5.2.7",
+        "chai": "^4.2.0",
+        "css-loader": "^3.0.0",
+        "mocha": "^6.1.4",
+        "source-map-loader": "^0.2.4",
+        "style-loader": "^0.23.1",
+        "ts-loader": "^6.0.3",
+        "typescript": "3.1.2",
+        "webpack": "^4.34.0",
+        "webpack-cli": "^3.3.4"
+    },
+    "dependencies": {
+        "axios": "^0.19.0",
+        "es6-promise": "^4.2.8",
+        "linq": "^3.2.0",
+        "lodash": "^4.17.11",
+        "requirejs": "^2.3.6"
+    }
+}
