@@ -15,12 +15,17 @@ export default class Song {
         //if (!id || id === '')
         //    throw new Error('id is required.');
 
+        console.log("hello");
+
         if (!name || name === '')
-            throw new Error('name is required.')
+            throw new Error('name is required.');
 
         this._id = (!id || id === '')
             ? _.uniqueId('user_')
             : id;
+
         this._name = name;
+
+        var a = 1;
     }
 }
