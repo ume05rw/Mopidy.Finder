@@ -12,7 +12,6 @@ module.exports = {
     // メインとなるJavaScriptファイル（エントリーポイント）
     // 注) 'src/ts/Main.ts' では認識しない。'./src/ts/Main.ts' とする。
     entry: [
-        './src/js/libraries.js',
         './src/ts/Main.ts'
     ],
 

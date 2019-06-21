@@ -3,6 +3,22 @@
 // 出力内容は src/js/libraries.js を参照のこと。
 // ** defineの引数functionは実際に使用されるまで実行されないため、
 // ** for文などのループで定義出来ない。
+
+// ダミーのCSS
+define('../css/site.css', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
+});
+
+// es6-promise
+define('es6-promise', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['es6-promise'];
+});
+
+// lodash
 define('lodash', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -12,11 +28,15 @@ define('lodash', ["exports"], function (exports) {
         exports[key] = val;
     }
 });
+
+// Axios
 define('axios', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = window.__globals['axios'];
 });
+
+// linq.js
 define('linq', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });

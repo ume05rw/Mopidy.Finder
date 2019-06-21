@@ -4,13 +4,13 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "eslint": "npx eslint -c ./.eslintrc.json src/**/*.ts",
-        "test": "npm run test:build && npm run test:exec",
-        "test:build": "tsc --project tsconfig.commonjs.json --listEmittedFiles --locale ja-JP",
+        "test": "npm run test:build && npm run test:exec && npm run test:eslint",
+        "test:build": "npx tsc --project tsconfig.commonjs.json --listEmittedFiles --locale ja-JP",
         "test:exec": "mocha tests/**/*.test.js",
+        "test:eslint": "npx eslint -c ./.eslintrc.json src/**/*.ts",
         "build:prod": "webpack --config webpack.config.prod.js",
         "build:dev": "npm run build:devTs && npm run build:devWp",
-        "build:devTs": "tsc --project tsconfig.dev.json --listEmittedFiles --locale ja-JP",
+        "build:devTs": "npx tsc --project tsconfig.dev.json --listEmittedFiles --locale ja-JP",
         "build:devWp": "webpack --config webpack.config.dev.js"
     },
     "keywords": [],
@@ -30,7 +30,7 @@
         "source-map-loader": "^0.2.4",
         "style-loader": "^0.23.1",
         "ts-loader": "^6.0.3",
-        "typescript": "3.1.2",
+        "typescript": "3.4.1",
         "webpack": "^4.34.0",
         "webpack-cli": "^3.3.4"
     },
@@ -39,7 +39,7 @@
         "es6-promise": "^4.2.8",
         "eslint-config-prettier": "^5.0.0",
         "eslint-plugin-prettier": "^3.1.0",
-        "linq": "^3.2.0",
+        "linq": "3.1.1",
         "lodash": "^4.17.11",
         "requirejs": "^2.3.6"
     }

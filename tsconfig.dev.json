@@ -90,6 +90,6 @@
 
     // コンパイル時に無視するフォルダ
     "exclude": [
-        "node_modules"
+        "./node_modules"
     ]
 }

@@ -2,11 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <TypeScriptToolsVersion>3.3</TypeScriptToolsVersion>
+    <TypeScriptToolsVersion>3.4</TypeScriptToolsVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="src\Main.ts" />
+    <None Remove="src\ts\Libraries.ts" />
     <None Remove="src\ts\Models\Entities\Song.ts" />
     <None Remove="src\ts\Models\SongStore.ts" />
     <None Remove="tests\Models\Entities\Song.test.ts" />
@@ -24,10 +25,27 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="src\ts\Libraries.ts" />
     <TypeScriptCompile Include="src\ts\Main.ts" />
     <TypeScriptCompile Include="src\ts\Models\Entities\Song.ts" />
     <TypeScriptCompile Include="src\ts\Models\Stores\SongStore.ts" />
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />
   </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
+    <TypeScriptModuleKind />
+    <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+    <TypeScriptRemoveComments>True</TypeScriptRemoveComments>
+    <TypeScriptOutFile />
+    <TypeScriptOutDir />
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
+    <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
+    <TypeScriptSourceMap>True</TypeScriptSourceMap>
+    <TypeScriptMapRoot />
+    <TypeScriptSourceRoot />
+  </PropertyGroup>
 
 </Project>
