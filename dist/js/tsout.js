@@ -1,4 +1,4 @@
-define("Libraries", ["require", "exports", "axios", "linq", "es6-promise"], function (require, exports, axios_1, Enumerable, es6Promise) {
+define("Libraries", ["require", "exports", "linq", "es6-promise"], function (require, exports, Enumerable, es6Promise) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -9,7 +9,7 @@ define("Libraries", ["require", "exports", "axios", "linq", "es6-promise"], func
      * プロダクションビルドでは書いた通りで動くため、その差分を吸収するためのロジック。
      */
     var Libraries = {
-        Axios: axios_1.default,
+        // linq.jsのバージョンは3.1.1に固定する。最新版の型定義がes5に対応しなくなったため。
         Enumerable: ((Enumerable.default)
             ? Enumerable.default
             : Enumerable),

@@ -1,4 +1,3 @@
-import Axios from 'axios';
 import * as Enumerable from 'linq';
 import * as es6Promise from 'es6-promise';
 
@@ -10,8 +9,6 @@ import * as es6Promise from 'es6-promise';
  * プロダクションビルドでは書いた通りで動くため、その差分を吸収するためのロジック。
  */
 const Libraries = {
-    Axios: Axios,
-
     // linq.jsのバージョンは3.1.1に固定する。最新版の型定義がes5に対応しなくなったため。
     Enumerable: (((Enumerable as any).default)
         ? (Enumerable as any).default
