@@ -26,7 +26,8 @@
         "no-array-constructor": "off",
         "@typescript-eslint/no-array-constructor": "error",
         "@typescript-eslint/no-empty-interface": "error",
-        "@typescript-eslint/no-explicit-any": "warn",
+
+        //"@typescript-eslint/no-explicit-any": "warn",
         "@typescript-eslint/no-inferrable-types": "error",
         "@typescript-eslint/no-misused-new": "error",
         "@typescript-eslint/no-namespace": "error",
@@ -40,7 +41,52 @@
         "@typescript-eslint/no-var-requires": "error",
         "@typescript-eslint/prefer-interface": "error",
         "@typescript-eslint/prefer-namespace-keyword": "error",
-        "@typescript-eslint/type-annotation-spacing": "error"
+        "@typescript-eslint/type-annotation-spacing": "error",
+
+        // 以下、独自ルール
+        // ルール定義参考：https://garafu.blogspot.com/2017/02/eslint-rules-jp.html
+
+        // カンマ前には空白を入れず、カンマ後には空白を入れること
+        "comma-spacing": "error",
+
+        // 関数を呼び出す際、関数名と丸括弧の間に空白を入れないこと
+        "func-call-spacing": "error",
+
+        // オブジェクトリテラルにおいてキーとバリューの間に空白を入れること
+        "key-spacing": "error",
+
+        // JavaScript キーワード の前後には空白を入れること
+        "keyword-spacing": "error",
+
+        // 改行は LF (line feed) になっていること
+        "linebreak-style": "error",
+
+        // ブロックコメントの前には空行を入れること
+        "lines-around-comment": "error",
+
+        // ネストできるブロック深さは4つ以内とすること
+        "max-depth": "error",
+
+        // return の前には空行を入れること
+        "newline-before-return": "error",
+
+        //メソッドチェーンを利用する場合、チェーン毎に改行すること
+        "newline-per-chained-call": "error",
+
+        // インデントにタブと空白を混在させないこと
+        "no-mixed-spaces-and-tabs": "error",
+
+        // 3行以上の連続した空行を作らないこと
+        "no-multiple-empty-lines": "error",
+
+        // var (メソットスコープ変数) は使わず let または const (ブロックスコープ変数) を使うこと
+        "no-var": "error",
+
+        // 3項演算子は複数行に分けて記述すること
+        "multiline-ternary": "error",
+
+        // クォートはシングルクォートを使う。
+        "quotes": [ "error", "single" ]
     },
     "parserOptions": {
         "sourceType": "module",

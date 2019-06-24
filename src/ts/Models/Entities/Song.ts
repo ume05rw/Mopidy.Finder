@@ -15,8 +15,6 @@ export default class Song {
         //if (!id || id === '')
         //    throw new Error('id is required.');
 
-        console.log("hello");
-
         if (!name || name === '')
             throw new Error('name is required.');
 
