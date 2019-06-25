@@ -1,5 +1,6 @@
 import Axios, { AxiosInstance } from 'axios';
 import Libraries from '../../Libraries';
+import { IEnumerable } from 'linq';
 
 interface JsonRpcFrame {
     jsonrpc: string;
@@ -18,6 +19,12 @@ interface JsonRpcResult extends JsonRpcFrame {
 }
 
 export default class StoreBase<T> {
+
+    public Entities: IEnumerable<T>;
+
+    public GetAll(): T[] {
+        return this.Entities.toArray();
+    }
 
     private static XhrInstance: AxiosInstance = Axios.create({
         //// APIの基底URLが存在するとき

@@ -7,9 +7,17 @@
 
   <ItemGroup>
     <None Remove="src\Main.ts" />
+    <None Remove="src\ts\Definitions\ApiMethods.ts" />
     <None Remove="src\ts\Libraries.ts" />
+    <None Remove="src\ts\Models\Entities\Album.ts" />
+    <None Remove="src\ts\Models\Entities\Artist.ts" />
+    <None Remove="src\ts\Models\Entities\Genre.ts" />
+    <None Remove="src\ts\Models\Entities\MopidyRef.ts" />
     <None Remove="src\ts\Models\Entities\Song.ts" />
     <None Remove="src\ts\Models\SongStore.ts" />
+    <None Remove="src\ts\Models\Stores\AlbumStore.ts" />
+    <None Remove="src\ts\Models\Stores\ArtistStore.ts" />
+    <None Remove="src\ts\Models\Stores\GenreStore.ts" />
     <None Remove="src\ts\Models\Stores\StoreBase.ts" />
     <None Remove="tests\Models\Entities\Song.test.ts" />
   </ItemGroup>
@@ -22,9 +30,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="src\ts\Definitions\ApiMethods.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />
     <TypeScriptCompile Include="src\ts\Main.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Entities\Album.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Entities\Artist.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Entities\Genre.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Entities\MopidyRef.ts" />
     <TypeScriptCompile Include="src\ts\Models\Entities\Song.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Stores\AlbumStore.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Stores\ArtistStore.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Stores\GenreStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Stores\SongStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Stores\StoreBase.ts" />
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />

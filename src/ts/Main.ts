@@ -1,33 +1,49 @@
 import '../css/site.css';
-import Song from './Models/Entities/Song';
-import SongStore from './Models/Stores/SongStore';
 import Libraries from './Libraries';
+import ArtistStore from './Models/Stores/ArtistStore';
+import GenreStore from './Models/Stores/GenreStore';
+import AlbumStore from './Models/Stores/AlbumStore';
 
-try {
-    Libraries.es6Promise.polyfill();
-    //console.log('Promise Polyfill OK.');
-} catch (ex) {
-    throw new Error('Promise Poliyfill Error!');
+
+class Main {
+    public Init(): void {
+        console.log('TS Start');
+
+        this.PolyfillPromise();
+        this.InitStores();
+    }
+
+    private PolyfillPromise(): void {
+        try {
+            Libraries.es6Promise.polyfill();
+            //console.log('Promise Polyfill OK.');
+        } catch (ex) {
+            throw new Error('Promise Poliyfill Error!');
+        }
+    }
+
+    private async InitStores() {
+        
+        const artists = new ArtistStore();
+        const genres = new GenreStore();
+        const albums = new AlbumStore();
+
+        // 最初にアルバム全件を取得する。
+        await albums.Init();
+
+        const promises: Promise<boolean>[] = [];
+        promises.push(artists.Init(albums));
+        promises.push(genres.Init(albums));
+        
+
+        await Promise.all(promises);
+
+        console.log('Artists:');
+        console.log(artists.GetAll());
+        console.log('Genres:');
+        console.log(genres.GetAll());
+        console.log('Albums;');
+        console.log(albums.GetAll());
+    }
 }
-
-try {
-    //console.log('TS Start');
-
-    const song1 = new Song('01', 'new york, new york');
-    const song2 = new Song(null, 'stranger in the night');
-
-    const store = new SongStore();
-    const result = store.GetAll().then((res) => {
-        console.log('result ok?');
-        console.log(res);
-    });
-    
-    
-    //console.log(song1);
-    //console.log(song2);
-
-    //const En = Libraries.Enumerable;
-
-} catch (ex) {
-    //console.log(ex);
-}
+const main = (new Main()).Init();
