@@ -3,7 +3,8 @@ import Libraries from './Libraries';
 import ArtistStore from './Models/Stores/ArtistStore';
 import GenreStore from './Models/Stores/GenreStore';
 import AlbumStore from './Models/Stores/AlbumStore';
-
+import ArtistAlbumStore from './Models/Stores/ArtistAlbumStore';
+import GenreAlbumStore from './Models/Stores/GenreAlbumStore';
 
 class Main {
     public Init(): void {
@@ -27,15 +28,18 @@ class Main {
         const artists = new ArtistStore();
         const genres = new GenreStore();
         const albums = new AlbumStore();
+        const artistAlbums = new ArtistAlbumStore();
+        const genreAlbums = new GenreAlbumStore();
 
-        // 最初にアルバム全件を取得する。
-        await albums.Init();
+        let promises: Promise<boolean>[] = [];
+        promises.push(albums.Init());
+        promises.push(artists.Init());
+        promises.push(genres.Init());
+        await Promise.all(promises);
 
-        const promises: Promise<boolean>[] = [];
-        promises.push(artists.Init(albums));
-        promises.push(genres.Init(albums));
-        
-
+        promises = [];
+        promises.push(artistAlbums.Init(artists, albums));
+        promises.push(genreAlbums.Init(genres, albums));
         await Promise.all(promises);
 
         console.log('Artists:');
@@ -44,6 +48,11 @@ class Main {
         console.log(genres.GetAll());
         console.log('Albums;');
         console.log(albums.GetAll());
+        console.log('ArtistAlbums:')
+        console.log(artistAlbums.GetAll());
+        console.log('GenreAlbums;');
+        console.log(genreAlbums.GetAll());
     }
 }
+
 const main = (new Main()).Init();
