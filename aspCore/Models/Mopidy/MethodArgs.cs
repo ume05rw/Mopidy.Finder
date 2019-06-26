@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 
 namespace MusicFront.Models.Mopidy
 {
-    public class Ref
+    public class MethodArgs
     {
-        public string type;
-        public string name;
         public string uri;
+
+        public MethodArgs(string uri)
+        {
+            this.uri = uri;
+        }
     }
 }

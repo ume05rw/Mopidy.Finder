@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MusicFront.Models;
+using MusicFront.Models.Albums;
 
 namespace MusicFront.Controllers
 {
@@ -24,8 +25,10 @@ namespace MusicFront.Controllers
         private static readonly byte[] IndexDevBytes
             = System.IO.File.ReadAllBytes(HomeController.IndexDevPath);
 
-        public IActionResult Index()
+        public IActionResult Index([FromServices] AlbumStore stroe)
         {
+            stroe.Refresh();
+
             return this.File(HomeController.IndexDevBytes, "text/html");
         }
     }

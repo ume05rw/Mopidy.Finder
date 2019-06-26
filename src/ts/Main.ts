@@ -31,27 +31,27 @@ class Main {
         const artistAlbums = new ArtistAlbumStore();
         const genreAlbums = new GenreAlbumStore();
 
-        let promises: Promise<boolean>[] = [];
-        promises.push(albums.Init());
-        promises.push(artists.Init());
-        promises.push(genres.Init());
-        await Promise.all(promises);
+        //let promises: Promise<boolean>[] = [];
+        //promises.push(albums.Init());
+        //promises.push(artists.Init());
+        //promises.push(genres.Init());
+        //await Promise.all(promises);
 
-        promises = [];
-        promises.push(artistAlbums.Init(artists, albums));
-        promises.push(genreAlbums.Init(genres, albums));
-        await Promise.all(promises);
+        //promises = [];
+        //promises.push(artistAlbums.Init(artists, albums));
+        //promises.push(genreAlbums.Init(genres, albums));
+        //await Promise.all(promises);
 
-        console.log('Artists:');
-        console.log(artists.GetAll());
-        console.log('Genres:');
-        console.log(genres.GetAll());
-        console.log('Albums;');
-        console.log(albums.GetAll());
-        console.log('ArtistAlbums:')
-        console.log(artistAlbums.GetAll());
-        console.log('GenreAlbums;');
-        console.log(genreAlbums.GetAll());
+        //console.log('Artists:');
+        //console.log(artists.GetAll());
+        //console.log('Genres:');
+        //console.log(genres.GetAll());
+        //console.log('Albums;');
+        //console.log(albums.GetAll());
+        //console.log('ArtistAlbums:')
+        //console.log(artistAlbums.GetAll());
+        //console.log('GenreAlbums;');
+        //console.log(genreAlbums.GetAll());
     }
 }
 
