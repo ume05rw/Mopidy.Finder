@@ -16,6 +16,7 @@ namespace MusicFront
         public static string CurrentPath { get; private set; } = string.Empty;
         public static string SrcPath { get; private set; } = string.Empty;
         public static string DistPath { get; private set; } = string.Empty;
+        public static string DbPath { get; private set; } = string.Empty;
         public static bool IsWindowsService { get; private set; } = false;
 
         public static void Main(string[] args)
@@ -38,8 +39,15 @@ namespace MusicFront
                 // 実行ファイルのパスを取得してルートとする。
                 Program.CurrentPath = Path.GetDirectoryName(pathToExe);
             }
+
+            // Webrootパス
             Program.DistPath = Path.Combine(Program.CurrentPath, "dist");
+
+            // TypeScript-srcパス
             Program.SrcPath = Path.Combine(Program.CurrentPath, "src");
+
+            // SQLiteDBファイルパス
+            Program.DbPath = Path.Combine(Program.CurrentPath, "database.db");
 
             // ロガーインスタンスを、Asp.NetCoreと無関係に取得する。
             var logger = NLog.LogManager
