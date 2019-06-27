@@ -66,6 +66,10 @@
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="aspCore\Models\Relations\" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptJSXEmit>None</TypeScriptJSXEmit>

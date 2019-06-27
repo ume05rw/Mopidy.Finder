@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MusicFront.Models;
 using MusicFront.Models.Albums;
+using MusicFront.Models.Artists;
+using MusicFront.Models.Genres;
 using Newtonsoft.Json.Serialization;
 
 namespace MusicFront
@@ -80,7 +82,9 @@ namespace MusicFront
                         = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 });
             services
-                .AddTransient<AlbumStore, AlbumStore>();
+                .AddTransient<AlbumStore, AlbumStore>()
+                .AddTransient<GenreStore, GenreStore>()
+                .AddTransient<ArtistStore, ArtistStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

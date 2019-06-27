@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Mopidy
+namespace MusicFront.Models.Mopidies
 {
     public class MethodArgs
     {

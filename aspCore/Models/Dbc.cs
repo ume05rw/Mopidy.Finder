@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MusicFront.Models.Albums;
+using MusicFront.Models.Artists;
+using MusicFront.Models.Genres;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +21,8 @@ namespace MusicFront.Models
 
 
         public DbSet<Album> Albums { get; set; }
-
+        public DbSet<Genre> Genres { get; set; }
+        public DbSet<Artist> Artists { get; set; }
 
         /// <summary>
         /// Constructor

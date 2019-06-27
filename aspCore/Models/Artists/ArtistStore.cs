@@ -2,31 +2,26 @@ using Microsoft.AspNetCore.Mvc;
 using MusicFront.Models.Bases;
 using MusicFront.Models.JsonRpcs;
 using MusicFront.Models.Mopidies;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Albums
+namespace MusicFront.Models.Artists
 {
-    public class AlbumStore : MopidyStoreBase<Album>
+    public class ArtistStore : MopidyStoreBase<Artist>
     {
-        private const string QueryString = "local:directory?type=album";
+        private const string QueryString = "local:directory?type=artist";
 
 
-        public AlbumStore([FromServices] Dbc dbc) : base(dbc)
+        public ArtistStore([FromServices] Dbc dbc) : base(dbc)
         {
         }
 
-
         public async Task<bool> Refresh()
         {
-            this.Dbc.Albums.RemoveRange(this.Dbc.Albums);
+            this.Dbc.Artists.RemoveRange(this.Dbc.Artists);
             await this.Dbc.SaveChangesAsync();
 
             var args = new MethodArgs(QueryString);
@@ -38,13 +33,13 @@ namespace MusicFront.Models.Albums
             // 型が違うとパースエラーになる。
             var result = JArray.FromObject(resultObject).ToObject<List<Ref>>();
 
-            var albums = result.Select(e => new Album()
+            var artists = result.Select(e => new Artist()
             {
                 Name = e.name,
                 Uri = e.uri
             }).ToArray();
 
-            this.Dbc.Albums.AddRange(albums);
+            this.Dbc.Artists.AddRange(artists);
             await this.Dbc.SaveChangesAsync();
 
             return true;
