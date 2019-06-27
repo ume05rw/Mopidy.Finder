@@ -3,9 +3,6 @@ using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
 using MusicFront.Models.Relations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

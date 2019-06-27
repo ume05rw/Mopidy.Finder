@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MusicFront.a.Models;
 using MusicFront.Models;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
@@ -96,6 +97,8 @@ namespace MusicFront
             IApplicationBuilder app,
             IHostingEnvironment env)
         {
+            Initializer.SetServiceProvider(app.ApplicationServices);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

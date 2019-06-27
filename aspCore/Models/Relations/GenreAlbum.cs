@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
+using MusicFront.Models.Albums;
+using MusicFront.Models.Genres;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MusicFront.Models.Relations
 {
@@ -18,5 +16,8 @@ namespace MusicFront.Models.Relations
 
         [Required]
         public int AlbumId { get; set; }
+
+        public Genre Genre { get; set; }
+        public Album Album { get; set; }
     }
 }
