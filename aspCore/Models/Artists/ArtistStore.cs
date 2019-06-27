@@ -3,7 +3,6 @@ using MusicFront.Models.Bases;
 using MusicFront.Models.JsonRpcs;
 using MusicFront.Models.Mopidies;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +12,6 @@ namespace MusicFront.Models.Artists
     public class ArtistStore : MopidyStoreBase<Artist>
     {
         private const string QueryString = "local:directory?type=artist";
-
 
         public ArtistStore([FromServices] Dbc dbc) : base(dbc)
         {
