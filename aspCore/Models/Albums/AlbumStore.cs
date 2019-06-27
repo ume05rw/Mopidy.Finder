@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MusicFront.Models.Bases;
 using MusicFront.Models.JsonRpcs;
 using MusicFront.Models.Mopidy;
 using Newtonsoft.Json;
@@ -13,74 +14,49 @@ using System.Threading.Tasks;
 
 namespace MusicFront.Models.Albums
 {
-    public class AlbumStore : IDisposable
+    public class AlbumStore : MopidyStoreBase<Album>
     {
         private const string QueryString = "local:directory?type=album";
 
-        private Dbc _dbc;
 
-        public AlbumStore([FromServices] Dbc dbc)
+        public AlbumStore([FromServices] Dbc dbc) : base(dbc)
         {
-            this._dbc = dbc;
         }
+
 
         public async Task<bool> Refresh()
         {
-            var args = new MethodArgs(AlbumStore.QueryString);
-            var query = JsonRpcFactory.CreateRequest("core.library.browse", args);
+            this.Dbc.Albums.RemoveRange(this.Dbc.Albums);
+            await this.Dbc.SaveChangesAsync();
 
-            var url = "http://192.168.254.251:6680/mopidy/rpc";
-            HttpResponseMessage message;
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json")
-            );
-            client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+            var args = new MethodArgs(QueryString);
+            var request = JsonRpcFactory.CreateRequest("core.library.browse", args);
+
+            var resultObject = await this.QueryMopidy(request);
+
+            // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
+            // 型が違うとパースエラーになる。
+            var result = JArray.FromObject(resultObject).ToObject<List<Ref>>();
+
+            var albums = result.Select(e => new Album()
+            {
+                Name = e.name,
+                Uri = e.uri
+            }).ToArray();
 
             try
             {
-                var sendJson = JsonConvert.SerializeObject(query);
-                var content = new StringContent(sendJson, Encoding.UTF8, "application/json");
-                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                message = await client.PostAsync(url, content);
+                this.Dbc.Albums.AddRange(albums);
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw;
             }
 
-            var responseJson = await message.Content.ReadAsStringAsync();
-            var response = JsonConvert.DeserializeObject<JsonRpcParamsResponse<List<Ref>>>(responseJson);
 
-            var result = response.result;
-
-            
+            await this.Dbc.SaveChangesAsync();
 
             return true;
         }
-
-        #region IDisposable Support
-        private bool IsDisposed = false; // 重複する呼び出しを検出するには
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!this.IsDisposed)
-            {
-                if (disposing)
-                {
-                    this._dbc = null;
-                }
-
-                this.IsDisposed = true;
-            }
-        }
-
-        // このコードは、破棄可能なパターンを正しく実装できるように追加されました。
-        public void Dispose()
-        {
-            this.Dispose(true);
-        }
-        #endregion
     }
 }

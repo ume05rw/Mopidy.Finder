@@ -18,7 +18,7 @@ namespace MusicFront.Models
         private static LockerObject Locker = new LockerObject();
 
 
-        public DbSet<Album> BrDevices { get; set; }
+        public DbSet<Album> Albums { get; set; }
 
 
         /// <summary>

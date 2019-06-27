@@ -25,9 +25,9 @@ namespace MusicFront.Controllers
         private static readonly byte[] IndexDevBytes
             = System.IO.File.ReadAllBytes(HomeController.IndexDevPath);
 
-        public IActionResult Index([FromServices] AlbumStore stroe)
+        public async Task<IActionResult> Index([FromServices] AlbumStore stroe)
         {
-            stroe.Refresh();
+            await stroe.Refresh();
 
             return this.File(HomeController.IndexDevBytes, "text/html");
         }
