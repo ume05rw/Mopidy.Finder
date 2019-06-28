@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace MusicFront.Models.Bases
 {
@@ -10,7 +11,6 @@ namespace MusicFront.Models.Bases
         {
             this.Dbc = dbc;
         }
-
 
         #region IDisposable Support
         protected bool IsDisposed = false; // 重複する呼び出しを検出するには

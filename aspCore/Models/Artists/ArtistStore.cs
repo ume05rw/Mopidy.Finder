@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using MusicFront.Models.Albums;
 using MusicFront.Models.Bases;
+using MusicFront.Models.Genres;
 using MusicFront.Models.JsonRpcs;
 using MusicFront.Models.Mopidies;
 using Newtonsoft.Json.Linq;
@@ -15,6 +17,35 @@ namespace MusicFront.Models.Artists
 
         public ArtistStore([FromServices] Dbc dbc) : base(dbc)
         {
+        }
+
+        public List<Artist> FindAll(string name = null)
+        {
+            return (name != null)
+                ? this.Dbc.Artists.Where(e => e.Name.Contains(name)).ToList()
+                : this.Dbc.Artists.ToList();
+        }
+
+        public Artist Get(int artistId)
+            => this.Dbc.Artists.FirstOrDefault(e => e.Id == artistId);
+
+        public List<Album> GetAlbumsByArtist(Artist artist)
+        {
+            return this.Dbc.ArtistAlbums
+                .Where(e => e.ArtistId == artist.Id)
+                .Select(e => e.Album)
+                .OrderBy(e => e.Year)
+                .ThenBy(e => e.Name)
+                .ToList();
+        }
+
+        public List<Genre> GetGenresByArtist(Artist artist)
+        {
+            return this.Dbc.GenreArtists
+                .Where(e => e.ArtistId == artist.Id)
+                .Select(e => e.Genre)
+                .OrderBy(e => e.Name)
+                .ToList();
         }
 
         public void Refresh()

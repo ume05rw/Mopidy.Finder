@@ -89,8 +89,7 @@ namespace MusicFront
                 .AddTransient<ArtistStore, ArtistStore>()
                 .AddTransient<ArtistAlbumStore, ArtistAlbumStore>()
                 .AddTransient<GenreAlbumStore, GenreAlbumStore>()
-                .AddTransient<GenreArtistStore, GenreArtistStore>()
-                .AddTransient<Initializer, Initializer>();
+                .AddTransient<GenreArtistStore, GenreArtistStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
