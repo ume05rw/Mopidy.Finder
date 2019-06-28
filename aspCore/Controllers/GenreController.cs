@@ -16,7 +16,6 @@ namespace MusicFront.Controllers
     public class GenreController : Controller
     {
         [HttpGet()]
-        [Produces("application/json")]
         public List<Genre> Index(
             [FromQuery] string name,
             [FromServices] GenreStore store
@@ -26,7 +25,6 @@ namespace MusicFront.Controllers
         }
 
         [HttpGet("GetArtistByGenreId/{genreId}")]
-        [Produces("application/json")]
         public Artist[] GetArtistByGenreId(
             [FromRoute] int genreId,
             [FromServices] GenreStore store
@@ -39,7 +37,6 @@ namespace MusicFront.Controllers
         }
 
         [HttpGet("GetAlbumsByGenreId/{genreId}")]
-        [Produces("application/json")]
         public Album[] GetAlbumsByGenreId(
             [FromRoute] int genreId,
             [FromServices] GenreStore store

@@ -13,11 +13,12 @@ using Newtonsoft.Json;
 
 namespace MusicFront.Controllers
 {
+    [Produces("application/json")]
+    [Route("JsonRpc")]
     public class JsonRpcController : Controller
     {
         // GET: /<controller>/
         [HttpPost()]
-        [Produces("application/json")]
         public async Task<JsonRpcResult> Index([FromBody] JsonRpcParamsQuery values)
         {
             // APIクエリ用パラメータセットを宣言する。
