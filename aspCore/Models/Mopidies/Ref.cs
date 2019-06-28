@@ -27,9 +27,8 @@ namespace MusicFront.Models.Mopidies
                 var albumParams = uriParams[1].Split('&')
                     .Where(e => e.StartsWith("album=")).FirstOrDefault();
 
-                return (albumParams != null)
-                    ? albumParams.Split('=')[1]
-                    : null;
+                // アルバムが存在しない場合はnull-return
+                return albumParams?.Split('=')[1];
             }
 
             return null;

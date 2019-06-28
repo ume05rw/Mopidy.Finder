@@ -41,12 +41,11 @@ namespace MusicFront.Models.Relations
             {
                 var albumUri = row.GetAlbumUri();
                 if (albumUri == null)
-                    continue;
+                    continue; // アルバムURIが取得出来ないことは無いはず。
 
                 var album = this.Dbc.Albums.FirstOrDefault(e => e.Uri == albumUri);
-
                 if (album == null)
-                    continue;
+                    continue; // 合致アルバムが取得出来ないことは無いはず。
 
                 this.Dbc.ArtistAlbums.Add(new ArtistAlbum() {
                     ArtistId = artist.Id,

@@ -24,14 +24,14 @@ namespace MusicFront.Models.Relations
                     aa => aa.AlbumId,
                     (ga, aa) => new
                     {
-                        GenreId = ga.GenreId,
-                        ArtistId = aa.ArtistId
+                        ga.GenreId,
+                        aa.ArtistId
                     }
                 )
                 .GroupBy(e => new
                 {
-                    GenreId = e.GenreId,
-                    ArtistId = e.ArtistId
+                    e.GenreId,
+                    e.ArtistId
                 })
                 .Select(e => new GenreArtist()
                 {

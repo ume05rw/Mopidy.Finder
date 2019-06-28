@@ -28,11 +28,9 @@ namespace MusicFront.Controllers
         private static readonly byte[] IndexDevBytes
             = System.IO.File.ReadAllBytes(HomeController.IndexDevPath);
 
-        public async Task<IActionResult> Index(
-            [FromServices] Initializer initializer
-        )
+        public IActionResult Index()
         {
-            initializer.Exec();
+            Initializer.Exec();
 
             return this.File(HomeController.IndexDevBytes, "text/html");
         }

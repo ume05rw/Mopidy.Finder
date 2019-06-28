@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MusicFront.a.Models
 {
-    public class Initializer
+    public static class Initializer
     {
         private static IServiceProvider Provider = null;
 
@@ -26,7 +26,7 @@ namespace MusicFront.a.Models
         }
 
 
-        public void Exec(bool force = false)
+        public static void Exec(bool force = false)
         {
             using (var serviceScope = Initializer.Provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
