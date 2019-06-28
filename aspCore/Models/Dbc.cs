@@ -35,6 +35,41 @@ namespace MusicFront.Models
             Xb.Util.Out("Dbc.Constructor");
         }
 
+        #region "EfDefinitions"
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Album>()
+                .HasIndex(e => e.Uri);
+            modelBuilder.Entity<Genre>()
+                .HasIndex(e => e.Uri);
+            modelBuilder.Entity<Artist>()
+                .HasIndex(e => e.Uri);
+            modelBuilder.Entity<ArtistAlbum>()
+                .HasIndex(e => e.ArtistId);
+            modelBuilder.Entity<ArtistAlbum>()
+                .HasIndex(e => e.AlbumId);
+            modelBuilder.Entity<ArtistAlbum>()
+                .HasIndex(e => new { e.ArtistId, e.AlbumId })
+                .IsUnique();
+            modelBuilder.Entity<GenreAlbum>()
+                .HasIndex(e => e.GenreId);
+            modelBuilder.Entity<GenreAlbum>()
+                .HasIndex(e => e.AlbumId);
+            modelBuilder.Entity<GenreAlbum>()
+                .HasIndex(e => new { e.GenreId, e.AlbumId })
+                .IsUnique();
+            modelBuilder.Entity<GenreArtist>()
+                .HasIndex(e => e.GenreId);
+            modelBuilder.Entity<GenreArtist>()
+                .HasIndex(e => e.ArtistId);
+            modelBuilder.Entity<GenreArtist>()
+                .HasIndex(e => new { e.GenreId, e.ArtistId })
+                .IsUnique();
+        }
+
+        #endregion
+
         /// <summary>
         /// SaveChanges
         /// </summary>

@@ -17,7 +17,10 @@ namespace MusicFront.Models.Relations
         [Required]
         public int AlbumId { get; set; }
 
+        [ForeignKey("ArtistId")]
         public Artist Artist { get; set; }
+
+        [ForeignKey("AlbumId")]
         public Album Album { get; set; }
     }
 }
