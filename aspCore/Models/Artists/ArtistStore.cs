@@ -17,15 +17,17 @@ namespace MusicFront.Models.Artists
         {
         }
 
-        public async Task<bool> Refresh()
+        public void Refresh()
         {
             this.Dbc.Artists.RemoveRange(this.Dbc.Artists);
-            await this.Dbc.SaveChangesAsync();
+            this.Dbc.SaveChanges();
 
             var args = new MethodArgs(QueryString);
             var request = JsonRpcFactory.CreateRequest(Methods.LibraryBrowse, args);
 
-            var resultObject = await this.QueryMopidy(request);
+            var resultObject = this.QueryMopidy(request)
+                .GetAwaiter()
+                .GetResult();
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。
@@ -38,9 +40,7 @@ namespace MusicFront.Models.Artists
             }).ToArray();
 
             this.Dbc.Artists.AddRange(artists);
-            await this.Dbc.SaveChangesAsync();
-
-            return true;
+            this.Dbc.SaveChanges();
         }
     }
 }

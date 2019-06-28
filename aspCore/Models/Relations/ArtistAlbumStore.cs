@@ -16,33 +16,34 @@ namespace MusicFront.Models.Relations
         {
         }
 
-        public async Task<bool> Refresh()
+        public void Refresh()
         {
             this.Dbc.ArtistAlbums.RemoveRange(this.Dbc.ArtistAlbums);
-            await this.Dbc.SaveChangesAsync();
+            this.Dbc.SaveChanges();
 
-            var tasks = new List<Task<bool>>();
-            var artists = this.Dbc.Artists.ToArray();
+            foreach (var artist in this.Dbc.Artists.ToArray())
+                this.AddAlbumsByArtist(artist);
 
-            foreach (var artist in artists)
-                tasks.Add(this.AddAlbumsByArtist(artist));
-
-            await Task.WhenAll(tasks);
-
-            return true;
+            this.Dbc.SaveChanges();
         }
 
-        private async Task<bool> AddAlbumsByArtist(Artist artist)
+        private void AddAlbumsByArtist(Artist artist)
         {
             var args = new MethodArgs(artist.Uri);
             var request = JsonRpcFactory.CreateRequest(Methods.LibraryBrowse, args);
 
-            var resultObject = await this.QueryMopidy(request);
+            var resultObject = this.QueryMopidy(request)
+                .GetAwaiter()
+                .GetResult();
             var result = JArray.FromObject(resultObject).ToObject<List<Ref>>();
 
             foreach (var row in result)
             {
-                var album = this.Dbc.Albums.FirstOrDefault(e => e.Uri == row.uri);
+                var albumUri = row.GetAlbumUri();
+                if (albumUri == null)
+                    continue;
+
+                var album = this.Dbc.Albums.FirstOrDefault(e => e.Uri == albumUri);
 
                 if (album == null)
                     continue;
@@ -52,10 +53,6 @@ namespace MusicFront.Models.Relations
                     AlbumId = album.Id
                 });
             }
-
-            await this.Dbc.SaveChangesAsync();
-
-            return true;
         }
     }
 }

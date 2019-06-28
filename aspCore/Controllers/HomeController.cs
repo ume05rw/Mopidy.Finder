@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using MusicFront.a.Models;
 using MusicFront.Models;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
@@ -28,17 +29,10 @@ namespace MusicFront.Controllers
             = System.IO.File.ReadAllBytes(HomeController.IndexDevPath);
 
         public async Task<IActionResult> Index(
-            [FromServices] AlbumStore albums,
-            [FromServices] GenreStore genres,
-            [FromServices] ArtistStore artists
+            [FromServices] Initializer initializer
         )
         {
-            var tasks = new List<Task<bool>>();
-            tasks.Add(albums.Refresh());
-            tasks.Add(genres.Refresh());
-            tasks.Add(artists.Refresh());
-
-            await Task.WhenAll(tasks);
+            initializer.Exec();
 
             return this.File(HomeController.IndexDevBytes, "text/html");
         }

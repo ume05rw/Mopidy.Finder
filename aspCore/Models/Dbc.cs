@@ -101,15 +101,15 @@ namespace MusicFront.Models
         /// <remarks>
         /// SQLiteのとき、マルチスレッドでDBファイル取得に失敗する現象への対応。
         /// </remarks>
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public async override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var result = default(Task<int>);
+            var result = default(int);
 
             lock (Dbc.Locker)
             {
                 Dbc.Locker.IsLocked = true;
 
-                result = base.SaveChangesAsync(cancellationToken);
+                result = base.SaveChanges();
 
                 Dbc.Locker.IsLocked = false;
             }

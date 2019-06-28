@@ -26,7 +26,7 @@ namespace MusicFront.a.Models
         }
 
 
-        public async Task<bool> Exec()
+        public void Exec(bool force = false)
         {
             using (var serviceScope = Initializer.Provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
@@ -37,32 +37,30 @@ namespace MusicFront.a.Models
             using (var genreAlbumStore = serviceScope.ServiceProvider.GetService<GenreAlbumStore>())
             using (var genreArtistStore = serviceScope.ServiceProvider.GetService<GenreArtistStore>())
             {
-                var tasks = new List<Task<bool>>();
-                if (dbc.Albums.FirstOrDefault() == null)
-                    tasks.Add(albumStore.Refresh());
-                if (dbc.Artists.FirstOrDefault() == null)
-                    tasks.Add(artistStore.Refresh());
-                if (dbc.Genres.FirstOrDefault() == null)
-                    tasks.Add(genreStore.Refresh());
+                try
+                {
+                    // 一つずつ順次実行する。並行するとDB書き込みが落ちる。
+                    if (force || dbc.Albums.FirstOrDefault() == null)
+                        albumStore.Refresh();
+                    if (force || dbc.Artists.FirstOrDefault() == null)
+                        artistStore.Refresh();
+                    if (force || dbc.Genres.FirstOrDefault() == null)
+                        genreStore.Refresh();
 
-                await Task.WhenAll(tasks);
-                tasks.Clear();
+                    if (force || dbc.ArtistAlbums.FirstOrDefault() == null)
+                        artistAlbumStore.Refresh();
+                    if (force || dbc.GenreAlbums.FirstOrDefault() == null)
+                        genreAlbumStore.Refresh();
 
-                if (dbc.ArtistAlbums.FirstOrDefault() == null)
-                    tasks.Add(artistAlbumStore.Refresh());
-                if (dbc.GenreAlbums.FirstOrDefault() == null)
-                    tasks.Add(genreAlbumStore.Refresh());
+                    if (force || dbc.GenreArtists.FirstOrDefault() == null)
+                        genreArtistStore.Refresh();
 
-                await Task.WhenAll(tasks);
-                tasks.Clear();
-
-                if (dbc.ArtistAlbums.FirstOrDefault() == null)
-                    tasks.Add(artistAlbumStore.Refresh());
-
-                await Task.WhenAll(tasks);
+                }
+                catch (Exception ex)
+                {
+                    throw;
+                }
             }
-
-            return true;
         }
     }
 }
