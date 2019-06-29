@@ -27,7 +27,6 @@ namespace MusicFront.Controllers
             // id有無(=リクエストor通知)を判定
             var hasId = (values.id != null);
 
-
             var url = "http://192.168.254.251:6680/mopidy/rpc";
             HttpResponseMessage message;
             var client = new HttpClient();

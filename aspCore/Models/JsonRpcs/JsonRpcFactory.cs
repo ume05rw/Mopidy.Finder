@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MusicFront.Models.JsonRpcs
 {
     [NotMapped]
-    public class JsonRpcFactory
+    public static class JsonRpcFactory
     {
         private static int _idForService = 90001;
 

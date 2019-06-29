@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
 using MusicFront.Models.Relations;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace MusicFront.Models
 {
@@ -24,6 +27,21 @@ namespace MusicFront.Models
         public DbSet<ArtistAlbum> ArtistAlbums { get; set; }
         public DbSet<GenreAlbum> GenreAlbums { get; set; }
         public DbSet<GenreArtist> GenreArtists { get; set; }
+
+        public IQueryable<Genre> GetGenreQuery()
+            => this.Genres
+                .Include(e => e.GenreAlbums)
+                .Include(e => e.GenreArtists);
+
+        public IQueryable<Album> GetAlbumQuery()
+            => this.Albums
+                .Include(e => e.GenreAlbums)
+                .Include(e => e.ArtistAlbums);
+
+        public IQueryable<Artist> GetArtistQuery()
+            => this.Artists
+                .Include(e => e.GenreArtists)
+                .Include(e => e.ArtistAlbums);
 
         /// <summary>
         /// Constructor

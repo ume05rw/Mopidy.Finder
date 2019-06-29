@@ -3,6 +3,7 @@ using MusicFront.Models.Artists;
 using MusicFront.Models.Bases;
 using MusicFront.Models.JsonRpcs;
 using MusicFront.Models.Mopidies;
+using MusicFront.Models.Mopidies.Methods.Libraries;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +30,7 @@ namespace MusicFront.Models.Relations
 
         private void AddAlbumsByArtist(Artist artist)
         {
-            var args = new MethodArgs(artist.Uri);
-            var request = JsonRpcFactory.CreateRequest(Methods.LibraryBrowse, args);
+            var request = Browse.CreateRequest(artist.Uri);
 
             var resultObject = this.QueryMopidy(request)
                 .GetAwaiter()

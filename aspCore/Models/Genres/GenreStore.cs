@@ -1,9 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Bases;
 using MusicFront.Models.JsonRpcs;
 using MusicFront.Models.Mopidies;
+using MusicFront.Models.Mopidies.Methods.Libraries;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,41 +22,38 @@ namespace MusicFront.Models.Genres
         {
         }
 
-        public List<Genre> FindAll(string name = null)
-        {
-            return (name != null)
-                ? this.Dbc.Genres.Where(e => e.Name.Contains(name)).ToList()
-                : this.Dbc.Genres.ToList();
-        }
-
         public Genre Get(int genreId)
-            => this.Dbc.Genres.FirstOrDefault(e => e.Id == genreId);
+            => this.Dbc.GetGenreQuery().FirstOrDefault(e => e.Id == genreId);
+
+        public List<Genre> FindAll(string[] names, int[] ids)
+        {
+            var query = this.Dbc.GetGenreQuery();
+            if (names != null && 0 < names.Length)
+                query = query.Where(e => names.All(name => e.Name.Contains(name)));
+            if (ids != null && 0 < ids.Length)
+                query = query.Where(e => ids.Contains(e.Id));
+
+            return query.ToList();
+        }
 
         public List<Artist> GetArtistsByGenre(Genre genre)
-        {
-            return this.Dbc.GenreArtists
-                .Where(e => e.GenreId == genre.Id)
-                .Select(e => e.Artist)
+            =>  this.Dbc.GetArtistQuery()
+                .Where(e => e.GenreArtists.Select(e2 => e2.GenreId).Contains(genre.Id))
                 .OrderBy(e => e.Name)
                 .ToList();
-        }
 
         public List<Album> GetAlbumsByGenre(Genre genre)
-        {
-            return this.Dbc.GenreAlbums
-                .Where(e => e.GenreId == genre.Id)
-                .Select(e => e.Album)
+            =>  this.Dbc.GetAlbumQuery()
+                .Where(e => e.GenreAlbums.Select(e2 => e2.GenreId).Contains(genre.Id))
                 .OrderBy(e => e.Name)
                 .ToList();
-        }
 
         public void Refresh()
         {
             this.Dbc.Genres.RemoveRange(this.Dbc.Genres);
             this.Dbc.SaveChanges();
 
-            var args = new MethodArgs(QueryString);
-            var request = JsonRpcFactory.CreateRequest(Methods.LibraryBrowse, args);
+            var request = Browse.CreateRequest(GenreStore.QueryString);
 
             var resultObject = this.QueryMopidy(request)
                 .GetAwaiter()

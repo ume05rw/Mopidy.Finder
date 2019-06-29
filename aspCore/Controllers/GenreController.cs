@@ -15,17 +15,27 @@ namespace MusicFront.Controllers
     [Route("Genre")]
     public class GenreController : Controller
     {
-        [HttpGet()]
-        public List<Genre> Index(
-            [FromQuery] string name,
+        [HttpGet("{id}")]
+        public Genre Index(
+            [FromQuery] int id,
             [FromServices] GenreStore store
         )
         {
-            return store.FindAll(name);
+            return store.Get(id);
         }
 
-        [HttpGet("GetArtistByGenreId/{genreId}")]
-        public Artist[] GetArtistByGenreId(
+        [HttpGet("FindAll")]
+        public List<Genre> FindAll(
+            [FromQuery] string[] names,
+            [FromQuery] int[] ids,
+            [FromServices] GenreStore store
+        )
+        {
+            return store.FindAll(names, ids);
+        }
+
+        [HttpGet("GetArtistsByGenreId/{genreId}")]
+        public Artist[] GetArtistsByGenreId(
             [FromRoute] int genreId,
             [FromServices] GenreStore store
         )

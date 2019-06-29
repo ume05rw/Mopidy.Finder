@@ -3,6 +3,7 @@ using MusicFront.Models.Bases;
 using MusicFront.Models.Genres;
 using MusicFront.Models.JsonRpcs;
 using MusicFront.Models.Mopidies;
+using MusicFront.Models.Mopidies.Methods.Libraries;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +32,7 @@ namespace MusicFront.Models.Relations
 
         private void AddAlbumsByGenre(Genre genre)
         {
-            var args = new MethodArgs(genre.Uri);
-            var request = JsonRpcFactory.CreateRequest(Methods.LibraryBrowse, args);
+            var request = Browse.CreateRequest(genre.Uri);
 
             var resultObject = this.QueryMopidy(request)
                 .GetAwaiter()
