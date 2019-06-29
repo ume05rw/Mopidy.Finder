@@ -30,7 +30,7 @@ namespace MusicFront.Models.Artists
         {
             var query = this.Dbc.GetArtistQuery();
             if (names != null && 0 < names.Length)
-                query = query.Where(e => names.All(name => e.Name.Contains(name)));
+                query = query.Where(e => names.All(name => e.LowerName.Contains(name.ToLower())));
             if (ids != null && 0 < ids.Length)
                 query = query.Where(e => ids.Contains(e.Id));
 
@@ -67,8 +67,9 @@ namespace MusicFront.Models.Artists
 
             var artists = result.Select(e => new Artist()
             {
-                Name = e.name,
-                Uri = e.uri
+                Name = e.Name,
+                LowerName = e.Name.ToLower(),
+                Uri = e.Uri
             }).ToArray();
 
             this.Dbc.Artists.AddRange(artists);

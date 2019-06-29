@@ -27,7 +27,7 @@ namespace MusicFront.Models.Albums
         {
             var query = this.Dbc.GetAlbumQuery();
             if (names != null && 0 < names.Length)
-                query = query.Where(e => names.All(name => e.Name.Contains(name)));
+                query = query.Where(e => names.All(name => e.LowerName.Contains(name.ToLower())));
             if (ids != null && 0 < ids.Length)
                 query = query.Where(e => ids.Contains(e.Id));
 
@@ -63,8 +63,9 @@ namespace MusicFront.Models.Albums
 
             var albums = result.Select(e => new Album()
             {
-                Name = e.name,
-                Uri = e.uri
+                Name = e.Name,
+                LowerName = e.Name.ToLower(),
+                Uri = e.Uri
             }).ToArray();
 
             this.Dbc.Albums.AddRange(albums);

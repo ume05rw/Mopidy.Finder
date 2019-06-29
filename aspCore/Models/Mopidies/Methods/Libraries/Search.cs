@@ -1,4 +1,5 @@
 using MusicFront.Models.JsonRpcs;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +11,14 @@ namespace MusicFront.Models.Mopidies.Methods.Libraries
     {
         private const string Method = "core.library.search";
 
+        [JsonObject(MemberSerialization.OptIn)]
         private class Args
         {
-            public string uri;
+            [JsonProperty("uri")]
+            public string Uri;
         }
 
         public static JsonRpcQuery CreateRequest(string uri)
-            => JsonRpcFactory.CreateRequest(Search.Method, new Args() { uri = uri });
+            => JsonRpcFactory.CreateRequest(Search.Method, new Args() { Uri = uri });
     }
 }

@@ -9,8 +9,8 @@ using MusicFront.Models;
 namespace MusicFront.Migrations
 {
     [DbContext(typeof(Dbc))]
-    [Migration("20190628023759_CreateGenreArtistAlbum")]
-    partial class CreateGenreArtistAlbum
+    [Migration("20190629052124_CreateTablesGenreArtistAlbum")]
+    partial class CreateTablesGenreArtistAlbum
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,6 +24,9 @@ namespace MusicFront.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ImageUri");
+
+                    b.Property<string>("LowerName")
+                        .IsRequired();
 
                     b.Property<string>("Name")
                         .IsRequired();
@@ -47,6 +50,9 @@ namespace MusicFront.Migrations
 
                     b.Property<string>("ImageUrl");
 
+                    b.Property<string>("LowerName")
+                        .IsRequired();
+
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -65,6 +71,9 @@ namespace MusicFront.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("LowerName")
+                        .IsRequired();
+
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -80,63 +89,45 @@ namespace MusicFront.Migrations
 
             modelBuilder.Entity("MusicFront.Models.Relations.ArtistAlbum", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("ArtistId");
 
                     b.Property<int>("AlbumId");
 
-                    b.Property<int>("ArtistId");
-
-                    b.HasKey("Id");
+                    b.HasKey("ArtistId", "AlbumId");
 
                     b.HasIndex("AlbumId");
 
                     b.HasIndex("ArtistId");
-
-                    b.HasIndex("ArtistId", "AlbumId")
-                        .IsUnique();
 
                     b.ToTable("artist_albums");
                 });
 
             modelBuilder.Entity("MusicFront.Models.Relations.GenreAlbum", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("GenreId");
 
                     b.Property<int>("AlbumId");
 
-                    b.Property<int>("GenreId");
-
-                    b.HasKey("Id");
+                    b.HasKey("GenreId", "AlbumId");
 
                     b.HasIndex("AlbumId");
 
                     b.HasIndex("GenreId");
-
-                    b.HasIndex("GenreId", "AlbumId")
-                        .IsUnique();
 
                     b.ToTable("genre_albums");
                 });
 
             modelBuilder.Entity("MusicFront.Models.Relations.GenreArtist", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
+                    b.Property<int>("GenreId");
 
                     b.Property<int>("ArtistId");
 
-                    b.Property<int>("GenreId");
-
-                    b.HasKey("Id");
+                    b.HasKey("GenreId", "ArtistId");
 
                     b.HasIndex("ArtistId");
 
                     b.HasIndex("GenreId");
-
-                    b.HasIndex("GenreId", "ArtistId")
-                        .IsUnique();
 
                     b.ToTable("genre_artists");
                 });

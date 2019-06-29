@@ -652,40 +652,14 @@ define("Main", ["require", "exports", "Libraries", "Models/Stores/ArtistStore", 
         };
         Main.prototype.InitStores = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var artists, genres, albums, artistAlbums, genreAlbums, promises;
+                var artists, genres, albums, artistAlbums, genreAlbums;
                 return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            artists = new ArtistStore_1.default();
-                            genres = new GenreStore_1.default();
-                            albums = new AlbumStore_1.default();
-                            artistAlbums = new ArtistAlbumStore_1.default();
-                            genreAlbums = new GenreAlbumStore_1.default();
-                            promises = [];
-                            promises.push(albums.Init());
-                            promises.push(artists.Init());
-                            promises.push(genres.Init());
-                            return [4 /*yield*/, Promise.all(promises)];
-                        case 1:
-                            _a.sent();
-                            promises = [];
-                            promises.push(artistAlbums.Init(artists, albums));
-                            promises.push(genreAlbums.Init(genres, albums));
-                            return [4 /*yield*/, Promise.all(promises)];
-                        case 2:
-                            _a.sent();
-                            console.log('Artists:');
-                            console.log(artists.GetAll());
-                            console.log('Genres:');
-                            console.log(genres.GetAll());
-                            console.log('Albums;');
-                            console.log(albums.GetAll());
-                            console.log('ArtistAlbums:');
-                            console.log(artistAlbums.GetAll());
-                            console.log('GenreAlbums;');
-                            console.log(genreAlbums.GetAll());
-                            return [2 /*return*/];
-                    }
+                    artists = new ArtistStore_1.default();
+                    genres = new GenreStore_1.default();
+                    albums = new AlbumStore_1.default();
+                    artistAlbums = new ArtistAlbumStore_1.default();
+                    genreAlbums = new GenreAlbumStore_1.default();
+                    return [2 /*return*/];
                 });
             });
         };

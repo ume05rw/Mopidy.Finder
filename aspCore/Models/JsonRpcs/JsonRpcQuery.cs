@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MusicFront.Models.JsonRpcs
 {
     [NotMapped]
-    [JsonObject]
+    [JsonObject(MemberSerialization.OptIn)]
     public abstract class JsonRpcQuery : JsonRpcBase
     {
     }

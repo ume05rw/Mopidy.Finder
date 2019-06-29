@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MusicFront.Models.JsonRpcs
 {
     [NotMapped]
-    [JsonObject]
+    [JsonObject(MemberSerialization.OptIn)]
     public class JsonRpcQueryNotice : JsonRpcQuery
     {
         [JsonProperty("method")]
-        public string method;
+        public string Method;
 
         public JsonRpcQueryNotice(string method) : base()
         {
-            this.method = method;
+            this.Method = method;
         }
     }
 }

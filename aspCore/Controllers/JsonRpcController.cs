@@ -25,7 +25,7 @@ namespace MusicFront.Controllers
             var sendValues = JsonRpcFactory.CreateQuery(values);
 
             // id有無(=リクエストor通知)を判定
-            var hasId = (values.id != null);
+            var hasId = (values.Id != null);
 
             var url = "http://192.168.254.251:6680/mopidy/rpc";
             HttpResponseMessage message;
@@ -47,7 +47,7 @@ namespace MusicFront.Controllers
             {
                 return JsonRpcFactory.CreateErrorResult(
                     (hasId
-                        ? (int)values.id
+                        ? (int)values.Id
                         : -1),
                     $"Network Error: {ex.Message}"
                 );

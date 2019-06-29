@@ -1,7 +1,9 @@
+using Newtonsoft.Json;
 using System.Linq;
 
 namespace MusicFront.Models.Mopidies
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class Ref
     {
         public const string TypeAlbum = "album";
@@ -9,18 +11,23 @@ namespace MusicFront.Models.Mopidies
         public const string TypeArtist = "artist";
         public const string TypeTrack = "track";
 
-        public string type;
-        public string name;
-        public string uri;
+        [JsonProperty("type")]
+        public string Type;
+
+        [JsonProperty("name")]
+        public string Name;
+
+        [JsonProperty("uri")]
+        public string Uri;
 
         public string GetAlbumUri()
         {
-            if (this.type == Ref.TypeAlbum)
-                return this.uri;
+            if (this.Type == Ref.TypeAlbum)
+                return this.Uri;
 
-            if (this.type == Ref.TypeDirectory)
+            if (this.Type == Ref.TypeDirectory)
             {
-                var uriParams = this.uri.Split('?');
+                var uriParams = this.Uri.Split('?');
                 if (uriParams.Length <= 0)
                     return null;
 

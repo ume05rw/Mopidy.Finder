@@ -5,6 +5,7 @@ using MusicFront.Models.JsonRpcs;
 using MusicFront.Models.Mopidies;
 using MusicFront.Models.Mopidies.Methods.Libraries;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,16 +42,27 @@ namespace MusicFront.Models.Relations
             {
                 var albumUri = row.GetAlbumUri();
                 if (albumUri == null)
-                    continue; // アルバムURIが取得出来ないことは無いはず。
+                    throw new Exception($"Album-Uri Not Found: uri={row.Uri}"); // アルバムURIが取得出来ないことは無いはず。
 
-                var album = this.Dbc.Albums.FirstOrDefault(e => e.Uri == albumUri);
-                if (album == null)
-                    continue; // 合致アルバムが取得出来ないことは無いはず。
+                try
+                {
+                    var albumId = this.Dbc.Albums
+                        .Where(e => e.Uri == albumUri)
+                        .Select(e => e.Id)
+                        .First();
 
-                this.Dbc.ArtistAlbums.Add(new ArtistAlbum() {
-                    ArtistId = artist.Id,
-                    AlbumId = album.Id
-                });
+                    this.Dbc.ArtistAlbums.Add(new ArtistAlbum()
+                    {
+                        ArtistId = artist.Id,
+                        AlbumId = albumId
+                    });
+                }
+                catch (Exception ex)
+                {
+                    // 合致アルバムが取得出来ないことは無いはず。
+                    throw new Exception($"Album Not Matched: uri={albumUri}");
+                }
+
             }
         }
     }

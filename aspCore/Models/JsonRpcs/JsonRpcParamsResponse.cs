@@ -1,16 +1,17 @@
+using Newtonsoft.Json;
+
 namespace MusicFront.Models.JsonRpcs
 {
+    [JsonObject(MemberSerialization.OptIn)]
     public class JsonRpcParamsResponse : JsonRpcBase
     {
-        public int? id;
-        public object result;
-        public object error;
-    }
+        [JsonProperty("id")]
+        public int? Id;
 
-    public class JsonRpcParamsResponse<T> : JsonRpcBase
-    {
-        public int? id;
-        public T result;
-        public object error;
+        [JsonProperty("result")]
+        public object Result;
+
+        [JsonProperty("error")]
+        public object Error;
     }
 }

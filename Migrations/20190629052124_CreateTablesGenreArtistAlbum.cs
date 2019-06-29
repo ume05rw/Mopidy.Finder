@@ -2,7 +2,7 @@
 
 namespace MusicFront.Migrations
 {
-    public partial class CreateGenreArtistAlbum : Migration
+    public partial class CreateTablesGenreArtistAlbum : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,6 +13,7 @@ namespace MusicFront.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: false),
+                    LowerName = table.Column<string>(nullable: false),
                     Uri = table.Column<string>(nullable: false),
                     Year = table.Column<int>(nullable: true),
                     ImageUri = table.Column<string>(nullable: true)
@@ -29,6 +30,7 @@ namespace MusicFront.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: false),
+                    LowerName = table.Column<string>(nullable: false),
                     Uri = table.Column<string>(nullable: false),
                     ImageUrl = table.Column<string>(nullable: true)
                 },
@@ -44,6 +46,7 @@ namespace MusicFront.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Name = table.Column<string>(nullable: false),
+                    LowerName = table.Column<string>(nullable: false),
                     Uri = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -55,14 +58,12 @@ namespace MusicFront.Migrations
                 name: "artist_albums",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
                     ArtistId = table.Column<int>(nullable: false),
                     AlbumId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_artist_albums", x => x.Id);
+                    table.PrimaryKey("PK_artist_albums", x => new { x.ArtistId, x.AlbumId });
                     table.ForeignKey(
                         name: "FK_artist_albums_albums_AlbumId",
                         column: x => x.AlbumId,
@@ -81,14 +82,12 @@ namespace MusicFront.Migrations
                 name: "genre_albums",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
                     GenreId = table.Column<int>(nullable: false),
                     AlbumId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_genre_albums", x => x.Id);
+                    table.PrimaryKey("PK_genre_albums", x => new { x.GenreId, x.AlbumId });
                     table.ForeignKey(
                         name: "FK_genre_albums_albums_AlbumId",
                         column: x => x.AlbumId,
@@ -107,14 +106,12 @@ namespace MusicFront.Migrations
                 name: "genre_artists",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
                     GenreId = table.Column<int>(nullable: false),
                     ArtistId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_genre_artists", x => x.Id);
+                    table.PrimaryKey("PK_genre_artists", x => new { x.GenreId, x.ArtistId });
                     table.ForeignKey(
                         name: "FK_genre_artists_artists_ArtistId",
                         column: x => x.ArtistId,
@@ -145,12 +142,6 @@ namespace MusicFront.Migrations
                 column: "ArtistId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_artist_albums_ArtistId_AlbumId",
-                table: "artist_albums",
-                columns: new[] { "ArtistId", "AlbumId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_artists_Uri",
                 table: "artists",
                 column: "Uri");
@@ -166,12 +157,6 @@ namespace MusicFront.Migrations
                 column: "GenreId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_genre_albums_GenreId_AlbumId",
-                table: "genre_albums",
-                columns: new[] { "GenreId", "AlbumId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_genre_artists_ArtistId",
                 table: "genre_artists",
                 column: "ArtistId");
@@ -180,12 +165,6 @@ namespace MusicFront.Migrations
                 name: "IX_genre_artists_GenreId",
                 table: "genre_artists",
                 column: "GenreId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_genre_artists_GenreId_ArtistId",
-                table: "genre_artists",
-                columns: new[] { "GenreId", "ArtistId" },
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_genres_Uri",

@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MusicFront.Models.JsonRpcs
 {
     [NotMapped]
-    [JsonObject]
+    [JsonObject(MemberSerialization.OptIn)]
     public class JsonRpcResultSucceeded : JsonRpcResult
     {
         [JsonProperty("result")]
-        public object result;
+        public object Result;
 
         public JsonRpcResultSucceeded(int id, object result) : base(id)
         {
-            this.result = result;
+            this.Result = result;
         }
     }
 }

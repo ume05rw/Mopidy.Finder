@@ -64,26 +64,23 @@ namespace MusicFront.Models
             modelBuilder.Entity<Artist>()
                 .HasIndex(e => e.Uri);
             modelBuilder.Entity<ArtistAlbum>()
+                .HasKey(e => new { e.ArtistId, e.AlbumId });
+            modelBuilder.Entity<ArtistAlbum>()
                 .HasIndex(e => e.ArtistId);
             modelBuilder.Entity<ArtistAlbum>()
                 .HasIndex(e => e.AlbumId);
-            modelBuilder.Entity<ArtistAlbum>()
-                .HasIndex(e => new { e.ArtistId, e.AlbumId })
-                .IsUnique();
+            modelBuilder.Entity<GenreAlbum>()
+                .HasKey(e => new { e.GenreId, e.AlbumId });
             modelBuilder.Entity<GenreAlbum>()
                 .HasIndex(e => e.GenreId);
             modelBuilder.Entity<GenreAlbum>()
                 .HasIndex(e => e.AlbumId);
-            modelBuilder.Entity<GenreAlbum>()
-                .HasIndex(e => new { e.GenreId, e.AlbumId })
-                .IsUnique();
+            modelBuilder.Entity<GenreArtist>()
+                .HasKey(e => new { e.GenreId, e.ArtistId });
             modelBuilder.Entity<GenreArtist>()
                 .HasIndex(e => e.GenreId);
             modelBuilder.Entity<GenreArtist>()
                 .HasIndex(e => e.ArtistId);
-            modelBuilder.Entity<GenreArtist>()
-                .HasIndex(e => new { e.GenreId, e.ArtistId })
-                .IsUnique();
         }
 
         #endregion

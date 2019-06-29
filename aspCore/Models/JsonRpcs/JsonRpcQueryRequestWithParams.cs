@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MusicFront.Models.JsonRpcs
 {
     [NotMapped]
-    [JsonObject]
+    [JsonObject(MemberSerialization.OptIn)]
     public class JsonRpcQueryRequestWithParams : JsonRpcQueryRequest
     {
         [JsonProperty("params")]
-        public object @params;
+        public object Params;
 
         public JsonRpcQueryRequestWithParams(int id, string method, object @params) : base(id, method)
         {
-            this.@params = @params;
+            this.Params = @params;
         }
     }
 }

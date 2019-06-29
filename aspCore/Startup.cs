@@ -76,7 +76,8 @@ namespace MusicFront
                         // アッパーキャメルの場合
                         // = new DefaultContractResolver();
                         // ロウアーキャメルの場合
-                        = new CamelCasePropertyNamesContractResolver();
+                        //= new CamelCasePropertyNamesContractResolver();
+                        = new DefaultContractResolver();
 
                     // 無限ループ検出時の動作。
                     // シリアライズエラー時、デフォルトでは途中状態の文字列を返してしまう。

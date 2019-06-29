@@ -43,10 +43,10 @@ namespace MusicFront.Models.Bases
             var json = await message.Content.ReadAsStringAsync();
             var response = JsonConvert.DeserializeObject<JsonRpcParamsResponse>(json);
 
-            if (response.error != null)
-                throw new Exception($"Mopidy Query Error: {response.error}");
+            if (response.Error != null)
+                throw new Exception($"Mopidy Query Error: {response.Error}");
 
-            return response.result;
+            return response.Result;
         }
     }
 }
