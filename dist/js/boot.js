@@ -36,6 +36,17 @@ define('axios', ["exports"], function (exports) {
     exports.default = window.__globals['axios'];
 });
 
+// qs
+define('qs', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var instance = window.__globals['qs'];
+    for (var key in instance) {
+        var val = instance[key];
+        exports[key] = val;
+    }
+});
+
 // linq.js
 define('linq', ["exports"], function (exports) {
     "use strict";

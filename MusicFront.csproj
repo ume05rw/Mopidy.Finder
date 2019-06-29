@@ -16,13 +16,8 @@
     <None Remove="src\ts\Models\Entities\GenreAlbum.ts" />
     <None Remove="src\ts\Models\Entities\MopidyRef.ts" />
     <None Remove="src\ts\Models\Entities\Song.ts" />
+    <None Remove="src\ts\Models\Relations\GenreArtist.ts" />
     <None Remove="src\ts\Models\SongStore.ts" />
-    <None Remove="src\ts\Models\Stores\AlbumStore.ts" />
-    <None Remove="src\ts\Models\Stores\ArtistAlbumStore.ts" />
-    <None Remove="src\ts\Models\Stores\ArtistStore.ts" />
-    <None Remove="src\ts\Models\Stores\GenreAlbumStore.ts" />
-    <None Remove="src\ts\Models\Stores\GenreStore.ts" />
-    <None Remove="src\ts\Models\Stores\StoreBase.ts" />
     <None Remove="tests\Models\Entities\Song.test.ts" />
   </ItemGroup>
 
@@ -49,20 +44,18 @@
     <TypeScriptCompile Include="src\ts\Definitions\ApiMethods.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />
     <TypeScriptCompile Include="src\ts\Main.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Entities\Album.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Entities\Artist.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Entities\ArtistAlbum.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Entities\Genre.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Entities\GenreAlbum.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Entities\MopidyRef.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Albums\Album.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Artists\Artist.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Relations\ArtistAlbum.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Genres\Genre.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Relations\GenreAlbum.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Mopidies\Ref.ts" />
     <TypeScriptCompile Include="src\ts\Models\Entities\Song.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Stores\AlbumStore.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Stores\ArtistAlbumStore.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Stores\ArtistStore.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Stores\GenreAlbumStore.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Stores\GenreStore.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Stores\SongStore.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Stores\StoreBase.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Relations\GenreArtist.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Albums\AlbumStore.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Artists\ArtistStore.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Genres\GenreStore.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Bases\StoreBase.ts" />
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />
   </ItemGroup>
 

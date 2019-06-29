@@ -8,6 +8,6 @@ namespace MusicFront.Models.JsonRpcs
     public abstract class JsonRpcBase
     {
         [JsonProperty("jsonrpc")]
-        public string Jsonrpc = "2.0";
+        public string JsonRpc = "2.0";
     }
 }

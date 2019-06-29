@@ -1,4 +1,5 @@
 import Axios, { AxiosInstance } from 'axios';
+import * as qs from 'qs';
 import Libraries from '../../Libraries';
 import { IEnumerable } from 'linq';
 
@@ -20,6 +21,12 @@ interface JsonRpcResult extends JsonRpcFrame {
 
 export default class StoreBase<T> {
 
+    // Axios+qsによるURIパラメータ生成
+    // https://blog.ryou103.com/post/axios-send-object-query/
+    private static ParamsSerializer(params: any): string {
+        return qs.stringify(params);
+    }
+
     public Entities: IEnumerable<T>;
 
     public GetAll(): T[] {
@@ -28,7 +35,7 @@ export default class StoreBase<T> {
 
     private static XhrInstance: AxiosInstance = Axios.create({
         //// APIの基底URLが存在するとき
-        baseURL: 'http://localhost:8080/JsonRpc/', 
+        baseURL: 'http://localhost:8080/', 
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
@@ -39,12 +46,27 @@ export default class StoreBase<T> {
 
     private static IdCounter: number = 1;
 
-    private Call(request: JsonRpcRequest): Promise<JsonRpcResult> {
+
+    public async ApiGet(url: string, params: any = null): Promise<any> {
+        try {
+            const result = await StoreBase.XhrInstance.get(url, {
+                params: params,
+                paramsSerializer: StoreBase.ParamsSerializer
+            });
+
+            return result.data;
+        } catch (e) {
+
+        }
+    }
+
+
+    private JsonRpcCall(request: JsonRpcRequest): Promise<JsonRpcResult> {
         return new Promise<JsonRpcResult>(async (resolve: (value: JsonRpcResult) => void) => {
             request.jsonrpc = '2.0';
 
             try {
-                const result = await StoreBase.XhrInstance.post(null, request);
+                const result = await StoreBase.XhrInstance.post('JsonRpc', request);
 
                 resolve(result.data as JsonRpcResult);
             } catch (ex) {
@@ -69,17 +91,17 @@ export default class StoreBase<T> {
         return request;
     }
 
-    protected Query(method: string, params: any = null): Promise<JsonRpcResult> {
+    protected JsonRpcQuery(method: string, params: any = null): Promise<JsonRpcResult> {
         const request = this.GetRequest(method, params);
 
         request.id = StoreBase.IdCounter;
         StoreBase.IdCounter++;
 
-        return this.Call(request);
+        return this.JsonRpcCall(request);
     }
 
-    protected Notice(method: string, params: any = null): void {
+    protected JsonRpcNotice(method: string, params: any = null): void {
         const request = this.GetRequest(method, params);
-        this.Call(request);
+        this.JsonRpcCall(request);
     }
 }

@@ -20,6 +20,7 @@
         "@types/chai": "^4.1.7",
         "@types/lodash": "^4.14.134",
         "@types/mocha": "^5.2.7",
+        "@types/qs": "^6.5.3",
         "@typescript-eslint/eslint-plugin": "^1.10.2",
         "@typescript-eslint/parser": "^1.10.2",
         "@typescript-eslint/typescript-estree": "^1.10.2",
@@ -39,6 +40,7 @@
         "es6-promise": "^4.2.8",
         "linq": "3.1.1",
         "lodash": "^4.17.11",
+        "qs": "^6.7.0",
         "requirejs": "^2.3.6"
     }
 }
