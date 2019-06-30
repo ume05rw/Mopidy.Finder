@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MusicFront.Models.Relations
 {
-    public class GenreArtistStore : MopidyStoreBase<GenreArtist>
+    public class GenreArtistStore : StoreBase<GenreArtist>
     {
         public GenreArtistStore([FromServices] Dbc dbc) : base(dbc)
         {

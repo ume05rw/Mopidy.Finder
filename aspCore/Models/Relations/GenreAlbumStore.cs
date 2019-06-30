@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace MusicFront.Models.Relations
 {
-    public class GenreAlbumStore : MopidyStoreBase<GenreAlbum>
+    public class GenreAlbumStore : StoreBase<GenreAlbum>
     {
         public GenreAlbumStore([FromServices] Dbc dbc) : base(dbc)
         {
@@ -31,12 +31,9 @@ namespace MusicFront.Models.Relations
 
         private void AddAlbumsByGenre(Genre genre)
         {
-            var request = Browse.CreateRequest(genre.Uri);
-
-            var resultObject = this.QueryMopidy(request)
+            var result = Browse.Request(genre.Uri)
                 .GetAwaiter()
                 .GetResult();
-            var result = JArray.FromObject(resultObject).ToObject<List<Ref>>();
 
             foreach (var row in result)
             {

@@ -1,21 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using MusicFront.Models.Albums;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Genres;
-using MusicFront.Models.JsonRpcs;
-using MusicFront.Models.Mopidies;
 using MusicFront.Models.Mopidies.Methods.Libraries;
-using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using System.Threading.Tasks;
 
 namespace MusicFront.Models.Artists
 {
-    public class ArtistStore : MopidyStoreBase<Artist>
+    public class ArtistStore : StoreBase<Artist>
     {
         private const string QueryString = "local:directory?type=artist";
 
@@ -37,7 +31,7 @@ namespace MusicFront.Models.Artists
             return query.ToList();
         }
 
-        public List<Album> GetAlbumsByArtist(Artist artist)
+        public List<Albums.Album> GetAlbumsByArtist(Artist artist)
             => this.Dbc.GetAlbumQuery()
                 .Where(e => e.ArtistAlbums.Select(e2 => e2.ArtistId).Contains(artist.Id))
                 .OrderBy(e => e.Year)
@@ -55,15 +49,9 @@ namespace MusicFront.Models.Artists
             this.Dbc.Artists.RemoveRange(this.Dbc.Artists);
             this.Dbc.SaveChanges();
 
-            var request = Browse.CreateRequest(ArtistStore.QueryString);
-
-            var resultObject = this.QueryMopidy(request)
+            var result = Browse.Request(ArtistStore.QueryString)
                 .GetAwaiter()
                 .GetResult();
-
-            // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
-            // 型が違うとパースエラーになる。
-            var result = JArray.FromObject(resultObject).ToObject<List<Ref>>();
 
             var artists = result.Select(e => new Artist()
             {

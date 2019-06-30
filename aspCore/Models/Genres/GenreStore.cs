@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MusicFront.Models.Genres
 {
-    public class GenreStore : MopidyStoreBase<Genre>
+    public class GenreStore : StoreBase<Genre>
     {
         private const string QueryString = "local:directory?type=genre";
 
@@ -36,13 +36,13 @@ namespace MusicFront.Models.Genres
             return query.ToList();
         }
 
-        public List<Artist> GetArtistsByGenre(Genre genre)
+        public List<Artists.Artist> GetArtistsByGenre(Genre genre)
             =>  this.Dbc.GetArtistQuery()
                 .Where(e => e.GenreArtists.Select(e2 => e2.GenreId).Contains(genre.Id))
                 .OrderBy(e => e.Name)
                 .ToList();
 
-        public List<Album> GetAlbumsByGenre(Genre genre)
+        public List<Albums.Album> GetAlbumsByGenre(Genre genre)
             =>  this.Dbc.GetAlbumQuery()
                 .Where(e => e.GenreAlbums.Select(e2 => e2.GenreId).Contains(genre.Id))
                 .OrderBy(e => e.Name)
@@ -53,15 +53,9 @@ namespace MusicFront.Models.Genres
             this.Dbc.Genres.RemoveRange(this.Dbc.Genres);
             this.Dbc.SaveChanges();
 
-            var request = Browse.CreateRequest(GenreStore.QueryString);
-
-            var resultObject = this.QueryMopidy(request)
+            var result = Browse.Request(GenreStore.QueryString)
                 .GetAwaiter()
                 .GetResult();
-
-            // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
-            // 型が違うとパースエラーになる。
-            var result = JArray.FromObject(resultObject).ToObject<List<Ref>>();
 
             var genres = result.Select(e => new Genre()
             {

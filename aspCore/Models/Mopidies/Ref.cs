@@ -1,8 +1,10 @@
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
 namespace MusicFront.Models.Mopidies
 {
+    [NotMapped]
     [JsonObject(MemberSerialization.OptIn)]
     public class Ref
     {

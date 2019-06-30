@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace MusicFront.Models.Albums
 {
-    public class AlbumStore : MopidyStoreBase<Album>
+    public class AlbumStore : StoreBase<Album>
     {
         private const string QueryString = "local:directory?type=album";
 
@@ -34,7 +34,7 @@ namespace MusicFront.Models.Albums
             return query.ToList();
         }
 
-        public List<Artist> GetArtistsByAlbum(Album album)
+        public List<Artists.Artist> GetArtistsByAlbum(Album album)
             => this.Dbc.GetArtistQuery()
                 .Where(e => e.ArtistAlbums.Select(e2 => e2.AlbumId).Contains(album.Id))
                 .OrderBy(e => e.Name)
@@ -51,15 +51,9 @@ namespace MusicFront.Models.Albums
             this.Dbc.Albums.RemoveRange(this.Dbc.Albums);
             this.Dbc.SaveChanges();
 
-            var request = Browse.CreateRequest(AlbumStore.QueryString);
-
-            var resultObject = this.QueryMopidy(request)
+            var result = Browse.Request(AlbumStore.QueryString)
                 .GetAwaiter()
                 .GetResult();
-
-            // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
-            // 型が違うとパースエラーになる。
-            var result = JArray.FromObject(resultObject).ToObject<List<Ref>>();
 
             var albums = result.Select(e => new Album()
             {

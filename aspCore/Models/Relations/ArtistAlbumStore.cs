@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace MusicFront.Models.Relations
 {
-    public class ArtistAlbumStore : MopidyStoreBase<ArtistAlbum>
+    public class ArtistAlbumStore : StoreBase<ArtistAlbum>
     {
         public ArtistAlbumStore([FromServices] Dbc dbc) : base(dbc)
         {
@@ -27,14 +27,11 @@ namespace MusicFront.Models.Relations
             this.Dbc.SaveChanges();
         }
 
-        private void AddAlbumsByArtist(Artist artist)
+        private void AddAlbumsByArtist(Artists.Artist artist)
         {
-            var request = Browse.CreateRequest(artist.Uri);
-
-            var resultObject = this.QueryMopidy(request)
+            var result = Browse.Request(artist.Uri)
                 .GetAwaiter()
                 .GetResult();
-            var result = JArray.FromObject(resultObject).ToObject<List<Ref>>();
 
             foreach (var row in result)
             {
@@ -60,7 +57,6 @@ namespace MusicFront.Models.Relations
                     // 合致アルバムが取得出来ないことは無いはず。
                     throw new Exception($"Album Not Matched: uri={albumUri}");
                 }
-
             }
         }
     }
