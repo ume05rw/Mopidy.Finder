@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.Models.Albums;
-using MusicFront.Models.Artists;
 using MusicFront.Models.Bases;
+using MusicFront.Models.Mopidies;
 using MusicFront.Models.Mopidies.Methods.Libraries;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,11 +14,11 @@ namespace MusicFront.Models.Tracks
         {
         }
 
-        public async Task<List<Track>> GetTracksByAlbum(Album album)
+        public async Task<List<Track>> GetTracksByAlbum(Albums.Album album)
         {
             var refs = await Browse.Request(album.Uri);
             var trackUris = refs
-                .Where(e => e.Type == "track")
+                .Where(e => e.Type == Ref.TypeTrack)
                 .Select(e => e.Uri)
                 .ToArray();
 
@@ -41,7 +39,7 @@ namespace MusicFront.Models.Tracks
                     Album = album,
                     Genre = this.Dbc.Genres.FirstOrDefault(e => e.Name == mt.Genre),
                     Artists = (mt.Artists == null)
-                        ? new List<Artist>()
+                        ? new List<Artists.Artist>()
                         : mt.Artists
                             .Join(
                                 this.Dbc.Artists,
@@ -50,10 +48,8 @@ namespace MusicFront.Models.Tracks
                                 (ma, at) => at
                             )
                             .ToList(),
-                    
-
                     Composers = (mt.Composers == null)
-                        ? new List<Artist>()
+                        ? new List<Artists.Artist>()
                         : mt.Composers
                             .Join(
                                 this.Dbc.Artists,
@@ -63,7 +59,7 @@ namespace MusicFront.Models.Tracks
                             )
                             .ToList(),
                     Performers = (mt.Performers == null)
-                        ? new List<Artist>()
+                        ? new List<Artists.Artist>()
                         : mt.Performers
                             .Join(
                                 this.Dbc.Artists,
