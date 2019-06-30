@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Genres;
-using MusicFront.Models.Mopidies.Methods.Libraries;
+using MusicFront.Models.Mopidies.Methods;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,7 +47,7 @@ namespace MusicFront.Models.Albums
             this.Dbc.Albums.RemoveRange(this.Dbc.Albums);
             this.Dbc.SaveChanges();
 
-            var result = Browse.Request(AlbumStore.QueryString)
+            var result = Library.Browse(AlbumStore.QueryString)
                 .GetAwaiter()
                 .GetResult();
 

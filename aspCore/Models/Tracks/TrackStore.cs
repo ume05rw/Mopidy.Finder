@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Mopidies;
-using MusicFront.Models.Mopidies.Methods.Libraries;
-using MusicFront.Models.Mopidies.Methods.Tracklists;
+using MusicFront.Models.Mopidies.Methods;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -63,7 +62,7 @@ namespace MusicFront.Models.Tracks
             };
         }
 
-        private Track Create(Mopidies.TlTrack mopidyTlTrack)
+        private Track Create(TlTrack mopidyTlTrack)
         {
             var result = this.Create(mopidyTlTrack.Track);
             result.TlId = mopidyTlTrack.TlId;
@@ -73,13 +72,13 @@ namespace MusicFront.Models.Tracks
 
         public async Task<List<Track>> GetTracksByAlbum(Albums.Album album)
         {
-            var refs = await Browse.Request(album.Uri);
+            var refs = await Library.Browse(album.Uri);
             var trackUris = refs
                 .Where(e => e.Type == Ref.TypeTrack)
                 .Select(e => e.Uri)
                 .ToArray();
 
-            var mopidyTracks = await Lookup.Request(trackUris);
+            var mopidyTracks = await Library.Lookup(trackUris);
 
             var result = mopidyTracks
                 .Select(mt => this.Create(mt))
@@ -88,17 +87,49 @@ namespace MusicFront.Models.Tracks
             return result;
         }
 
-        public async Task<bool> ClearTracks()
-            => await Clear.Request();
+        public Task<bool> ClearList()
+            => Tracklist.Clear();
 
-        public async Task<List<Track>> SetTracks(List<string> uris)
+        public async Task<List<Track>> SetListByUris(string[] uris)
         {
-            var tlTracks = await Add.Request(uris.ToArray());
+            var tlTracks = await Tracklist.Add(uris);
             var result = tlTracks
                 .Select(mtt => this.Create(mtt))
                 .ToList();
 
             return result;
         }
+
+        public async Task<List<Track>> GetList()
+        {
+            var tlTracks = await Tracklist.GetTlTracks();
+            var result = tlTracks
+                .Select(mtt => this.Create(mtt))
+                .ToList();
+
+            return result;
+        }
+
+        public async Task<Track> GetCurrentTrack()
+        {
+            var tlTrack = await Playback.GetCurrentTlTrack();
+            return (tlTrack == null)
+                ? null
+                : this.Create(tlTrack);
+        }
+
+        //public Task<bool> Play(int? tlId = null)
+        //    => (tlId != null)
+        //        ? Playback.Play((int)tlId)
+        //        : Playback.Resume();
+
+        //public Task<bool> Pause()
+        //    => Playback.Pause();
+
+        //public Task<bool> Next()
+        //    => Playback.Next();
+
+        //public Task<bool> Previous()
+        //    => Playback.Previous();
     }
 }

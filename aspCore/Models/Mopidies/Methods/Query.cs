@@ -10,7 +10,7 @@ namespace MusicFront.Models.Mopidies.Methods
 {
     public static class Query
     {
-        public static async Task<object> Exec(JsonRpcQuery request)
+        public static async Task<JsonRpcParamsResponse> Exec(JsonRpcQuery request)
         {
             var url = "http://192.168.254.251:6680/mopidy/rpc";
             HttpResponseMessage message;
@@ -34,12 +34,21 @@ namespace MusicFront.Models.Mopidies.Methods
             }
 
             var json = await message.Content.ReadAsStringAsync();
-            var response = JsonConvert.DeserializeObject<JsonRpcParamsResponse>(json);
 
-            if (response.Error != null)
-                throw new Exception($"Mopidy Query Error: {response.Error}");
+            if (json == null || string.IsNullOrEmpty(json))
+            {
+                // 通知の時は応答JSONが無い。
+                return null;
+            }
+            else
+            {
+                var response = JsonConvert.DeserializeObject<JsonRpcParamsResponse>(json);
 
-            return response.Result;
+                if (response.Error != null)
+                    throw new Exception($"Mopidy Query Error: {response.Error}");
+
+                return response;
+            }
         }
     }
 }

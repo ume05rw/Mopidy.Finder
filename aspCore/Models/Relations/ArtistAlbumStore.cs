@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Mopidies;
-using MusicFront.Models.Mopidies.Methods.Libraries;
+using MusicFront.Models.Mopidies.Methods;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace MusicFront.Models.Relations
 
         private void AddAlbumsByArtist(Artists.Artist artist)
         {
-            var result = Browse.Request(artist.Uri)
+            var result = Library.Browse(artist.Uri)
                 .GetAwaiter()
                 .GetResult();
 
