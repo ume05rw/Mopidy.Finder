@@ -17,6 +17,9 @@ namespace MusicFront.Models.Tracks
         [JsonProperty("Uri")]
         public string Uri { get; set; }
 
+        [JsonProperty("TlId")]
+        public int? TlId { get; set; }
+
         [JsonProperty("DiscNo")]
         public int? DiscNo { get; set; }
 

@@ -31,7 +31,7 @@ namespace MusicFront.Models.JsonRpcs
             return query;
         }
 
-        public static JsonRpcQuery CreateRequest(string method, object @params)
+        public static JsonRpcQuery CreateRequest(string method, object @params = null)
         {
             JsonRpcQuery query;
             if (@params != null)
@@ -40,6 +40,17 @@ namespace MusicFront.Models.JsonRpcs
                 query = new JsonRpcQueryRequest(JsonRpcFactory._idForService, method);
 
             JsonRpcFactory._idForService++;
+
+            return query;
+        }
+
+        public static JsonRpcQuery CreateNotice(string method, object @params = null)
+        {
+            JsonRpcQuery query;
+            if (@params != null)
+                query = new JsonRpcQueryNoticeWithParams(method, @params);
+            else
+                query = new JsonRpcQueryNotice(method);
 
             return query;
         }
