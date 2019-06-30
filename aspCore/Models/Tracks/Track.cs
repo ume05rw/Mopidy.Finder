@@ -2,11 +2,8 @@ using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MusicFront.Models.Tracks
 {
@@ -39,7 +36,7 @@ namespace MusicFront.Models.Tracks
         public int BitRate { get; set; }
 
         [JsonProperty("LastModified")]
-        public int? LastModified { get; set; }
+        public long? LastModified { get; set; }
 
         [JsonProperty("Genre")]
         public Genre Genre { get; set; }

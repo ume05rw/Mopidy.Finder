@@ -29,20 +29,11 @@ namespace MusicFront.Models.Mopidies
         [JsonProperty("album")]
         public Album Album { get; set; }
 
-        [JsonProperty("composers")]
-        public List<Artist> Composers { get; set; }
-
-        [JsonProperty("performers")]
-        public List<Artist> Performers { get; set; }
-
         [JsonProperty("genre")]
         public string Genre { get; set; }
 
         [JsonProperty("track_no")]
         public int? TrackNo { get; set; }
-
-        [JsonProperty("disc_no")]
-        public int? DiscNo { get; set; }
 
         [JsonProperty("date")]
         public string Date { get; set; }
@@ -50,16 +41,27 @@ namespace MusicFront.Models.Mopidies
         [JsonProperty("length")]
         public int? Length { get; set; }
 
+        [JsonProperty("last_modified")]
+        public long? LastModified { get; set; }
+
+        [JsonProperty("disc_no")]
+        public int? DiscNo { get; set; }
+
         [JsonProperty("bitrate")]
         public int BitRate { get; set; }
 
         [JsonProperty("comment")]
         public string Comment { get; set; }
 
+        [JsonProperty("composers")]
+        public List<Artist> Composers { get; set; }
+
+        [JsonProperty("performers")]
+        public List<Artist> Performers { get; set; }
+
+
+
         [JsonProperty("musicbrainz_id")]
         public string MusicbrainzId { get; set; }
-
-        [JsonProperty("last_modified")]
-        public int? LastModified { get; set; }
     }
 }

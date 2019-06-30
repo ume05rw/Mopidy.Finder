@@ -26,19 +26,19 @@ namespace MusicFront.Models.Mopidies
         [JsonProperty("artists")]
         public List<Artist> Artists { get; set; }
 
+        [JsonProperty("Date")]
+        public string Date { get; set; }
+
+        [JsonProperty("images")]
+        public List<string> Images { get; set; }
+
         [JsonProperty("num_tracks")]
         public int? NumTracks { get; set; }
 
         [JsonProperty("num_discs")]
         public int? NumDiscs { get; set; }
 
-        [JsonProperty("Date")]
-        public string Date { get; set; }
-
         [JsonProperty("musicbrainz_id")]
         public string MusicbrainzId { get; set; }
-
-        [JsonProperty("images")]
-        public List<string> Images { get; set; }
     }
 }
