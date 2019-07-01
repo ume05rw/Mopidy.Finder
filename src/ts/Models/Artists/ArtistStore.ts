@@ -5,7 +5,7 @@ import Artist from './Artist';
 export default class ArtistStore extends StoreBase<Artist> {
 
     public async Init(): Promise<boolean> {
-        const entities: Artist[] = await this.ApiGet('Artist/FindAll');
+        const entities: Artist[] = await this.ApiGet('Artist/GetList');
         this.Entities = Libraries.Enumerable.from(entities);
 
         return true;

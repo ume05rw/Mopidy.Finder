@@ -8,8 +8,13 @@
   <ItemGroup>
     <None Remove="src\Main.ts" />
     <None Remove="src\ts\Libraries.ts" />
+    <None Remove="src\ts\MainController.ts" />
     <None Remove="src\ts\Models\Relations\GenreArtist.ts" />
     <None Remove="src\ts\Models\SongStore.ts" />
+    <None Remove="src\ts\Views\Bases\ViewBase.ts" />
+    <None Remove="src\ts\Views\Finders\Finder.ts" />
+    <None Remove="src\ts\Views\RootView.ts" />
+    <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
     <None Remove="tests\Models\Entities\Song.test.ts" />
   </ItemGroup>
 
@@ -33,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="src\ts\Controllers\MainController.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\Methods\Library.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />
     <TypeScriptCompile Include="src\ts\Main.ts" />
@@ -47,7 +53,15 @@
     <TypeScriptCompile Include="src\ts\Models\Artists\ArtistStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Genres\GenreStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Bases\StoreBase.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Bases\ViewBase.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Finders\Finder.ts" />
+    <TypeScriptCompile Include="src\ts\Views\RootView.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="src\ts\Views\Playlists\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

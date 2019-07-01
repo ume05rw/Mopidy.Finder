@@ -1,3 +1,5 @@
+import 'animate.css/animate.css';
+import 'font-awesome/css/font-awesome.css';
 import '../css/site.css';
 import 'vue2-admin-lte/src/lib/css';
 import 'vue2-admin-lte/src/lib/script';

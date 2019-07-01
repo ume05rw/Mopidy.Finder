@@ -1,17 +1,26 @@
 import '../css/site.css';
+import 'animate.css/animate.css';
+import 'font-awesome/css/font-awesome.css';
 import 'vue2-admin-lte/src/lib/css';
 import 'vue2-admin-lte/src/lib/script';
 import Libraries from './Libraries';
 import ArtistStore from './Models/Artists/ArtistStore';
 import GenreStore from './Models/Genres/GenreStore';
 import AlbumStore from './Models/Albums/AlbumStore';
+import RootContoller from './Controllers/MainController';
 
 class Main {
-    public Init(): void {
+
+    private _rootController: RootContoller;
+
+    public async Init(): Promise<boolean> {
         console.log('TS Start');
 
         this.PolyfillPromise();
-        this.InitStores();
+        await this.InitStores();
+        await this.InitControllers();
+
+        return true;
     }
 
     private PolyfillPromise(): void {
@@ -23,7 +32,7 @@ class Main {
         }
     }
 
-    private async InitStores() {
+    private async InitStores(): Promise<boolean> {
         
         const artists = new ArtistStore();
         const genres = new GenreStore();
@@ -41,6 +50,16 @@ class Main {
         console.log(genres.GetAll());
         console.log('Albums;');
         console.log(albums.GetAll());
+
+        return true;
+    }
+
+    private async InitControllers(): Promise<boolean> {
+
+        this._rootController = new RootContoller();
+        await this._rootController.Init();
+
+        return true;
     }
 }
 

@@ -1,5 +1,6 @@
 const path = require('path');
 const outDir = path.resolve(__dirname, "dist", "js");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
 
@@ -28,13 +29,14 @@ module.exports = {
             // CSS
             {
                 test: /\.css/,
+                //loader: ExtractTextPlugin.extract("css-loader")
                 use: [
                     'style-loader',
                     {
                         loader: 'css-loader',
                         options: {
-                            // CSS内のurl()メソッドの取り込みを禁止する
-                            url: false,
+                            // CSS内のurl()メソッドの取り込み可否
+                            url: true,
                             // ソースマップを有効にする
                             sourceMap: true
                         }
@@ -48,6 +50,11 @@ module.exports = {
                 options: {
                     configFile: path.resolve(__dirname, "tsconfig.commonjs.json")
                 }
+            },
+            // WebFont
+            {
+                test: /\.(woff|woff2|eot|ttf|svg)$/,
+                loader: 'file-loader?name=../font/[name].[ext]'
             }
         ]
     },

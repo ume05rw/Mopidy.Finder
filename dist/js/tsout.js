@@ -46,6 +46,12 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 define("Libraries", ["require", "exports", "linq", "es6-promise"], function (require, exports, Enumerable, es6Promise) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -213,7 +219,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Libraries", "Models
                 var entities;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.ApiGet('Artist/FindAll')];
+                        case 0: return [4 /*yield*/, this.ApiGet('Artist/GetList')];
                         case 1:
                             entities = _a.sent();
                             this.Entities = Libraries_1.default.Enumerable.from(entities);
@@ -259,7 +265,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Libraries", "Models/B
                 var entities;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.ApiGet('Genre/FindAll')];
+                        case 0: return [4 /*yield*/, this.ApiGet('Genre/GetList')];
                         case 1:
                             entities = _a.sent();
                             this.Entities = Libraries_2.default.Enumerable.from(entities);
@@ -295,7 +301,7 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Libraries", "Models/B
                 var entities;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.ApiGet('Album/FindAll')];
+                        case 0: return [4 /*yield*/, this.ApiGet('Album/GetList')];
                         case 1:
                             entities = _a.sent();
                             this.Entities = Libraries_3.default.Enumerable.from(entities);
@@ -308,16 +314,112 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Libraries", "Models/B
     }(StoreBase_3.default));
     exports.default = AlbumStore;
 });
-define("Main", ["require", "exports", "Libraries", "Models/Artists/ArtistStore", "Models/Genres/GenreStore", "Models/Albums/AlbumStore", "../css/site.css", "vue2-admin-lte/src/lib/css", "vue2-admin-lte/src/lib/script"], function (require, exports, Libraries_4, ArtistStore_1, GenreStore_1, AlbumStore_1) {
+define("Views/Bases/ViewBase", ["require", "exports", "vue"], function (require, exports, vue_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ViewBase = /** @class */ (function (_super) {
+        __extends(ViewBase, _super);
+        function ViewBase(options) {
+            return _super.call(this, options) || this;
+        }
+        return ViewBase;
+    }(vue_1.default));
+    exports.default = ViewBase;
+});
+define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component"], function (require, exports, ViewBase_1, vue_class_component_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Sidebar = /** @class */ (function (_super) {
+        __extends(Sidebar, _super);
+        function Sidebar() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Sidebar = __decorate([
+            vue_class_component_1.default({
+                template: "<aside class=\"main-sidebar\">\n    <ul class=\"sidebar-menu tree\" data-widget=\"tree\">\n        <li class=\"active treeview\">\n            <a href=\"#\">\n                <i class=\"fa fa-dashboard\" />\n                <span>Main</span>\n                <span class=\"pull-right-container\">\n                    <i class=\"fa fa-angle-left pull-right\" />\n                </span>\n            </a>\n            <ul>\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-circle-o\" />Finder\n                    </a>\n                </li>\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-circle-o\" />Playlists\n                    </a>\n                </li>\n            </ul>\n        </li>\n        <li class=\"treeview\">\n            <a href=\"#\">\n                <i class=\"fa fa-dashboard\" />\n                <span>Settings</span>\n                <span class=\"pull-right-container\">\n                    <i class=\"fa fa-angle-left pull-right\" />\n                </span>\n            </a>\n            <ul>\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-circle-o\" />Server\n                    </a>\n                </li>\n                <li>\n                    <a href=\"#\">\n                        <i class=\"fa fa-circle-o\" />Refresh\n                    </a>\n                </li>\n            </ul>\n        </li>\n    </ul>\n</aside>"
+            })
+        ], Sidebar);
+        return Sidebar;
+    }(ViewBase_1.default));
+    exports.default = Sidebar;
+});
+define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component"], function (require, exports, ViewBase_2, vue_class_component_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Finder = /** @class */ (function (_super) {
+        __extends(Finder, _super);
+        function Finder() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Finder = __decorate([
+            vue_class_component_2.default({
+                template: "<section class=\"content\">\n</section>"
+            })
+        ], Finder);
+        return Finder;
+    }(ViewBase_2.default));
+    exports.default = Finder;
+});
+define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/Sidebars/Sidebar", "Views/Finders/Finder"], function (require, exports, ViewBase_3, Sidebar_1, Finder_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var RootView = /** @class */ (function (_super) {
+        __extends(RootView, _super);
+        function RootView() {
+            return _super.call(this, {
+                template: "<div class=\"wrapper\" style=\"height: auto; min-height: 100%;\">\n    <sidebar ref=\"Sidebar\" />\n    <div class=\"content-wrapper\" style=\"height: 100%\">\n        <section class=\"content-header\">\n            <h1 ref=\"ContentTitle\"></h1>\n        </section>\n        <finder ref=\"Finder\" />\n    </div>\n</div>",
+                components: {
+                    'sidebar': Sidebar_1.default,
+                    'finder': Finder_1.default
+                }
+            }) || this;
+        }
+        return RootView;
+    }(ViewBase_3.default));
+    exports.default = RootView;
+});
+define("Controllers/MainController", ["require", "exports", "Views/RootView"], function (require, exports, RootView_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var RootContoller = /** @class */ (function () {
+        function RootContoller() {
+        }
+        RootContoller.prototype.Init = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    this._view = new RootView_1.default();
+                    this._view.$mount('#root');
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        return RootContoller;
+    }());
+    exports.default = RootContoller;
+});
+define("Main", ["require", "exports", "Libraries", "Models/Artists/ArtistStore", "Models/Genres/GenreStore", "Models/Albums/AlbumStore", "Controllers/MainController", "../css/site.css", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "vue2-admin-lte/src/lib/css", "vue2-admin-lte/src/lib/script"], function (require, exports, Libraries_4, ArtistStore_1, GenreStore_1, AlbumStore_1, MainController_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
         function Main() {
         }
         Main.prototype.Init = function () {
-            console.log('TS Start');
-            this.PolyfillPromise();
-            this.InitStores();
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            console.log('TS Start');
+                            this.PolyfillPromise();
+                            return [4 /*yield*/, this.InitStores()];
+                        case 1:
+                            _a.sent();
+                            return [4 /*yield*/, this.InitControllers()];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         Main.prototype.PolyfillPromise = function () {
             try {
@@ -350,7 +452,21 @@ define("Main", ["require", "exports", "Libraries", "Models/Artists/ArtistStore",
                             console.log(genres.GetAll());
                             console.log('Albums;');
                             console.log(albums.GetAll());
-                            return [2 /*return*/];
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Main.prototype.InitControllers = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this._rootController = new MainController_1.default();
+                            return [4 /*yield*/, this._rootController.Init()];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
                     }
                 });
             });

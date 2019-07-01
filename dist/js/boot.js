@@ -4,13 +4,6 @@
 // ** defineの引数functionは実際に使用されるまで実行されないため、
 // ** for文などのループで定義出来ない。
 
-// ダミーのCSS
-define('../css/site.css', ["exports"], function (exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = {};
-});
-
 // es6-promise
 define('es6-promise', ["exports"], function (exports) {
     "use strict";
@@ -77,6 +70,41 @@ define('vue-property-decorator', ["exports"], function (exports) {
         var val = instance[key];
         exports[key] = val;
     }
+});
+
+// ダミー: site.css
+define('../css/site.css', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
+});
+
+// ダミー: animate.css/animate.css
+define('animate.css/animate.css', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
+});
+
+// ダミー: font-awesome/css/font-awesome.css
+define('font-awesome/css/font-awesome.css', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
+});
+
+// ダミー: vue2-admin-lte/src/lib/css
+define('vue2-admin-lte/src/lib/css', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
+});
+
+// ダミー: vue2-admin-lte/src/lib/script
+define('vue2-admin-lte/src/lib/script', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
 });
 
 // AMD出力されたTSロジックを起動する。
