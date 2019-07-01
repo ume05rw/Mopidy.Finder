@@ -54,6 +54,30 @@ define('linq', ["exports"], function (exports) {
     exports.default = window.__globals['linq'];
 });
 
+// vue
+define('vue', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['vue'];
+});
+
+// vue-class-component
+define('vue-class-component', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['vue-class-component'];
+});
+
+// vue-property-decorator
+define('vue-property-decorator', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var instance = window.__globals['vue-property-decorator'];
+    for (var key in instance) {
+        var val = instance[key];
+        exports[key] = val;
+    }
+});
 
 // AMD出力されたTSロジックを起動する。
 var app = require(['Main']);

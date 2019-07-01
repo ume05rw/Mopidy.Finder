@@ -1,4 +1,6 @@
 import '../css/site.css';
+import 'vue2-admin-lte/src/lib/css';
+import 'vue2-admin-lte/src/lib/script';
 import Libraries from './Libraries';
 import ArtistStore from './Models/Artists/ArtistStore';
 import GenreStore from './Models/Genres/GenreStore';

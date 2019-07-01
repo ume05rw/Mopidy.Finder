@@ -61,7 +61,12 @@ module.exports = {
         extensions: [
             '.js',
             '.ts'
-        ]
+        ],
+
+        alias: {
+            'vue$': 'vue/dist/vue.esm.js',
+            'va': 'vue2-admin-lte/src'
+        }
     },
 
     devtool: 'inline-source-map'

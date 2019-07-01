@@ -308,7 +308,7 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Libraries", "Models/B
     }(StoreBase_3.default));
     exports.default = AlbumStore;
 });
-define("Main", ["require", "exports", "Libraries", "Models/Artists/ArtistStore", "Models/Genres/GenreStore", "Models/Albums/AlbumStore", "../css/site.css"], function (require, exports, Libraries_4, ArtistStore_1, GenreStore_1, AlbumStore_1) {
+define("Main", ["require", "exports", "Libraries", "Models/Artists/ArtistStore", "Models/Genres/GenreStore", "Models/Albums/AlbumStore", "../css/site.css", "vue2-admin-lte/src/lib/css", "vue2-admin-lte/src/lib/script"], function (require, exports, Libraries_4, ArtistStore_1, GenreStore_1, AlbumStore_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -359,50 +359,6 @@ define("Main", ["require", "exports", "Libraries", "Models/Artists/ArtistStore",
     }());
     var main = (new Main()).Init();
 });
-define("Definitions/ApiMethods", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ApiMethods = /** @class */ (function () {
-        function ApiMethods() {
-        }
-        ApiMethods.LibrarySearch = 'core.library.search';
-        ApiMethods.LibraryBrowse = 'core.library.browse';
-        return ApiMethods;
-    }());
-    exports.default = ApiMethods;
-});
-define("Models/Entities/Song", ["require", "exports", "lodash"], function (require, exports, _) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Song = /** @class */ (function () {
-        function Song(id, name) {
-            //if (!id || id === '')
-            //    throw new Error('id is required.');
-            if (!name || name === '')
-                throw new Error('name is required.');
-            this._id = (!id || id === '')
-                ? _.uniqueId('user_')
-                : id;
-            this._name = name;
-        }
-        Object.defineProperty(Song.prototype, "Id", {
-            get: function () {
-                return this._id;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Song.prototype, "Name", {
-            get: function () {
-                return this._name;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return Song;
-    }());
-    exports.default = Song;
-});
 define("Models/Mopidies/Ref", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -412,5 +368,17 @@ define("Models/Mopidies/Ref", ["require", "exports"], function (require, exports
         return Ref;
     }());
     exports.default = Ref;
+});
+define("Models/Mopidies/Methods/Library", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Library = /** @class */ (function () {
+        function Library() {
+        }
+        Library.Search = 'core.library.search';
+        Library.Browse = 'core.library.browse';
+        return Library;
+    }());
+    exports.default = Library;
 });
 //# sourceMappingURL=tsout.js.map
