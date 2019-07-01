@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MusicFront.Models.Tracks;
 using MusicFront.Models;
 using MusicFront.Models.Mopidies.Methods;
+using MusicFront.Models.Xhrs;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,77 +17,138 @@ namespace MusicFront.Controllers
     public class PlayerController : Controller
     {
         [HttpPost("ClearList")]
-        public async Task<bool> ClearList(
+        public async Task<XhrResponse> ClearList(
             [FromServices] TrackStore store
         )
         {
             var result = await store.ClearList();
-            return result;
+            return (!result)
+                ? XhrResponseFactory.CreateError($"Clear Failed.")
+                : XhrResponseFactory.CreateSucceeded();
         }
 
         [HttpPost("SetListByUris")]
-        public async Task<List<Track>> SetListByUris(
+        public async Task<XhrResponse> SetListByUris(
             [FromBody] string[] uris,
             [FromServices] TrackStore store
         )
         {
-            var result = await store.SetListByUris(uris);
-            return result;
+            try
+            {
+                var result = await store.SetListByUris(uris);
+                return XhrResponseFactory.CreateSucceeded(result);
+            }
+            catch (Exception ex)
+            {
+                return XhrResponseFactory.CreateError(ex.Message);
+            }
         }
 
         [HttpGet("GetList")]
-        public async Task<List<Track>> GetList(
+        public async Task<XhrResponse> GetList(
             [FromServices] TrackStore store
         )
         {
-            var result = await store.GetList();
-            return result;
+            try
+            {
+                var result = await store.GetList();
+                return XhrResponseFactory.CreateSucceeded(result);
+            }
+            catch (Exception ex)
+            {
+                return XhrResponseFactory.CreateError(ex.Message);
+            }
         }
 
         [HttpGet("GetState")]
-        public async Task<string> GetState()
+        public async Task<XhrResponse> GetState()
         {
-            var result = await Playback.GetState();
-            return result;
+            try
+            {
+                var result = await Playback.GetState();
+                return XhrResponseFactory.CreateSucceeded(result);
+            }
+            catch (Exception ex)
+            {
+                return XhrResponseFactory.CreateError(ex.Message);
+            }
         }
 
         [HttpGet("GetCurrentTrack")]
-        public async Task<Track> GetCurrentTrack(
+        public async Task<XhrResponse> GetCurrentTrack(
             [FromServices] TrackStore store
         )
         {
-            var result = await store.GetCurrentTrack();
-            return result;
+            try
+            {
+                var result = await store.GetCurrentTrack();
+                return XhrResponseFactory.CreateSucceeded(result);
+            }
+            catch (Exception ex)
+            {
+                return XhrResponseFactory.CreateError(ex.Message);
+            }
         }
 
         [HttpGet("Play/{tlId?}")]
-        public async Task<bool> Play(
+        public async Task<XhrResponse> Play(
             [FromRoute] int? tlId
         )
         {
-            var result = (tlId != null)
-                ? await Playback.Play((int)tlId)
-                : await Playback.Resume();
+            try
+            {
+                var result = (tlId != null)
+                    ? await Playback.Play((int)tlId)
+                    : await Playback.Resume();
 
-            return result;
+                return XhrResponseFactory.CreateSucceeded();
+            }
+            catch (Exception ex)
+            {
+                return XhrResponseFactory.CreateError(ex.Message);
+            }
         }
 
         [HttpGet("Pause")]
-        public async Task<bool> Pause()
+        public async Task<XhrResponse> Pause()
         {
-            return await Playback.Pause();
+            try
+            {
+                await Playback.Pause();
+                return XhrResponseFactory.CreateSucceeded();
+            }
+            catch (Exception ex)
+            {
+                return XhrResponseFactory.CreateError(ex.Message);
+            }
         }
 
         [HttpGet("Next")]
-        public async Task<bool> Next()
+        public async Task<XhrResponse> Next()
         {
-            return await Playback.Next();
+            try
+            {
+                await Playback.Next();
+                return XhrResponseFactory.CreateSucceeded();
+            }
+            catch (Exception ex)
+            {
+                return XhrResponseFactory.CreateError(ex.Message);
+            }
         }
 
         [HttpGet("Previous")]
-        public async Task<bool> Previous()
+        public async Task<XhrResponse> Previous()
         {
-            return await Playback.Previous();
+            try
+            {
+                await Playback.Previous();
+                return XhrResponseFactory.CreateSucceeded();
+            }
+            catch (Exception ex)
+            {
+                return XhrResponseFactory.CreateError(ex.Message);
+            }
         }
     }
 }

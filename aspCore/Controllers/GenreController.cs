@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
+using MusicFront.Models.Xhrs;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,46 +17,56 @@ namespace MusicFront.Controllers
     public class GenreController : Controller
     {
         [HttpGet("{id}")]
-        public Genre Index(
-            [FromQuery] int id,
+        public XhrResponse Index(
+            [FromRoute] int id,
             [FromServices] GenreStore store
         )
         {
-            return store.Get(id);
+            var genre = store.Get(id);
+            return (genre == null)
+                ? XhrResponseFactory.CreateError($"Genre Not Found: id={id}")
+                : XhrResponseFactory.CreateSucceeded(genre);
         }
 
-        [HttpGet("FindAll")]
-        public List<Genre> FindAll(
+        [HttpGet("GetList")]
+        public XhrResponse GetList(
             [FromQuery] string[] names,
             [FromQuery] int[] ids,
             [FromServices] GenreStore store
         )
         {
-            return store.FindAll(names, ids);
+            var genres = store.GetList(names, ids);
+            return XhrResponseFactory.CreateSucceeded(genres);
         }
 
-        [HttpGet("GetArtistsByGenreId/{genreId}")]
-        public Artist[] GetArtistsByGenreId(
-            [FromRoute] int genreId,
-            [FromServices] GenreStore store
+        [HttpGet("GetListByArtistId/{artistId}")]
+        public XhrResponse GetListByArtistId(
+            [FromRoute] int artistId,
+            [FromServices] GenreStore store,
+            [FromServices] ArtistStore artistStore
         )
         {
-            var genre = store.Get(genreId);
-            return (genre == null)
-                ? Array.Empty<Artist>()
-                : store.GetArtistsByGenre(genre).ToArray();
+            var artist = artistStore.Get(artistId);
+            return (artist == null)
+                ? XhrResponseFactory.CreateError($"Related Genres Not Found: artistId={artistId}")
+                : XhrResponseFactory.CreateSucceeded(
+                    store.GetListByArtist(artist).ToArray()
+                  );
         }
 
-        [HttpGet("GetAlbumsByGenreId/{genreId}")]
-        public Album[] GetAlbumsByGenreId(
-            [FromRoute] int genreId,
-            [FromServices] GenreStore store
+        [HttpGet("GetListByAlbumId/{albumId}")]
+        public XhrResponse GetListByAlbumId(
+            [FromRoute] int albumId,
+            [FromServices] GenreStore store,
+            [FromServices] AlbumStore albumStore
         )
         {
-            var genre = store.Get(genreId);
-            return (genre == null)
-                ? Array.Empty<Album>()
-                : store.GetAlbumsByGenre(genre).ToArray();
+            var album = albumStore.Get(albumId);
+            return (album == null)
+                ? XhrResponseFactory.CreateError($"Related Genres Not Found: albumId={albumId}")
+                : XhrResponseFactory.CreateSucceeded(
+                    store.GetListByAlbum(album).ToArray()
+                  );
         }
     }
 }

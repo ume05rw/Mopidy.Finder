@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Tracks;
+using MusicFront.Models.Xhrs;
 using System;
 using System.Threading.Tasks;
 
@@ -13,16 +14,21 @@ namespace MusicFront.Controllers
     public class TrackController : Controller
     {
         [HttpGet("GetTracksByAlbumId/{albumId}")]
-        public async Task<Track[]> GetArtistsByAlbumId(
+        public async Task<XhrResponse> GetArtistsByAlbumId(
             [FromRoute] int albumId,
             [FromServices] AlbumStore albums,
             [FromServices] TrackStore store
         )
         {
             var album = albums.Get(albumId);
-            return (album == null)
-                ? Array.Empty<Track>()
-                : (await store.GetTracksByAlbum(album)).ToArray();
+
+            if (album == null)
+                return XhrResponseFactory.CreateError($"Album Not Found: albumId={albumId}");
+
+            var tracks = (await store.GetTracksByAlbum(album)).ToArray();
+            return (tracks.Length <= 0)
+                ? XhrResponseFactory.CreateError($"Related Tracks Not Found: albumId={albumId}")
+                : XhrResponseFactory.CreateSucceeded(tracks);
         }
     }
 }
