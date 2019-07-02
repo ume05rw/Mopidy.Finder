@@ -9,6 +9,7 @@
     <None Remove="src\Main.ts" />
     <None Remove="src\ts\Libraries.ts" />
     <None Remove="src\ts\MainController.ts" />
+    <None Remove="src\ts\Models\Bases\JsonRpcStore.ts" />
     <None Remove="src\ts\Models\Relations\GenreArtist.ts" />
     <None Remove="src\ts\Models\SongStore.ts" />
     <None Remove="src\ts\Views\Bases\ViewBase.ts" />
@@ -38,16 +39,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="src\ts\Controllers\MainController.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Mopidies\Methods\Library.ts" />
+    <TypeScriptCompile Include="src\ts\Controllers\RootContoller.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />
     <TypeScriptCompile Include="src\ts\Main.ts" />
     <TypeScriptCompile Include="src\ts\Models\Albums\Album.ts" />
     <TypeScriptCompile Include="src\ts\Models\Artists\Artist.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Bases\JsonRpcStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Relations\ArtistAlbum.ts" />
     <TypeScriptCompile Include="src\ts\Models\Genres\Genre.ts" />
     <TypeScriptCompile Include="src\ts\Models\Relations\GenreAlbum.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Mopidies\Ref.ts" />
     <TypeScriptCompile Include="src\ts\Models\Relations\GenreArtist.ts" />
     <TypeScriptCompile Include="src\ts\Models\Albums\AlbumStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Artists\ArtistStore.ts" />

@@ -1,39 +1,31 @@
 import Axios, { AxiosInstance } from 'axios';
 import * as qs from 'qs';
 import Libraries from '../../Libraries';
-import { IEnumerable } from 'linq';
+import * as Enumerable from 'linq';
 
-interface JsonRpcFrame {
-    jsonrpc: string;
+export interface XhrError {
+    Message: string;
+    Code?: number;
+    FieldName?: string;
 }
 
-interface JsonRpcRequest extends JsonRpcFrame {
-    method: string;
-    params?: { [name: string]: any };
-    id?: number;
+export interface XhrResult {
+    Succeeded: boolean;
+    Result?: any;
+    Errors?: XhrError[]
 }
 
-interface JsonRpcResult extends JsonRpcFrame {
-    result?: any;
-    error?: any;
-    id: number;
-}
-
-export default class StoreBase<T> {
+export default abstract class StoreBase<T> {
 
     // Axios+qsによるURIパラメータ生成
     // https://blog.ryou103.com/post/axios-send-object-query/
-    private static ParamsSerializer(params: any): string {
+    protected static ParamsSerializer(params: any): string {
         return qs.stringify(params);
     }
 
-    public Entities: IEnumerable<T>;
+    protected Enumerable: typeof Enumerable = Libraries.Enumerable;
 
-    public GetAll(): T[] {
-        return this.Entities.toArray();
-    }
-
-    private static XhrInstance: AxiosInstance = Axios.create({
+    protected static XhrInstance: AxiosInstance = Axios.create({
         //// APIの基底URLが存在するとき
         baseURL: 'http://localhost:8080/', 
         headers: {
@@ -44,64 +36,91 @@ export default class StoreBase<T> {
         responseType: 'json' 
     });
 
-    private static IdCounter: number = 1;
+    private ParseResponse(data: any): XhrResult {
+        if (!data)
+            return {
+                Succeeded: false,
+                Errors: [{
+                    Message: 'Unexpected Error'
+                }]
+            } as XhrResult;
 
+        return ((typeof data == 'object') && data.hasOwnProperty('Succeeded'))
+            // dataが定型応答のとき
+            ? data as XhrResult
+            // dataが定型応答のとき
+            : {
+                Succeeded: true,
+                Result: data
+            } as XhrResult;
+    }
 
-    public async ApiGet(url: string, params: any = null): Promise<any> {
+    protected async QueryGet(url: string, params: any = null): Promise<XhrResult> {
         try {
-            const result = await StoreBase.XhrInstance.get(url, {
+            const response = await StoreBase.XhrInstance.get(url, {
                 params: params,
                 paramsSerializer: StoreBase.ParamsSerializer
             });
 
-            return result.data;
-        } catch (e) {
-
+            return this.ParseResponse(response.data);
+        } catch (ex) {
+            console.error(`QueryGet.Error: url=${url}`);
+            if (params) {
+                console.error('params:')
+                console.error(params);
+            }
+            console.error(ex);
         }
     }
 
+    protected async QueryPost(url: string, params: any = null): Promise<XhrResult> {
+        try {
+            const response = await StoreBase.XhrInstance.post(url, params);
 
-    private JsonRpcCall(request: JsonRpcRequest): Promise<JsonRpcResult> {
-        return new Promise<JsonRpcResult>(async (resolve: (value: JsonRpcResult) => void) => {
-            request.jsonrpc = '2.0';
-
-            try {
-                const result = await StoreBase.XhrInstance.post('JsonRpc', request);
-
-                resolve(result.data as JsonRpcResult);
-            } catch (ex) {
-                const error = {
-                    id: request.id,
-                    error: `Network Error: ${ex}`
-                } as JsonRpcResult;
-
-                resolve(error);
+            return this.ParseResponse(response.data);
+        } catch (ex) {
+            console.error(`QueryPost.Error: url=${url}`);
+            if (params) {
+                console.error('params:')
+                console.error(params);
             }
-        });
-    };
+            console.error(ex);
 
-    private GetRequest(method: string, params: any = null): JsonRpcRequest {
-        const request = {
-            method: method
-        } as JsonRpcRequest;
-
-        if (params)
-            request.params = params;
-
-        return request;
+            return this.ParseResponse(null);
+        }
     }
 
-    protected JsonRpcQuery(method: string, params: any = null): Promise<JsonRpcResult> {
-        const request = this.GetRequest(method, params);
+    protected async RawQueryPut(url: string, params: any = null): Promise<XhrResult> {
+        try {
+            const response = await StoreBase.XhrInstance.put(url, params);
 
-        request.id = StoreBase.IdCounter;
-        StoreBase.IdCounter++;
+            return this.ParseResponse(response.data);
+        } catch (ex) {
+            console.error(`QueryPut.Error: url=${url}`);
+            if (params) {
+                console.error('params:')
+                console.error(params);
+            }
+            console.error(ex);
 
-        return this.JsonRpcCall(request);
+            return this.ParseResponse(null);
+        }
     }
 
-    protected JsonRpcNotice(method: string, params: any = null): void {
-        const request = this.GetRequest(method, params);
-        this.JsonRpcCall(request);
+    protected async QueryDelete(url: string, params: any = null): Promise<XhrResult> {
+        try {
+            const response = await StoreBase.XhrInstance.delete(url, params);
+
+            return this.ParseResponse(response.data);
+        } catch (ex) {
+            console.error(`QueryDelete.Error: url=${url}`);
+            if (params) {
+                console.error('params:')
+                console.error(params);
+            }
+            console.error(ex);
+
+            return this.ParseResponse(null);
+        }
     }
 }

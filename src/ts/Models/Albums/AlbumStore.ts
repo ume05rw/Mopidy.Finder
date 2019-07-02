@@ -1,13 +1,39 @@
-import Libraries from '../../Libraries';
+import { IEnumerable } from 'linq';
+import Artist from '../Artists/Artist';
 import StoreBase from '../Bases/StoreBase';
 import Album from './Album';
+import Genre from '../Genres/Genre';
 
 export default class AlbumStore extends StoreBase<Album> {
 
-    public async Init(): Promise<boolean> {
-        const entities: Album[] = await this.ApiGet('Album/GetList');
-        this.Entities = Libraries.Enumerable.from(entities);
+    public async GetList(): Promise<IEnumerable<Album>> {
+        const result = await this.QueryGet('Album/GetList');
+        const entities = (result.Succeeded)
+            ? result.Result as Album[]
+            : [];
 
-        return true;
+        return this.Enumerable.from(entities);
+    }
+
+    public async GetListByArtist(artist: Artist): Promise<IEnumerable<Album>> {
+        const result = await this.QueryGet('Album/GetListByArtistId', {
+            artistId: artist.Id
+        });
+        const entities = (result.Succeeded)
+            ? result.Result as Album[]
+            : [];
+
+        return this.Enumerable.from(entities);
+    }
+
+    public async GetListByGenre(genre: Genre): Promise<IEnumerable<Album>> {
+        const result = await this.QueryGet('Album/GetListByGenreId', {
+            genreId: genre.Id
+        });
+        const entities = (result.Succeeded)
+            ? result.Result as Album[]
+            : [];
+
+        return this.Enumerable.from(entities);
     }
 }
