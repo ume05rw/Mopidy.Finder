@@ -6,8 +6,8 @@ import ViewBase from '../Bases/ViewBase';
 @Component({
     template: `<li class="nav-item"
                    ref="Li" >
-    <a  href="javascript:void(0)"
-        @click="OnClick" >
+    <a href="javascript:void(0)" class="d-inline-block w-100"
+       @click="OnClick" >
         {{ entity.Name }}
     </a>
 </li>`

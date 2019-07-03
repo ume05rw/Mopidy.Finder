@@ -1,5 +1,7 @@
-.content-wrapper-fill-height {
-    height: calc(100% - 53px);
+.list-scrollable {
+    /* 57, 64, 49 **/
+    height: calc(100vh - 190px);
+    overflow-y: scroll;
 }
 /*.flexcolumn {
     display: -webkit-flex;
