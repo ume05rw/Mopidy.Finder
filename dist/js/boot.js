@@ -11,6 +11,13 @@ define('es6-promise', ["exports"], function (exports) {
     exports.default = window.__globals['es6-promise'];
 });
 
+// jquery
+define('jquery', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['jquery'];
+});
+
 // lodash
 define('lodash', ["exports"], function (exports) {
     "use strict";
@@ -93,15 +100,15 @@ define('font-awesome/css/font-awesome.css', ["exports"], function (exports) {
     exports.default = {};
 });
 
-// ダミー: vue2-admin-lte/src/lib/css
-define('vue2-admin-lte/src/lib/css', ["exports"], function (exports) {
+// ダミー: admin-lte/dist/css/adminlte.css
+define('admin-lte/dist/css/adminlte.css', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {};
 });
 
-// ダミー: vue2-admin-lte/src/lib/script
-define('vue2-admin-lte/src/lib/script', ["exports"], function (exports) {
+// ダミー: admin-lte/dist/js/adminlte.js
+define('admin-lte/dist/js/adminlte.js', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {};

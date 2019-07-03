@@ -8,6 +8,7 @@ export default class RootContoller {
 
         this._view = new RootView();
         this._view.$mount('#root');
+        await this._view.Initialize();
 
         return true;
     }

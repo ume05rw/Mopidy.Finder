@@ -1,7 +1,8 @@
+import ISelectionItem from '../Bases/ISelectionItem';
 import ArtistAlbum from '../Relations/ArtistAlbum';
 import GenreArtist from '../Relations/GenreArtist';
 
-export default class Artist {
+export default class Artist implements ISelectionItem {
     public Id: number;
     public Name: string;
     public LowerName: string;

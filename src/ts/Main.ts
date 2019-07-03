@@ -1,7 +1,7 @@
 import 'animate.css/animate.css';
 import 'font-awesome/css/font-awesome.css';
-import 'vue2-admin-lte/src/lib/css';
-import 'vue2-admin-lte/src/lib/script';
+import 'admin-lte/dist/css/adminlte.css';
+import 'admin-lte/dist/js/adminlte.js';
 import '../css/site.css';
 import RootContoller from './Controllers/RootContoller';
 import Libraries from './Libraries';

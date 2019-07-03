@@ -1,6 +1,7 @@
 const path = require('path');
 const outDir = path.resolve(__dirname, "dist", "js");
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const webpack = require('webpack');
+//const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
 
@@ -75,6 +76,13 @@ module.exports = {
             'va': 'vue2-admin-lte/src'
         }
     },
+
+    plugins: [
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery'
+        })
+    ],
 
     devtool: 'inline-source-map'
 };

@@ -1,1 +1,1 @@
-{"version":3,"file":"Tracks.js","sourceRoot":"","sources":["Tracks.ts"],"names":[],"mappings":";;AAIA;IAAA;IAgBA,CAAC;IAAD,YAAC;AAAD,CAAC,AAhBD,IAgBC"}
+{"version":3,"file":"Track.js","sourceRoot":"","sources":["Track.ts"],"names":[],"mappings":";;AAKA;IAAA;IAwBA,CAAC;IAPG,sBAAW,qBAAE;aAAb;YACI,OAAO,IAAI,CAAC,IAAI,CAAC;QACrB,CAAC;;;OAAA;IAED,sBAAW,4BAAS;aAApB;YACI,OAAO,IAAI,CAAC,IAAI,CAAC,WAAW,EAAE,CAAC;QACnC,CAAC;;;OAAA;IACL,YAAC;AAAD,CAAC,AAxBD,IAwBC"}

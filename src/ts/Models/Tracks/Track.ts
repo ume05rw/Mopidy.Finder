@@ -1,8 +1,9 @@
+import ISelectionItem from '../Bases/ISelectionItem';
 import Genre from '../Genres/Genre';
 import Album from '../Albums/Album';
 import Artist from '../Artists/Artist';
 
-export default class Track {
+export default class Track implements ISelectionItem {
     public Name: string;
     public Uri: string;
     public TlId: number;
@@ -18,4 +19,12 @@ export default class Track {
     public Artists: Artist[];
     public Composers: Artist[];
     public Performaers: Artist[];
+
+    public get Id(): number {
+        return this.TlId;
+    }
+
+    public get LowerName(): string {
+        return this.Name.toLowerCase();
+    }
 }

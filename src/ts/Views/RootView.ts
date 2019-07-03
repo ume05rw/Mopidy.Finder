@@ -10,7 +10,7 @@ export default class RootView extends ViewBase {
     <sidebar ref="Sidebar" />
     <div class="content-wrapper" style="height: 100%">
         <section class="content-header">
-            <h1 ref="ContentTitle"></h1>
+            <h1 ref="ContentTitle">{{ contentTitleString }}</h1>
         </section>
         <finder ref="Finder" />
     </div>
@@ -21,4 +21,7 @@ export default class RootView extends ViewBase {
             }
         });
     }
+
+    private contentTitleString: string = 'Finder';
+
 }
