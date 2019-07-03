@@ -14,13 +14,13 @@ namespace MusicFront.Controllers
     public class TrackController : Controller
     {
         [HttpGet("GetTracksByAlbumId/{albumId}")]
-        public async Task<XhrResponse> GetArtistsByAlbumId(
+        public async Task<XhrResponse> GetTracksByAlbumId(
             [FromRoute] int albumId,
-            [FromServices] AlbumStore albums,
+            [FromServices] AlbumStore albumStore,
             [FromServices] TrackStore store
         )
         {
-            var album = albums.Get(albumId);
+            var album = albumStore.Get(albumId);
 
             if (album == null)
                 return XhrResponseFactory.CreateError($"Album Not Found: albumId={albumId}");

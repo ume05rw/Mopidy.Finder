@@ -9,9 +9,12 @@
     <None Remove="src\Main.ts" />
     <None Remove="src\ts\Libraries.ts" />
     <None Remove="src\ts\MainController.ts" />
-    <None Remove="src\ts\Models\Bases\JsonRpcStore.ts" />
+    <None Remove="src\ts\Models\Bases\JsonRpcQueryableBase.ts" />
+    <None Remove="src\ts\Models\Bases\XhrQueryableBase.ts" />
     <None Remove="src\ts\Models\Relations\GenreArtist.ts" />
     <None Remove="src\ts\Models\SongStore.ts" />
+    <None Remove="src\ts\Models\Tracks\Track.ts" />
+    <None Remove="src\ts\Models\Tracks\TrackStore.ts" />
     <None Remove="src\ts\Views\Bases\ViewBase.ts" />
     <None Remove="src\ts\Views\Finders\Finder.ts" />
     <None Remove="src\ts\Views\RootView.ts" />
@@ -44,7 +47,8 @@
     <TypeScriptCompile Include="src\ts\Main.ts" />
     <TypeScriptCompile Include="src\ts\Models\Albums\Album.ts" />
     <TypeScriptCompile Include="src\ts\Models\Artists\Artist.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Bases\JsonRpcStore.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Bases\JsonRpcQueryableBase.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Bases\XhrQueryableBase.ts" />
     <TypeScriptCompile Include="src\ts\Models\Relations\ArtistAlbum.ts" />
     <TypeScriptCompile Include="src\ts\Models\Genres\Genre.ts" />
     <TypeScriptCompile Include="src\ts\Models\Relations\GenreAlbum.ts" />
@@ -53,6 +57,8 @@
     <TypeScriptCompile Include="src\ts\Models\Artists\ArtistStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Genres\GenreStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Bases\StoreBase.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Tracks\Track.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Tracks\TrackStore.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\ViewBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Finder.ts" />
     <TypeScriptCompile Include="src\ts\Views\RootView.ts" />

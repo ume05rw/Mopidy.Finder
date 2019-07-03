@@ -1,4 +1,4 @@
-import StoreBase from './StoreBase';
+import XhrQueryableBase from './XhrQueryableBase';
 
 interface JsonRpcParamsBase {
     jsonrpc: string;
@@ -16,8 +16,7 @@ interface JsonRpcResultParams extends JsonRpcParamsBase {
     id: number;
 }
 
-export default abstract class JsonRpcStoreBase<T> extends StoreBase<T> {
-
+export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
     private static readonly Url: string = 'JsonRpc';
     private static IdCounter: number = 1;
 
@@ -25,7 +24,7 @@ export default abstract class JsonRpcStoreBase<T> extends StoreBase<T> {
         params.jsonrpc = '2.0';
 
         try {
-            const response = await StoreBase.XhrInstance.post(JsonRpcStoreBase.Url, params);
+            const response = await XhrQueryableBase.XhrInstance.post(JsonRpcQueryableBase.Url, params);
             const result = response.data as JsonRpcResultParams;
 
             if (result.error) {
@@ -53,13 +52,13 @@ export default abstract class JsonRpcStoreBase<T> extends StoreBase<T> {
     protected async JsonRpcRequest(method: string, params: any = null): Promise<JsonRpcResultParams> {
         const query = {
             method: method,
-            id: JsonRpcStoreBase.IdCounter
+            id: JsonRpcQueryableBase.IdCounter
         } as JsonRpcQueryParams;
 
         if (params)
             query.params = params;
-        
-        JsonRpcStoreBase.IdCounter++;
+
+        JsonRpcQueryableBase.IdCounter++;
 
         const result = await this.QueryJsonRpc(query);
 

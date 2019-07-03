@@ -58,10 +58,10 @@ namespace MusicFront.Controllers
         public XhrResponse GetListByAlbumId(
             [FromRoute] int albumId,
             [FromServices] ArtistStore store,
-            [FromServices] AlbumStore albunStore
+            [FromServices] AlbumStore albumStore
         )
         {
-            var album = albunStore.Get(albumId);
+            var album = albumStore.Get(albumId);
             return (album == null)
                 ? XhrResponseFactory.CreateError($"Related Artists Not Found: albumId={albumId}")
                 : XhrResponseFactory.CreateSucceeded(
