@@ -6,9 +6,9 @@ export default class RootView extends ViewBase {
 
     public constructor() {
         super({
-            template: `<div class="wrapper" style="height: auto; min-height: 100%;">
+            template: `<div class="wrapper" style="height: 100%; min-height: 100%;">
     <sidebar ref="Sidebar" />
-    <div class="content-wrapper" style="height: 100%">
+    <div class="content-wrapper " style="height: 100%">
         <section class="content-header">
             <h1 ref="ContentTitle">{{ contentTitleString }}</h1>
         </section>

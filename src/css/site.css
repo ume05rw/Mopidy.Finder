@@ -1,16 +1,15 @@
-html,
-body,
-div#root {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
-    background-color: #000000;
-    color: #FFFFFF;
-    font-size: 1.6vh; /* 描画領域の縦1.6% を基準フォントサイズとする。 */
-    /* ピンチズームを禁止する目的。
-     * noneにするとスクロールしなくなるとの記事があったため、panのみ許可とした。
-     */
-    touch-action: pan-x pan-y;
+.content-wrapper-fill-height {
+    height: calc(100% - 53px);
 }
+/*.flexcolumn {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column nowrap;
+    flex-flow: column nowrap;
+}
+.flexcolumn-stretch {
+    align-items: stretch;
+}
+.scroll-y {
+    overflow-y: scroll;
+}*/
