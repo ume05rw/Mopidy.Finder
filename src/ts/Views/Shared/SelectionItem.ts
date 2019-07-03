@@ -4,8 +4,8 @@ import ISelectionItem from '../../Models/Bases/ISelectionItem';
 import ViewBase from '../Bases/ViewBase';
 
 @Component({
-    template: `<li  class=""
-                    ref="Li" >
+    template: `<li class="nav-item"
+                   ref="Li" >
     <a  href="javascript:void(0)"
         @click="OnClick" >
         {{ entity.Name }}

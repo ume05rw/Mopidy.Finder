@@ -394,7 +394,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
         ], SelectionItem.prototype, "entity", void 0);
         SelectionItem = SelectionItem_1 = __decorate([
             vue_class_component_2.default({
-                template: "<li  class=\"\"\n                    ref=\"Li\" >\n    <a  href=\"javascript:void(0)\"\n        @click=\"OnClick\" >\n        {{ entity.Name }}\n    </a>\n</li>"
+                template: "<li class=\"nav-item\"\n                   ref=\"Li\" >\n    <a  href=\"javascript:void(0)\"\n        @click=\"OnClick\" >\n        {{ entity.Name }}\n    </a>\n</li>"
             })
         ], SelectionItem);
         return SelectionItem;
@@ -433,9 +433,11 @@ define("Views/Finders/GenreList", ["require", "exports", "Views/Bases/ViewBase",
         };
         GenreList.prototype.OnClickRemove = function () {
         };
+        GenreList.prototype.OnClickItem = function () {
+        };
         GenreList = __decorate([
             vue_class_component_3.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"box box-solid\">\n        <div class=\"box-header with-border bg-green\">\n            <h3 class=\"box-title\">Genre</h3>\n            <div class=\"box-tools pull-right\">\n                <button type=\"button\"\n                        class=\"btn btn-box-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"box-footer no-padding\">\n            <ul class=\"nav nav-stacked\">\n            <template v-for=\"genre in genres\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"genre\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genre</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body\">\n            <ul class=\"nav nav-pills flex-column\">\n            <template v-for=\"genre in genres\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"genre\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_2.default
                 }

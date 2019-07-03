@@ -6,19 +6,19 @@ import Genre from 'src/ts/Models/Genres/Genre';
 
 @Component({
     template: `<div class="col-md-3">
-    <div class="box box-solid">
-        <div class="box-header with-border bg-green">
-            <h3 class="box-title">Genre</h3>
-            <div class="box-tools pull-right">
+    <div class="card">
+        <div class="card-header with-border bg-green">
+            <h3 class="card-title">Genre</h3>
+            <div class="card-tools">
                 <button type="button"
-                        class="btn btn-box-tool"
+                        class="btn btn-tool"
                         @click="OnClickRemove" >
                     <i class="fa fa-remove" />
                 </button>
             </div>
         </div>
-        <div class="box-footer no-padding">
-            <ul class="nav nav-stacked">
+        <div class="card-body">
+            <ul class="nav nav-pills flex-column">
             <template v-for="genre in genres">
                 <selection-item
                     ref="Items"
@@ -49,6 +49,10 @@ export default class GenreList extends ViewBase {
     }
 
     private OnClickRemove(): void {
+
+    }
+
+    private OnClickItem(): void {
 
     }
 }
