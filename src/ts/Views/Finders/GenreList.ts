@@ -5,8 +5,8 @@ import SelectionItem from '../Shared/SelectionItem';
 import Genre from 'src/ts/Models/Genres/Genre';
 
 @Component({
-    template: `<div class="col-md-3 flex-column">
-    <div class="card d-flex align-items-stretch">
+    template: `<div class="col-md-3 h-100">
+    <div class="card h-100 d-flex flex-column">
         <div class="card-header with-border bg-green">
             <h3 class="card-title">Genre</h3>
             <div class="card-tools">
@@ -17,8 +17,8 @@ import Genre from 'src/ts/Models/Genres/Genre';
                 </button>
             </div>
         </div>
-        <div class="card-body flex-column">
-            <ul class="nav nav-pills">
+        <div class="card-body align-items-stretch">
+            <ul class="nav nav-pills h-100 d-flex flex-column">
             <template v-for="genre in genres">
                 <selection-item
                     ref="Items"

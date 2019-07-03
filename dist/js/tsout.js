@@ -437,7 +437,7 @@ define("Views/Finders/GenreList", ["require", "exports", "Views/Bases/ViewBase",
         };
         GenreList = __decorate([
             vue_class_component_3.default({
-                template: "<div class=\"col-md-3 flex-column\">\n    <div class=\"card d-flex align-items-stretch\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genre</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body flex-column\">\n            <ul class=\"nav nav-pills\">\n            <template v-for=\"genre in genres\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"genre\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3 h-100\">\n    <div class=\"card h-100 d-flex flex-column\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genre</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body align-items-stretch\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column\">\n            <template v-for=\"genre in genres\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"genre\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_2.default
                 }
@@ -464,7 +464,7 @@ define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "v
         });
         Finder = __decorate([
             vue_class_component_4.default({
-                template: "<section class=\"content\">\n    <div class=\"row\">\n        <genre-list ref=\"GenreList\" />\n    </div>\n</section>",
+                template: "<section class=\"content h-100\">\n    <div class=\"row\">\n        <genre-list ref=\"GenreList\" />\n    </div>\n</section>",
                 components: {
                     'genre-list': GenreList_1.default
                 }
@@ -481,7 +481,7 @@ define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/S
         __extends(RootView, _super);
         function RootView() {
             var _this = _super.call(this, {
-                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <sidebar ref=\"Sidebar\" />\n    <div class=\"content-wrapper \" style=\"height: 100%\">\n        <section class=\"content-header\">\n            <h1 ref=\"ContentTitle\">{{ contentTitleString }}</h1>\n        </section>\n        <finder ref=\"Finder\" />\n    </div>\n</div>",
+                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <sidebar ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100\">\n        <section class=\"content-header\">\n            <h1 ref=\"ContentTitle\">{{ contentTitleString }}</h1>\n        </section>\n        <finder ref=\"Finder\" />\n    </div>\n</div>",
                 components: {
                     'sidebar': Sidebar_1.default,
                     'finder': Finder_1.default

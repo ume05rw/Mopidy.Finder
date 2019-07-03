@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 import GenreList from './GenreList';
 
 @Component({
-    template: `<section class="content">
+    template: `<section class="content h-100">
     <div class="row">
         <genre-list ref="GenreList" />
     </div>
