@@ -21,6 +21,7 @@
     <None Remove="src\ts\Views\Finders\ArtistList.ts" />
     <None Remove="src\ts\Views\Finders\Finder.ts" />
     <None Remove="src\ts\Views\Finders\GenreList.ts" />
+    <None Remove="src\ts\Views\Finders\TrackList.ts" />
     <None Remove="src\ts\Views\RootView.ts" />
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
     <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
@@ -70,6 +71,7 @@
     <TypeScriptCompile Include="src\ts\Views\Finders\ArtistList.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Finder.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\GenreList.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Finders\TrackList.ts" />
     <TypeScriptCompile Include="src\ts\Views\RootView.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionItem.ts" />
     <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />
@@ -97,7 +99,7 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="npm run build:dev" />
+    <Exec Command="npx webpack --config webpack.config.dev.js" />
   </Target>
 
 </Project>

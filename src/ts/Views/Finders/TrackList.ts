@@ -1,13 +1,13 @@
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
-import ArtistStore from '../../Models/Artists/ArtistStore';
+import TrackStore from '../../Models/Tracks/TrackStore';
 import SelectionItem from '../Shared/SelectionItem';
-import Artist from 'src/ts/Models/Artists/Artist';
+import Track from 'src/ts/Models/Tracks/Track';
 
 @Component({
-    template: `<div class="col-md-2 h-100">
+    template: `<div class="col-md-6 h-100">
     <div class="card h-100">
-        <div class="card-header with-border bg-info">
+        <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Artists</h3>
             <div class="card-tools">
                 <button type="button"
@@ -33,17 +33,17 @@ import Artist from 'src/ts/Models/Artists/Artist';
         'selection-item': SelectionItem
     }
 })
-export default class ArtistList extends ViewBase {
+export default class TrackList extends ViewBase {
 
-    private store: ArtistStore = new ArtistStore();
-    private entities: Artist[] = [];
+    private store: TrackStore = new TrackStore();
+    private entities: Track[] = [];
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        this.entities = (await this.store.GetList())
-            .orderBy(e => e.Name)
-            .toArray();
+        //this.entities = (await this.store.GetList())
+        //    .orderBy(e => e.Name)
+        //    .toArray();
 
         return true;
     }

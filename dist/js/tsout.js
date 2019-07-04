@@ -437,7 +437,7 @@ define("Views/Finders/GenreList", ["require", "exports", "Views/Bases/ViewBase",
         };
         GenreList = __decorate([
             vue_class_component_3.default({
-                template: "<div class=\"col-md-3 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_2.default
                 }
@@ -543,7 +543,7 @@ define("Views/Finders/ArtistList", ["require", "exports", "Views/Bases/ViewBase"
         };
         ArtistList = __decorate([
             vue_class_component_4.default({
-                template: "<div class=\"col-md-3 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_3.default
                 }
@@ -663,7 +663,7 @@ define("Views/Finders/AlbumList", ["require", "exports", "Views/Bases/ViewBase",
         };
         AlbumList = __decorate([
             vue_class_component_5.default({
-                template: "<div class=\"col-md-3 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_4.default
                 }
@@ -673,7 +673,103 @@ define("Views/Finders/AlbumList", ["require", "exports", "Views/Bases/ViewBase",
     }(ViewBase_5.default));
     exports.default = AlbumList;
 });
-define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Views/Finders/GenreList", "Views/Finders/ArtistList", "Views/Finders/AlbumList"], function (require, exports, ViewBase_6, vue_class_component_6, GenreList_1, ArtistList_1, AlbumList_1) {
+define("Models/Tracks/Track", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Track = /** @class */ (function () {
+        function Track() {
+        }
+        Object.defineProperty(Track.prototype, "Id", {
+            get: function () {
+                return this.TlId;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Track.prototype, "LowerName", {
+            get: function () {
+                return this.Name.toLowerCase();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Track;
+    }());
+    exports.default = Track;
+});
+define("Models/Tracks/TrackStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var TrackStore = /** @class */ (function (_super) {
+        __extends(TrackStore, _super);
+        function TrackStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        TrackStore.prototype.GetListByAlbum = function (album) {
+            return __awaiter(this, void 0, void 0, function () {
+                var result, entities;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Track/GetTracksByAlbumId', {
+                                albumId: album.Id
+                            })];
+                        case 1:
+                            result = _a.sent();
+                            entities = (result.Succeeded)
+                                ? result.Result
+                                : [];
+                            return [2 /*return*/, this.Enumerable.from(entities)];
+                    }
+                });
+            });
+        };
+        return TrackStore;
+    }(StoreBase_4.default));
+    exports.default = TrackStore;
+});
+define("Views/Finders/TrackList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Tracks/TrackStore", "Views/Shared/SelectionItem"], function (require, exports, ViewBase_6, vue_class_component_6, TrackStore_1, SelectionItem_5) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var TrackList = /** @class */ (function (_super) {
+        __extends(TrackList, _super);
+        function TrackList() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.store = new TrackStore_1.default();
+            _this.entities = [];
+            return _this;
+        }
+        TrackList.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            //this.entities = (await this.store.GetList())
+                            //    .orderBy(e => e.Name)
+                            //    .toArray();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.OnClickRemove = function () {
+        };
+        TrackList.prototype.OnClickItem = function () {
+        };
+        TrackList = __decorate([
+            vue_class_component_6.default({
+                template: "<div class=\"col-md-6 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                components: {
+                    'selection-item': SelectionItem_5.default
+                }
+            })
+        ], TrackList);
+        return TrackList;
+    }(ViewBase_6.default));
+    exports.default = TrackList;
+});
+define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Views/Finders/GenreList", "Views/Finders/ArtistList", "Views/Finders/AlbumList", "Views/Finders/TrackList"], function (require, exports, ViewBase_7, vue_class_component_7, GenreList_1, ArtistList_1, AlbumList_1, TrackList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -702,21 +798,29 @@ define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "v
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Finder.prototype, "TrackList", {
+            get: function () {
+                return this.$refs.TrackList;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Finder = __decorate([
-            vue_class_component_6.default({
-                template: "<section class=\"content h-100\">\n    <div class=\"row\">\n        <genre-list ref=\"GenreList\" />\n        <artist-list ref=\"ArtistList\" />\n        <album-list ref=\"AlbumList\" />\n    </div>\n</section>",
+            vue_class_component_7.default({
+                template: "<section class=\"content h-100\">\n    <div class=\"row\">\n        <genre-list ref=\"GenreList\" />\n        <artist-list ref=\"ArtistList\" />\n        <album-list ref=\"AlbumList\" />\n        <track-list ref=\"TrackList\" />\n    </div>\n</section>",
                 components: {
                     'genre-list': GenreList_1.default,
                     'artist-list': ArtistList_1.default,
-                    'album-list': AlbumList_1.default
+                    'album-list': AlbumList_1.default,
+                    'track-list': TrackList_1.default
                 }
             })
         ], Finder);
         return Finder;
-    }(ViewBase_6.default));
+    }(ViewBase_7.default));
     exports.default = Finder;
 });
-define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/Sidebars/Sidebar", "Views/Finders/Finder"], function (require, exports, ViewBase_7, Sidebar_1, Finder_1) {
+define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/Sidebars/Sidebar", "Views/Finders/Finder"], function (require, exports, ViewBase_8, Sidebar_1, Finder_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -733,7 +837,7 @@ define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/S
             return _this;
         }
         return RootView;
-    }(ViewBase_7.default));
+    }(ViewBase_8.default));
     exports.default = RootView;
 });
 define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], function (require, exports, RootView_1) {
@@ -899,59 +1003,5 @@ define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases
         return JsonRpcQueryableBase;
     }(XhrQueryableBase_2.default));
     exports.default = JsonRpcQueryableBase;
-});
-define("Models/Tracks/Track", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Track = /** @class */ (function () {
-        function Track() {
-        }
-        Object.defineProperty(Track.prototype, "Id", {
-            get: function () {
-                return this.TlId;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Track.prototype, "LowerName", {
-            get: function () {
-                return this.Name.toLowerCase();
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return Track;
-    }());
-    exports.default = Track;
-});
-define("Models/Tracks/TrackStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_4) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var TrackStore = /** @class */ (function (_super) {
-        __extends(TrackStore, _super);
-        function TrackStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        TrackStore.prototype.GetListByAlbum = function (album) {
-            return __awaiter(this, void 0, void 0, function () {
-                var result, entities;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Track/GetTracksByAlbumId', {
-                                albumId: album.Id
-                            })];
-                        case 1:
-                            result = _a.sent();
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
-                    }
-                });
-            });
-        };
-        return TrackStore;
-    }(StoreBase_4.default));
-    exports.default = TrackStore;
 });
 //# sourceMappingURL=tsout.js.map

@@ -74,7 +74,13 @@
         "sourceMap": true,
 
         // コメントを削除するか否か
-        "removeComments": false
+        "removeComments": false,
+
+        // モジュール単位の出力形式指定: commonjs, amd, system, umd, es2015
+        "module": "amd",
+
+        // 単一ファイル出力時のパスとファイル名
+        "outFile": "dist/js/tsout.js"
     },
 
     // tsconfig.json がプロジェクトルートに無いとき、パスを教える。

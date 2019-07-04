@@ -5,7 +5,7 @@ import SelectionItem from '../Shared/SelectionItem';
 import Album from 'src/ts/Models/Albums/Album';
 
 @Component({
-    template: `<div class="col-md-3 h-100">
+    template: `<div class="col-md-2 h-100">
     <div class="card h-100">
         <div class="card-header with-border bg-warning">
             <h3 class="card-title">Albums</h3>
