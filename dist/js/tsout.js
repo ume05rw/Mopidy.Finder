@@ -408,8 +408,8 @@ define("Views/Finders/GenreList", ["require", "exports", "Views/Bases/ViewBase",
         __extends(GenreList, _super);
         function GenreList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.genreStore = new GenreStore_1.default();
-            _this.genres = [];
+            _this.store = new GenreStore_1.default();
+            _this.entities = [];
             return _this;
         }
         GenreList.prototype.Initialize = function () {
@@ -421,9 +421,9 @@ define("Views/Finders/GenreList", ["require", "exports", "Views/Bases/ViewBase",
                         case 1:
                             _b.sent();
                             _a = this;
-                            return [4 /*yield*/, this.genreStore.GetList()];
+                            return [4 /*yield*/, this.store.GetList()];
                         case 2:
-                            _a.genres = (_b.sent())
+                            _a.entities = (_b.sent())
                                 .orderBy(function (e) { return e.Name; })
                                 .toArray();
                             return [2 /*return*/, true];
@@ -437,7 +437,7 @@ define("Views/Finders/GenreList", ["require", "exports", "Views/Bases/ViewBase",
         };
         GenreList = __decorate([
             vue_class_component_3.default({
-                template: "<div class=\"col-md-3 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genre</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"genre in genres\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"genre\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_2.default
                 }
@@ -447,7 +447,233 @@ define("Views/Finders/GenreList", ["require", "exports", "Views/Bases/ViewBase",
     }(ViewBase_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Views/Finders/GenreList"], function (require, exports, ViewBase_4, vue_class_component_4, GenreList_1) {
+define("Models/Relations/ArtistAlbum", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ArtistAlbum = /** @class */ (function () {
+        function ArtistAlbum() {
+        }
+        return ArtistAlbum;
+    }());
+    exports.default = ArtistAlbum;
+});
+define("Models/Artists/Artist", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Artist = /** @class */ (function () {
+        function Artist() {
+        }
+        return Artist;
+    }());
+    exports.default = Artist;
+});
+define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ArtistStore = /** @class */ (function (_super) {
+        __extends(ArtistStore, _super);
+        function ArtistStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ArtistStore.prototype.GetList = function (genre) {
+            if (genre === void 0) { genre = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var result, _a, entities;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            if (!(!genre)) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.QueryGet('Artist/GetList')];
+                        case 1:
+                            _a = _b.sent();
+                            return [3 /*break*/, 4];
+                        case 2: return [4 /*yield*/, this.QueryGet('Artist/GetListByGenreId', {
+                                genreId: genre.Id
+                            })];
+                        case 3:
+                            _a = _b.sent();
+                            _b.label = 4;
+                        case 4:
+                            result = _a;
+                            entities = (result.Succeeded)
+                                ? result.Result
+                                : [];
+                            return [2 /*return*/, this.Enumerable.from(entities)];
+                    }
+                });
+            });
+        };
+        return ArtistStore;
+    }(StoreBase_2.default));
+    exports.default = ArtistStore;
+});
+define("Views/Finders/ArtistList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Artists/ArtistStore", "Views/Shared/SelectionItem"], function (require, exports, ViewBase_4, vue_class_component_4, ArtistStore_1, SelectionItem_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ArtistList = /** @class */ (function (_super) {
+        __extends(ArtistList, _super);
+        function ArtistList() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.store = new ArtistStore_1.default();
+            _this.entities = [];
+            return _this;
+        }
+        ArtistList.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _a;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _b.sent();
+                            _a = this;
+                            return [4 /*yield*/, this.store.GetList()];
+                        case 2:
+                            _a.entities = (_b.sent())
+                                .orderBy(function (e) { return e.Name; })
+                                .toArray();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ArtistList.prototype.OnClickRemove = function () {
+        };
+        ArtistList.prototype.OnClickItem = function () {
+        };
+        ArtistList = __decorate([
+            vue_class_component_4.default({
+                template: "<div class=\"col-md-3 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                components: {
+                    'selection-item': SelectionItem_3.default
+                }
+            })
+        ], ArtistList);
+        return ArtistList;
+    }(ViewBase_4.default));
+    exports.default = ArtistList;
+});
+define("Models/Albums/Album", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Album = /** @class */ (function () {
+        function Album() {
+        }
+        return Album;
+    }());
+    exports.default = Album;
+});
+define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AlbumStore = /** @class */ (function (_super) {
+        __extends(AlbumStore, _super);
+        function AlbumStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        AlbumStore.prototype.GetList = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var result, entities;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetList')];
+                        case 1:
+                            result = _a.sent();
+                            entities = (result.Succeeded)
+                                ? result.Result
+                                : [];
+                            return [2 /*return*/, this.Enumerable.from(entities)];
+                    }
+                });
+            });
+        };
+        AlbumStore.prototype.GetListByArtist = function (artist) {
+            return __awaiter(this, void 0, void 0, function () {
+                var result, entities;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetListByArtistId', {
+                                artistId: artist.Id
+                            })];
+                        case 1:
+                            result = _a.sent();
+                            entities = (result.Succeeded)
+                                ? result.Result
+                                : [];
+                            return [2 /*return*/, this.Enumerable.from(entities)];
+                    }
+                });
+            });
+        };
+        AlbumStore.prototype.GetListByGenre = function (genre) {
+            return __awaiter(this, void 0, void 0, function () {
+                var result, entities;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetListByGenreId', {
+                                genreId: genre.Id
+                            })];
+                        case 1:
+                            result = _a.sent();
+                            entities = (result.Succeeded)
+                                ? result.Result
+                                : [];
+                            return [2 /*return*/, this.Enumerable.from(entities)];
+                    }
+                });
+            });
+        };
+        return AlbumStore;
+    }(StoreBase_3.default));
+    exports.default = AlbumStore;
+});
+define("Views/Finders/AlbumList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Albums/AlbumStore", "Views/Shared/SelectionItem"], function (require, exports, ViewBase_5, vue_class_component_5, AlbumStore_1, SelectionItem_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AlbumList = /** @class */ (function (_super) {
+        __extends(AlbumList, _super);
+        function AlbumList() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.store = new AlbumStore_1.default();
+            _this.entities = [];
+            return _this;
+        }
+        AlbumList.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _a;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _b.sent();
+                            _a = this;
+                            return [4 /*yield*/, this.store.GetList()];
+                        case 2:
+                            _a.entities = (_b.sent())
+                                .orderBy(function (e) { return e.Name; })
+                                .toArray();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        AlbumList.prototype.OnClickRemove = function () {
+        };
+        AlbumList.prototype.OnClickItem = function () {
+        };
+        AlbumList = __decorate([
+            vue_class_component_5.default({
+                template: "<div class=\"col-md-3 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                components: {
+                    'selection-item': SelectionItem_4.default
+                }
+            })
+        ], AlbumList);
+        return AlbumList;
+    }(ViewBase_5.default));
+    exports.default = AlbumList;
+});
+define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Views/Finders/GenreList", "Views/Finders/ArtistList", "Views/Finders/AlbumList"], function (require, exports, ViewBase_6, vue_class_component_6, GenreList_1, ArtistList_1, AlbumList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -462,19 +688,35 @@ define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "v
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Finder.prototype, "ArtistList", {
+            get: function () {
+                return this.$refs.ArtistList;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Finder.prototype, "AlbumList", {
+            get: function () {
+                return this.$refs.AlbumList;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Finder = __decorate([
-            vue_class_component_4.default({
-                template: "<section class=\"content h-100\">\n    <div class=\"row\">\n        <genre-list ref=\"GenreList\" />\n    </div>\n</section>",
+            vue_class_component_6.default({
+                template: "<section class=\"content h-100\">\n    <div class=\"row\">\n        <genre-list ref=\"GenreList\" />\n        <artist-list ref=\"ArtistList\" />\n        <album-list ref=\"AlbumList\" />\n    </div>\n</section>",
                 components: {
-                    'genre-list': GenreList_1.default
+                    'genre-list': GenreList_1.default,
+                    'artist-list': ArtistList_1.default,
+                    'album-list': AlbumList_1.default
                 }
             })
         ], Finder);
         return Finder;
-    }(ViewBase_4.default));
+    }(ViewBase_6.default));
     exports.default = Finder;
 });
-define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/Sidebars/Sidebar", "Views/Finders/Finder"], function (require, exports, ViewBase_5, Sidebar_1, Finder_1) {
+define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/Sidebars/Sidebar", "Views/Finders/Finder"], function (require, exports, ViewBase_7, Sidebar_1, Finder_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -491,7 +733,7 @@ define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/S
             return _this;
         }
         return RootView;
-    }(ViewBase_5.default));
+    }(ViewBase_7.default));
     exports.default = RootView;
 });
 define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], function (require, exports, RootView_1) {
@@ -566,140 +808,6 @@ define("Main", ["require", "exports", "Controllers/RootContoller", "Libraries", 
         return Main;
     }());
     var main = (new Main()).Init();
-});
-define("Models/Relations/ArtistAlbum", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ArtistAlbum = /** @class */ (function () {
-        function ArtistAlbum() {
-        }
-        return ArtistAlbum;
-    }());
-    exports.default = ArtistAlbum;
-});
-define("Models/Albums/Album", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Album = /** @class */ (function () {
-        function Album() {
-        }
-        return Album;
-    }());
-    exports.default = Album;
-});
-define("Models/Artists/Artist", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Artist = /** @class */ (function () {
-        function Artist() {
-        }
-        return Artist;
-    }());
-    exports.default = Artist;
-});
-define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var AlbumStore = /** @class */ (function (_super) {
-        __extends(AlbumStore, _super);
-        function AlbumStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        AlbumStore.prototype.GetList = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var result, entities;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetList')];
-                        case 1:
-                            result = _a.sent();
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
-                    }
-                });
-            });
-        };
-        AlbumStore.prototype.GetListByArtist = function (artist) {
-            return __awaiter(this, void 0, void 0, function () {
-                var result, entities;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetListByArtistId', {
-                                artistId: artist.Id
-                            })];
-                        case 1:
-                            result = _a.sent();
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
-                    }
-                });
-            });
-        };
-        AlbumStore.prototype.GetListByGenre = function (genre) {
-            return __awaiter(this, void 0, void 0, function () {
-                var result, entities;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetListByGenreId', {
-                                genreId: genre.Id
-                            })];
-                        case 1:
-                            result = _a.sent();
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
-                    }
-                });
-            });
-        };
-        return AlbumStore;
-    }(StoreBase_2.default));
-    exports.default = AlbumStore;
-});
-define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ArtistStore = /** @class */ (function (_super) {
-        __extends(ArtistStore, _super);
-        function ArtistStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        ArtistStore.prototype.GetList = function (genre) {
-            if (genre === void 0) { genre = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var result, _a, entities;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0:
-                            if (!(!genre)) return [3 /*break*/, 2];
-                            return [4 /*yield*/, this.QueryGet('Artist/GetList')];
-                        case 1:
-                            _a = _b.sent();
-                            return [3 /*break*/, 4];
-                        case 2: return [4 /*yield*/, this.QueryGet('Artist/GetListByGenreId', {
-                                genreId: genre.Id
-                            })];
-                        case 3:
-                            _a = _b.sent();
-                            _b.label = 4;
-                        case 4:
-                            result = _a;
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
-                    }
-                });
-            });
-        };
-        return ArtistStore;
-    }(StoreBase_3.default));
-    exports.default = ArtistStore;
 });
 define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_2) {
     "use strict";

@@ -1,14 +1,14 @@
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
-import GenreStore from '../../Models/Genres/GenreStore';
+import ArtistStore from '../../Models/Artists/ArtistStore';
 import SelectionItem from '../Shared/SelectionItem';
-import Genre from 'src/ts/Models/Genres/Genre';
+import Artist from 'src/ts/Models/Artists/Artist';
 
 @Component({
     template: `<div class="col-md-3 h-100">
     <div class="card h-100">
-        <div class="card-header with-border bg-green">
-            <h3 class="card-title">Genres</h3>
+        <div class="card-header with-border bg-info">
+            <h3 class="card-title">Artists</h3>
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
@@ -33,10 +33,10 @@ import Genre from 'src/ts/Models/Genres/Genre';
         'selection-item': SelectionItem
     }
 })
-export default class GenreList extends ViewBase {
+export default class ArtistList extends ViewBase {
 
-    private store: GenreStore = new GenreStore();
-    private entities: Genre[] = [];
+    private store: ArtistStore = new ArtistStore();
+    private entities: Artist[] = [];
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
