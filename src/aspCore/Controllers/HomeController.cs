@@ -1,14 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.a.Models;
 using MusicFront.Models;
-using MusicFront.Models.Albums;
-using MusicFront.Models.Artists;
-using MusicFront.Models.Genres;
 
 namespace MusicFront.Controllers
 {

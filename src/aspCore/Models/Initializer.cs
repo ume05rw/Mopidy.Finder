@@ -1,15 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
-using MusicFront.Models;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
 using MusicFront.Models.Relations;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace MusicFront.a.Models
+namespace MusicFront.Models
 {
     public static class Initializer
     {
