@@ -28,45 +28,19 @@ namespace MusicFront.Controllers
                 : XhrResponseFactory.CreateSucceeded(genre);
         }
 
+        /// <summary>
+        /// ジャンル一覧
+        /// </summary>
+        /// <param name="store"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// こちらはページング無しの全件取得。
+        /// </remarks>
         [HttpGet("GetList")]
-        public XhrResponse GetList(
-            [FromQuery] string[] names,
-            [FromQuery] int[] ids,
-            [FromServices] GenreStore store
-        )
+        public XhrResponse GetList([FromServices] GenreStore store)
         {
-            var genres = store.GetList(names, ids);
+            var genres = store.GetList();
             return XhrResponseFactory.CreateSucceeded(genres);
-        }
-
-        [HttpGet("GetListByArtistId/{artistId}")]
-        public XhrResponse GetListByArtistId(
-            [FromRoute] int artistId,
-            [FromServices] GenreStore store,
-            [FromServices] ArtistStore artistStore
-        )
-        {
-            var artist = artistStore.Get(artistId);
-            return (artist == null)
-                ? XhrResponseFactory.CreateError($"Related Genres Not Found: artistId={artistId}")
-                : XhrResponseFactory.CreateSucceeded(
-                    store.GetListByArtist(artist).ToArray()
-                  );
-        }
-
-        [HttpGet("GetListByAlbumId/{albumId}")]
-        public XhrResponse GetListByAlbumId(
-            [FromRoute] int albumId,
-            [FromServices] GenreStore store,
-            [FromServices] AlbumStore albumStore
-        )
-        {
-            var album = albumStore.Get(albumId);
-            return (album == null)
-                ? XhrResponseFactory.CreateError($"Related Genres Not Found: albumId={albumId}")
-                : XhrResponseFactory.CreateSucceeded(
-                    store.GetListByAlbum(album).ToArray()
-                  );
         }
     }
 }

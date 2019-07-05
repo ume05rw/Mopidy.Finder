@@ -1,7 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MusicFront.Models.Albums;
-using MusicFront.Models.Artists;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Mopidies.Methods;
 using System.Collections.Generic;
@@ -20,26 +17,8 @@ namespace MusicFront.Models.Genres
         public Genre Get(int genreId)
             => this.Dbc.GetGenreQuery().FirstOrDefault(e => e.Id == genreId);
 
-        public List<Genre> GetList(string[] names, int[] ids)
-        {
-            var query = this.Dbc.GetGenreQuery();
-            if (names != null && 0 < names.Length)
-                query = query.Where(e => names.All(name => e.LowerName.Contains(name.ToLower())));
-            if (ids != null && 0 < ids.Length)
-                query = query.Where(e => ids.Contains(e.Id));
-
-            return query.ToList();
-        }
-
-        public List<Genre> GetListByArtist(Artist artist)
+        public List<Genre> GetList()
             => this.Dbc.GetGenreQuery()
-                .Where(e => e.GenreArtists.Select(e2 => e2.ArtistId).Contains(artist.Id))
-                .OrderBy(e => e.Name)
-                .ToList();
-
-        public List<Genre> GetListByAlbum(Album album)
-            => this.Dbc.GetGenreQuery()
-                .Where(e => e.GenreAlbums.Select(e2 => e2.AlbumId).Contains(album.Id))
                 .OrderBy(e => e.Name)
                 .ToList();
 
