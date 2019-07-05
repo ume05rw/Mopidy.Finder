@@ -4,6 +4,12 @@ import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import ViewBase from '../../Bases/ViewBase';
 import SelectionAlbumTracks from './SelectionAlbumTracks';
+import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
+import Vue from 'vue';
+import Libraries from '../../../Libraries';
+import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
+
+Vue.use(InfiniteLoading);
 
 @Component({
     template: `<div class="col-md-6 h-100">
@@ -20,12 +26,13 @@ import SelectionAlbumTracks from './SelectionAlbumTracks';
         </div>
         <div class="card-body list-scrollable">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
-            <template v-for="entity in entities">
-                <selection-album-tracks
-                    ref="AlbumTracks"
-                    v-bind:entity="entity"
-                    @click="OnClickItem" />
-            </template>
+                <template v-for="entity in entities">
+                    <selection-album-tracks
+                        ref="AlbumTracks"
+                        v-bind:entity="entity"
+                        @click="OnClickItem" />
+                </template>
+                <infinite-loading @infinite="OnInfinite" ref="InfiniteLoading"></infinite-loading>
             </ul>
         </div>
     </div>
@@ -37,25 +44,75 @@ import SelectionAlbumTracks from './SelectionAlbumTracks';
 export default class TrackList extends ViewBase {
 
     private readonly PageLength: number = 10;
+    private page: number = 1;
     private albumIds: number[] = [];
     private store: AlbumTracksStore = new AlbumTracksStore();
     private entities: AlbumTracks[] = [];
 
-    public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+    private get InfiniteLoading(): InfiniteLoading {
+        return this.$refs.InfiniteLoading as InfiniteLoading;
+    }
 
-        //this.entities = (await this.store.GetList())
-        //    .orderBy(e => e.Name)
-        //    .toArray();
+    public async OnInfinite($state: StateChanger): Promise<boolean> {
+
+        var targetAlbumIds = Libraries.Enumerable.from(this.albumIds)
+            .skip((this.page - 1) * this.PageLength)
+            .take(this.PageLength)
+            .toArray();
+
+        if (0 < targetAlbumIds.length) {
+            var result = await this.store.GetList(targetAlbumIds);
+
+            if (0 < result.length)
+                this.entities = this.entities.concat(result);
+
+            $state.loaded();
+            this.page++;
+
+            if (0 < result.length) {
+                this.$emit(Events.ListAppended, {
+                    entities: result
+                } as IListAppendedArgs);
+            }
+
+        } else {
+            $state.complete();
+        }
 
         return true;
     }
 
-    private OnClickRefresh(): void {
+    private Refresh(): void {
+        this.page = 1;
+        this.entities = [];
+        this.$nextTick(() => {
+            this.InfiniteLoading.stateChanger.reset();
+            (this.InfiniteLoading as any).attemptLoad();
+        });
+    }
 
+    private OnClickRefresh(): void {
+        this.Refresh();
+        this.$emit(Events.Refreshed);
     }
 
     private OnClickItem(): void {
 
+    }
+
+    public ClearAlbumIds(): void {
+        this.albumIds = [];
+        this.Refresh();
+    }
+
+    public AppendAlbumIds(albumIds: number[]): void {
+        this.albumIds = this.albumIds.concat(albumIds);
+        console.log('InfiniteLoading.$props');
+        console.log(this.InfiniteLoading.$props);
+        console.log('InfiniteLoading.$data');
+        console.log(this.InfiniteLoading.$data);
+
+        this.InfiniteLoading.stateChanger.reset();
+        (this.InfiniteLoading as any).attemptLoad();
     }
 }

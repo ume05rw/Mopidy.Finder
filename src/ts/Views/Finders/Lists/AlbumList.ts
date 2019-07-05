@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
-import { Events, ISelectionChangedArgs } from '../../Events/ListEvents';
+import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
 import Album from '../../../Models/Albums/Album';
 import AlbumStore from '../../../Models/Albums/AlbumStore';
 import ViewBase from '../../Bases/ViewBase';
@@ -48,6 +48,10 @@ export default class AlbumList extends ViewBase {
     private artistIds: number[] = [];
     private entities: Album[] = [];
 
+    private get InfiniteLoading(): InfiniteLoading {
+        return this.$refs.InfiniteLoading as InfiniteLoading;
+    }
+
     public async OnInfinite($state: StateChanger): Promise<boolean> {
 
         var result = await this.store.GetList(this.genreIds, this.artistIds, this.page);
@@ -62,6 +66,12 @@ export default class AlbumList extends ViewBase {
             $state.complete();
         }
 
+        if (0 < result.ResultList.length) {
+            this.$emit(Events.ListAppended, {
+                entities: result.ResultList
+            } as IListAppendedArgs);
+        }
+
         return true;
     }
 
@@ -71,7 +81,6 @@ export default class AlbumList extends ViewBase {
     }
 
     private OnSelectionChanged(args: ISelectionChangedArgs): void {
-        console.log('AlbumList.OnSelectionChanged');
         this.$emit(Events.SelectionChanged, args);
     }
 
@@ -79,8 +88,8 @@ export default class AlbumList extends ViewBase {
         this.page = 1;
         this.entities = [];
         this.$nextTick(() => {
-            (this.$refs.InfiniteLoading as InfiniteLoading).stateChanger.reset();
-            (this.$refs.InfiniteLoading as any).attemptLoad();
+            this.InfiniteLoading.stateChanger.reset();
+            (this.InfiniteLoading as any).attemptLoad();
         });
     }
 

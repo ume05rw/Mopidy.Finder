@@ -5,8 +5,12 @@ export interface ISelectionChangedArgs {
     selected: boolean
 }
 
-export const Events = {
-    SelectionChanged: 'SelectionChanged',
-    Refreshed: 'Refreshed'
+export interface IListAppendedArgs {
+    entities: ISelectionItem[]
 }
 
+export const Events = {
+    SelectionChanged: 'SelectionChanged',
+    Refreshed: 'Refreshed',
+    ListAppended: 'ListAppended'
+}

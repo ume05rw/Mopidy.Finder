@@ -20,14 +20,16 @@ namespace MusicFront.Models.AlbumTracks
 
             foreach (var albumId in albumIds)
             {
-                var album = this.Dbc.Albums.FirstOrDefault(e => e.Id == albumId);
+                var album = this.Dbc.GetAlbumQuery()
+                    .FirstOrDefault(e => e.Id == albumId);
+
                 if (album == null)
                     continue;
 
-                var artistId = album.ArtistAlbums.FirstOrDefault()?.AlbumId;
+                var artistId = album.ArtistAlbums.FirstOrDefault()?.ArtistId;
 
                 var artist = (artistId != null)
-                    ? this.Dbc.Artists.FirstOrDefault(e => e.Id == artistId)
+                    ? this.Dbc.GetArtistQuery().FirstOrDefault(e => e.Id == artistId)
                     : null;
 
                 var tracks = default(List<Track>);

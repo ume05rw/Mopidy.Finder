@@ -3,7 +3,7 @@ import Genre from '../../../Models/Genres/Genre';
 import GenreStore from '../../../Models/Genres/GenreStore';
 import ViewBase from '../../Bases/ViewBase';
 import SelectionItem from '../../Shared/SelectionItem';
-import { Events, ISelectionChangedArgs } from '../../Events/ListEvents';
+import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
 
 @Component({
     template: `<div class="col-md-2 h-100">
@@ -46,6 +46,10 @@ export default class GenreList extends ViewBase {
             .orderBy(e => e.Name)
             .toArray();
 
+        this.$emit(Events.ListAppended, {
+            entities: this.entities
+        } as IListAppendedArgs);
+
         return true;
     }
 
@@ -55,7 +59,6 @@ export default class GenreList extends ViewBase {
     }
 
     private OnSelectionChanged(args: ISelectionChangedArgs): void {
-        console.log('GenreList.OnSelectionChanged');
         this.$emit(Events.SelectionChanged, args);
     }
 

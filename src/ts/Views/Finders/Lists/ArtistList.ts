@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
-import { Events, ISelectionChangedArgs } from '../../Events/ListEvents';
+import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
 import Artist from '../../../Models/Artists/Artist';
 import ArtistStore from '../../../Models/Artists/ArtistStore';
 import ViewBase from '../../Bases/ViewBase';
@@ -47,6 +47,10 @@ export default class ArtistList extends ViewBase {
     private genreIds: number[] = [];
     private entities: Artist[] = [];
 
+    private get InfiniteLoading(): InfiniteLoading {
+        return this.$refs.InfiniteLoading as InfiniteLoading;
+    }
+
     private async OnInfinite($state: StateChanger): Promise<boolean> {
 
         var result = await this.store.GetList(this.genreIds, this.page);
@@ -61,6 +65,12 @@ export default class ArtistList extends ViewBase {
             $state.complete();
         }
 
+        if (0 < result.ResultList.length) {
+            this.$emit(Events.ListAppended, {
+                entities: result.ResultList
+            } as IListAppendedArgs);
+        }
+
         return true;
     }
 
@@ -70,7 +80,6 @@ export default class ArtistList extends ViewBase {
     }
 
     private OnSelectionChanged(args: ISelectionChangedArgs): void {
-        console.log('ArtistList.OnSelectionChanged');
         this.$emit(Events.SelectionChanged, args);
     }
 
@@ -78,8 +87,8 @@ export default class ArtistList extends ViewBase {
         this.page = 1;
         this.entities = [];
         this.$nextTick(() => {
-            (this.$refs.InfiniteLoading as InfiniteLoading).stateChanger.reset();
-            (this.$refs.InfiniteLoading as any).attemptLoad();
+            this.InfiniteLoading.stateChanger.reset();
+            (this.InfiniteLoading as any).attemptLoad();
         });
     }
 

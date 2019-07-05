@@ -4,7 +4,8 @@ import GenreList from './Lists/GenreList';
 import ArtistList from './Lists/ArtistList';
 import AlbumList from './Lists/AlbumList';
 import TrackList from './Lists/TrackList';
-import { Events, ISelectionChangedArgs } from '../Events/ListEvents';
+import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../Events/ListEvents';
+import Libraries from '../../Libraries';
 
 @Component({
     template: `<section class="content h-100">
@@ -20,7 +21,8 @@ import { Events, ISelectionChangedArgs } from '../Events/ListEvents';
         <album-list
             ref="AlbumList"
             @SelectionChanged="OnAlbumSelectionChanged"
-            @Refreshed="OnAlbumRefreshed" />
+            @Refreshed="OnAlbumRefreshed"
+            @ListAppended="OnAlbumListAppended"/>
         <track-list
             ref="TrackList"
             @SelectionChanged="OnTrackSelectionChanged"
@@ -63,26 +65,34 @@ export default class Finder extends ViewBase {
             this.ArtistList.RemoveFilterGenreId(args.entity.Id);
             this.AlbumList.RemoveFilterGenreId(args.entity.Id);
         }
+        this.TrackList.ClearAlbumIds();
     }
 
     private OnGenreRefreshed(): void {
         this.ArtistList.RemoveAllFilters();
         this.AlbumList.RemoveAllFilters();
+        this.TrackList.ClearAlbumIds();
     }
 
     private OnArtistSelectionChanged(args: ISelectionChangedArgs): void {
-        console.log('Finder.OnArtistSelectionChanged');
-        console.log(args);
-
         if (args.selected) {
             this.AlbumList.AddFilterArtistId(args.entity.Id);
         } else {
             this.AlbumList.RemoveFilterArtistId(args.entity.Id);
         }
+        this.TrackList.ClearAlbumIds();
     }
 
     private OnArtistRefreshed(): void {
         this.AlbumList.RemoveFilterAllArtists();
+        this.TrackList.ClearAlbumIds();
+    }
+
+    private OnAlbumListAppended(args: IListAppendedArgs): void {
+        var albumIds = Libraries.Enumerable.from(args.entities)
+            .select(e => e.Id)
+            .toArray();
+        this.TrackList.AppendAlbumIds(albumIds);
     }
 
     private OnAlbumSelectionChanged(args: ISelectionChangedArgs): void {

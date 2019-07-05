@@ -358,7 +358,8 @@ define("Views/Events/ListEvents", ["require", "exports"], function (require, exp
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Events = {
         SelectionChanged: 'SelectionChanged',
-        Refreshed: 'Refreshed'
+        Refreshed: 'Refreshed',
+        ListAppended: 'ListAppended'
     };
 });
 define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Views/Events/ListEvents"], function (require, exports, vue_class_component_2, vue_property_decorator_1, ViewBase_2, ListEvents_1) {
@@ -438,6 +439,9 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                             _a.entities = (_b.sent())
                                 .orderBy(function (e) { return e.Name; })
                                 .toArray();
+                            this.$emit(ListEvents_2.Events.ListAppended, {
+                                entities: this.entities
+                            });
                             return [2 /*return*/, true];
                     }
                 });
@@ -448,7 +452,6 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             this.$emit(ListEvents_2.Events.Refreshed);
         };
         GenreList.prototype.OnSelectionChanged = function (args) {
-            console.log('GenreList.OnSelectionChanged');
             this.$emit(ListEvents_2.Events.SelectionChanged, args);
         };
         GenreList.prototype.Refresh = function () {
@@ -533,6 +536,13 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
             _this.entities = [];
             return _this;
         }
+        Object.defineProperty(ArtistList.prototype, "InfiniteLoading", {
+            get: function () {
+                return this.$refs.InfiniteLoading;
+            },
+            enumerable: true,
+            configurable: true
+        });
         ArtistList.prototype.OnInfinite = function ($state) {
             return __awaiter(this, void 0, void 0, function () {
                 var result;
@@ -550,6 +560,11 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
                             else {
                                 $state.complete();
                             }
+                            if (0 < result.ResultList.length) {
+                                this.$emit(ListEvents_3.Events.ListAppended, {
+                                    entities: result.ResultList
+                                });
+                            }
                             return [2 /*return*/, true];
                     }
                 });
@@ -560,7 +575,6 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
             this.$emit(ListEvents_3.Events.Refreshed);
         };
         ArtistList.prototype.OnSelectionChanged = function (args) {
-            console.log('ArtistList.OnSelectionChanged');
             this.$emit(ListEvents_3.Events.SelectionChanged, args);
         };
         ArtistList.prototype.Refresh = function () {
@@ -568,8 +582,8 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
             this.page = 1;
             this.entities = [];
             this.$nextTick(function () {
-                _this.$refs.InfiniteLoading.stateChanger.reset();
-                _this.$refs.InfiniteLoading.attemptLoad();
+                _this.InfiniteLoading.stateChanger.reset();
+                _this.InfiniteLoading.attemptLoad();
             });
         };
         ArtistList.prototype.HasGenre = function (genreId) {
@@ -663,6 +677,13 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
             _this.entities = [];
             return _this;
         }
+        Object.defineProperty(AlbumList.prototype, "InfiniteLoading", {
+            get: function () {
+                return this.$refs.InfiniteLoading;
+            },
+            enumerable: true,
+            configurable: true
+        });
         AlbumList.prototype.OnInfinite = function ($state) {
             return __awaiter(this, void 0, void 0, function () {
                 var result;
@@ -680,6 +701,11 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
                             else {
                                 $state.complete();
                             }
+                            if (0 < result.ResultList.length) {
+                                this.$emit(ListEvents_4.Events.ListAppended, {
+                                    entities: result.ResultList
+                                });
+                            }
                             return [2 /*return*/, true];
                     }
                 });
@@ -690,7 +716,6 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
             this.$emit(ListEvents_4.Events.Refreshed);
         };
         AlbumList.prototype.OnSelectionChanged = function (args) {
-            console.log('AlbumList.OnSelectionChanged');
             this.$emit(ListEvents_4.Events.SelectionChanged, args);
         };
         AlbumList.prototype.Refresh = function () {
@@ -698,8 +723,8 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
             this.page = 1;
             this.entities = [];
             this.$nextTick(function () {
-                _this.$refs.InfiniteLoading.stateChanger.reset();
-                _this.$refs.InfiniteLoading.attemptLoad();
+                _this.InfiniteLoading.stateChanger.reset();
+                _this.InfiniteLoading.attemptLoad();
             });
         };
         AlbumList.prototype.HasGenre = function (genreId) {
@@ -885,41 +910,91 @@ define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-c
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/AlbumTracks/AlbumTracksStore", "Views/Bases/ViewBase", "Views/Finders/Lists/SelectionAlbumTracks"], function (require, exports, vue_class_component_7, AlbumTracksStore_1, ViewBase_7, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/AlbumTracks/AlbumTracksStore", "Views/Bases/ViewBase", "Views/Finders/Lists/SelectionAlbumTracks", "vue-infinite-loading", "vue", "Libraries", "Views/Events/ListEvents"], function (require, exports, vue_class_component_7, AlbumTracksStore_1, ViewBase_7, SelectionAlbumTracks_1, vue_infinite_loading_3, vue_4, Libraries_2, ListEvents_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    vue_4.default.use(vue_infinite_loading_3.default);
     var TrackList = /** @class */ (function (_super) {
         __extends(TrackList, _super);
         function TrackList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.PageLength = 10;
+            _this.page = 1;
             _this.albumIds = [];
             _this.store = new AlbumTracksStore_1.default();
             _this.entities = [];
             return _this;
         }
-        TrackList.prototype.Initialize = function () {
+        Object.defineProperty(TrackList.prototype, "InfiniteLoading", {
+            get: function () {
+                return this.$refs.InfiniteLoading;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        TrackList.prototype.OnInfinite = function ($state) {
             return __awaiter(this, void 0, void 0, function () {
+                var targetAlbumIds, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            targetAlbumIds = Libraries_2.default.Enumerable.from(this.albumIds)
+                                .skip((this.page - 1) * this.PageLength)
+                                .take(this.PageLength)
+                                .toArray();
+                            if (!(0 < targetAlbumIds.length)) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.store.GetList(targetAlbumIds)];
                         case 1:
-                            _a.sent();
-                            //this.entities = (await this.store.GetList())
-                            //    .orderBy(e => e.Name)
-                            //    .toArray();
-                            return [2 /*return*/, true];
+                            result = _a.sent();
+                            if (0 < result.length)
+                                this.entities = this.entities.concat(result);
+                            $state.loaded();
+                            this.page++;
+                            if (0 < result.length) {
+                                this.$emit(ListEvents_5.Events.ListAppended, {
+                                    entities: result
+                                });
+                            }
+                            return [3 /*break*/, 3];
+                        case 2:
+                            $state.complete();
+                            _a.label = 3;
+                        case 3: return [2 /*return*/, true];
                     }
                 });
             });
         };
+        TrackList.prototype.Refresh = function () {
+            var _this = this;
+            this.page = 1;
+            this.entities = [];
+            this.$nextTick(function () {
+                _this.InfiniteLoading.stateChanger.reset();
+                _this.InfiniteLoading.attemptLoad();
+            });
+        };
         TrackList.prototype.OnClickRefresh = function () {
+            this.Refresh();
+            this.$emit(ListEvents_5.Events.Refreshed);
         };
         TrackList.prototype.OnClickItem = function () {
         };
+        TrackList.prototype.ClearAlbumIds = function () {
+            this.albumIds = [];
+            this.Refresh();
+        };
+        TrackList.prototype.AppendAlbumIds = function (albumIds) {
+            this.albumIds = this.albumIds.concat(albumIds);
+            console.log('InfiniteLoading.$props');
+            console.log(this.InfiniteLoading.$props);
+            console.log('InfiniteLoading.$data');
+            console.log(this.InfiniteLoading.$data);
+            this.InfiniteLoading.stateChanger.reset();
+            this.InfiniteLoading.attemptLoad();
+        };
         TrackList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-6 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fas fa-redo\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-album-tracks\n                    ref=\"AlbumTracks\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fas fa-redo\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @click=\"OnClickItem\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-album-tracks': SelectionAlbumTracks_1.default
                 }
@@ -929,7 +1004,7 @@ define("Views/Finders/Lists/TrackList", ["require", "exports", "vue-class-compon
     }(ViewBase_7.default));
     exports.default = TrackList;
 });
-define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Views/Finders/Lists/GenreList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/AlbumList", "Views/Finders/Lists/TrackList"], function (require, exports, ViewBase_8, vue_class_component_8, GenreList_1, ArtistList_1, AlbumList_1, TrackList_1) {
+define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Views/Finders/Lists/GenreList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/AlbumList", "Views/Finders/Lists/TrackList", "Libraries"], function (require, exports, ViewBase_8, vue_class_component_8, GenreList_1, ArtistList_1, AlbumList_1, TrackList_1, Libraries_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -976,23 +1051,31 @@ define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "v
                 this.ArtistList.RemoveFilterGenreId(args.entity.Id);
                 this.AlbumList.RemoveFilterGenreId(args.entity.Id);
             }
+            this.TrackList.ClearAlbumIds();
         };
         Finder.prototype.OnGenreRefreshed = function () {
             this.ArtistList.RemoveAllFilters();
             this.AlbumList.RemoveAllFilters();
+            this.TrackList.ClearAlbumIds();
         };
         Finder.prototype.OnArtistSelectionChanged = function (args) {
-            console.log('Finder.OnArtistSelectionChanged');
-            console.log(args);
             if (args.selected) {
                 this.AlbumList.AddFilterArtistId(args.entity.Id);
             }
             else {
                 this.AlbumList.RemoveFilterArtistId(args.entity.Id);
             }
+            this.TrackList.ClearAlbumIds();
         };
         Finder.prototype.OnArtistRefreshed = function () {
             this.AlbumList.RemoveFilterAllArtists();
+            this.TrackList.ClearAlbumIds();
+        };
+        Finder.prototype.OnAlbumListAppended = function (args) {
+            var albumIds = Libraries_3.default.Enumerable.from(args.entities)
+                .select(function (e) { return e.Id; })
+                .toArray();
+            this.TrackList.AppendAlbumIds(albumIds);
         };
         Finder.prototype.OnAlbumSelectionChanged = function (args) {
             console.log('Finder.OnAlbumSelectionChanged');
@@ -1008,7 +1091,7 @@ define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "v
         };
         Finder = __decorate([
             vue_class_component_8.default({
-                template: "<section class=\"content h-100\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\"\n            @SelectionChanged=\"OnAlbumSelectionChanged\"\n            @Refreshed=\"OnAlbumRefreshed\" />\n        <track-list\n            ref=\"TrackList\"\n            @SelectionChanged=\"OnTrackSelectionChanged\"\n            @Refreshed=\"OnTrackRefreshed\" />\n    </div>\n</section>",
+                template: "<section class=\"content h-100\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\"\n            @SelectionChanged=\"OnAlbumSelectionChanged\"\n            @Refreshed=\"OnAlbumRefreshed\"\n            @ListAppended=\"OnAlbumListAppended\"/>\n        <track-list\n            ref=\"TrackList\"\n            @SelectionChanged=\"OnTrackSelectionChanged\"\n            @Refreshed=\"OnTrackRefreshed\" />\n    </div>\n</section>",
                 components: {
                     'genre-list': GenreList_1.default,
                     'artist-list': ArtistList_1.default,
@@ -1066,7 +1149,7 @@ define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], fu
     }());
     exports.default = RootContoller;
 });
-define("Main", ["require", "exports", "Controllers/RootContoller", "Libraries", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/dist/js/adminlte.js", "../css/site.css"], function (require, exports, RootContoller_1, Libraries_2) {
+define("Main", ["require", "exports", "Controllers/RootContoller", "Libraries", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/dist/js/adminlte.js", "../css/site.css"], function (require, exports, RootContoller_1, Libraries_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -1089,7 +1172,7 @@ define("Main", ["require", "exports", "Controllers/RootContoller", "Libraries", 
         };
         Main.prototype.PolyfillPromise = function () {
             try {
-                Libraries_2.default.es6Promise.polyfill();
+                Libraries_4.default.es6Promise.polyfill();
                 //console.log('Promise Polyfill OK.');
             }
             catch (ex) {
