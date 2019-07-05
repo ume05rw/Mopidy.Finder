@@ -1,15 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MusicFront.Models.Artists;
 using MusicFront.Models.Bases;
-using MusicFront.Models.Genres;
 using MusicFront.Models.Mopidies.Methods;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace MusicFront.Models.Albums
 {
-    public class AlbumStore : StoreBase<Album>
+    public class AlbumStore : PagenagedStoreBase<Album>
     {
         private const string QueryString = "local:directory?type=album";
 
@@ -20,29 +17,41 @@ namespace MusicFront.Models.Albums
         public Album Get(int genreId)
             => this.Dbc.GetAlbumQuery().FirstOrDefault(e => e.Id == genreId);
 
-        public List<Album> GetList(string[] names, int[] ids)
+        public PagenatedResult GetPagenatedList(int[] genreIds, int[] artistIds, int? page)
         {
             var query = this.Dbc.GetAlbumQuery();
-            if (names != null && 0 < names.Length)
-                query = query.Where(e => names.All(name => e.LowerName.Contains(name.ToLower())));
-            if (ids != null && 0 < ids.Length)
-                query = query.Where(e => ids.Contains(e.Id));
 
-            return query.ToList();
+            if (genreIds != null && 0 < genreIds.Length)
+                query = query
+                    .Where(e => e.GenreAlbums.Any(e2 => genreIds.Contains(e2.GenreId)));
+
+            if (artistIds != null && 0 < artistIds.Length)
+                query = query
+                    .Where(e => e.ArtistAlbums.Any(e2 => artistIds.Contains(e2.ArtistId)));
+
+            var totalLength = query.Count();
+
+            query = query.OrderBy(e => e.Name);
+
+            if (page != null)
+            {
+                query = query
+                    .Skip(((int)page - 1) * this.PageLength)
+                    .Take(this.PageLength);
+            }
+
+            var list = query.ToArray();
+
+            var result = new PagenatedResult()
+            {
+                TotalLength = totalLength,
+                ResultLength = list.Length,
+                ResultPage = page,
+                ResultList = list
+            };
+
+            return result;
         }
-
-        public List<Album> GetListByArtist(Artist artist)
-            => this.Dbc.GetAlbumQuery()
-                .Where(e => e.ArtistAlbums.Select(e2 => e2.ArtistId).Contains(artist.Id))
-                .OrderBy(e => e.Year)
-                .ThenBy(e => e.Name)
-                .ToList();
-
-        public List<Album> GetListByGenre(Genre genre)
-            => this.Dbc.GetAlbumQuery()
-                .Where(e => e.GenreAlbums.Select(e2 => e2.GenreId).Contains(genre.Id))
-                .OrderBy(e => e.Name)
-                .ToList();
 
         public void Refresh()
         {

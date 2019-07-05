@@ -475,30 +475,22 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
         function ArtistStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        ArtistStore.prototype.GetList = function (genre) {
-            if (genre === void 0) { genre = null; }
+        ArtistStore.prototype.GetList = function (genreIds, page) {
             return __awaiter(this, void 0, void 0, function () {
-                var result, _a, entities;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0:
-                            if (!(!genre)) return [3 /*break*/, 2];
-                            return [4 /*yield*/, this.QueryGet('Artist/GetList')];
-                        case 1:
-                            _a = _b.sent();
-                            return [3 /*break*/, 4];
-                        case 2: return [4 /*yield*/, this.QueryGet('Artist/GetListByGenreId', {
-                                genreId: genre.Id
+                var result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Artist/GetPagenatedList', {
+                                genreIds: genreIds,
+                                page: page
                             })];
-                        case 3:
-                            _a = _b.sent();
-                            _b.label = 4;
-                        case 4:
-                            result = _a;
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
+                        case 1:
+                            result = _a.sent();
+                            if (!result.Succeeded) {
+                                console.error(result.Errors);
+                                throw new Error('Unexpected Error on ApiQuery');
+                            }
+                            return [2 /*return*/, result.Result];
                     }
                 });
             });
@@ -507,31 +499,37 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
     }(StoreBase_2.default));
     exports.default = ArtistStore;
 });
-define("Views/Finders/ArtistList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Artists/ArtistStore", "Views/Shared/SelectionItem"], function (require, exports, ViewBase_4, vue_class_component_4, ArtistStore_1, SelectionItem_3) {
+define("Views/Finders/ArtistList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Artists/ArtistStore", "Views/Shared/SelectionItem", "vue", "vue-infinite-loading"], function (require, exports, ViewBase_4, vue_class_component_4, ArtistStore_1, SelectionItem_3, vue_2, vue_infinite_loading_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    vue_2.default.use(vue_infinite_loading_1.default);
     var ArtistList = /** @class */ (function (_super) {
         __extends(ArtistList, _super);
         function ArtistList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.store = new ArtistStore_1.default();
+            _this.page = 1;
+            _this.genreIds = [];
             _this.entities = [];
             return _this;
         }
-        ArtistList.prototype.Initialize = function () {
+        ArtistList.prototype.OnInfinite = function ($state) {
             return __awaiter(this, void 0, void 0, function () {
-                var _a;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                var result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.store.GetList(this.genreIds, this.page)];
                         case 1:
-                            _b.sent();
-                            _a = this;
-                            return [4 /*yield*/, this.store.GetList()];
-                        case 2:
-                            _a.entities = (_b.sent())
-                                .orderBy(function (e) { return e.Name; })
-                                .toArray();
+                            result = _a.sent();
+                            if (0 < result.ResultList.length)
+                                this.entities = this.entities.concat(result.ResultList);
+                            if (this.entities.length < result.TotalLength) {
+                                $state.loaded();
+                                this.page++;
+                            }
+                            else {
+                                $state.complete();
+                            }
                             return [2 /*return*/, true];
                     }
                 });
@@ -543,7 +541,7 @@ define("Views/Finders/ArtistList", ["require", "exports", "Views/Bases/ViewBase"
         };
         ArtistList = __decorate([
             vue_class_component_4.default({
-                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_3.default
                 }
@@ -571,54 +569,23 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBas
         function AlbumStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        AlbumStore.prototype.GetList = function () {
+        AlbumStore.prototype.GetList = function (genreIds, artistIds, page) {
             return __awaiter(this, void 0, void 0, function () {
-                var result, entities;
+                var result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetList')];
-                        case 1:
-                            result = _a.sent();
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
-                    }
-                });
-            });
-        };
-        AlbumStore.prototype.GetListByArtist = function (artist) {
-            return __awaiter(this, void 0, void 0, function () {
-                var result, entities;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetListByArtistId', {
-                                artistId: artist.Id
+                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetPagenatedList', {
+                                genreIds: genreIds,
+                                artistIds: artistIds,
+                                page: page
                             })];
                         case 1:
                             result = _a.sent();
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
-                    }
-                });
-            });
-        };
-        AlbumStore.prototype.GetListByGenre = function (genre) {
-            return __awaiter(this, void 0, void 0, function () {
-                var result, entities;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Album/GetListByGenreId', {
-                                genreId: genre.Id
-                            })];
-                        case 1:
-                            result = _a.sent();
-                            entities = (result.Succeeded)
-                                ? result.Result
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
+                            if (!result.Succeeded) {
+                                console.error(result.Errors);
+                                throw new Error('Unexpected Error on ApiQuery');
+                            }
+                            return [2 /*return*/, result.Result];
                     }
                 });
             });
@@ -627,31 +594,38 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = AlbumStore;
 });
-define("Views/Finders/AlbumList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Albums/AlbumStore", "Views/Shared/SelectionItem"], function (require, exports, ViewBase_5, vue_class_component_5, AlbumStore_1, SelectionItem_4) {
+define("Views/Finders/AlbumList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Albums/AlbumStore", "Views/Shared/SelectionItem", "vue", "vue-infinite-loading"], function (require, exports, ViewBase_5, vue_class_component_5, AlbumStore_1, SelectionItem_4, vue_3, vue_infinite_loading_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    vue_3.default.use(vue_infinite_loading_2.default);
     var AlbumList = /** @class */ (function (_super) {
         __extends(AlbumList, _super);
         function AlbumList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.store = new AlbumStore_1.default();
+            _this.page = 1;
+            _this.genreIds = [];
+            _this.artistIds = [];
             _this.entities = [];
             return _this;
         }
-        AlbumList.prototype.Initialize = function () {
+        AlbumList.prototype.OnInfinite = function ($state) {
             return __awaiter(this, void 0, void 0, function () {
-                var _a;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                var result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.store.GetList(this.genreIds, this.artistIds, this.page)];
                         case 1:
-                            _b.sent();
-                            _a = this;
-                            return [4 /*yield*/, this.store.GetList()];
-                        case 2:
-                            _a.entities = (_b.sent())
-                                .orderBy(function (e) { return e.Name; })
-                                .toArray();
+                            result = _a.sent();
+                            if (0 < result.ResultList.length)
+                                this.entities = this.entities.concat(result.ResultList);
+                            if (this.entities.length < result.TotalLength) {
+                                $state.loaded();
+                                this.page++;
+                            }
+                            else {
+                                $state.complete();
+                            }
                             return [2 /*return*/, true];
                     }
                 });
@@ -663,7 +637,7 @@ define("Views/Finders/AlbumList", ["require", "exports", "Views/Bases/ViewBase",
         };
         AlbumList = __decorate([
             vue_class_component_5.default({
-                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @click=\"OnClickItem\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRemove\" >\n                    <i class=\"fa fa-remove\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @click=\"OnClickItem\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_4.default
                 }

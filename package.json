@@ -27,7 +27,6 @@
         "chai": "^4.2.0",
         "css-loader": "^3.0.0",
         "eslint": "^5.16.0",
-        "extract-text-webpack-plugin": "^3.0.2",
         "file-loader": "^4.0.0",
         "mocha": "^6.1.4",
         "source-map-loader": "^0.2.4",
@@ -50,6 +49,7 @@
         "requirejs": "^2.3.6",
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0",
+        "vue-infinite-loading": "^2.4.4",
         "vue-property-decorator": "^8.2.1"
     }
 }

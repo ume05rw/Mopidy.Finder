@@ -12,6 +12,7 @@ import * as Enumerable from 'linq';
 import Vue from 'vue';
 import VueClassComponent from 'vue-class-component';
 import * as VuePropertyDecorator from 'vue-property-decorator';
+import InfiniteLoading from 'vue-infinite-loading';
 
 window.__globals = {
     'es6-promise': es6Promise,
@@ -22,5 +23,6 @@ window.__globals = {
     'linq': Enumerable,
     'vue': Vue,
     'vue-class-component': VueClassComponent,
-    'vue-property-decorator': VuePropertyDecorator
+    'vue-property-decorator': VuePropertyDecorator,
+    'vue-infinite-loading': InfiniteLoading
 };

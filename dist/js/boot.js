@@ -79,6 +79,15 @@ define('vue-property-decorator', ["exports"], function (exports) {
     }
 });
 
+// vue-infinite-loading
+define('vue-infinite-loading', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['vue-infinite-loading'];
+});
+
+
+
 // ダミー: site.css
 define('../css/site.css', ["exports"], function (exports) {
     "use strict";

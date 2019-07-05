@@ -1,20 +1,19 @@
-import { IEnumerable } from 'linq';
-import StoreBase from '../Bases/StoreBase';
-import Genre from '../Genres/Genre';
+import { default as StoreBase, PagenatedResult } from '../Bases/StoreBase';
 import Artist from './Artist';
 
 export default class ArtistStore extends StoreBase<Artist> {
 
-    public async GetList(genre: Genre = null): Promise<IEnumerable<Artist>> {
-        const result = (!genre)
-            ? await this.QueryGet('Artist/GetList')
-            : await this.QueryGet('Artist/GetListByGenreId', {
-                genreId: genre.Id
-            });
-        const entities = (result.Succeeded)
-            ? result.Result as Artist[]
-            : [];
+    public async GetList(genreIds: number[], page: number): Promise<PagenatedResult<Artist>> {
+        const result = await this.QueryGet('Artist/GetPagenatedList', {
+            genreIds: genreIds,
+            page: page
+        });
 
-        return this.Enumerable.from(entities);
+        if (!result.Succeeded) {
+            console.error(result.Errors);
+            throw new Error('Unexpected Error on ApiQuery');
+        }
+
+        return result.Result as PagenatedResult<Artist>;
     }
 }
