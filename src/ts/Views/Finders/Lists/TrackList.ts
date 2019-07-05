@@ -1,14 +1,14 @@
-import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
-import GenreStore from '../../Models/Genres/GenreStore';
-import SelectionItem from '../Shared/SelectionItem';
-import Genre from 'src/ts/Models/Genres/Genre';
+import Track from '../../../Models/Tracks/Track';
+import TrackStore from '../../../Models/Tracks/TrackStore';
+import ViewBase from '../../Bases/ViewBase';
+import SelectionItem from '../../Shared/SelectionItem';
 
 @Component({
-    template: `<div class="col-md-2 h-100">
+    template: `<div class="col-md-6 h-100">
     <div class="card h-100">
-        <div class="card-header with-border bg-green">
-            <h3 class="card-title">Genres</h3>
+        <div class="card-header with-border bg-secondary">
+            <h3 class="card-title">Artists</h3>
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
@@ -33,17 +33,17 @@ import Genre from 'src/ts/Models/Genres/Genre';
         'selection-item': SelectionItem
     }
 })
-export default class GenreList extends ViewBase {
+export default class TrackList extends ViewBase {
 
-    private store: GenreStore = new GenreStore();
-    private entities: Genre[] = [];
+    private store: TrackStore = new TrackStore();
+    private entities: Track[] = [];
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        this.entities = (await this.store.GetList())
-            .orderBy(e => e.Name)
-            .toArray();
+        //this.entities = (await this.store.GetList())
+        //    .orderBy(e => e.Name)
+        //    .toArray();
 
         return true;
     }

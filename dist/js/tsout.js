@@ -128,6 +128,40 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
     }(ViewBase_1.default));
     exports.default = Sidebar;
 });
+define("Models/Bases/ISelectionItem", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Relations/GenreArtist", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var GenreArtist = /** @class */ (function () {
+        function GenreArtist() {
+        }
+        return GenreArtist;
+    }());
+    exports.default = GenreArtist;
+});
+define("Models/Relations/GenreAlbum", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var GenreAlbum = /** @class */ (function () {
+        function GenreAlbum() {
+        }
+        return GenreAlbum;
+    }());
+    exports.default = GenreAlbum;
+});
+define("Models/Genres/Genre", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Genre = /** @class */ (function () {
+        function Genre() {
+        }
+        return Genre;
+    }());
+    exports.default = Genre;
+});
 define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs"], function (require, exports, axios_1, qs) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -291,40 +325,6 @@ define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bas
     }(XhrQueryableBase_1.default));
     exports.default = StoreBase;
 });
-define("Models/Bases/ISelectionItem", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Relations/GenreArtist", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var GenreArtist = /** @class */ (function () {
-        function GenreArtist() {
-        }
-        return GenreArtist;
-    }());
-    exports.default = GenreArtist;
-});
-define("Models/Relations/GenreAlbum", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var GenreAlbum = /** @class */ (function () {
-        function GenreAlbum() {
-        }
-        return GenreAlbum;
-    }());
-    exports.default = GenreAlbum;
-});
-define("Models/Genres/Genre", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Genre = /** @class */ (function () {
-        function Genre() {
-        }
-        return Genre;
-    }());
-    exports.default = Genre;
-});
 define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -401,7 +401,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
     }(ViewBase_2.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/GenreList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Genres/GenreStore", "Views/Shared/SelectionItem"], function (require, exports, ViewBase_3, vue_class_component_3, GenreStore_1, SelectionItem_2) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Shared/SelectionItem"], function (require, exports, vue_class_component_3, GenreStore_1, ViewBase_3, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -499,7 +499,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
     }(StoreBase_2.default));
     exports.default = ArtistStore;
 });
-define("Views/Finders/ArtistList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Artists/ArtistStore", "Views/Shared/SelectionItem", "vue", "vue-infinite-loading"], function (require, exports, ViewBase_4, vue_class_component_4, ArtistStore_1, SelectionItem_3, vue_2, vue_infinite_loading_1) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "vue", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Shared/SelectionItem"], function (require, exports, vue_2, vue_class_component_4, vue_infinite_loading_1, ArtistStore_1, ViewBase_4, SelectionItem_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     vue_2.default.use(vue_infinite_loading_1.default);
@@ -594,7 +594,7 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = AlbumStore;
 });
-define("Views/Finders/AlbumList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Albums/AlbumStore", "Views/Shared/SelectionItem", "vue", "vue-infinite-loading"], function (require, exports, ViewBase_5, vue_class_component_5, AlbumStore_1, SelectionItem_4, vue_3, vue_infinite_loading_2) {
+define("Views/Finders/Lists/AlbumList", ["require", "exports", "vue", "vue-class-component", "vue-infinite-loading", "Models/Albums/AlbumStore", "Views/Bases/ViewBase", "Views/Shared/SelectionItem"], function (require, exports, vue_3, vue_class_component_5, vue_infinite_loading_2, AlbumStore_1, ViewBase_5, SelectionItem_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     vue_3.default.use(vue_infinite_loading_2.default);
@@ -701,7 +701,7 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_4.default));
     exports.default = TrackStore;
 });
-define("Views/Finders/TrackList", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Models/Tracks/TrackStore", "Views/Shared/SelectionItem"], function (require, exports, ViewBase_6, vue_class_component_6, TrackStore_1, SelectionItem_5) {
+define("Views/Finders/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/Tracks/TrackStore", "Views/Bases/ViewBase", "Views/Shared/SelectionItem"], function (require, exports, vue_class_component_6, TrackStore_1, ViewBase_6, SelectionItem_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackList = /** @class */ (function (_super) {
@@ -743,7 +743,7 @@ define("Views/Finders/TrackList", ["require", "exports", "Views/Bases/ViewBase",
     }(ViewBase_6.default));
     exports.default = TrackList;
 });
-define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Views/Finders/GenreList", "Views/Finders/ArtistList", "Views/Finders/AlbumList", "Views/Finders/TrackList"], function (require, exports, ViewBase_7, vue_class_component_7, GenreList_1, ArtistList_1, AlbumList_1, TrackList_1) {
+define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Views/Finders/Lists/GenreList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/AlbumList", "Views/Finders/Lists/TrackList"], function (require, exports, ViewBase_7, vue_class_component_7, GenreList_1, ArtistList_1, AlbumList_1, TrackList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {

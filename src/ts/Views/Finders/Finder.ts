@@ -1,9 +1,9 @@
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
-import GenreList from './GenreList';
-import ArtistList from './ArtistList';
-import AlbumList from './AlbumList';
-import TrackList from './TrackList';
+import GenreList from './Lists/GenreList';
+import ArtistList from './Lists/ArtistList';
+import AlbumList from './Lists/AlbumList';
+import TrackList from './Lists/TrackList';
 
 @Component({
     template: `<section class="content h-100">

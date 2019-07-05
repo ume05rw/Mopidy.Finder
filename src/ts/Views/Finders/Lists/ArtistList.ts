@@ -1,10 +1,10 @@
-import ViewBase from '../Bases/ViewBase';
-import Component from 'vue-class-component';
-import ArtistStore from '../../Models/Artists/ArtistStore';
-import SelectionItem from '../Shared/SelectionItem';
-import Artist from 'src/ts/Models/Artists/Artist';
 import Vue from 'vue';
+import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
+import Artist from '../../../Models/Artists/Artist';
+import ArtistStore from '../../../Models/Artists/ArtistStore';
+import ViewBase from '../../Bases/ViewBase';
+import SelectionItem from '../../Shared/SelectionItem';
 
 Vue.use(InfiniteLoading);
 
