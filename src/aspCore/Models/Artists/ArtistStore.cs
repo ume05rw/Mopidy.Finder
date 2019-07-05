@@ -37,14 +37,14 @@ namespace MusicFront.Models.Artists
                     .Take(this.PageLength);
             }
 
-            var list = query.ToArray();
+            var array = query.ToArray();
 
             var result = new PagenatedResult()
             {
                 TotalLength = totalLength,
-                ResultLength = list.Length,
+                ResultLength = array.Length,
                 ResultPage = page,
-                ResultList = list
+                ResultList = array
             };
 
             return result;

@@ -78,10 +78,17 @@ namespace MusicFront.Models.Tracks
                 .Select(e => e.Uri)
                 .ToArray();
 
+            if (trackUris.Length <= 0)
+                return new List<Track>();
+
             var mopidyTracks = await Library.Lookup(trackUris);
+
+            if (mopidyTracks == null || mopidyTracks.Count() <= 0)
+                return new List<Track>();
 
             var result = mopidyTracks
                 .Select(mt => this.Create(mt))
+                .OrderBy(e => e.TrackNo)
                 .ToList();
 
             return result;

@@ -3,6 +3,7 @@ import Genre from '../../../Models/Genres/Genre';
 import GenreStore from '../../../Models/Genres/GenreStore';
 import ViewBase from '../../Bases/ViewBase';
 import SelectionItem from '../../Shared/SelectionItem';
+import { Events, ISelectionChangedArgs } from '../../Events/ListEvents';
 
 @Component({
     template: `<div class="col-md-2 h-100">
@@ -12,8 +13,8 @@ import SelectionItem from '../../Shared/SelectionItem';
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
-                        @click="OnClickRemove" >
-                    <i class="fa fa-remove" />
+                        @click="OnClickRefresh" >
+                    <i class="fa fa-redo" />
                 </button>
             </div>
         </div>
@@ -23,7 +24,7 @@ import SelectionItem from '../../Shared/SelectionItem';
                 <selection-item
                     ref="Items"
                     v-bind:entity="entity"
-                    @click="OnClickItem" />
+                    @SelectionChanged="OnSelectionChanged" />
             </template>
             </ul>
         </div>
@@ -48,11 +49,18 @@ export default class GenreList extends ViewBase {
         return true;
     }
 
-    private OnClickRemove(): void {
-
+    private OnClickRefresh(): void {
+        this.Refresh();
+        this.$emit(Events.Refreshed);
     }
 
-    private OnClickItem(): void {
+    private OnSelectionChanged(args: ISelectionChangedArgs): void {
+        console.log('GenreList.OnSelectionChanged');
+        this.$emit(Events.SelectionChanged, args);
+    }
 
+    public Refresh(): void {
+        this.entities = [];
+        this.Initialize();
     }
 }

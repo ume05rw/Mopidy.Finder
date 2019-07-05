@@ -8,6 +8,7 @@ export default class Album implements ISelectionItem {
     public LowerName: string;
     public Uri: string;
     public Year: number;
+    public ImageUri: string;
     public ArtistAlbums: ArtistAlbum[];
     public GenreAlbums: GenreAlbum[];
 }

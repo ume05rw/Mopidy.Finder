@@ -1,6 +1,8 @@
+import * as _ from 'lodash';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
+import { Events, ISelectionChangedArgs } from '../../Events/ListEvents';
 import Artist from '../../../Models/Artists/Artist';
 import ArtistStore from '../../../Models/Artists/ArtistStore';
 import ViewBase from '../../Bases/ViewBase';
@@ -16,8 +18,8 @@ Vue.use(InfiniteLoading);
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
-                        @click="OnClickRemove" >
-                    <i class="fa fa-remove" />
+                        @click="OnClickRefresh" >
+                    <i class="fa fa-redo" />
                 </button>
             </div>
         </div>
@@ -27,9 +29,9 @@ Vue.use(InfiniteLoading);
                 <selection-item
                     ref="Items"
                     v-bind:entity="entity"
-                    @click="OnClickItem" />
+                    @SelectionChanged="OnSelectionChanged" />
                 </template>
-                <infinite-loading @infinite="OnInfinite"></infinite-loading>
+                <infinite-loading @infinite="OnInfinite" ref="InfiniteLoading"></infinite-loading>
             </ul>
         </div>
     </div>
@@ -62,11 +64,47 @@ export default class ArtistList extends ViewBase {
         return true;
     }
 
-    private OnClickRemove(): void {
-
+    private OnClickRefresh(): void {
+        this.Refresh();
+        this.$emit(Events.Refreshed);
     }
 
-    private OnClickItem(): void {
+    private OnSelectionChanged(args: ISelectionChangedArgs): void {
+        console.log('ArtistList.OnSelectionChanged');
+        this.$emit(Events.SelectionChanged, args);
+    }
 
+    private Refresh(): void {
+        this.page = 1;
+        this.entities = [];
+        this.$nextTick(() => {
+            (this.$refs.InfiniteLoading as InfiniteLoading).stateChanger.reset();
+            (this.$refs.InfiniteLoading as any).attemptLoad();
+        });
+    }
+
+    private HasGenre(genreId: number): boolean {
+        return (0 <= _.indexOf(this.genreIds, genreId));
+    }
+
+    public AddFilterGenreId(genreId: number): void {
+        if (!this.HasGenre(genreId)) {
+            this.genreIds.push(genreId);
+            this.Refresh();
+        }
+    }
+
+    public RemoveFilterGenreId(genreId: number): void {
+        if (this.HasGenre(genreId)) {
+            _.pull(this.genreIds, genreId);
+            this.Refresh();
+        }
+    }
+
+    public RemoveAllFilters(): void {
+        if (0 < this.genreIds.length) {
+            this.genreIds = [];
+            this.Refresh();
+        }
     }
 }

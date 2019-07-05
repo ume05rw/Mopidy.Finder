@@ -1,8 +1,9 @@
 import Component from 'vue-class-component';
 import Track from '../../../Models/Tracks/Track';
-import TrackStore from '../../../Models/Tracks/TrackStore';
+import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
+import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import ViewBase from '../../Bases/ViewBase';
-import SelectionItem from '../../Shared/SelectionItem';
+import SelectionAlbumTracks from './SelectionAlbumTracks';
 
 @Component({
     template: `<div class="col-md-6 h-100">
@@ -12,16 +13,16 @@ import SelectionItem from '../../Shared/SelectionItem';
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
-                        @click="OnClickRemove" >
-                    <i class="fa fa-remove" />
+                        @click="OnClickRefresh" >
+                    <i class="fas fa-redo" />
                 </button>
             </div>
         </div>
         <div class="card-body list-scrollable">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
             <template v-for="entity in entities">
-                <selection-item
-                    ref="Items"
+                <selection-album-tracks
+                    ref="AlbumTracks"
                     v-bind:entity="entity"
                     @click="OnClickItem" />
             </template>
@@ -30,13 +31,15 @@ import SelectionItem from '../../Shared/SelectionItem';
     </div>
 </div>`,
     components: {
-        'selection-item': SelectionItem
+        'selection-album-tracks': SelectionAlbumTracks
     }
 })
 export default class TrackList extends ViewBase {
 
-    private store: TrackStore = new TrackStore();
-    private entities: Track[] = [];
+    private readonly PageLength: number = 10;
+    private albumIds: number[] = [];
+    private store: AlbumTracksStore = new AlbumTracksStore();
+    private entities: AlbumTracks[] = [];
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
@@ -48,7 +51,7 @@ export default class TrackList extends ViewBase {
         return true;
     }
 
-    private OnClickRemove(): void {
+    private OnClickRefresh(): void {
 
     }
 

@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MusicFront.Models;
 using MusicFront.Models.Albums;
+using MusicFront.Models.AlbumTracks;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
 using MusicFront.Models.Relations;
@@ -88,6 +89,7 @@ namespace MusicFront
                 .AddTransient<ArtistAlbumStore, ArtistAlbumStore>()
                 .AddTransient<GenreAlbumStore, GenreAlbumStore>()
                 .AddTransient<GenreArtistStore, GenreArtistStore>()
+                .AddTransient<AlbumTracksStore, AlbumTracksStore>()
                 .AddTransient<TrackStore, TrackStore>();
         }
 
