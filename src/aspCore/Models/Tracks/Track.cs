@@ -54,9 +54,8 @@ namespace MusicFront.Models.Tracks
         [JsonProperty("LastModified")]
         public long? LastModified { get; set; }
 
-        [Required]
         [JsonProperty("GenreId")]
-        public int GenreId { get; set; }
+        public int? GenreId { get; set; }
 
         [Required]
         [JsonProperty("AlbumId")]

@@ -142,7 +142,7 @@ namespace MusicFront.Migrations
                     Length = table.Column<int>(nullable: true),
                     BitRate = table.Column<int>(nullable: false),
                     LastModified = table.Column<long>(nullable: true),
-                    GenreId = table.Column<int>(nullable: false),
+                    GenreId = table.Column<int>(nullable: true),
                     AlbumId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
@@ -159,7 +159,7 @@ namespace MusicFront.Migrations
                         column: x => x.GenreId,
                         principalTable: "genres",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(

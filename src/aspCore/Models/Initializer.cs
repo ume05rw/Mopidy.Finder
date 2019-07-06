@@ -3,6 +3,7 @@ using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
 using MusicFront.Models.Relations;
+using MusicFront.Models.Tracks;
 using System;
 using System.Linq;
 
@@ -29,6 +30,7 @@ namespace MusicFront.Models
             using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
             using (var albumStore = serviceScope.ServiceProvider.GetService<AlbumStore>())
             using (var artistStore = serviceScope.ServiceProvider.GetService<ArtistStore>())
+            using (var trackStore = serviceScope.ServiceProvider.GetService<TrackStore>())
             using (var genreStore = serviceScope.ServiceProvider.GetService<GenreStore>())
             using (var artistAlbumStore = serviceScope.ServiceProvider.GetService<ArtistAlbumStore>())
             using (var genreAlbumStore = serviceScope.ServiceProvider.GetService<GenreAlbumStore>())
@@ -52,6 +54,8 @@ namespace MusicFront.Models
                     if (force || dbc.GenreArtists.FirstOrDefault() == null)
                         genreArtistStore.Refresh();
 
+                    //if (force || dbc.Tracks.FirstOrDefault() == null)
+                    //    trackStore.Refresh();
                 }
                 catch (Exception ex)
                 {

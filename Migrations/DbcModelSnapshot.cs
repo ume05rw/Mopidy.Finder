@@ -190,7 +190,7 @@ namespace MusicFront.Migrations
 
                     b.Property<int?>("DiscNo");
 
-                    b.Property<int>("GenreId");
+                    b.Property<int?>("GenreId");
 
                     b.Property<long?>("LastModified");
 
@@ -305,8 +305,7 @@ namespace MusicFront.Migrations
 
                     b.HasOne("MusicFront.Models.Genres.Genre", "Genre")
                         .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("GenreId");
                 });
 #pragma warning restore 612, 618
         }

@@ -9,7 +9,7 @@ using MusicFront.Models;
 namespace MusicFront.Migrations
 {
     [DbContext(typeof(Dbc))]
-    [Migration("20190706072609_CreateTables")]
+    [Migration("20190706135633_CreateTables")]
     partial class CreateTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -192,7 +192,7 @@ namespace MusicFront.Migrations
 
                     b.Property<int?>("DiscNo");
 
-                    b.Property<int>("GenreId");
+                    b.Property<int?>("GenreId");
 
                     b.Property<long?>("LastModified");
 
@@ -307,8 +307,7 @@ namespace MusicFront.Migrations
 
                     b.HasOne("MusicFront.Models.Genres.Genre", "Genre")
                         .WithMany()
-                        .HasForeignKey("GenreId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("GenreId");
                 });
 #pragma warning restore 612, 618
         }

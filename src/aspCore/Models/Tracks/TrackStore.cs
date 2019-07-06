@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Genres;
@@ -107,6 +108,9 @@ namespace MusicFront.Models.Tracks
 
         private Albums.Album GetAlbumByUri(string uri)
         {
+            if (string.IsNullOrEmpty(uri))
+                return null;
+
             if (this.AlbumCache.ContainsKey(uri))
             {
                 return this.AlbumCache[uri];
@@ -122,6 +126,9 @@ namespace MusicFront.Models.Tracks
 
         private Genre GetGenreByName(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
             if (this.GenreCache.ContainsKey(name))
             {
                 return this.GenreCache[name];
@@ -137,6 +144,9 @@ namespace MusicFront.Models.Tracks
 
         private Artists.Artist GetArtistByUri(string uri)
         {
+            if (string.IsNullOrEmpty(uri))
+                return null;
+
             if (this.ArtistCache.ContainsKey(uri))
             {
                 return this.ArtistCache[uri];
@@ -216,6 +226,8 @@ namespace MusicFront.Models.Tracks
             }
         }
 
+        
+
         public Task<bool> ClearList()
             => Tracklist.Clear();
 
@@ -246,6 +258,123 @@ namespace MusicFront.Models.Tracks
                 ? null
                 : this.Create(tlTrack);
         }
+
+        //public void Refresh()
+        //{
+        //    var albums = this.Dbc.Albums.ToArray();
+        //    foreach (var album in albums)
+        //    {
+        //        var refs = Library.Browse(album.Uri)
+        //            .GetAwaiter()
+        //            .GetResult();
+
+        //        var trackUris = refs
+        //            .Where(e => e.Type == Ref.TypeTrack)
+        //            .Select(e => e.Uri)
+        //            .ToArray();
+
+        //        if (trackUris.Length <= 0)
+        //            continue;
+
+        //        var mopidyTracks = Library.Lookup(trackUris)
+        //            .GetAwaiter()
+        //            .GetResult();
+
+        //        if (mopidyTracks == null || mopidyTracks.Count() <= 0)
+        //            continue;
+
+        //        var tracks = mopidyTracks
+        //            .Select(mt => this.CreateTrack(mt))
+        //            .OrderBy(e => e.TrackNo)
+        //            .ToArray();
+
+        //        foreach (var track in tracks)
+        //        {
+        //            foreach (var tr in track.TrackArtists)
+        //                this.Dbc.TrackArtists.Add(tr);
+        //            foreach (var tc in track.TrackComposers)
+        //                this.Dbc.TrackComposers.Add(tc);
+        //            foreach (var tp in track.TrackPerformers)
+        //                this.Dbc.TrackPerformers.Add(tp);
+
+        //            this.Dbc.Tracks.Add(track);
+        //        }
+        //    }
+
+        //    this.Dbc.SaveChanges();
+        //}
+
+
+        //private Track CreateTrack(Mopidies.Track mopidyTrack)
+        //{
+        //    var album = this.GetAlbumByUri(mopidyTrack.Album.Uri);
+        //    var genre = this.GetGenreByName(mopidyTrack.Genre);
+        //    if (genre == null)
+        //    {
+        //        var genreAlbum = this.Dbc.GenreAlbums
+        //            .Include(e => e.Genre)
+        //            .FirstOrDefault(e => e.AlbumId == album.Id);
+        //        if (genreAlbum != null)
+        //            genre = genreAlbum.Genre;
+        //    }
+        //    var artists = (mopidyTrack.Artists == null)
+        //        ? new List<Artists.Artist>()
+        //        : this.GetArtistListByMopidyList(mopidyTrack.Artists);
+        //    var composers = (mopidyTrack.Composers == null)
+        //        ? new List<Artists.Artist>()
+        //        : this.GetArtistListByMopidyList(mopidyTrack.Composers);
+        //    var performers = (mopidyTrack.Performers == null)
+        //        ? new List<Artists.Artist>()
+        //        : this.GetArtistListByMopidyList(mopidyTrack.Performers);
+
+        //    var track = new Track()
+        //    {
+        //        Name = mopidyTrack.Name,
+        //        LowerName = mopidyTrack.Name.ToLower(),
+        //        Uri = mopidyTrack.Uri,
+        //        TrackNo = mopidyTrack.TrackNo,
+        //        DiscNo = mopidyTrack.DiscNo,
+        //        Length = mopidyTrack.Length,
+        //        Date = mopidyTrack.Date,
+        //        Comment = mopidyTrack.Comment,
+        //        BitRate = mopidyTrack.BitRate,
+        //        LastModified = mopidyTrack.LastModified,
+        //        AlbumId = album.Id,
+        //        GenreId = (genre != null)
+        //            ? (int?)genre.Id
+        //            : null,
+        //        Album = album,
+        //        Genre = genre,
+        //        Artists = artists,
+        //        Composers = composers,
+        //        Performers = performers
+        //    };
+
+        //    track.TrackArtists = (0 < artists.Count())
+        //        ? artists.Select(e => new Relations.TrackArtist()
+        //        {
+        //            TrackId = track.Id,
+        //            ArtistId = e.Id
+        //        }).ToList()
+        //        : new List<Relations.TrackArtist>();
+        //    track.TrackComposers = (0 < composers.Count())
+        //        ? composers.Select(e => new Relations.TrackComposer()
+        //        {
+        //            TrackId = track.Id,
+        //            ComposerId = e.Id
+        //        }).ToList()
+        //        : new List<Relations.TrackComposer>();
+        //    track.TrackPerformers = (0 < performers.Count())
+        //        ? performers.Select(e => new Relations.TrackPerformer()
+        //        {
+        //            TrackId = track.Id,
+        //            PerformerId = e.Id
+        //        }).ToList()
+        //        : new List<Relations.TrackPerformer>();
+
+        //    return track;
+        //}
+
 
         protected override void Dispose(bool disposing)
         {
