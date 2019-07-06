@@ -19,7 +19,7 @@ Vue.use(InfiniteLoading);
                 <button type="button"
                         class="btn btn-tool"
                         @click="OnClickRefresh" >
-                    <i class="fa fa-redo" />
+                    <i class="fa fa-repeat" />
                 </button>
             </div>
         </div>

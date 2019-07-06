@@ -4,16 +4,19 @@ import Artist from './Artist';
 export default class ArtistStore extends StoreBase<Artist> {
 
     public async GetList(genreIds: number[], page: number): Promise<PagenatedResult<Artist>> {
-        const result = await this.QueryGet('Artist/GetPagenatedList', {
+        const response = await this.QueryGet('Artist/GetPagenatedList', {
             genreIds: genreIds,
             page: page
         });
 
-        if (!result.Succeeded) {
-            console.error(result.Errors);
+        if (!response.Succeeded) {
+            console.error(response.Errors);
             throw new Error('Unexpected Error on ApiQuery');
         }
 
-        return result.Result as PagenatedResult<Artist>;
+        var result = response.Result as PagenatedResult<Artist>;
+        result.ResultList = Artist.CreateArray(result.ResultList);
+
+        return result;
     }
 }

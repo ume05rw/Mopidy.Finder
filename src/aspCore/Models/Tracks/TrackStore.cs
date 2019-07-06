@@ -124,19 +124,5 @@ namespace MusicFront.Models.Tracks
                 ? null
                 : this.Create(tlTrack);
         }
-
-        //public Task<bool> Play(int? tlId = null)
-        //    => (tlId != null)
-        //        ? Playback.Play((int)tlId)
-        //        : Playback.Resume();
-
-        //public Task<bool> Pause()
-        //    => Playback.Pause();
-
-        //public Task<bool> Next()
-        //    => Playback.Next();
-
-        //public Task<bool> Previous()
-        //    => Playback.Previous();
     }
 }

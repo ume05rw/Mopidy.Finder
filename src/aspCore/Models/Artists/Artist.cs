@@ -27,7 +27,7 @@ namespace MusicFront.Models.Artists
         public string Uri { get; set; }
 
         [JsonProperty("ImageUri")]
-        public string ImageUrl { get; set; }
+        public string ImageUri { get; set; }
 
         [JsonProperty("ArtistAlbums")]
         public List<ArtistAlbum> ArtistAlbums { get; set; }

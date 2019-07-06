@@ -19,7 +19,7 @@ namespace MusicFront.Models.Genres
 
         public List<Genre> GetList()
             => this.Dbc.GetGenreQuery()
-                .OrderBy(e => e.Name)
+                .OrderBy(e => e.LowerName)
                 .ToList();
 
         public void Refresh()

@@ -15,12 +15,12 @@ Vue.use(InfiniteLoading);
     template: `<div class="col-md-6 h-100">
     <div class="card h-100">
         <div class="card-header with-border bg-secondary">
-            <h3 class="card-title">Artists</h3>
+            <h3 class="card-title">Tracks</h3>
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
                         @click="OnClickRefresh" >
-                    <i class="fas fa-redo" />
+                    <i class="fa fa-repeat" />
                 </button>
             </div>
         </div>

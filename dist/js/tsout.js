@@ -132,32 +132,75 @@ define("Models/Bases/ISelectionItem", ["require", "exports"], function (require,
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Relations/GenreArtist", ["require", "exports"], function (require, exports) {
+define("Models/Relations/GenreArtist", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreArtist = /** @class */ (function () {
         function GenreArtist() {
         }
+        GenreArtist.Create = function (entity) {
+            var result = new GenreArtist();
+            result.GenreId = entity.GenreId;
+            result.ArtistId = entity.ArtistId;
+            return result;
+        };
+        GenreArtist.CreateArray = function (entities) {
+            var result = [];
+            _.each(entities, function (entity) {
+                result.push(GenreArtist.Create(entity));
+            });
+            return result;
+        };
         return GenreArtist;
     }());
     exports.default = GenreArtist;
 });
-define("Models/Relations/GenreAlbum", ["require", "exports"], function (require, exports) {
+define("Models/Relations/GenreAlbum", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreAlbum = /** @class */ (function () {
         function GenreAlbum() {
         }
+        GenreAlbum.Create = function (entity) {
+            var result = new GenreAlbum();
+            result.GenreId = entity.GenreId;
+            result.AlbumId = entity.AlbumId;
+            return result;
+        };
+        GenreAlbum.CreateArray = function (entities) {
+            var result = [];
+            _.each(entities, function (entity) {
+                result.push(GenreAlbum.Create(entity));
+            });
+            return result;
+        };
         return GenreAlbum;
     }());
     exports.default = GenreAlbum;
 });
-define("Models/Genres/Genre", ["require", "exports"], function (require, exports) {
+define("Models/Genres/Genre", ["require", "exports", "lodash", "Models/Relations/GenreArtist", "Models/Relations/GenreAlbum"], function (require, exports, _, GenreArtist_1, GenreAlbum_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Genre = /** @class */ (function () {
         function Genre() {
         }
+        Genre.Create = function (entity) {
+            var result = new Genre();
+            result.Id = entity.Id;
+            result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
+            result.Uri = entity.Uri;
+            result.GenreArtists = GenreArtist_1.default.CreateArray(entity.GenreArtists);
+            result.GenreAlbums = GenreAlbum_1.default.CreateArray(entity.GenreAlbums);
+            return result;
+        };
+        Genre.CreateArray = function (entities) {
+            var result = [];
+            _.each(entities, function (entity) {
+                result.push(Genre.Create(entity));
+            });
+            return result;
+        };
         return Genre;
     }());
     exports.default = Genre;
@@ -325,7 +368,7 @@ define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bas
     }(XhrQueryableBase_1.default));
     exports.default = StoreBase;
 });
-define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_1) {
+define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Genres/Genre"], function (require, exports, StoreBase_1, Genre_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreStore = /** @class */ (function (_super) {
@@ -342,7 +385,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
                         case 1:
                             result = _a.sent();
                             entities = (result.Succeeded)
-                                ? result.Result
+                                ? Genre_1.default.CreateArray(result.Result)
                                 : [];
                             return [2 /*return*/, this.Enumerable.from(entities)];
                     }
@@ -437,7 +480,6 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                             return [4 /*yield*/, this.store.GetList()];
                         case 2:
                             _a.entities = (_b.sent())
-                                .orderBy(function (e) { return e.Name; })
                                 .toArray();
                             this.$emit(ListEvents_2.Events.ListAppended, {
                                 entities: this.entities
@@ -460,7 +502,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         };
         GenreList = __decorate([
             vue_class_component_3.default({
-                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-redo\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_2.default
                 }
@@ -470,27 +512,58 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(ViewBase_3.default));
     exports.default = GenreList;
 });
-define("Models/Relations/ArtistAlbum", ["require", "exports"], function (require, exports) {
+define("Models/Relations/ArtistAlbum", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistAlbum = /** @class */ (function () {
         function ArtistAlbum() {
         }
+        ArtistAlbum.Create = function (entity) {
+            var result = new ArtistAlbum();
+            result.ArtistId = entity.ArtistId;
+            result.AlbumId = entity.AlbumId;
+            return result;
+        };
+        ArtistAlbum.CreateArray = function (entities) {
+            var result = [];
+            _.each(entities, function (entity) {
+                result.push(ArtistAlbum.Create(entity));
+            });
+            return result;
+        };
         return ArtistAlbum;
     }());
     exports.default = ArtistAlbum;
 });
-define("Models/Artists/Artist", ["require", "exports"], function (require, exports) {
+define("Models/Artists/Artist", ["require", "exports", "lodash", "Models/Relations/ArtistAlbum", "Models/Relations/GenreArtist"], function (require, exports, _, ArtistAlbum_1, GenreArtist_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Artist = /** @class */ (function () {
         function Artist() {
         }
+        Artist.Create = function (entity) {
+            var result = new Artist();
+            result.Id = entity.Id;
+            result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
+            result.Uri = entity.Uri;
+            result.ImageUri = entity.ImageUri;
+            result.ArtistAlbums = ArtistAlbum_1.default.CreateArray(entity.ArtistAlbums);
+            result.GenreArtists = GenreArtist_2.default.CreateArray(entity.GenreArtists);
+            return result;
+        };
+        Artist.CreateArray = function (entities) {
+            var result = [];
+            _.each(entities, function (entity) {
+                result.push(Artist.Create(entity));
+            });
+            return result;
+        };
         return Artist;
     }());
     exports.default = Artist;
 });
-define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_2) {
+define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Artists/Artist"], function (require, exports, StoreBase_2, Artist_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistStore = /** @class */ (function (_super) {
@@ -500,7 +573,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
         }
         ArtistStore.prototype.GetList = function (genreIds, page) {
             return __awaiter(this, void 0, void 0, function () {
-                var result;
+                var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.QueryGet('Artist/GetPagenatedList', {
@@ -508,12 +581,14 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
                                 page: page
                             })];
                         case 1:
-                            result = _a.sent();
-                            if (!result.Succeeded) {
-                                console.error(result.Errors);
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                console.error(response.Errors);
                                 throw new Error('Unexpected Error on ApiQuery');
                             }
-                            return [2 /*return*/, result.Result];
+                            result = response.Result;
+                            result.ResultList = Artist_1.default.CreateArray(result.ResultList);
+                            return [2 /*return*/, result];
                     }
                 });
             });
@@ -609,7 +684,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
         };
         ArtistList = __decorate([
             vue_class_component_4.default({
-                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-redo\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_3.default
                 }
@@ -619,17 +694,36 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
     }(ViewBase_4.default));
     exports.default = ArtistList;
 });
-define("Models/Albums/Album", ["require", "exports"], function (require, exports) {
+define("Models/Albums/Album", ["require", "exports", "lodash", "Models/Relations/ArtistAlbum", "Models/Relations/GenreAlbum"], function (require, exports, _, ArtistAlbum_2, GenreAlbum_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Album = /** @class */ (function () {
         function Album() {
         }
+        Album.Create = function (entity) {
+            var result = new Album();
+            result.Id = entity.Id;
+            result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
+            result.Uri = entity.Uri;
+            result.Year = entity.Year;
+            result.ImageUri = entity.ImageUri;
+            result.ArtistAlbums = ArtistAlbum_2.default.CreateArray(entity.ArtistAlbums);
+            result.GenreAlbums = GenreAlbum_2.default.CreateArray(entity.GenreAlbums);
+            return result;
+        };
+        Album.CreateArray = function (entities) {
+            var result = [];
+            _.each(entities, function (entity) {
+                result.push(Album.Create(entity));
+            });
+            return result;
+        };
         return Album;
     }());
     exports.default = Album;
 });
-define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_3) {
+define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Albums/Album"], function (require, exports, StoreBase_3, Album_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumStore = /** @class */ (function (_super) {
@@ -639,7 +733,7 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBas
         }
         AlbumStore.prototype.GetList = function (genreIds, artistIds, page) {
             return __awaiter(this, void 0, void 0, function () {
-                var result;
+                var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.QueryGet('Album/GetPagenatedList', {
@@ -648,12 +742,14 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBas
                                 page: page
                             })];
                         case 1:
-                            result = _a.sent();
-                            if (!result.Succeeded) {
-                                console.error(result.Errors);
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                console.error(response.Errors);
                                 throw new Error('Unexpected Error on ApiQuery');
                             }
-                            return [2 /*return*/, result.Result];
+                            result = response.Result;
+                            result.ResultList = Album_1.default.CreateArray(result.ResultList);
+                            return [2 /*return*/, result];
                     }
                 });
             });
@@ -782,7 +878,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
         };
         AlbumList = __decorate([
             vue_class_component_5.default({
-                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-redo\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-2 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_4.default
                 }
@@ -792,12 +888,38 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
     }(ViewBase_5.default));
     exports.default = AlbumList;
 });
-define("Models/Tracks/Track", ["require", "exports"], function (require, exports) {
+define("Models/Tracks/Track", ["require", "exports", "lodash", "Models/Genres/Genre", "Models/Albums/Album", "Models/Artists/Artist"], function (require, exports, _, Genre_2, Album_2, Artist_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Track = /** @class */ (function () {
         function Track() {
         }
+        Track.Create = function (entity) {
+            var result = new Track();
+            result.Name = entity.Name;
+            result.Uri = entity.Uri;
+            result.TlId = entity.TlId;
+            result.DiscNo = entity.DiscNo;
+            result.TrackNo = entity.TrackNo;
+            result.Date = entity.Date;
+            result.Comment = entity.Comment;
+            result.Length = entity.Length;
+            result.BitRate = entity.BitRate;
+            result.LastModified = entity.LastModified;
+            result.Genre = Genre_2.default.Create(entity.Genre);
+            result.Album = Album_2.default.Create(entity.Album);
+            result.Artists = Artist_2.default.CreateArray(entity.Artists);
+            result.Composers = Artist_2.default.CreateArray(entity.Composers);
+            result.Performaers = Artist_2.default.CreateArray(entity.Performaers);
+            return result;
+        };
+        Track.CreateArray = function (entities) {
+            var result = [];
+            _.each(entities, function (entity) {
+                result.push(Track.Create(entity));
+            });
+            return result;
+        };
         Object.defineProperty(Track.prototype, "Id", {
             get: function () {
                 return this.TlId;
@@ -812,16 +934,41 @@ define("Models/Tracks/Track", ["require", "exports"], function (require, exports
             enumerable: true,
             configurable: true
         });
+        Track.prototype.GetTimeString = function () {
+            console.log('Track.TimeString: Length = ' + this.Length);
+            if (!this.Length) {
+                return '';
+            }
+            var minute = ('00' + Math.floor(this.Length / 60000).toString()).slice(-2);
+            var second = ('00' + Math.floor(this.Length % 60000).toString()).slice(-2);
+            console.log('minute: ' + minute);
+            console.log('second: ' + second);
+            return minute + ':' + second;
+        };
         return Track;
     }());
     exports.default = Track;
 });
-define("Models/AlbumTracks/AlbumTracks", ["require", "exports"], function (require, exports) {
+define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "lodash", "Models/Albums/Album", "Models/Artists/Artist", "Models/Tracks/Track"], function (require, exports, _, Album_3, Artist_3, Track_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumTracks = /** @class */ (function () {
         function AlbumTracks() {
         }
+        AlbumTracks.Create = function (entity) {
+            var result = new AlbumTracks();
+            result.Album = Album_3.default.Create(entity.Album);
+            result.Artist = Artist_3.default.Create(entity.Artist);
+            result.Tracks = Track_1.default.CreateArray(entity.Tracks);
+            return result;
+        };
+        AlbumTracks.CreateArray = function (entities) {
+            var result = [];
+            _.each(entities, function (entity) {
+                result.push(AlbumTracks.Create(entity));
+            });
+            return result;
+        };
         Object.defineProperty(AlbumTracks.prototype, "Id", {
             get: function () {
                 return this.Album.Id;
@@ -854,7 +1001,7 @@ define("Models/AlbumTracks/AlbumTracks", ["require", "exports"], function (requi
     }());
     exports.default = AlbumTracks;
 });
-define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bases/StoreBase"], function (require, exports, StoreBase_4) {
+define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bases/StoreBase", "Models/AlbumTracks/AlbumTracks"], function (require, exports, StoreBase_4, AlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumTracksStore = /** @class */ (function (_super) {
@@ -864,19 +1011,20 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
         }
         AlbumTracksStore.prototype.GetList = function (albumIds) {
             return __awaiter(this, void 0, void 0, function () {
-                var result;
+                var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.QueryGet('AlbumTracks/GetList', {
                                 albumIds: albumIds
                             })];
                         case 1:
-                            result = _a.sent();
-                            if (!result.Succeeded) {
-                                console.error(result.Errors);
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                console.error(response.Errors);
                                 throw new Error('Unexpected Error on ApiQuery');
                             }
-                            return [2 /*return*/, result.Result];
+                            result = AlbumTracks_1.default.CreateArray(response.Result);
+                            return [2 /*return*/, result];
                     }
                 });
             });
@@ -885,7 +1033,7 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
     }(StoreBase_4.default));
     exports.default = AlbumTracksStore;
 });
-define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks"], function (require, exports, vue_class_component_6, vue_property_decorator_2, ViewBase_6, AlbumTracks_1) {
+define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks"], function (require, exports, vue_class_component_6, vue_property_decorator_2, ViewBase_6, AlbumTracks_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionAlbumTracks = /** @class */ (function (_super) {
@@ -899,11 +1047,11 @@ define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-c
         };
         __decorate([
             vue_property_decorator_2.Prop(),
-            __metadata("design:type", AlbumTracks_1.default)
+            __metadata("design:type", AlbumTracks_2.default)
         ], SelectionAlbumTracks.prototype, "entity", void 0);
         SelectionAlbumTracks = __decorate([
             vue_class_component_6.default({
-                template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">{{ entity.Artist.Name }}: {{ entity.Album.Name }} / {{ entity.Album.Year }}</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fas fa-caret-right\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img v-bind:href=\"entity.Album.ImageUri\" />\n            </div>\n            <div class=\"col-md-8\">\n                <ul>\n                    <template v-for=\"track in entity.Tracks\">\n                        <li @click=\"OnClickTrack\">\n                            {{ track.TrackNo }}. {{ track.Name }}\n                        </li>\n                    </template>\n                </ul>\n            </div>\n        </div>\n    </div>\n</li>"
+                template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">{{ entity.Artist.Name }}: {{ entity.Album.Name }} {{ (entity.Album.Year) ? '/' + entity.Album.Year : '' }}</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img v-bind:href=\"entity.Album.ImageUri\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-hover\">\n                    <tbody>\n                    <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\">\n                            <td>{{ track.TrackNo }}</td>\n                            <td>{{ track.Name }}</td>\n                            <td>{{ track.GetTimeString() }}</td>\n                        </tr>\n                    </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
@@ -994,7 +1142,7 @@ define("Views/Finders/Lists/TrackList", ["require", "exports", "vue-class-compon
         };
         TrackList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-6 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fas fa-redo\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @click=\"OnClickItem\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6 h-100\">\n    <div class=\"card h-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @click=\"OnClickItem\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-album-tracks': SelectionAlbumTracks_1.default
                 }
@@ -1045,11 +1193,12 @@ define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "v
             console.log(args);
             if (args.selected) {
                 this.ArtistList.AddFilterGenreId(args.entity.Id);
+                this.AlbumList.RemoveAllFilters();
                 this.AlbumList.AddFilterGenreId(args.entity.Id);
             }
             else {
                 this.ArtistList.RemoveFilterGenreId(args.entity.Id);
-                this.AlbumList.RemoveFilterGenreId(args.entity.Id);
+                this.AlbumList.RemoveAllFilters();
             }
             this.TrackList.ClearAlbumIds();
         };
@@ -1082,6 +1231,7 @@ define("Views/Finders/Finder", ["require", "exports", "Views/Bases/ViewBase", "v
             console.log(args);
         };
         Finder.prototype.OnAlbumRefreshed = function () {
+            this.TrackList.ClearAlbumIds();
         };
         Finder.prototype.OnTrackSelectionChanged = function (args) {
             console.log('Finder.OnTrackSelectionChanged');

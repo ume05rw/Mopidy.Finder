@@ -7,13 +7,13 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
     template: `<li class="nav-item w-100"
                    ref="Li" >
     <div class="card w-100">
-        <div class="card-header with-border bg-green">
-            <h3 class="card-title">{{ entity.Artist.Name }}: {{ entity.Album.Name }} / {{ entity.Album.Year }}</h3>
+        <div class="card-header with-border bg-secondary">
+            <h3 class="card-title">{{ entity.Artist.Name }}: {{ entity.Album.Name }} {{ (entity.Album.Year) ? '/' + entity.Album.Year : '' }}</h3>
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
                         @click="OnClickAlbumPlay" >
-                    <i class="fas fa-caret-right" />
+                    <i class="fa fa-play" />
                 </button>
             </div>
         </div>
@@ -22,13 +22,17 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
                 <img v-bind:href="entity.Album.ImageUri" />
             </div>
             <div class="col-md-8">
-                <ul>
+                <table class="table table-hover">
+                    <tbody>
                     <template v-for="track in entity.Tracks">
-                        <li @click="OnClickTrack">
-                            {{ track.TrackNo }}. {{ track.Name }}
-                        </li>
+                        <tr @click="OnClickTrack">
+                            <td>{{ track.TrackNo }}</td>
+                            <td>{{ track.Name }}</td>
+                            <td>{{ track.GetTimeString() }}</td>
+                        </tr>
                     </template>
-                </ul>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

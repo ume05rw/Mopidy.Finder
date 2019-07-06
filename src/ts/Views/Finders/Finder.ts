@@ -60,10 +60,11 @@ export default class Finder extends ViewBase {
 
         if (args.selected) {
             this.ArtistList.AddFilterGenreId(args.entity.Id);
+            this.AlbumList.RemoveAllFilters();
             this.AlbumList.AddFilterGenreId(args.entity.Id);
         } else {
             this.ArtistList.RemoveFilterGenreId(args.entity.Id);
-            this.AlbumList.RemoveFilterGenreId(args.entity.Id);
+            this.AlbumList.RemoveAllFilters();
         }
         this.TrackList.ClearAlbumIds();
     }
@@ -101,7 +102,7 @@ export default class Finder extends ViewBase {
     }
 
     private OnAlbumRefreshed(): void {
-
+        this.TrackList.ClearAlbumIds();
     }
 
     private OnTrackSelectionChanged(args: ISelectionChangedArgs): void {

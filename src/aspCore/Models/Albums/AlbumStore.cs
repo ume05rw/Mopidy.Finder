@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicFront.Models.Artists;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Mopidies.Methods;
 using System.Collections.Generic;
@@ -22,73 +23,59 @@ namespace MusicFront.Models.Albums
 
         public PagenatedResult GetPagenatedList(int[] genreIds, int[] artistIds, int? page)
         {
-            var query = this.Dbc.GetAlbumQuery();
+            var query = this.Dbc.GetArtistQuery();
 
             if (genreIds != null && 0 < genreIds.Length)
                 query = query
-                    .Where(e => e.GenreAlbums.Any(e2 => genreIds.Contains(e2.GenreId)));
+                    .Where(e => e.GenreArtists.Any(e2 => genreIds.Contains(e2.GenreId)));
 
             if (artistIds != null && 0 < artistIds.Length)
                 query = query
                     .Where(e => e.ArtistAlbums.Any(e2 => artistIds.Contains(e2.ArtistId)));
 
-            // アーティスト名順にしようとしたが、クエリが重い上に
-            // Artists.Orderby(e => e.Name)と順序が異なるため、とりやめ。
-            //var joinedAll = query
-            //    .Join(
-            //        this.Dbc.ArtistAlbums,
-            //        al => al.Id,
-            //        aa => aa.AlbumId,
-            //        (al, aa) => new {
-            //            Album = al,
-            //            ArtistAlbum = aa
-            //        }
-            //    )
-            //    .Join(
-            //        this.Dbc.Artists,
-            //        al => al.ArtistAlbum.ArtistId,
-            //        at => at.Id,
-            //        (al, at) => new {
-            //            Album = al.Album,
-            //            Artist = at
-            //        }
-            //    )
-            //    .GroupBy(e => e.Album.Id)
-            //    .Select(e => new {
-            //        Album = e.First().Album,
-            //        ArtistName = e.Min(e3 => e3.Artist.Name)
-            //    })
-            //    .OrderBy(e => e.ArtistName)
-            //    .ThenBy(e => e.Album.Year)
-            //    .ThenBy(e => e.Album.Name)
-            //    .ToArray();
+            var joinedAll = query
+                .Join(
+                    this.Dbc.ArtistAlbums,
+                    artist => artist.Id,
+                    artistAlbum => artistAlbum.ArtistId,
+                    (artist, artistAlbum) => new
+                    {
+                        Artist = artist,
+                        ArtistAlbum = artistAlbum
+                    }
+                )
+                .Join(
+                    this.Dbc.Albums,
+                    entity => entity.ArtistAlbum.AlbumId,
+                    album => album.Id,
+                    (entity, album) => new
+                    {
+                        Artist = entity.Artist,
+                        Album = album
+                    }
+                )
+                .GroupBy(e => e.Album.Id)
+                .Select(e => new
+                {
+                    Album = e.First().Album,
+                    ArtistName = e.Min(e2 => e2.Artist.LowerName)
+                })
+                .OrderBy(e => e.ArtistName)
+                .ThenBy(e => e.Album.Year)
+                .ThenBy(e => e.Album.LowerName)
+                .ToArray();
 
-            //var totalLength = joinedAll.Length;
+            var totalLength = joinedAll.Length;
 
-            //var array = (page != null)
-            //    ? joinedAll
-            //        .Skip(((int)page - 1) * this.PageLength)
-            //        .Take(this.PageLength)
-            //        .Select(e => e.Album)
-            //        .ToArray()
-            //    : joinedAll
-            //        .Select(e => e.Album)
-            //        .ToArray();
-
-            var totalLength = query.Count();
-
-            query = query
-                .OrderBy(e => e.Year)
-                .ThenBy(e => e.Name);
-
-            if (page != null)
-            {
-                query = query
+            var array = (page != null)
+                ? joinedAll
                     .Skip(((int)page - 1) * this.PageLength)
-                    .Take(this.PageLength);
-            }
-
-            var array = query.ToArray();
+                    .Take(this.PageLength)
+                    .Select(e => e.Album)
+                    .ToArray()
+                : joinedAll
+                    .Select(e => e.Album)
+                    .ToArray();
 
             var result = new PagenatedResult()
             {

@@ -28,7 +28,7 @@ namespace MusicFront.Models.Artists
 
             var totalLength = query.Count();
 
-            query = query.OrderBy(e => e.Name);
+            query = query.OrderBy(e => e.LowerName);
 
             if (page != null)
             {

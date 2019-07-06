@@ -1,18 +1,20 @@
 import StoreBase from '../Bases/StoreBase';
-import AlbumTracks from './AlbumTracks';
+import { default as AlbumTracks, IAlbumTracks } from './AlbumTracks';
 
 export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
 
     public async GetList(albumIds: number[]): Promise<AlbumTracks[]> {
-        const result = await this.QueryGet('AlbumTracks/GetList', {
+        const response = await this.QueryGet('AlbumTracks/GetList', {
             albumIds: albumIds
         });
 
-        if (!result.Succeeded) {
-            console.error(result.Errors);
+        if (!response.Succeeded) {
+            console.error(response.Errors);
             throw new Error('Unexpected Error on ApiQuery');
         }
 
-        return result.Result as AlbumTracks[];
+        var result = AlbumTracks.CreateArray(response.Result as IAlbumTracks[]);
+
+        return result;
     }
 }

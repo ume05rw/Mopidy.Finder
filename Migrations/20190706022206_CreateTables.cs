@@ -2,7 +2,7 @@
 
 namespace MusicFront.Migrations
 {
-    public partial class CreateTablesGenreArtistAlbum : Migration
+    public partial class CreateTables : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,7 +32,7 @@ namespace MusicFront.Migrations
                     Name = table.Column<string>(nullable: false),
                     LowerName = table.Column<string>(nullable: false),
                     Uri = table.Column<string>(nullable: false),
-                    ImageUrl = table.Column<string>(nullable: true)
+                    ImageUri = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -126,6 +126,116 @@ namespace MusicFront.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "tracks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(nullable: false),
+                    LowerName = table.Column<string>(nullable: false),
+                    Uri = table.Column<string>(nullable: false),
+                    TlId = table.Column<int>(nullable: true),
+                    DiscNo = table.Column<int>(nullable: true),
+                    TrackNo = table.Column<int>(nullable: true),
+                    Date = table.Column<string>(nullable: true),
+                    Comment = table.Column<string>(nullable: true),
+                    Length = table.Column<int>(nullable: true),
+                    BitRate = table.Column<int>(nullable: false),
+                    LastModified = table.Column<long>(nullable: true),
+                    GenreId = table.Column<int>(nullable: false),
+                    AlbumId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_tracks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_tracks_albums_AlbumId",
+                        column: x => x.AlbumId,
+                        principalTable: "albums",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_tracks_genres_GenreId",
+                        column: x => x.GenreId,
+                        principalTable: "genres",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "track_artists",
+                columns: table => new
+                {
+                    TrackId = table.Column<int>(nullable: false),
+                    ArtistId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_track_artists", x => new { x.TrackId, x.ArtistId });
+                    table.ForeignKey(
+                        name: "FK_track_artists_artists_ArtistId",
+                        column: x => x.ArtistId,
+                        principalTable: "artists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_track_artists_tracks_TrackId",
+                        column: x => x.TrackId,
+                        principalTable: "tracks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "track_composers",
+                columns: table => new
+                {
+                    TrackId = table.Column<int>(nullable: false),
+                    ComposerId = table.Column<int>(nullable: false),
+                    ArtistId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_track_composers", x => new { x.TrackId, x.ComposerId });
+                    table.ForeignKey(
+                        name: "FK_track_composers_artists_ArtistId",
+                        column: x => x.ArtistId,
+                        principalTable: "artists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_track_composers_tracks_TrackId",
+                        column: x => x.TrackId,
+                        principalTable: "tracks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "track_performers",
+                columns: table => new
+                {
+                    TrackId = table.Column<int>(nullable: false),
+                    PerformerId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_track_performers", x => new { x.TrackId, x.PerformerId });
+                    table.ForeignKey(
+                        name: "FK_track_performers_artists_PerformerId",
+                        column: x => x.PerformerId,
+                        principalTable: "artists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_track_performers_tracks_TrackId",
+                        column: x => x.TrackId,
+                        principalTable: "tracks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_albums_Uri",
                 table: "albums",
@@ -170,6 +280,51 @@ namespace MusicFront.Migrations
                 name: "IX_genres_Uri",
                 table: "genres",
                 column: "Uri");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_track_artists_ArtistId",
+                table: "track_artists",
+                column: "ArtistId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_track_artists_TrackId",
+                table: "track_artists",
+                column: "TrackId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_track_composers_ArtistId",
+                table: "track_composers",
+                column: "ArtistId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_track_composers_TrackId",
+                table: "track_composers",
+                column: "TrackId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_track_performers_PerformerId",
+                table: "track_performers",
+                column: "PerformerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_track_performers_TrackId",
+                table: "track_performers",
+                column: "TrackId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tracks_AlbumId",
+                table: "tracks",
+                column: "AlbumId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tracks_GenreId",
+                table: "tracks",
+                column: "GenreId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_tracks_Uri",
+                table: "tracks",
+                column: "Uri");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -184,10 +339,22 @@ namespace MusicFront.Migrations
                 name: "genre_artists");
 
             migrationBuilder.DropTable(
-                name: "albums");
+                name: "track_artists");
+
+            migrationBuilder.DropTable(
+                name: "track_composers");
+
+            migrationBuilder.DropTable(
+                name: "track_performers");
 
             migrationBuilder.DropTable(
                 name: "artists");
+
+            migrationBuilder.DropTable(
+                name: "tracks");
+
+            migrationBuilder.DropTable(
+                name: "albums");
 
             migrationBuilder.DropTable(
                 name: "genres");

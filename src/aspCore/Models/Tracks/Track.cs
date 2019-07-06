@@ -1,19 +1,31 @@
 using MusicFront.Models.Albums;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
+using MusicFront.Models.Relations;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MusicFront.Models.Tracks
 {
-    [NotMapped]
+    [Table("tracks")]
     [JsonObject(MemberSerialization.OptIn)]
     public class Track
     {
+        [Key]
+        [JsonProperty("Id")]
+        public int Id { get; set; }
+
+        [Required]
         [JsonProperty("Name")]
         public string Name { get; set; }
 
+        [Required]
+        [JsonProperty("LowerName")]
+        public string LowerName { get; set; }
+
+        [Required]
         [JsonProperty("Uri")]
         public string Uri { get; set; }
 
@@ -41,18 +53,43 @@ namespace MusicFront.Models.Tracks
         [JsonProperty("LastModified")]
         public long? LastModified { get; set; }
 
+        [Required]
+        [JsonProperty("GenreId")]
+        public int GenreId { get; set; }
+
+        [Required]
+        [JsonProperty("AlbumId")]
+        public int AlbumId { get; set; }
+
+        [NotMapped]
+        [JsonProperty("TrackArtists")]
+        public List<TrackArtist> TrackArtists { get; set; }
+
+        [NotMapped]
+        [JsonProperty("TrackComposers")]
+        public List<TrackComposer> TrackComposers { get; set; }
+
+        [NotMapped]
+        [JsonProperty("TrackPerformers")]
+        public List<TrackPerformer> TrackPerformers { get; set; }
+
+        [ForeignKey("GenreId")]
         [JsonProperty("Genre")]
         public Genre Genre { get; set; }
 
+        [ForeignKey("AlbumId")]
         [JsonProperty("Album")]
         public Album Album { get; set; }
 
+        [NotMapped]
         [JsonProperty("Artists")]
         public List<Artist> Artists { get; set; }
 
+        [NotMapped]
         [JsonProperty("Composers")]
         public List<Artist> Composers { get; set; }
 
+        [NotMapped]
         [JsonProperty("Performers")]
         public List<Artist> Performers { get; set; }
     }

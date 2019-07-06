@@ -14,7 +14,7 @@ import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/L
                 <button type="button"
                         class="btn btn-tool"
                         @click="OnClickRefresh" >
-                    <i class="fa fa-redo" />
+                    <i class="fa fa-repeat" />
                 </button>
             </div>
         </div>
@@ -43,7 +43,6 @@ export default class GenreList extends ViewBase {
         await super.Initialize();
 
         this.entities = (await this.store.GetList())
-            .orderBy(e => e.Name)
             .toArray();
 
         this.$emit(Events.ListAppended, {
