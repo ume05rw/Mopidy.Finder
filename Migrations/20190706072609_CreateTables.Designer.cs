@@ -9,7 +9,7 @@ using MusicFront.Models;
 namespace MusicFront.Migrations
 {
     [DbContext(typeof(Dbc))]
-    [Migration("20190706022206_CreateTables")]
+    [Migration("20190706072609_CreateTables")]
     partial class CreateTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -153,11 +153,9 @@ namespace MusicFront.Migrations
 
                     b.Property<int>("ComposerId");
 
-                    b.Property<int?>("ArtistId");
-
                     b.HasKey("TrackId", "ComposerId");
 
-                    b.HasIndex("ArtistId");
+                    b.HasIndex("ComposerId");
 
                     b.HasIndex("TrackId");
 
@@ -205,8 +203,6 @@ namespace MusicFront.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired();
-
-                    b.Property<int?>("TlId");
 
                     b.Property<int?>("TrackNo");
 
@@ -271,7 +267,7 @@ namespace MusicFront.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("MusicFront.Models.Tracks.Track", "Track")
-                        .WithMany()
+                        .WithMany("TrackArtists")
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -280,10 +276,11 @@ namespace MusicFront.Migrations
                 {
                     b.HasOne("MusicFront.Models.Artists.Artist", "Composer")
                         .WithMany()
-                        .HasForeignKey("ArtistId");
+                        .HasForeignKey("ComposerId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("MusicFront.Models.Tracks.Track", "Track")
-                        .WithMany()
+                        .WithMany("TrackComposers")
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -296,7 +293,7 @@ namespace MusicFront.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("MusicFront.Models.Tracks.Track", "Track")
-                        .WithMany()
+                        .WithMany("TrackPerformers")
                         .HasForeignKey("TrackId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

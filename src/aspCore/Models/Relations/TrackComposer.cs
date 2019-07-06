@@ -21,7 +21,7 @@ namespace MusicFront.Models.Relations
         [ForeignKey("TrackId")]
         public Track Track { get; set; }
 
-        [ForeignKey("ArtistId")]
+        [ForeignKey("ComposerId")]
         public Artist Composer { get; set; }
     }
 }

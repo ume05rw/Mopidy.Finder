@@ -29,6 +29,7 @@ namespace MusicFront.Models.Tracks
         [JsonProperty("Uri")]
         public string Uri { get; set; }
 
+        [NotMapped]
         [JsonProperty("TlId")]
         public int? TlId { get; set; }
 
@@ -61,16 +62,10 @@ namespace MusicFront.Models.Tracks
         [JsonProperty("AlbumId")]
         public int AlbumId { get; set; }
 
-        [NotMapped]
-        [JsonProperty("TrackArtists")]
         public List<TrackArtist> TrackArtists { get; set; }
 
-        [NotMapped]
-        [JsonProperty("TrackComposers")]
         public List<TrackComposer> TrackComposers { get; set; }
 
-        [NotMapped]
-        [JsonProperty("TrackPerformers")]
         public List<TrackPerformer> TrackPerformers { get; set; }
 
         [ForeignKey("GenreId")]

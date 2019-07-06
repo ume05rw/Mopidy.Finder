@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using MusicFront.Models.Albums;
 using MusicFront.Models.Bases;
+using MusicFront.Models.Genres;
 using MusicFront.Models.Mopidies;
 using MusicFront.Models.Mopidies.Methods;
 using System.Collections.Generic;
@@ -14,52 +16,152 @@ namespace MusicFront.Models.Tracks
         {
         }
 
+        private Dictionary<string, Albums.Album> AlbumCache
+            = new Dictionary<string, Albums.Album>();
+        private Dictionary<string, Genre> GenreCache
+            = new Dictionary<string, Genre>();
+        private Dictionary<string, Artists.Artist> ArtistCache
+            = new Dictionary<string, Artists.Artist>();
+
         private Track Create(Mopidies.Track mopidyTrack)
         {
-            return new Track()
+            var album = this.GetAlbumByUri(mopidyTrack.Album.Uri);
+            var genre = this.GetGenreByName(mopidyTrack.Genre);
+            var artists = (mopidyTrack.Artists == null)
+                ? new List<Artists.Artist>()
+                : this.GetArtistListByMopidyList(mopidyTrack.Artists);
+            var composers = (mopidyTrack.Composers == null)
+                ? new List<Artists.Artist>()
+                : this.GetArtistListByMopidyList(mopidyTrack.Composers);
+            var performers = (mopidyTrack.Performers == null)
+                ? new List<Artists.Artist>()
+                : this.GetArtistListByMopidyList(mopidyTrack.Performers);
+
+            var track = this.Dbc.Tracks.FirstOrDefault(e => e.Uri == mopidyTrack.Uri);
+            if (track != null)
             {
-                Name = mopidyTrack.Name,
-                Uri = mopidyTrack.Uri,
-                TrackNo = mopidyTrack.TrackNo,
-                DiscNo = mopidyTrack.DiscNo,
-                Length = mopidyTrack.Length,
-                Date = mopidyTrack.Date,
-                Comment = mopidyTrack.Comment,
-                BitRate = mopidyTrack.BitRate,
-                LastModified = mopidyTrack.LastModified,
-                Album = this.Dbc.Albums.FirstOrDefault(e => e.Uri == mopidyTrack.Album.Uri),
-                Genre = this.Dbc.Genres.FirstOrDefault(e => e.Name == mopidyTrack.Genre),
-                Artists = (mopidyTrack.Artists == null)
-                        ? new List<Artists.Artist>()
-                        : mopidyTrack.Artists
-                            .Join(
-                                this.Dbc.Artists,
-                                ma => ma.Uri,
-                                at => at.Uri,
-                                (ma, at) => at
-                            )
-                            .ToList(),
-                Composers = (mopidyTrack.Composers == null)
-                        ? new List<Artists.Artist>()
-                        : mopidyTrack.Composers
-                            .Join(
-                                this.Dbc.Artists,
-                                ma => ma.Uri,
-                                at => at.Uri,
-                                (ma, at) => at
-                            )
-                            .ToList(),
-                Performers = (mopidyTrack.Performers == null)
-                        ? new List<Artists.Artist>()
-                        : mopidyTrack.Performers
-                            .Join(
-                                this.Dbc.Artists,
-                                ma => ma.Uri,
-                                at => at.Uri,
-                                (ma, at) => at
-                            )
-                            .ToList()
-            };
+                track.Album = album;
+                track.Genre = genre;
+                track.Artists = artists;
+                track.Composers = composers;
+                track.Performers = performers;
+            }
+            else
+            {
+                track = new Track()
+                {
+                    Name = mopidyTrack.Name,
+                    LowerName = mopidyTrack.Name.ToLower(),
+                    Uri = mopidyTrack.Uri,
+                    TrackNo = mopidyTrack.TrackNo,
+                    DiscNo = mopidyTrack.DiscNo,
+                    Length = mopidyTrack.Length,
+                    Date = mopidyTrack.Date,
+                    Comment = mopidyTrack.Comment,
+                    BitRate = mopidyTrack.BitRate,
+                    LastModified = mopidyTrack.LastModified,
+                    AlbumId = album.Id,
+                    GenreId = genre.Id,
+                    Album = album,
+                    Genre = genre,
+                    Artists = artists,
+                    Composers = composers,
+                    Performers = performers
+                };
+
+                track.TrackArtists = (0 < artists.Count())
+                    ? artists.Select(e => new Relations.TrackArtist()
+                    {
+                        TrackId = track.Id,
+                        ArtistId = e.Id
+                    }).ToList()
+                    : new List<Relations.TrackArtist>();
+                track.TrackComposers = (0 < composers.Count())
+                    ? composers.Select(e => new Relations.TrackComposer()
+                    {
+                        TrackId = track.Id,
+                        ComposerId = e.Id
+                    }).ToList()
+                    : new List<Relations.TrackComposer>();
+                track.TrackPerformers = (0 < performers.Count())
+                    ? performers.Select(e => new Relations.TrackPerformer()
+                    {
+                        TrackId = track.Id,
+                        PerformerId = e.Id
+                    }).ToList()
+                    : new List<Relations.TrackPerformer>();
+
+                foreach (var tr in track.TrackArtists)
+                    this.Dbc.TrackArtists.Add(tr);
+                foreach (var tc in track.TrackComposers)
+                    this.Dbc.TrackComposers.Add(tc);
+                foreach (var tp in track.TrackPerformers)
+                    this.Dbc.TrackPerformers.Add(tp);
+
+                this.Dbc.Tracks.Add(track);
+                this.Dbc.SaveChanges();
+            }
+
+            return track;
+        }
+
+        private Albums.Album GetAlbumByUri(string uri)
+        {
+            if (this.AlbumCache.ContainsKey(uri))
+            {
+                return this.AlbumCache[uri];
+            }
+            else
+            {
+                var album = this.Dbc.Albums.FirstOrDefault(e => e.Uri == uri);
+                this.AlbumCache.Add(uri, album);
+
+                return album;
+            }
+        }
+
+        private Genre GetGenreByName(string name)
+        {
+            if (this.GenreCache.ContainsKey(name))
+            {
+                return this.GenreCache[name];
+            }
+            else
+            {
+                var genre = this.Dbc.Genres.FirstOrDefault(e => e.Name == name);
+                this.GenreCache.Add(name, genre);
+
+                return genre;
+            }
+        }
+
+        private Artists.Artist GetArtistByUri(string uri)
+        {
+            if (this.ArtistCache.ContainsKey(uri))
+            {
+                return this.ArtistCache[uri];
+            }
+            else
+            {
+                var artist = this.Dbc.Artists.FirstOrDefault(e => e.Uri == uri);
+                if (artist != null)
+                    this.ArtistCache.Add(uri, artist);
+
+                return artist;
+            }
+        }
+
+        private List<Artists.Artist> GetArtistListByMopidyList(List<Mopidies.Artist> mpArtists)
+        {
+            var result = new List<Artists.Artist>();
+            foreach (var mpArtist in mpArtists)
+            {
+                var artist = this.GetArtistByUri(mpArtist.Uri);
+                if (artist != null)
+                    result.Add(artist);
+            }
+
+            return result;
         }
 
         private Track Create(TlTrack mopidyTlTrack)
@@ -72,26 +174,46 @@ namespace MusicFront.Models.Tracks
 
         public async Task<List<Track>> GetTracksByAlbum(Albums.Album album)
         {
-            var refs = await Library.Browse(album.Uri);
-            var trackUris = refs
-                .Where(e => e.Type == Ref.TypeTrack)
-                .Select(e => e.Uri)
-                .ToArray();
-
-            if (trackUris.Length <= 0)
-                return new List<Track>();
-
-            var mopidyTracks = await Library.Lookup(trackUris);
-
-            if (mopidyTracks == null || mopidyTracks.Count() <= 0)
-                return new List<Track>();
-
-            var result = mopidyTracks
-                .Select(mt => this.Create(mt))
-                .OrderBy(e => e.TrackNo)
+            var tracks = this.Dbc.GetTrackQuery()
+                .Where(e => e.AlbumId == album.Id)
+                .OrderBy(e => e.DiscNo)
+                .ThenBy(e => e.TrackNo)
                 .ToList();
 
-            return result;
+            if (0 < tracks.Count())
+            {
+                foreach (var track in tracks)
+                {
+                    track.Artists = track.TrackArtists.Select(e => e.Artist).ToList();
+                    track.Composers = track.TrackComposers.Select(e => e.Composer).ToList();
+                    track.Performers = track.TrackPerformers.Select(e => e.Performer).ToList();
+                }
+
+                return tracks;
+            }
+            else
+            {
+                var refs = await Library.Browse(album.Uri);
+                var trackUris = refs
+                    .Where(e => e.Type == Ref.TypeTrack)
+                    .Select(e => e.Uri)
+                    .ToArray();
+
+                if (trackUris.Length <= 0)
+                    return new List<Track>();
+
+                var mopidyTracks = await Library.Lookup(trackUris);
+
+                if (mopidyTracks == null || mopidyTracks.Count() <= 0)
+                    return new List<Track>();
+
+                var result = mopidyTracks
+                    .Select(mt => this.Create(mt))
+                    .OrderBy(e => e.TrackNo)
+                    .ToList();
+
+                return result;
+            }
         }
 
         public Task<bool> ClearList()
@@ -123,6 +245,24 @@ namespace MusicFront.Models.Tracks
             return (tlTrack == null)
                 ? null
                 : this.Create(tlTrack);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!this.IsDisposed)
+            {
+                if (disposing)
+                {
+                    this.AlbumCache.Clear();
+                    this.AlbumCache = null;
+                    this.GenreCache.Clear();
+                    this.GenreCache = null;
+                }
+
+                this.IsDisposed = true;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

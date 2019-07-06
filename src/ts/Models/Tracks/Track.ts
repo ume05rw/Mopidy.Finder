@@ -5,7 +5,9 @@ import { default as Album, IAlbum } from '../Albums/Album';
 import { default as Artist, IArtist } from '../Artists/Artist';
 
 export interface ITrack {
+    Id: number;
     Name: string;
+    LowerName: string;
     Uri: string;
     TlId: number;
     DiscNo: number;
@@ -26,7 +28,9 @@ export default class Track implements ITrack, ISelectionItem {
 
     public static Create(entity: ITrack): Track {
         var result = new Track();
+        result.Id = entity.Id;
         result.Name = entity.Name;
+        result.LowerName = entity.LowerName;
         result.Uri = entity.Uri;
         result.TlId = entity.TlId;
         result.DiscNo = entity.DiscNo;
@@ -38,9 +42,23 @@ export default class Track implements ITrack, ISelectionItem {
         result.LastModified = entity.LastModified;
         result.Genre = Genre.Create(entity.Genre);
         result.Album = Album.Create(entity.Album);
-        result.Artists = Artist.CreateArray(entity.Artists);
-        result.Composers = Artist.CreateArray(entity.Composers);
-        result.Performaers = Artist.CreateArray(entity.Performaers);
+
+        try {
+            result.Artists = Artist.CreateArray(entity.Artists);
+        } catch (e) {
+            console.log(e);
+        }
+        try {
+            result.Composers = Artist.CreateArray(entity.Composers);
+        } catch (e) {
+            console.log(e);
+        }
+        try {
+            result.Performaers = Artist.CreateArray(entity.Performaers);
+        } catch (e) {
+            console.log(e);
+        }
+        
 
         return result;
     }
@@ -54,7 +72,9 @@ export default class Track implements ITrack, ISelectionItem {
         return result;
     }
 
+    public Id: number;
     public Name: string;
+    public LowerName: string;
     public Uri: string;
     public TlId: number;
     public DiscNo: number;
@@ -69,14 +89,6 @@ export default class Track implements ITrack, ISelectionItem {
     public Artists: Artist[];
     public Composers: Artist[];
     public Performaers: Artist[];
-
-    public get Id(): number {
-        return this.TlId;
-    }
-
-    public get LowerName(): string {
-        return this.Name.toLowerCase();
-    }
 
     public GetTimeString(): string {
         console.log('Track.TimeString: Length = ' + this.Length);

@@ -51,8 +51,11 @@ namespace MusicFront.Models
                 .Include(e => e.Genre)
                 .Include(e => e.Album)
                 .Include(e => e.TrackArtists)
+                    .ThenInclude(e2 => e2.Artist)
                 .Include(e => e.TrackComposers)
-                .Include(e => e.TrackPerformers);
+                    .ThenInclude(e2 => e2.Composer)
+                .Include(e => e.TrackPerformers)
+                    .ThenInclude(e2 => e2.Performer);
 
         /// <summary>
         /// Constructor
@@ -78,6 +81,8 @@ namespace MusicFront.Models
                 .HasIndex(e => e.Uri);
             modelBuilder.Entity<Track>()
                 .HasIndex(e => e.AlbumId);
+            modelBuilder.Entity<Track>()
+                .HasIndex(e => e.Uri);
             modelBuilder.Entity<ArtistAlbum>()
                 .HasKey(e => new { e.ArtistId, e.AlbumId });
             modelBuilder.Entity<ArtistAlbum>()

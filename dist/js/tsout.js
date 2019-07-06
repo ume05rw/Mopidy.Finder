@@ -896,7 +896,9 @@ define("Models/Tracks/Track", ["require", "exports", "lodash", "Models/Genres/Ge
         }
         Track.Create = function (entity) {
             var result = new Track();
+            result.Id = entity.Id;
             result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
             result.Uri = entity.Uri;
             result.TlId = entity.TlId;
             result.DiscNo = entity.DiscNo;
@@ -908,9 +910,24 @@ define("Models/Tracks/Track", ["require", "exports", "lodash", "Models/Genres/Ge
             result.LastModified = entity.LastModified;
             result.Genre = Genre_2.default.Create(entity.Genre);
             result.Album = Album_2.default.Create(entity.Album);
-            result.Artists = Artist_2.default.CreateArray(entity.Artists);
-            result.Composers = Artist_2.default.CreateArray(entity.Composers);
-            result.Performaers = Artist_2.default.CreateArray(entity.Performaers);
+            try {
+                result.Artists = Artist_2.default.CreateArray(entity.Artists);
+            }
+            catch (e) {
+                console.log(e);
+            }
+            try {
+                result.Composers = Artist_2.default.CreateArray(entity.Composers);
+            }
+            catch (e) {
+                console.log(e);
+            }
+            try {
+                result.Performaers = Artist_2.default.CreateArray(entity.Performaers);
+            }
+            catch (e) {
+                console.log(e);
+            }
             return result;
         };
         Track.CreateArray = function (entities) {
@@ -920,20 +937,6 @@ define("Models/Tracks/Track", ["require", "exports", "lodash", "Models/Genres/Ge
             });
             return result;
         };
-        Object.defineProperty(Track.prototype, "Id", {
-            get: function () {
-                return this.TlId;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Track.prototype, "LowerName", {
-            get: function () {
-                return this.Name.toLowerCase();
-            },
-            enumerable: true,
-            configurable: true
-        });
         Track.prototype.GetTimeString = function () {
             console.log('Track.TimeString: Length = ' + this.Length);
             if (!this.Length) {
