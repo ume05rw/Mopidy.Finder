@@ -3,6 +3,10 @@
     height: calc(100vh - 190px);
     overflow-y: scroll;
 }
+.albumart {
+    width: 100%;
+    height: auto;
+}
 /*.flexcolumn {
     display: -webkit-flex;
     display: flex;

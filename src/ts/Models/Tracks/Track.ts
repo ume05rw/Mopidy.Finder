@@ -1,8 +1,5 @@
 import * as _ from 'lodash';
 import ISelectionItem from '../Bases/ISelectionItem';
-import { default as Genre, IGenre } from '../Genres/Genre';
-import { default as Album, IAlbum } from '../Albums/Album';
-import { default as Artist, IArtist } from '../Artists/Artist';
 
 export interface ITrack {
     Id: number;
@@ -17,11 +14,13 @@ export interface ITrack {
     Length: number;
     BitRate: number;
     LastModified: number;
-    Genre: IGenre;
-    Album: IAlbum;
-    Artists: IArtist[];
-    Composers: IArtist[];
-    Performaers: IArtist[];
+
+    // JSONがアホほどでかくなるのでやめる
+    //Genre: IGenre;
+    //Album: IAlbum;
+    //Artists: IArtist[];
+    //Composers: IArtist[];
+    //Performaers: IArtist[];
 }
 
 export default class Track implements ITrack, ISelectionItem {
@@ -40,25 +39,13 @@ export default class Track implements ITrack, ISelectionItem {
         result.Length = entity.Length;
         result.BitRate = entity.BitRate;
         result.LastModified = entity.LastModified;
-        result.Genre = Genre.Create(entity.Genre);
-        result.Album = Album.Create(entity.Album);
 
-        try {
-            result.Artists = Artist.CreateArray(entity.Artists);
-        } catch (e) {
-            console.log(e);
-        }
-        try {
-            result.Composers = Artist.CreateArray(entity.Composers);
-        } catch (e) {
-            console.log(e);
-        }
-        try {
-            result.Performaers = Artist.CreateArray(entity.Performaers);
-        } catch (e) {
-            console.log(e);
-        }
-        
+        // JSONがアホほどでかくなるのでやめる
+        //result.Genre = Genre.Create(entity.Genre);
+        //result.Album = Album.Create(entity.Album);
+        //result.Artists = Artist.CreateArray(entity.Artists);
+        //result.Composers = Artist.CreateArray(entity.Composers);
+        //result.Performaers = Artist.CreateArray(entity.Performaers);
 
         return result;
     }
@@ -84,11 +71,6 @@ export default class Track implements ITrack, ISelectionItem {
     public Length: number;
     public BitRate: number;
     public LastModified: number;
-    public Genre: Genre;
-    public Album: Album;
-    public Artists: Artist[];
-    public Composers: Artist[];
-    public Performaers: Artist[];
 
     public GetTimeString(): string {
         console.log('Track.TimeString: Length = ' + this.Length);

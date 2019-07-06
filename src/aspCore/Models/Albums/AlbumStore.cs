@@ -3,8 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using MusicFront.Models.Artists;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Mopidies.Methods;
+using MusicFront.Models.Tracks;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MusicFront.Models.Albums
 {
@@ -86,6 +88,42 @@ namespace MusicFront.Models.Albums
             };
 
             return result;
+        }
+
+        public async Task<bool> CoverInfo(Album album, List<Track> tracks)
+        {
+            var isAlbumChanged = false;
+            if (album.Year == null)
+            {
+                var date = tracks.Max(e => e.Date);
+                if (date != null && 4 < date.Length)
+                    date = date.Substring(0, 4);
+
+                var year = default(int);
+                if (date != null && int.TryParse(date, out year))
+                {
+                    album.Year = year;
+                    isAlbumChanged = true;
+                }
+            }
+
+            if (string.IsNullOrEmpty(album.ImageUri))
+            {
+                var image = await Library.GetImage(album.Uri);
+                if (image != null && image.Uri != null)
+                {
+                    album.ImageUri = image.Uri;
+                    isAlbumChanged = true;
+                }
+            }
+
+            if (isAlbumChanged)
+            {
+                this.Dbc.Entry(album).State = EntityState.Modified;
+                this.Dbc.SaveChanges();
+            }
+
+            return true;
         }
 
         public void Refresh()

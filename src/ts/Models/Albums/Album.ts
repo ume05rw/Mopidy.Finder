@@ -47,4 +47,8 @@ export default class Album implements IAlbum, ISelectionItem {
     public ImageUri: string;
     public ArtistAlbums: ArtistAlbum[];
     public GenreAlbums: GenreAlbum[];
+
+    public GetImageFullUri(): string {
+        return `${location.protocol}//${location.host}${this.ImageUri}`;
+    }
 }

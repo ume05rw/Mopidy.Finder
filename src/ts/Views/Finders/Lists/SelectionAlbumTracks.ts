@@ -19,7 +19,7 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
         </div>
         <div class="card-body row">
             <div class="col-md-4">
-                <img v-bind:href="entity.Album.ImageUri" />
+                <img class="albumart" v-bind:src="entity.Album.GetImageFullUri()" />
             </div>
             <div class="col-md-8">
                 <table class="table table-hover">

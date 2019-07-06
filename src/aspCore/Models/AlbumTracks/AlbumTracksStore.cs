@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MusicFront.Models.Albums;
 using MusicFront.Models.Bases;
 using MusicFront.Models.Tracks;
 using System;
@@ -35,6 +37,12 @@ namespace MusicFront.Models.AlbumTracks
                 var tracks = default(List<Track>);
                 using (var trackStore = new TrackStore(this.Dbc))
                     tracks = await trackStore.GetTracksByAlbum(album);
+
+                if (album.Year == null || string.IsNullOrEmpty(album.ImageUri))
+                {
+                    var albumStore = new AlbumStore(this.Dbc);
+                    await albumStore.CoverInfo(album, tracks);
+                }
 
                 result.Add(new AlbumTracks()
                 {

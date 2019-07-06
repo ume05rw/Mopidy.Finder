@@ -719,6 +719,9 @@ define("Models/Albums/Album", ["require", "exports", "lodash", "Models/Relations
             });
             return result;
         };
+        Album.prototype.GetImageFullUri = function () {
+            return location.protocol + "//" + location.host + this.ImageUri;
+        };
         return Album;
     }());
     exports.default = Album;
@@ -888,7 +891,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
     }(ViewBase_5.default));
     exports.default = AlbumList;
 });
-define("Models/Tracks/Track", ["require", "exports", "lodash", "Models/Genres/Genre", "Models/Albums/Album", "Models/Artists/Artist"], function (require, exports, _, Genre_2, Album_2, Artist_2) {
+define("Models/Tracks/Track", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Track = /** @class */ (function () {
@@ -908,26 +911,12 @@ define("Models/Tracks/Track", ["require", "exports", "lodash", "Models/Genres/Ge
             result.Length = entity.Length;
             result.BitRate = entity.BitRate;
             result.LastModified = entity.LastModified;
-            result.Genre = Genre_2.default.Create(entity.Genre);
-            result.Album = Album_2.default.Create(entity.Album);
-            try {
-                result.Artists = Artist_2.default.CreateArray(entity.Artists);
-            }
-            catch (e) {
-                console.log(e);
-            }
-            try {
-                result.Composers = Artist_2.default.CreateArray(entity.Composers);
-            }
-            catch (e) {
-                console.log(e);
-            }
-            try {
-                result.Performaers = Artist_2.default.CreateArray(entity.Performaers);
-            }
-            catch (e) {
-                console.log(e);
-            }
+            // JSONがアホほどでかくなるのでやめる
+            //result.Genre = Genre.Create(entity.Genre);
+            //result.Album = Album.Create(entity.Album);
+            //result.Artists = Artist.CreateArray(entity.Artists);
+            //result.Composers = Artist.CreateArray(entity.Composers);
+            //result.Performaers = Artist.CreateArray(entity.Performaers);
             return result;
         };
         Track.CreateArray = function (entities) {
@@ -952,7 +941,7 @@ define("Models/Tracks/Track", ["require", "exports", "lodash", "Models/Genres/Ge
     }());
     exports.default = Track;
 });
-define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "lodash", "Models/Albums/Album", "Models/Artists/Artist", "Models/Tracks/Track"], function (require, exports, _, Album_3, Artist_3, Track_1) {
+define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "lodash", "Models/Albums/Album", "Models/Artists/Artist", "Models/Tracks/Track"], function (require, exports, _, Album_2, Artist_2, Track_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumTracks = /** @class */ (function () {
@@ -960,8 +949,8 @@ define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "lodash", "Model
         }
         AlbumTracks.Create = function (entity) {
             var result = new AlbumTracks();
-            result.Album = Album_3.default.Create(entity.Album);
-            result.Artist = Artist_3.default.Create(entity.Artist);
+            result.Album = Album_2.default.Create(entity.Album);
+            result.Artist = Artist_2.default.Create(entity.Artist);
             result.Tracks = Track_1.default.CreateArray(entity.Tracks);
             return result;
         };
@@ -1054,7 +1043,7 @@ define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-c
         ], SelectionAlbumTracks.prototype, "entity", void 0);
         SelectionAlbumTracks = __decorate([
             vue_class_component_6.default({
-                template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">{{ entity.Artist.Name }}: {{ entity.Album.Name }} {{ (entity.Album.Year) ? '/' + entity.Album.Year : '' }}</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img v-bind:href=\"entity.Album.ImageUri\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-hover\">\n                    <tbody>\n                    <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\">\n                            <td>{{ track.TrackNo }}</td>\n                            <td>{{ track.Name }}</td>\n                            <td>{{ track.GetTimeString() }}</td>\n                        </tr>\n                    </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
+                template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">{{ entity.Artist.Name }}: {{ entity.Album.Name }} {{ (entity.Album.Year) ? '/' + entity.Album.Year : '' }}</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-hover\">\n                    <tbody>\n                    <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\">\n                            <td>{{ track.TrackNo }}</td>\n                            <td>{{ track.Name }}</td>\n                            <td>{{ track.GetTimeString() }}</td>\n                        </tr>\n                    </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;

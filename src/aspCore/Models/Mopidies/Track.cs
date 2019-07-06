@@ -56,8 +56,6 @@ namespace MusicFront.Models.Mopidies
         [JsonProperty("performers")]
         public List<Artist> Performers { get; set; }
 
-
-
         [JsonProperty("musicbrainz_id")]
         public string MusicbrainzId { get; set; }
     }

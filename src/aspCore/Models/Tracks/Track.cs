@@ -62,6 +62,7 @@ namespace MusicFront.Models.Tracks
         [JsonProperty("AlbumId")]
         public int AlbumId { get; set; }
 
+        // JSONがアホほどでかくなるので、以下項目をJSONから除外。
         public List<TrackArtist> TrackArtists { get; set; }
 
         public List<TrackComposer> TrackComposers { get; set; }
@@ -69,23 +70,18 @@ namespace MusicFront.Models.Tracks
         public List<TrackPerformer> TrackPerformers { get; set; }
 
         [ForeignKey("GenreId")]
-        [JsonProperty("Genre")]
         public Genre Genre { get; set; }
 
         [ForeignKey("AlbumId")]
-        [JsonProperty("Album")]
         public Album Album { get; set; }
 
         [NotMapped]
-        [JsonProperty("Artists")]
         public List<Artist> Artists { get; set; }
 
         [NotMapped]
-        [JsonProperty("Composers")]
         public List<Artist> Composers { get; set; }
 
         [NotMapped]
-        [JsonProperty("Performers")]
         public List<Artist> Performers { get; set; }
     }
 }

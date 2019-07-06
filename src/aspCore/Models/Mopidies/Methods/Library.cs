@@ -13,6 +13,7 @@ namespace MusicFront.Models.Mopidies.Methods
         private const string MethodBrowse = "core.library.browse";
         private const string MethodSearch = "core.library.search";
         private const string MethodLookup = "core.library.lookup";
+        private const string MethodGetImages = "core.library.get_images";
 
         [JsonObject(MemberSerialization.OptIn)]
         private class ArgsUri
@@ -61,6 +62,25 @@ namespace MusicFront.Models.Mopidies.Methods
                 result.AddRange(pair.Value);
 
             return result;
+        }
+
+        public static async Task<Image> GetImage(string albumUri)
+        {
+            var request = JsonRpcFactory.CreateRequest(Library.MethodGetImages, new ArgsUris()
+            {
+                Uris = new string[] { albumUri }
+            });
+
+            var response = await Query.Exec(request);
+
+            // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
+            // 型が違うとパースエラーになる。
+            var images = JObject.FromObject(response.Result).ToObject<Dictionary<string, List<Image>>>();
+
+            if (images.Count() <= 0 || images.First().Value.Count() <= 0)
+                return null;
+
+            return images.First().Value.First();
         }
 
         // 検索機能はAsp側で保持する。
