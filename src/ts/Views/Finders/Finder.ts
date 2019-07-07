@@ -1,10 +1,10 @@
-import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
-import GenreList from './Lists/GenreList';
-import ArtistList from './Lists/ArtistList';
-import AlbumList from './Lists/AlbumList';
-import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../Events/ListEvents';
 import Libraries from '../../Libraries';
+import ViewBase from '../Bases/ViewBase';
+import { IListAppendedArgs, ISelectionChangedArgs } from '../Events/ListEvents';
+import AlbumList from './Lists/AlbumList';
+import ArtistList from './Lists/ArtistList';
+import GenreList from './Lists/GenreList';
 
 @Component({
     template: `<section class="content h-100">
