@@ -11,11 +11,14 @@ import SelectionAlbumTracks from './SelectionAlbumTracks';
 Vue.use(InfiniteLoading);
 
 @Component({
-    template: `<div class="col-md-6 h-100">
-    <div class="card h-100">
+    template: `<div class="col-md-6">
+    <div class="card">
         <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Albums</h3>
             <div class="card-tools">
+                <button class="btn btn-tool" data-widget="collapse">
+                    <i class="fa fa-repeat" />
+                </button>
                 <button type="button"
                         class="btn btn-tool"
                         @click="OnClickRefresh" >

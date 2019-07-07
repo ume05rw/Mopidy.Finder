@@ -11,11 +11,14 @@ import SelectionItem from '../../Shared/SelectionItem';
 Vue.use(InfiniteLoading);
 
 @Component({
-    template: `<div class="col-md-3 h-100">
-    <div class="card h-100">
+    template: `<div class="col-md-3">
+    <div class="card">
         <div class="card-header with-border bg-info">
             <h3 class="card-title">Artists</h3>
             <div class="card-tools">
+                <button class="btn btn-tool" data-widget="collapse">
+                    <i class="fa fa-repeat" />
+                </button>
                 <button type="button"
                         class="btn btn-tool"
                         @click="OnClickRefresh" >
