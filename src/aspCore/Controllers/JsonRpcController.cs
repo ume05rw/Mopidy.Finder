@@ -14,6 +14,9 @@ using Newtonsoft.Json;
 
 namespace MusicFront.Controllers
 {
+    /// <summary>
+    /// JsonRPCプロキシ
+    /// </summary>
     [Produces("application/json")]
     [Route("JsonRpc")]
     public class JsonRpcController : Controller
@@ -30,32 +33,6 @@ namespace MusicFront.Controllers
 
             var response = await Query.Exec(request);
 
-            //var url = "http://192.168.254.251:6680/mopidy/rpc";
-            //HttpResponseMessage message;
-            //var client = new HttpClient();
-            //client.DefaultRequestHeaders.Accept.Clear();
-            //client.DefaultRequestHeaders.Accept.Add(
-            //    new MediaTypeWithQualityHeaderValue("application/json")
-            //);
-            //client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
-
-            //try
-            //{
-            //    var sendJson = JsonConvert.SerializeObject(sendValues);
-            //    var content = new StringContent(sendJson, Encoding.UTF8, "application/json");
-            //    content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            //    message = await client.PostAsync(url, content);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return JsonRpcFactory.CreateErrorResult(
-            //        (hasId
-            //            ? (int)values.Id
-            //            : -1),
-            //        $"Network Error: {ex.Message}"
-            //    );
-            //}
-
             // クエリ後
             if (!hasId)
             {
@@ -67,11 +44,7 @@ namespace MusicFront.Controllers
             {
                 // リクエストの場合
                 // 戻り値JSONをそのまま返す。
-                //var responseJson = await message.Content.ReadAsStringAsync();
-                //var response = JsonConvert.DeserializeObject<JsonRpcParamsResponse>(responseJson);
-                var result = JsonRpcFactory.CreateResult(response);
-
-                return result;
+                return JsonRpcFactory.CreateResult(response);
             }
         }
     }

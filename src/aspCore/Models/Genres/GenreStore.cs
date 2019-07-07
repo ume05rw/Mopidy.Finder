@@ -3,6 +3,7 @@ using MusicFront.Models.Bases;
 using MusicFront.Models.Mopidies.Methods;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MusicFront.Models.Genres
 {
@@ -22,14 +23,9 @@ namespace MusicFront.Models.Genres
                 .OrderBy(e => e.LowerName)
                 .ToList();
 
-        public void Refresh()
+        public async Task<bool> Refresh()
         {
-            this.Dbc.Genres.RemoveRange(this.Dbc.Genres);
-            this.Dbc.SaveChanges();
-
-            var result = Library.Browse(GenreStore.QueryString)
-                .GetAwaiter()
-                .GetResult();
+            var result = await Library.Browse(GenreStore.QueryString);
 
             var genres = result.Select(e => new Genre()
             {
@@ -39,7 +35,8 @@ namespace MusicFront.Models.Genres
             }).ToArray();
 
             this.Dbc.Genres.AddRange(genres);
-            this.Dbc.SaveChanges();
+
+            return true;
         }
     }
 }

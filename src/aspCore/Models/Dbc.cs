@@ -23,13 +23,9 @@ namespace MusicFront.Models
         public DbSet<Album> Albums { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Artist> Artists { get; set; }
-        public DbSet<Track> Tracks { get; set; }
         public DbSet<ArtistAlbum> ArtistAlbums { get; set; }
         public DbSet<GenreAlbum> GenreAlbums { get; set; }
         public DbSet<GenreArtist> GenreArtists { get; set; }
-        public DbSet<TrackArtist> TrackArtists { get; set; }
-        public DbSet<TrackComposer> TrackComposers { get; set; }
-        public DbSet<TrackPerformer> TrackPerformers { get; set; }
 
         public IQueryable<Genre> GetGenreQuery()
             => this.Genres
@@ -45,17 +41,6 @@ namespace MusicFront.Models
             => this.Artists
                 .Include(e => e.GenreArtists)
                 .Include(e => e.ArtistAlbums);
-
-        public IQueryable<Track> GetTrackQuery()
-            => this.Tracks
-                .Include(e => e.Genre)
-                .Include(e => e.Album)
-                .Include(e => e.TrackArtists)
-                    .ThenInclude(e2 => e2.Artist)
-                .Include(e => e.TrackComposers)
-                    .ThenInclude(e2 => e2.Composer)
-                .Include(e => e.TrackPerformers)
-                    .ThenInclude(e2 => e2.Performer);
 
         /// <summary>
         /// Constructor
@@ -77,12 +62,6 @@ namespace MusicFront.Models
                 .HasIndex(e => e.Uri);
             modelBuilder.Entity<Artist>()
                 .HasIndex(e => e.Uri);
-            modelBuilder.Entity<Track>()
-                .HasIndex(e => e.Uri);
-            modelBuilder.Entity<Track>()
-                .HasIndex(e => e.AlbumId);
-            modelBuilder.Entity<Track>()
-                .HasIndex(e => e.Uri);
             modelBuilder.Entity<ArtistAlbum>()
                 .HasKey(e => new { e.ArtistId, e.AlbumId });
             modelBuilder.Entity<ArtistAlbum>()
@@ -101,18 +80,6 @@ namespace MusicFront.Models
                 .HasIndex(e => e.GenreId);
             modelBuilder.Entity<GenreArtist>()
                 .HasIndex(e => e.ArtistId);
-            modelBuilder.Entity<TrackArtist>()
-                .HasKey(e => new { e.TrackId, e.ArtistId });
-            modelBuilder.Entity<TrackArtist>()
-                .HasIndex(e => e.TrackId);
-            modelBuilder.Entity<TrackComposer>()
-                .HasKey(e => new { e.TrackId, e.ComposerId });
-            modelBuilder.Entity<TrackComposer>()
-                .HasIndex(e => e.TrackId);
-            modelBuilder.Entity<TrackPerformer>()
-                .HasKey(e => new { e.TrackId, e.PerformerId });
-            modelBuilder.Entity<TrackPerformer>()
-                .HasIndex(e => e.TrackId);
         }
 
         #endregion

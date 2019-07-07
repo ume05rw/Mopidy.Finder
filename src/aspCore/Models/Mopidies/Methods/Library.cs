@@ -83,6 +83,33 @@ namespace MusicFront.Models.Mopidies.Methods
             return images.First().Value.First();
         }
 
+        public static async Task<Dictionary<string, Image>> GetImages(string[] uris)
+        {
+            var request = JsonRpcFactory.CreateRequest(Library.MethodGetImages, new ArgsUris()
+            {
+                Uris = uris
+            });
+
+            var response = await Query.Exec(request);
+
+            // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
+            // 型が違うとパースエラーになる。
+            var imageDictionary = JObject.FromObject(response.Result).ToObject<Dictionary<string, List<Image>>>();
+
+            var result = new Dictionary<string, Image>();
+            if (imageDictionary == null)
+                return result;
+
+            foreach (var pair in imageDictionary)
+            {
+                if (pair.Value == null || pair.Value.Count() <= 0)
+                    continue;
+                result.Add(pair.Key, pair.Value.First());
+            }
+
+            return result;
+        }
+
         // 検索機能はAsp側で保持する。
         //public static async Task<List<Ref>> Search(string uri)
         //{

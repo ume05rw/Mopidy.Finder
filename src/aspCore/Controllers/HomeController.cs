@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MusicFront.Models;
+using System.Threading.Tasks;
 
 namespace MusicFront.Controllers
 {
@@ -19,9 +20,9 @@ namespace MusicFront.Controllers
         private static readonly byte[] IndexDevBytes
             = System.IO.File.ReadAllBytes(HomeController.IndexDevPath);
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            Initializer.Exec();
+            await Initializer.Exec();
 
             return this.File(HomeController.IndexDevBytes, "text/html");
         }

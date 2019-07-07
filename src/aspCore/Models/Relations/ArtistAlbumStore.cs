@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MusicFront.Models.Relations
 {
@@ -16,48 +17,33 @@ namespace MusicFront.Models.Relations
         {
         }
 
-        public void Refresh()
+        public async Task<bool> Refresh()
         {
-            this.Dbc.ArtistAlbums.RemoveRange(this.Dbc.ArtistAlbums);
-            this.Dbc.SaveChanges();
+            var albumDictionary = this.Dbc.Albums
+                .ToDictionary(e => e.Uri);
 
             foreach (var artist in this.Dbc.Artists.ToArray())
-                this.AddAlbumsByArtist(artist);
-
-            this.Dbc.SaveChanges();
-        }
-
-        private void AddAlbumsByArtist(Artists.Artist artist)
-        {
-            var result = Library.Browse(artist.Uri)
-                .GetAwaiter()
-                .GetResult();
-
-            foreach (var row in result)
             {
-                var albumUri = row.GetAlbumUri();
-                if (albumUri == null)
-                    throw new Exception($"Album-Uri Not Found: uri={row.Uri}"); // アルバムURIが取得出来ないことは無いはず。
+                var refs = await Library.Browse(artist.Uri);
 
-                try
+                foreach (var row in refs)
                 {
-                    var albumId = this.Dbc.Albums
-                        .Where(e => e.Uri == albumUri)
-                        .Select(e => e.Id)
-                        .First();
+                    var albumUri = row.GetAlbumUri();
+                    if (albumUri == null)
+                        continue; // アルバムURIが取得出来ないことは無いはず。
+
+                    if (!albumDictionary.ContainsKey(albumUri))
+                        continue; // 合致するアルバムが取得出来ないことは無いはず
 
                     this.Dbc.ArtistAlbums.Add(new ArtistAlbum()
                     {
                         ArtistId = artist.Id,
-                        AlbumId = albumId
+                        AlbumId = albumDictionary[albumUri].Id
                     });
                 }
-                catch (Exception ex)
-                {
-                    // 合致アルバムが取得出来ないことは無いはず。
-                    throw new Exception($"Album Not Matched: uri={albumUri}");
-                }
             }
+
+            return true;
         }
     }
 }

@@ -20,6 +20,7 @@ namespace MusicFront.Models.Mopidies.Methods
                 new MediaTypeWithQualityHeaderValue("application/json")
             );
             client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+            client.Timeout = TimeSpan.FromMilliseconds(500000); // 500秒
 
             try
             {

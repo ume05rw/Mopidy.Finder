@@ -38,12 +38,6 @@ namespace MusicFront.Models.AlbumTracks
                 using (var trackStore = new TrackStore(this.Dbc))
                     tracks = await trackStore.GetTracksByAlbum(album);
 
-                if (album.Year == null || string.IsNullOrEmpty(album.ImageUri))
-                {
-                    var albumStore = new AlbumStore(this.Dbc);
-                    await albumStore.CoverInfo(album, tracks);
-                }
-
                 result.Add(new AlbumTracks()
                 {
                     Album = album,
@@ -51,6 +45,9 @@ namespace MusicFront.Models.AlbumTracks
                     Tracks = tracks
                 });
             }
+
+            var albumStore = new AlbumStore(this.Dbc);
+            await albumStore.CompleteAlbumInfo(result);
 
             return result;
         }

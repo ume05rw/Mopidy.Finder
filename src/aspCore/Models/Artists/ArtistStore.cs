@@ -4,6 +4,7 @@ using MusicFront.Models.Bases;
 using MusicFront.Models.Mopidies.Methods;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MusicFront.Models.Artists
 {
@@ -50,14 +51,9 @@ namespace MusicFront.Models.Artists
             return result;
         }
 
-        public void Refresh()
+        public async Task<bool> Refresh()
         {
-            this.Dbc.Artists.RemoveRange(this.Dbc.Artists);
-            this.Dbc.SaveChanges();
-
-            var result = Library.Browse(ArtistStore.QueryString)
-                .GetAwaiter()
-                .GetResult();
+            var result = await Library.Browse(ArtistStore.QueryString);
 
             var artists = result.Select(e => new Artist()
             {
@@ -67,7 +63,8 @@ namespace MusicFront.Models.Artists
             }).ToArray();
 
             this.Dbc.Artists.AddRange(artists);
-            this.Dbc.SaveChanges();
+
+            return true;
         }
     }
 }

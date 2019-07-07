@@ -5,6 +5,7 @@ using MusicFront.Models.Bases;
 using MusicFront.Models.Mopidies.Methods;
 using MusicFront.Models.Tracks;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,7 +13,8 @@ namespace MusicFront.Models.Albums
 {
     public class AlbumStore : PagenagedStoreBase<Album>
     {
-        private const string QueryString = "local:directory?type=album";
+        private const string AlbumQueryString = "local:directory?type=album";
+        private const string YearQueryString = "local:directory?type=date&format=%25Y";
 
         private readonly int AlbumPageLength = 10;
 
@@ -90,60 +92,135 @@ namespace MusicFront.Models.Albums
             return result;
         }
 
-        public async Task<bool> CoverInfo(Album album, List<Track> tracks)
+        public async Task<bool> CompleteAlbumInfo(List<AlbumTracks.AlbumTracks> albumTracksList)
         {
-            var isAlbumChanged = false;
-            if (album.Year == null)
-            {
-                var date = tracks.Max(e => e.Date);
-                if (date != null && 4 < date.Length)
-                    date = date.Substring(0, 4);
+            var isImageUpdated = await this.CompleteImages(albumTracksList);
+            var isYearUpdated = this.CompleteYears(albumTracksList);
 
-                var year = default(int);
-                if (date != null && int.TryParse(date, out year))
-                {
-                    album.Year = year;
-                    isAlbumChanged = true;
-                }
-            }
-
-            if (string.IsNullOrEmpty(album.ImageUri))
-            {
-                var image = await Library.GetImage(album.Uri);
-                if (image != null && image.Uri != null)
-                {
-                    album.ImageUri = image.Uri;
-                    isAlbumChanged = true;
-                }
-            }
-
-            if (isAlbumChanged)
-            {
-                this.Dbc.Entry(album).State = EntityState.Modified;
+            if (isImageUpdated || isYearUpdated)
                 this.Dbc.SaveChanges();
-            }
 
             return true;
         }
 
-        public void Refresh()
+        public async Task<bool> CompleteImages(List<AlbumTracks.AlbumTracks> albumTracksList)
         {
-            this.Dbc.Albums.RemoveRange(this.Dbc.Albums);
-            this.Dbc.SaveChanges();
+            var targetDictionary = albumTracksList
+                .Where(e => string.IsNullOrEmpty(e.Album.ImageUri))
+                .Select(e => e.Album)
+                .ToDictionary(e => e.Uri);
 
-            var result = Library.Browse(AlbumStore.QueryString)
-                .GetAwaiter()
-                .GetResult();
+            if (targetDictionary.Count() <= 0)
+                return false;
 
-            var albums = result.Select(e => new Album()
+            var hasUpdated = false;
+            var imageDictionary = await Library.GetImages(targetDictionary.Keys.ToArray());
+
+            foreach (var pair in imageDictionary)
+            {
+                if (!targetDictionary.ContainsKey(pair.Key))
+                    continue;
+
+                var album = targetDictionary[pair.Key];
+                album.ImageUri = pair.Value.Uri;
+                this.Dbc.Entry(album).State = EntityState.Modified;
+                hasUpdated = true;
+            }
+
+            return hasUpdated;
+        }
+
+        public bool CompleteYears(List<AlbumTracks.AlbumTracks> albumTracksList)
+        {
+            var hasUpdated = false;
+            foreach (var at in albumTracksList)
+            {
+                if (at.Album.Year != null)
+                    continue;
+
+                var date = at.Tracks.Max(e => e.Date);
+                if (date != null && 4 < date.Length)
+                    date = date.Substring(0, 4);
+
+                if (date != null && int.TryParse(date, out var year))
+                {
+                    at.Album.Year = year;
+                    this.Dbc.Entry(at.Album).State = EntityState.Modified;
+                    hasUpdated = true;
+                }
+            }
+
+            return hasUpdated;
+        }
+
+        public async Task<bool> Refresh()
+        {
+            var albumResults = await Library.Browse(AlbumStore.AlbumQueryString);
+
+            var albumDictionary = albumResults.Select(e => new Album()
             {
                 Name = e.Name,
                 LowerName = e.Name.ToLower(),
                 Uri = e.Uri
-            }).ToArray();
+            }).ToDictionary(e => e.Uri);
 
-            this.Dbc.Albums.AddRange(albums);
+            var yearResults = await Library.Browse(AlbumStore.YearQueryString);
+
+            foreach (var row in yearResults)
+            {
+                var year = default(int);
+                if (!int.TryParse(row.Name, out year))
+                    continue;
+
+                var yearAlbums = await Library.Browse(row.Uri);
+
+                foreach (var ya in yearAlbums)
+                {
+                    var albumUri = ya.GetAlbumUri();
+                    if (albumDictionary.ContainsKey(albumUri))
+                        albumDictionary[albumUri].Year = year;
+                }
+            }
+
+            this.Dbc.Albums.AddRange(albumDictionary.Select(e => e.Value));
+
+            return true;
+        }
+
+        public async Task<bool> UpdateAlbumImages()
+        {
+            var albumAllUris = this.Dbc.Albums
+                .Where(e => e.ImageUri == null)
+                .Select(e => e.Uri)
+                .ToArray();
+
+            for (var i = 0; i < albumAllUris.Length; i += 10)
+            {
+                var albumUris = albumAllUris
+                    .Skip(i)
+                    .Take(10)
+                    .ToArray();
+
+                Debug.WriteLine($"AlbumImage Progress: {i + albumUris.Length } / {albumAllUris.Length}");
+
+                var imageDictionary = await Library.GetImages(albumUris);
+
+                foreach (var pair in imageDictionary)
+                {
+                    var album = this.Dbc.Albums.FirstOrDefault(e => e.Uri == pair.Key);
+                    if (album == null || !string.IsNullOrEmpty(album.ImageUri))
+                        continue;
+
+                    album.ImageUri = pair.Value.Uri;
+                    this.Dbc.Entry(album).State = EntityState.Modified;
+                }
+
+                // 待機時間を挟む。
+                await Task.Delay(1000);
+            }
             this.Dbc.SaveChanges();
+
+            return true;
         }
     }
 }

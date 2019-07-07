@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace MusicFront.Controllers
 {
+    /// <summary>
+    /// 画像プロキシ
+    /// </summary>
     [Route("Images")]
     public class ImagesController : Controller
     {

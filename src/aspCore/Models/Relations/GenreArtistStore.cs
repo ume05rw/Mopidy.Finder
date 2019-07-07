@@ -13,9 +13,6 @@ namespace MusicFront.Models.Relations
 
         public void Refresh()
         {
-            this.Dbc.GenreArtists.RemoveRange(this.Dbc.GenreArtists);
-            this.Dbc.SaveChanges();
-
             var genreArtists = this.Dbc.GenreAlbums
                 .Join(
                     this.Dbc.ArtistAlbums,
@@ -40,8 +37,6 @@ namespace MusicFront.Models.Relations
                 .ToArray();
 
             this.Dbc.GenreArtists.AddRange(genreArtists);
-
-            this.Dbc.SaveChanges();
         }
     }
 }

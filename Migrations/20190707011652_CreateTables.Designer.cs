@@ -9,7 +9,7 @@ using MusicFront.Models;
 namespace MusicFront.Migrations
 {
     [DbContext(typeof(Dbc))]
-    [Migration("20190706135633_CreateTables")]
+    [Migration("20190707011652_CreateTables")]
     partial class CreateTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -132,94 +132,6 @@ namespace MusicFront.Migrations
                     b.ToTable("genre_artists");
                 });
 
-            modelBuilder.Entity("MusicFront.Models.Relations.TrackArtist", b =>
-                {
-                    b.Property<int>("TrackId");
-
-                    b.Property<int>("ArtistId");
-
-                    b.HasKey("TrackId", "ArtistId");
-
-                    b.HasIndex("ArtistId");
-
-                    b.HasIndex("TrackId");
-
-                    b.ToTable("track_artists");
-                });
-
-            modelBuilder.Entity("MusicFront.Models.Relations.TrackComposer", b =>
-                {
-                    b.Property<int>("TrackId");
-
-                    b.Property<int>("ComposerId");
-
-                    b.HasKey("TrackId", "ComposerId");
-
-                    b.HasIndex("ComposerId");
-
-                    b.HasIndex("TrackId");
-
-                    b.ToTable("track_composers");
-                });
-
-            modelBuilder.Entity("MusicFront.Models.Relations.TrackPerformer", b =>
-                {
-                    b.Property<int>("TrackId");
-
-                    b.Property<int>("PerformerId");
-
-                    b.HasKey("TrackId", "PerformerId");
-
-                    b.HasIndex("PerformerId");
-
-                    b.HasIndex("TrackId");
-
-                    b.ToTable("track_performers");
-                });
-
-            modelBuilder.Entity("MusicFront.Models.Tracks.Track", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int>("AlbumId");
-
-                    b.Property<int>("BitRate");
-
-                    b.Property<string>("Comment");
-
-                    b.Property<string>("Date");
-
-                    b.Property<int?>("DiscNo");
-
-                    b.Property<int?>("GenreId");
-
-                    b.Property<long?>("LastModified");
-
-                    b.Property<int?>("Length");
-
-                    b.Property<string>("LowerName")
-                        .IsRequired();
-
-                    b.Property<string>("Name")
-                        .IsRequired();
-
-                    b.Property<int?>("TrackNo");
-
-                    b.Property<string>("Uri")
-                        .IsRequired();
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AlbumId");
-
-                    b.HasIndex("GenreId");
-
-                    b.HasIndex("Uri");
-
-                    b.ToTable("tracks");
-                });
-
             modelBuilder.Entity("MusicFront.Models.Relations.ArtistAlbum", b =>
                 {
                     b.HasOne("MusicFront.Models.Albums.Album", "Album")
@@ -257,57 +169,6 @@ namespace MusicFront.Migrations
                         .WithMany("GenreArtists")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MusicFront.Models.Relations.TrackArtist", b =>
-                {
-                    b.HasOne("MusicFront.Models.Artists.Artist", "Artist")
-                        .WithMany()
-                        .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("MusicFront.Models.Tracks.Track", "Track")
-                        .WithMany("TrackArtists")
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MusicFront.Models.Relations.TrackComposer", b =>
-                {
-                    b.HasOne("MusicFront.Models.Artists.Artist", "Composer")
-                        .WithMany()
-                        .HasForeignKey("ComposerId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("MusicFront.Models.Tracks.Track", "Track")
-                        .WithMany("TrackComposers")
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MusicFront.Models.Relations.TrackPerformer", b =>
-                {
-                    b.HasOne("MusicFront.Models.Artists.Artist", "Performer")
-                        .WithMany()
-                        .HasForeignKey("PerformerId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("MusicFront.Models.Tracks.Track", "Track")
-                        .WithMany("TrackPerformers")
-                        .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MusicFront.Models.Tracks.Track", b =>
-                {
-                    b.HasOne("MusicFront.Models.Albums.Album", "Album")
-                        .WithMany()
-                        .HasForeignKey("AlbumId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("MusicFront.Models.Genres.Genre", "Genre")
-                        .WithMany()
-                        .HasForeignKey("GenreId");
                 });
 #pragma warning restore 612, 618
         }
