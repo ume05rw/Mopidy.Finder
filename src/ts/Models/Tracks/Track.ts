@@ -78,10 +78,10 @@ export default class Track implements ITrack, ISelectionItem {
             return '';
         }
 
-        const minute = ('00' + Math.floor(this.Length / 60000).toString()).slice(-2);
-        const second = ('00' + Math.floor(this.Length % 60000).toString()).slice(-2);
-        console.log('minute: ' + minute);
-        console.log('second: ' + second);
-        return minute + ':' + second;
+        const minute = Math.floor(this.Length / 60000);
+        const second = Math.floor((this.Length % 60000) / 1000);
+        const minuteStr = ('00' + minute.toString()).slice(-2);
+        const secondStr = ('00' + second.toString()).slice(-2);
+        return minuteStr + ':' + secondStr;
     }
 }

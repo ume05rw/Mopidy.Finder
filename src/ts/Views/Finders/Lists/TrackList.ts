@@ -43,7 +43,7 @@ Vue.use(InfiniteLoading);
 })
 export default class TrackList extends ViewBase {
 
-    private readonly PageLength: number = 10;
+    private readonly PageLength: number = 6;
     private page: number = 1;
     private albumIds: number[] = [];
     private store: AlbumTracksStore = new AlbumTracksStore();

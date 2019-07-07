@@ -8,7 +8,7 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
                    ref="Li" >
     <div class="card w-100">
         <div class="card-header with-border bg-secondary">
-            <h3 class="card-title">{{ entity.Artist.Name }}: {{ entity.Album.Name }} {{ (entity.Album.Year) ? '/' + entity.Album.Year : '' }}</h3>
+            <h3 class="card-title">{{ entity.Artist.Name }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }} </h3>
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
@@ -22,15 +22,15 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
                 <img class="albumart" v-bind:src="entity.Album.GetImageFullUri()" />
             </div>
             <div class="col-md-8">
-                <table class="table table-hover">
+                <table class="table table-sm table-hover tracks">
                     <tbody>
-                    <template v-for="track in entity.Tracks">
+                        <template v-for="track in entity.Tracks">
                         <tr @click="OnClickTrack">
-                            <td>{{ track.TrackNo }}</td>
-                            <td>{{ track.Name }}</td>
-                            <td>{{ track.GetTimeString() }}</td>
+                            <td class="tracknum">{{ track.TrackNo }}</td>
+                            <td class="trackname">{{ track.Name }}</td>
+                            <td class="tracklength">{{ track.GetTimeString() }}</td>
                         </tr>
-                    </template>
+                        </template>
                     </tbody>
                 </table>
             </div>

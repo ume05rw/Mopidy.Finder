@@ -931,11 +931,11 @@ define("Models/Tracks/Track", ["require", "exports", "lodash"], function (requir
             if (!this.Length) {
                 return '';
             }
-            var minute = ('00' + Math.floor(this.Length / 60000).toString()).slice(-2);
-            var second = ('00' + Math.floor(this.Length % 60000).toString()).slice(-2);
-            console.log('minute: ' + minute);
-            console.log('second: ' + second);
-            return minute + ':' + second;
+            var minute = Math.floor(this.Length / 60000);
+            var second = Math.floor((this.Length % 60000) / 1000);
+            var minuteStr = ('00' + minute.toString()).slice(-2);
+            var secondStr = ('00' + second.toString()).slice(-2);
+            return minuteStr + ':' + secondStr;
         };
         return Track;
     }());
@@ -1043,7 +1043,7 @@ define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-c
         ], SelectionAlbumTracks.prototype, "entity", void 0);
         SelectionAlbumTracks = __decorate([
             vue_class_component_6.default({
-                template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">{{ entity.Artist.Name }}: {{ entity.Album.Name }} {{ (entity.Album.Year) ? '/' + entity.Album.Year : '' }}</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-hover\">\n                    <tbody>\n                    <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\">\n                            <td>{{ track.TrackNo }}</td>\n                            <td>{{ track.Name }}</td>\n                            <td>{{ track.GetTimeString() }}</td>\n                        </tr>\n                    </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
+                template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">{{ entity.Artist.Name }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }} </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\">\n                            <td class=\"tracknum\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname\">{{ track.Name }}</td>\n                            <td class=\"tracklength\">{{ track.GetTimeString() }}</td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
@@ -1058,7 +1058,7 @@ define("Views/Finders/Lists/TrackList", ["require", "exports", "vue-class-compon
         __extends(TrackList, _super);
         function TrackList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.PageLength = 10;
+            _this.PageLength = 6;
             _this.page = 1;
             _this.albumIds = [];
             _this.store = new AlbumTracksStore_1.default();

@@ -36,6 +36,9 @@ namespace MusicFront.Models.Tracks
             return track;
         }
 
+        public Track CreateTrack(Mopidies.Track mopidyTrack)
+            => this.Create(mopidyTrack);
+
         private Track Create(TlTrack mopidyTlTrack)
         {
             var result = this.Create(mopidyTlTrack.Track);
@@ -44,29 +47,46 @@ namespace MusicFront.Models.Tracks
             return result;
         }
 
-        public async Task<List<Track>> GetTracksByAlbum(Albums.Album album)
-        {
-            var refs = await Library.Browse(album.Uri);
-            var trackUris = refs
-                .Where(e => e.Type == Ref.TypeTrack)
-                .Select(e => e.Uri)
-                .ToArray();
+        public Track CreateTrack(TlTrack mopidyTlTrack)
+            => this.Create(mopidyTlTrack);
 
-            if (trackUris.Length <= 0)
-                return new List<Track>();
 
-            var mopidyTracks = await Library.Lookup(trackUris);
+        //public async Task<List<AlbumTracks.AlbumTracks>> GetTracksByAlbums(List<Albums.Album> albums)
+        //{
+        //    var albumDictionary = albums.ToDictionary(e => e.Uri);
 
-            if (mopidyTracks == null || mopidyTracks.Count() <= 0)
-                return new List<Track>();
+        //    var mopidyTrackDictionary
+        //        = await Library.LookupByAlbumUris(albumDictionary.Keys.ToArray());
 
-            var result = mopidyTracks
-                .Select(mt => this.Create(mt))
-                .OrderBy(e => e.TrackNo)
-                .ToList();
+        //    if (mopidyTrackDictionary == null || mopidyTrackDictionary.Count() <= 0)
+        //        return new List<AlbumTracks.AlbumTracks>();
 
-            return result;
-        }
+        //    var result = new List<AlbumTracks.AlbumTracks>();
+
+        //    foreach (var pair in mopidyTrackDictionary)
+        //    {
+        //        if (!albumDictionary.ContainsKey(pair.Key))
+        //            continue;
+
+        //        var album = albumDictionary[pair.Key];
+        //        var artistId = album.ArtistAlbums.FirstOrDefault()?.ArtistId;
+        //        var artist = (artistId != null)
+        //            ? this.Dbc.GetArtistQuery().FirstOrDefault(e => e.Id == artistId)
+        //            : null;
+
+        //        result.Add(new AlbumTracks.AlbumTracks()
+        //        {
+        //            Album = album,
+        //            Artist = artist,
+        //            Tracks = pair.Value
+        //                .Select(mt => this.Create(mt))
+        //                .OrderBy(e => e.TrackNo)
+        //                .ToList()
+        //        });
+        //    }
+
+        //    return result;
+        //}
 
         public Task<bool> ClearList()
             => Tracklist.Clear();

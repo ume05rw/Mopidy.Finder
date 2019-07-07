@@ -7,15 +7,13 @@
     width: 100%;
     height: auto;
 }
-/*.flexcolumn {
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-flow: column nowrap;
-    flex-flow: column nowrap;
+.tracks .tracknum {
+    width: 10%;
+    text-align: right;
 }
-.flexcolumn-stretch {
-    align-items: stretch;
+.tracks .trackname {
+    width: 70%;
 }
-.scroll-y {
-    overflow-y: scroll;
-}*/
+.tracks .tracklength {
+    width: 20%;
+}

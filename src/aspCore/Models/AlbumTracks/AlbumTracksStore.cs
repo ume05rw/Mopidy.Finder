@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicFront.Models.Albums;
 using MusicFront.Models.Bases;
+using MusicFront.Models.Mopidies.Methods;
 using MusicFront.Models.Tracks;
 using System;
 using System.Collections.Generic;
@@ -19,35 +20,52 @@ namespace MusicFront.Models.AlbumTracks
         public async Task<List<AlbumTracks>> GetList(int[] albumIds)
         {
             var result = new List<AlbumTracks>();
-
-            foreach (var albumId in albumIds)
+            using (var trackStore = new TrackStore(this.Dbc))
+            using (var albumStore = new AlbumStore(this.Dbc))
             {
-                var album = this.Dbc.GetAlbumQuery()
-                    .FirstOrDefault(e => e.Id == albumId);
+                var albumDictionary = this.Dbc.GetAlbumQuery()
+                    .Where(e => albumIds.Contains(e.Id))
+                    .ToDictionary(e => e.Uri);
 
-                if (album == null)
-                    continue;
+                var mopidyTrackDictionary = await Library.Lookup(albumDictionary.Keys.ToArray());
 
-                var artistId = album.ArtistAlbums.FirstOrDefault()?.ArtistId;
+                if (mopidyTrackDictionary == null || mopidyTrackDictionary.Count() <= 0)
+                    return result;
 
-                var artist = (artistId != null)
-                    ? this.Dbc.GetArtistQuery().FirstOrDefault(e => e.Id == artistId)
-                    : null;
+                var tmpList = new List<AlbumTracks>();
 
-                var tracks = default(List<Track>);
-                using (var trackStore = new TrackStore(this.Dbc))
-                    tracks = await trackStore.GetTracksByAlbum(album);
-
-                result.Add(new AlbumTracks()
+                foreach (var pair in mopidyTrackDictionary)
                 {
-                    Album = album,
-                    Artist = artist,
-                    Tracks = tracks
-                });
-            }
+                    if (!albumDictionary.ContainsKey(pair.Key))
+                        continue;
 
-            var albumStore = new AlbumStore(this.Dbc);
-            await albumStore.CompleteAlbumInfo(result);
+                    var album = albumDictionary[pair.Key];
+                    var artistId = album.ArtistAlbums.FirstOrDefault()?.ArtistId;
+                    var artist = (artistId != null)
+                        ? this.Dbc.GetArtistQuery().FirstOrDefault(e => e.Id == artistId)
+                        : null;
+
+                    tmpList.Add(new AlbumTracks()
+                    {
+                        Album = album,
+                        Artist = artist,
+                        Tracks = pair.Value
+                            .Select(mt => trackStore.CreateTrack(mt))
+                            .OrderBy(e => e.TrackNo)
+                            .ToList()
+                    });
+                }
+
+                // 渡し値アルバムID順に並べ替え
+                foreach (var id in albumIds)
+                {
+                    var at = tmpList.FirstOrDefault(e => e.Album.Id == id);
+                    if (at != null)
+                        result.Add(at);
+                }
+
+                await albumStore.CompleteAlbumInfo(result);
+            }
 
             return result;
         }

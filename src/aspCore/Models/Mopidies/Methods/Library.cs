@@ -45,7 +45,7 @@ namespace MusicFront.Models.Mopidies.Methods
             return result;
         }
 
-        public static async Task<List<Track>> Lookup(string[] uris)
+        public static async Task<Dictionary<string, List<Track>>> Lookup(string[] uris)
         {
             var request = JsonRpcFactory.CreateRequest(Library.MethodLookup, new ArgsUris()
             {
@@ -56,10 +56,7 @@ namespace MusicFront.Models.Mopidies.Methods
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。
-            var dic = JObject.FromObject(response.Result).ToObject<Dictionary<string, List<Track>>>();
-            var result = new List<Track>();
-            foreach (var pair in dic)
-                result.AddRange(pair.Value);
+            var result = JObject.FromObject(response.Result).ToObject<Dictionary<string, List<Track>>>();
 
             return result;
         }
