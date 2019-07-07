@@ -6,7 +6,7 @@ import SelectionItem from '../../Shared/SelectionItem';
 import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
 
 @Component({
-    template: `<div class="col-md-2 h-100">
+    template: `<div class="col-md-3 h-100">
     <div class="card h-100">
         <div class="card-header with-border bg-green">
             <h3 class="card-title">Genres</h3>

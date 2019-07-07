@@ -14,14 +14,17 @@ namespace MusicFront.src.aspCore.Controllers
     [Route("AlbumTracks")]
     public class AlbumTracksController : Controller
     {
-        [HttpGet("GetList")]
+        [HttpGet("GetPagenatedList")]
         public async Task<XhrResponse> GetPagenatedList(
-            [FromQuery] int[] albumIds,
+            [FromQuery] int[] genreIds,
+            [FromQuery] int[] artistIds,
+            [FromQuery] int? page,
             [FromServices] AlbumTracksStore store
         )
         {
-            var result = await store.GetList(albumIds);
+            var result = await store.GetPagenatedList(genreIds, artistIds, page);
             return XhrResponseFactory.CreateSucceeded(result);
         }
     }
+
 }

@@ -16,7 +16,7 @@ namespace MusicFront.Models.Albums
         private const string AlbumQueryString = "local:directory?type=album";
         private const string YearQueryString = "local:directory?type=date&format=%25Y";
 
-        private readonly int AlbumPageLength = 10;
+        //private readonly int AlbumPageLength = 10;
 
         public AlbumStore([FromServices] Dbc dbc) : base(dbc)
         {
@@ -24,75 +24,6 @@ namespace MusicFront.Models.Albums
 
         public Album Get(int genreId)
             => this.Dbc.GetAlbumQuery().FirstOrDefault(e => e.Id == genreId);
-
-        public PagenatedResult GetPagenatedList(int[] genreIds, int[] artistIds, int? page)
-        {
-            var query = this.Dbc.GetArtistQuery();
-
-            if (genreIds != null && 0 < genreIds.Length)
-                query = query
-                    .Where(e => e.GenreArtists.Any(e2 => genreIds.Contains(e2.GenreId)));
-
-            if (artistIds != null && 0 < artistIds.Length)
-                query = query
-                    .Where(e => e.ArtistAlbums.Any(e2 => artistIds.Contains(e2.ArtistId)));
-
-            var joinedAll = query
-                .Join(
-                    this.Dbc.ArtistAlbums,
-                    artist => artist.Id,
-                    artistAlbum => artistAlbum.ArtistId,
-                    (artist, artistAlbum) => new
-                    {
-                        Artist = artist,
-                        ArtistAlbum = artistAlbum
-                    }
-                )
-                .Join(
-                    this.Dbc.Albums,
-                    entity => entity.ArtistAlbum.AlbumId,
-                    album => album.Id,
-                    (entity, album) => new
-                    {
-                        Artist = entity.Artist,
-                        Album = album
-                    }
-                )
-                //.GroupBy(e => e.Album.Id)
-                //.Select(e => new
-                //{
-                //    Album = e.First().Album,
-                //    ArtistName = e.Min(e2 => e2.Artist.LowerName)
-                //})
-                //.OrderBy(e => e.ArtistName)
-                //.ThenBy(e => e.Album.Year)
-                //.ThenBy(e => e.Album.LowerName)
-                .OrderBy(e => e.Artist.LowerName)
-                .ThenBy(e => e.Album.Year)
-                .ThenBy(e => e.Album.LowerName);
-
-            var totalLength = joinedAll.Count();
-
-            var array = (page != null)
-                ? joinedAll
-                    .Skip(((int)page - 1) * this.PageLength)
-                    .Take(this.PageLength)
-                    .Select(e => e.Album)
-                    .ToArray()
-                : joinedAll
-                    .Select(e => e.Album)
-                    .ToArray();
-
-            var result = new PagenatedResult()
-            {
-                TotalLength = totalLength,
-                ResultLength = array.Length,
-                ResultPage = page,
-                ResultList = array
-            };
-
-            return result;
-        }
 
         public async Task<bool> CompleteAlbumInfo(List<AlbumTracks.AlbumTracks> albumTracksList)
         {

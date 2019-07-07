@@ -3,7 +3,6 @@ import Component from 'vue-class-component';
 import GenreList from './Lists/GenreList';
 import ArtistList from './Lists/ArtistList';
 import AlbumList from './Lists/AlbumList';
-import TrackList from './Lists/TrackList';
 import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../Events/ListEvents';
 import Libraries from '../../Libraries';
 
@@ -19,21 +18,13 @@ import Libraries from '../../Libraries';
             @SelectionChanged="OnArtistSelectionChanged"
             @Refreshed="OnArtistRefreshed" />
         <album-list
-            ref="AlbumList"
-            @SelectionChanged="OnAlbumSelectionChanged"
-            @Refreshed="OnAlbumRefreshed"
-            @ListAppended="OnAlbumListAppended"/>
-        <track-list
-            ref="TrackList"
-            @SelectionChanged="OnTrackSelectionChanged"
-            @Refreshed="OnTrackRefreshed" />
+            ref="AlbumList" />
     </div>
 </section>`,
     components: {
         'genre-list': GenreList,
         'artist-list': ArtistList,
-        'album-list': AlbumList,
-        'track-list': TrackList
+        'album-list': AlbumList
     }
 })
 export default class Finder extends ViewBase {
@@ -50,10 +41,6 @@ export default class Finder extends ViewBase {
         return this.$refs.AlbumList as AlbumList;
     }
 
-    private get TrackList(): TrackList {
-        return this.$refs.TrackList as TrackList;
-    }
-
     private OnGenreSelectionChanged(args: ISelectionChangedArgs): void {
         console.log('Finder.OnGenreSelectionChanged');
         console.log(args);
@@ -66,13 +53,11 @@ export default class Finder extends ViewBase {
             this.ArtistList.RemoveFilterGenreId(args.entity.Id);
             this.AlbumList.RemoveAllFilters();
         }
-        this.TrackList.ClearAlbumIds();
     }
 
     private OnGenreRefreshed(): void {
         this.ArtistList.RemoveAllFilters();
         this.AlbumList.RemoveAllFilters();
-        this.TrackList.ClearAlbumIds();
     }
 
     private OnArtistSelectionChanged(args: ISelectionChangedArgs): void {
@@ -81,19 +66,16 @@ export default class Finder extends ViewBase {
         } else {
             this.AlbumList.RemoveFilterArtistId(args.entity.Id);
         }
-        this.TrackList.ClearAlbumIds();
     }
 
     private OnArtistRefreshed(): void {
         this.AlbumList.RemoveFilterAllArtists();
-        this.TrackList.ClearAlbumIds();
     }
 
     private OnAlbumListAppended(args: IListAppendedArgs): void {
         var albumIds = Libraries.Enumerable.from(args.entities)
             .select(e => e.Id)
             .toArray();
-        this.TrackList.AppendAlbumIds(albumIds);
     }
 
     private OnAlbumSelectionChanged(args: ISelectionChangedArgs): void {
@@ -102,7 +84,6 @@ export default class Finder extends ViewBase {
     }
 
     private OnAlbumRefreshed(): void {
-        this.TrackList.ClearAlbumIds();
     }
 
     private OnTrackSelectionChanged(args: ISelectionChangedArgs): void {

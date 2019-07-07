@@ -2,18 +2,18 @@ import * as _ from 'lodash';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
-import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
-import Album from '../../../Models/Albums/Album';
-import AlbumStore from '../../../Models/Albums/AlbumStore';
+import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
+import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
 import ViewBase from '../../Bases/ViewBase';
-import SelectionItem from '../../Shared/SelectionItem';
+import { Events } from '../../Events/ListEvents';
+import SelectionAlbumTracks from './SelectionAlbumTracks';
 
 Vue.use(InfiniteLoading);
 
 @Component({
-    template: `<div class="col-md-2 h-100">
+    template: `<div class="col-md-6 h-100">
     <div class="card h-100">
-        <div class="card-header with-border bg-warning">
+        <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Albums</h3>
             <div class="card-tools">
                 <button type="button"
@@ -26,10 +26,10 @@ Vue.use(InfiniteLoading);
         <div class="card-body list-scrollable">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
-                    <selection-item
-                        ref="Items"
+                    <selection-album-tracks
+                        ref="AlbumTracks"
                         v-bind:entity="entity"
-                        @SelectionChanged="OnSelectionChanged" />
+                        @click="OnClickItem" />
                 </template>
                 <infinite-loading @infinite="OnInfinite" ref="InfiniteLoading"></infinite-loading>
             </ul>
@@ -37,16 +37,17 @@ Vue.use(InfiniteLoading);
     </div>
 </div>`,
     components: {
-        'selection-item': SelectionItem
+        'selection-album-tracks': SelectionAlbumTracks
     }
 })
 export default class AlbumList extends ViewBase {
 
-    private store: AlbumStore = new AlbumStore();
     private page: number = 1;
     private genreIds: number[] = [];
     private artistIds: number[] = [];
-    private entities: Album[] = [];
+
+    private store: AlbumTracksStore = new AlbumTracksStore();
+    private entities: AlbumTracks[] = [];
 
     private get InfiniteLoading(): InfiniteLoading {
         return this.$refs.InfiniteLoading as InfiniteLoading;
@@ -66,12 +67,6 @@ export default class AlbumList extends ViewBase {
             $state.complete();
         }
 
-        if (0 < result.ResultList.length) {
-            this.$emit(Events.ListAppended, {
-                entities: result.ResultList
-            } as IListAppendedArgs);
-        }
-
         return true;
     }
 
@@ -80,8 +75,8 @@ export default class AlbumList extends ViewBase {
         this.$emit(Events.Refreshed);
     }
 
-    private OnSelectionChanged(args: ISelectionChangedArgs): void {
-        this.$emit(Events.SelectionChanged, args);
+    private OnClickItem(): void {
+
     }
 
     private Refresh(): void {
@@ -110,15 +105,7 @@ export default class AlbumList extends ViewBase {
 
     public RemoveFilterGenreId(genreId: number): void {
         if (this.HasGenre(genreId)) {
-
-            console.log('Before - GenreId: ' + genreId);
-            console.log(this.genreIds);
-
             _.pull(this.genreIds, genreId);
-
-            console.log('After - GenreId: ' + genreId);
-            console.log(this.genreIds);
-
             this.Refresh();
         }
     }

@@ -11,24 +11,66 @@ using System.Threading.Tasks;
 
 namespace MusicFront.Models.AlbumTracks
 {
-    public class AlbumTracksStore : StoreBase<AlbumTracks>
+    public class AlbumTracksStore : PagenagedStoreBase<AlbumTracks>
     {
         public AlbumTracksStore([FromServices] Dbc dbc) : base(dbc)
         {
         }
 
-        public async Task<List<AlbumTracks>> GetList(int[] albumIds)
+        protected new int PageLength = 10;
+
+        public async Task<PagenatedResult> GetPagenatedList(
+            int[] genreIds,
+            int[] artistIds,
+            int? page
+        )
+        {
+            var query = (IQueryable<Album>)this.Dbc.Albums
+                .Include(e => e.GenreAlbums)
+                .Include(e => e.ArtistAlbums)
+                .ThenInclude(e2 => e2.Artist);
+
+            if (genreIds != null && 0 < genreIds.Length)
+                query = query
+                    .Where(e => e.GenreAlbums.Any(e2 => genreIds.Contains(e2.GenreId)));
+
+            if (artistIds != null && 0 < artistIds.Length)
+                query = query
+                    .Where(e => e.ArtistAlbums.Any(e2 => artistIds.Contains(e2.ArtistId)));
+
+            var ordered = query
+                .OrderBy(e => e.ArtistAlbums.Min(e2 => e2.Artist.LowerName))
+                .ThenBy(e => e.Year)
+                .ThenBy(e => e.LowerName);
+
+            var totalLength = ordered.Count();
+
+            var albums = (page != null)
+                ? ordered
+                    .Skip(((int)page - 1) * this.PageLength)
+                    .Take(this.PageLength)
+                    .ToList()
+                : ordered
+                    .ToList();
+
+            var albumTracksList = await this.GetList(albums);
+
+            var result = new PagenatedResult()
+            {
+                TotalLength = totalLength,
+                ResultLength = albums.Count(),
+                ResultPage = page,
+                ResultList = albumTracksList.ToArray()
+            };
+
+            return result;
+        }
+
+        private async Task<List<AlbumTracks>> GetList(List<Album> albums)
         {
             var result = new List<AlbumTracks>();
             using (var albumStore = new AlbumStore(this.Dbc))
             {
-                var albums = this.Dbc.Albums
-                    .Include(e => e.GenreAlbums)
-                    .Include(e => e.ArtistAlbums)
-                    .ThenInclude(e2 => e2.Artist)
-                    .Where(e => albumIds.Contains(e.Id))
-                    .ToList();
-
                 var tmpList = this.GetListFromCache(albums);
 
                 var cached = tmpList.Select(e => e.Album.Id).ToArray();
@@ -41,9 +83,9 @@ namespace MusicFront.Models.AlbumTracks
                     tmpList.AddRange(await this.GetListFromMopidy(remainings, albums));
 
                 // 渡し値アルバムID順に並べ替え
-                foreach (var id in albumIds)
+                foreach (var album in albums)
                 {
-                    var at = tmpList.FirstOrDefault(e => e.Album.Id == id);
+                    var at = tmpList.FirstOrDefault(e => e.Album.Id == album.Id);
                     if (at != null)
                         result.Add(at);
                 }

@@ -3,18 +3,18 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
-import Artist from '../../../Models/Artists/Artist';
-import ArtistStore from '../../../Models/Artists/ArtistStore';
+import Album from '../../../Models/Albums/Album';
+import AlbumStore from '../../../Models/Albums/AlbumStore';
 import ViewBase from '../../Bases/ViewBase';
 import SelectionItem from '../../Shared/SelectionItem';
 
 Vue.use(InfiniteLoading);
 
 @Component({
-    template: `<div class="col-md-3 h-100">
+    template: `<div class="col-md-2 h-100">
     <div class="card h-100">
-        <div class="card-header with-border bg-info">
-            <h3 class="card-title">Artists</h3>
+        <div class="card-header with-border bg-warning">
+            <h3 class="card-title">Albums</h3>
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
@@ -26,10 +26,10 @@ Vue.use(InfiniteLoading);
         <div class="card-body list-scrollable">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
-                <selection-item
-                    ref="Items"
-                    v-bind:entity="entity"
-                    @SelectionChanged="OnSelectionChanged" />
+                    <selection-item
+                        ref="Items"
+                        v-bind:entity="entity"
+                        @SelectionChanged="OnSelectionChanged" />
                 </template>
                 <infinite-loading @infinite="OnInfinite" ref="InfiniteLoading"></infinite-loading>
             </ul>
@@ -40,20 +40,21 @@ Vue.use(InfiniteLoading);
         'selection-item': SelectionItem
     }
 })
-export default class ArtistList extends ViewBase {
+export default class AlbumList extends ViewBase {
 
-    private store: ArtistStore = new ArtistStore();
+    private store: AlbumStore = new AlbumStore();
     private page: number = 1;
     private genreIds: number[] = [];
-    private entities: Artist[] = [];
+    private artistIds: number[] = [];
+    private entities: Album[] = [];
 
     private get InfiniteLoading(): InfiniteLoading {
         return this.$refs.InfiniteLoading as InfiniteLoading;
     }
 
-    private async OnInfinite($state: StateChanger): Promise<boolean> {
+    public async OnInfinite($state: StateChanger): Promise<boolean> {
 
-        var result = await this.store.GetList(this.genreIds, this.page);
+        var result = await this.store.GetList(this.genreIds, this.artistIds, this.page);
 
         if (0 < result.ResultList.length)
             this.entities = this.entities.concat(result.ResultList);
@@ -96,6 +97,10 @@ export default class ArtistList extends ViewBase {
         return (0 <= _.indexOf(this.genreIds, genreId));
     }
 
+    private HasArtist(artistId: number): boolean {
+        return (0 <= _.indexOf(this.artistIds, artistId));
+    }
+
     public AddFilterGenreId(genreId: number): void {
         if (!this.HasGenre(genreId)) {
             this.genreIds.push(genreId);
@@ -110,9 +115,38 @@ export default class ArtistList extends ViewBase {
         }
     }
 
-    public RemoveAllFilters(): void {
+    public RemoveFilterAllGenres(): void {
         if (0 < this.genreIds.length) {
             this.genreIds = [];
+            this.Refresh();
+        }
+    }
+
+    public AddFilterArtistId(artistId: number): void {
+        if (!this.HasArtist(artistId)) {
+            this.artistIds.push(artistId);
+            this.Refresh();
+        }
+    }
+
+    public RemoveFilterArtistId(artistId: number): void {
+        if (this.HasArtist(artistId)) {
+            _.pull(this.artistIds, artistId);
+            this.Refresh();
+        }
+    }
+
+    public RemoveFilterAllArtists(): void {
+        if (0 < this.artistIds.length) {
+            this.artistIds = [];
+            this.Refresh();
+        }
+    }
+
+    public RemoveAllFilters(): void {
+        if (0 < this.genreIds.length || 0 < this.artistIds.length) {
+            this.genreIds = [];
+            this.artistIds = [];
             this.Refresh();
         }
     }

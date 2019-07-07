@@ -52,34 +52,35 @@ export default class TrackList extends ViewBase {
         return this.$refs.InfiniteLoading as InfiniteLoading;
     }
 
-    public async OnInfinite($state: StateChanger): Promise<boolean> {
+    // AlbumTracksStore.GetList()の引数変更に伴い、コメントアウト
+    //public async OnInfinite($state: StateChanger): Promise<boolean> {
 
-        var targetAlbumIds = Libraries.Enumerable.from(this.albumIds)
-            .skip((this.page - 1) * this.PageLength)
-            .take(this.PageLength)
-            .toArray();
+    //    var targetAlbumIds = Libraries.Enumerable.from(this.albumIds)
+    //        .skip((this.page - 1) * this.PageLength)
+    //        .take(this.PageLength)
+    //        .toArray();
 
-        if (0 < targetAlbumIds.length) {
-            var result = await this.store.GetList(targetAlbumIds);
+    //    if (0 < targetAlbumIds.length) {
+    //        var result = await this.store.GetList(targetAlbumIds);
 
-            if (0 < result.length)
-                this.entities = this.entities.concat(result);
+    //        if (0 < result.length)
+    //            this.entities = this.entities.concat(result);
 
-            $state.loaded();
-            this.page++;
+    //        $state.loaded();
+    //        this.page++;
 
-            if (0 < result.length) {
-                this.$emit(Events.ListAppended, {
-                    entities: result
-                } as IListAppendedArgs);
-            }
+    //        if (0 < result.length) {
+    //            this.$emit(Events.ListAppended, {
+    //                entities: result
+    //            } as IListAppendedArgs);
+    //        }
 
-        } else {
-            $state.complete();
-        }
+    //    } else {
+    //        $state.complete();
+    //    }
 
-        return true;
-    }
+    //    return true;
+    //}
 
     private Refresh(): void {
         this.page = 1;
