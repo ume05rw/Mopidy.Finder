@@ -1,6 +1,6 @@
 .list-scrollable {
     /* 57, 64, 49 **/
-    height: calc(100vh - 190px);
+    height: calc(100vh - 140px);
     overflow-y: scroll;
 }
 .albumart {

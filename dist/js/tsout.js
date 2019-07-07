@@ -117,11 +117,13 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "Views/Bases/ViewBas
     var HeaderBar = /** @class */ (function (_super) {
         __extends(HeaderBar, _super);
         function HeaderBar() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.contentTitle = 'Finder';
+            return _this;
         }
         HeaderBar = __decorate([
             vue_class_component_1.default({
-                template: "<nav class=\"main-header navbar navbar-expand navbar-white navbar-light border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\" data-widget=\"pushmenu\" href=\"#\">\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n    </ul>\n    <ul class=\"navbar-nav ml-auto\">\n        <li class=\"nav-item\">\n            <button type=\"button\" class=\"btn btn-default btn-sm\">\n                <i class=\"fa fa-backward\" />\n            </button>\n        </li>\n        <li class=\"nav-item\">\n            <button type=\"button\" class=\"btn btn-default btn-sm\">\n                <i class=\"fa fa-play\" />\n            </button>\n        </li>\n        <li class=\"nav-item\">\n            <button type=\"button\" class=\"btn btn-default btn-sm\">\n                <i class=\"fa fa-forward\" />\n            </button>\n        </li>\n    </ul>\n</nav>"
+                template: "<nav class=\"main-header navbar navbar-expand navbar-white navbar-light border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\" data-widget=\"pushmenu\" href=\"#\">\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n        <li class=\"nav-item\">\n            <h3>{{ contentTitle }}</h3>\n        </li>\n    </ul>\n    <ul class=\"navbar-nav ml-auto\">\n        <li class=\"nav-item\">\n            <button type=\"button\" class=\"btn btn-default btn-sm\">\n                <i class=\"fa fa-backward\" />\n            </button>\n        </li>\n        <li class=\"nav-item\">\n            <button type=\"button\" class=\"btn btn-default btn-sm\">\n                <i class=\"fa fa-play\" />\n            </button>\n        </li>\n        <li class=\"nav-item\">\n            <button type=\"button\" class=\"btn btn-default btn-sm\">\n                <i class=\"fa fa-forward\" />\n            </button>\n        </li>\n    </ul>\n</nav>"
             })
         ], HeaderBar);
         return HeaderBar;
@@ -1272,16 +1274,14 @@ define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/H
     var RootView = /** @class */ (function (_super) {
         __extends(RootView, _super);
         function RootView() {
-            var _this = _super.call(this, {
-                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100\">\n        <section class=\"content-header\">\n            <h1 ref=\"ContentTitle\">{{ contentTitleString }}</h1>\n        </section>\n        <finder ref=\"Finder\" />\n    </div>\n</div>",
+            return _super.call(this, {
+                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100\">\n        <finder ref=\"Finder\" />\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
                     'sidebar': Sidebar_1.default,
                     'finder': Finder_1.default
                 }
             }) || this;
-            _this.contentTitleString = 'Finder';
-            return _this;
         }
         return RootView;
     }(ViewBase_10.default));

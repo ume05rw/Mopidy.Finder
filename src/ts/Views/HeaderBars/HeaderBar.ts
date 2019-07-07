@@ -9,6 +9,9 @@ import Component from 'vue-class-component';
                 <i class="fa fa-bars" />
             </a>
         </li>
+        <li class="nav-item">
+            <h3>{{ contentTitle }}</h3>
+        </li>
     </ul>
     <ul class="navbar-nav ml-auto">
         <li class="nav-item">
@@ -30,5 +33,5 @@ import Component from 'vue-class-component';
 </nav>`
 })
 export default class HeaderBar extends ViewBase {
-
+    private contentTitle: string = 'Finder';
 }
