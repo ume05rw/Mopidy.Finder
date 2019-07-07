@@ -58,18 +58,20 @@ namespace MusicFront.Models.Albums
                         Album = album
                     }
                 )
-                .GroupBy(e => e.Album.Id)
-                .Select(e => new
-                {
-                    Album = e.First().Album,
-                    ArtistName = e.Min(e2 => e2.Artist.LowerName)
-                })
-                .OrderBy(e => e.ArtistName)
+                //.GroupBy(e => e.Album.Id)
+                //.Select(e => new
+                //{
+                //    Album = e.First().Album,
+                //    ArtistName = e.Min(e2 => e2.Artist.LowerName)
+                //})
+                //.OrderBy(e => e.ArtistName)
+                //.ThenBy(e => e.Album.Year)
+                //.ThenBy(e => e.Album.LowerName)
+                .OrderBy(e => e.Artist.LowerName)
                 .ThenBy(e => e.Album.Year)
-                .ThenBy(e => e.Album.LowerName)
-                .ToArray();
+                .ThenBy(e => e.Album.LowerName);
 
-            var totalLength = joinedAll.Length;
+            var totalLength = joinedAll.Count();
 
             var array = (page != null)
                 ? joinedAll
@@ -103,7 +105,7 @@ namespace MusicFront.Models.Albums
             return true;
         }
 
-        public async Task<bool> CompleteImages(List<AlbumTracks.AlbumTracks> albumTracksList)
+        private async Task<bool> CompleteImages(List<AlbumTracks.AlbumTracks> albumTracksList)
         {
             var targetDictionary = albumTracksList
                 .Where(e => string.IsNullOrEmpty(e.Album.ImageUri))
@@ -130,7 +132,7 @@ namespace MusicFront.Models.Albums
             return hasUpdated;
         }
 
-        public bool CompleteYears(List<AlbumTracks.AlbumTracks> albumTracksList)
+        private bool CompleteYears(List<AlbumTracks.AlbumTracks> albumTracksList)
         {
             var hasUpdated = false;
             foreach (var at in albumTracksList)

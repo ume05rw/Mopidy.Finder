@@ -14,8 +14,8 @@ namespace MusicFront.Models.AlbumTracks
         [JsonProperty("Album")]
         public Album Album { get; set; }
 
-        [JsonProperty("Artist")]
-        public Artist Artist { get; set; }
+        [JsonProperty("Artists")]
+        public List<Artist> Artists { get; set; }
 
         [JsonProperty("Tracks")]
         public List<Track> Tracks { get; set; }

@@ -8,7 +8,9 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
                    ref="Li" >
     <div class="card w-100">
         <div class="card-header with-border bg-secondary">
-            <h3 class="card-title">{{ entity.Artist.Name }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }} </h3>
+            <h3 class="card-title text-nowrap text-truncate">
+                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}
+            </h3>
             <div class="card-tools">
                 <button type="button"
                         class="btn btn-tool"
@@ -27,7 +29,7 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
                         <template v-for="track in entity.Tracks">
                         <tr @click="OnClickTrack">
                             <td class="tracknum">{{ track.TrackNo }}</td>
-                            <td class="trackname">{{ track.Name }}</td>
+                            <td class="trackname text-truncate">{{ track.Name }}</td>
                             <td class="tracklength">{{ track.GetTimeString() }}</td>
                         </tr>
                         </template>

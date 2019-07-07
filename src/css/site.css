@@ -7,6 +7,9 @@
     width: 100%;
     height: auto;
 }
+.table.tracks {
+    table-layout: fixed;
+}
 .tracks .tracknum {
     width: 10%;
     text-align: right;

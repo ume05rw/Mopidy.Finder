@@ -1,13 +1,12 @@
-import Component from 'vue-class-component';
-import Track from '../../../Models/Tracks/Track';
-import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
-import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
-import ViewBase from '../../Bases/ViewBase';
-import SelectionAlbumTracks from './SelectionAlbumTracks';
-import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Vue from 'vue';
+import Component from 'vue-class-component';
+import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../../Libraries';
-import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
+import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
+import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
+import ViewBase from '../../Bases/ViewBase';
+import { Events, IListAppendedArgs } from '../../Events/ListEvents';
+import SelectionAlbumTracks from './SelectionAlbumTracks';
 
 Vue.use(InfiniteLoading);
 
@@ -107,10 +106,6 @@ export default class TrackList extends ViewBase {
 
     public AppendAlbumIds(albumIds: number[]): void {
         this.albumIds = this.albumIds.concat(albumIds);
-        console.log('InfiniteLoading.$props');
-        console.log(this.InfiniteLoading.$props);
-        console.log('InfiniteLoading.$data');
-        console.log(this.InfiniteLoading.$data);
 
         this.InfiniteLoading.stateChanger.reset();
         (this.InfiniteLoading as any).attemptLoad();

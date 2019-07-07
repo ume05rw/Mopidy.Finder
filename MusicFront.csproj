@@ -25,6 +25,7 @@
     <None Remove="src\ts\Views\Finders\GenreList.ts" />
     <None Remove="src\ts\Views\Finders\Lists\SelectionAlbumTracks.ts" />
     <None Remove="src\ts\Views\Finders\TrackList.ts" />
+    <None Remove="src\ts\Views\HeaderBars\HeaderBar.ts" />
     <None Remove="src\ts\Views\RootView.ts" />
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
     <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
@@ -78,6 +79,7 @@
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\GenreList.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\SelectionAlbumTracks.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\TrackList.ts" />
+    <TypeScriptCompile Include="src\ts\Views\HeaderBars\HeaderBar.ts" />
     <TypeScriptCompile Include="src\ts\Views\RootView.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionItem.ts" />
     <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />

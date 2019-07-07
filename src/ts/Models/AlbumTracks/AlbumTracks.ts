@@ -6,7 +6,7 @@ import ISelectionItem from '../Bases/ISelectionItem';
 
 export interface IAlbumTracks {
     Album: IAlbum;
-    Artist: IArtist;
+    Artists: IArtist[];
     Tracks: ITrack[];
 }
 
@@ -15,7 +15,7 @@ export default class AlbumTracks implements IAlbumTracks, ISelectionItem {
     public static Create(entity: IAlbumTracks): AlbumTracks {
         var result = new AlbumTracks();
         result.Album = Album.Create(entity.Album);
-        result.Artist = Artist.Create(entity.Artist);
+        result.Artists = Artist.CreateArray(entity.Artists);
         result.Tracks = Track.CreateArray(entity.Tracks);
 
         return result;
@@ -31,7 +31,7 @@ export default class AlbumTracks implements IAlbumTracks, ISelectionItem {
     }
 
     public Album: Album;
-    public Artist: Artist;
+    public Artists: Artist[];
     public Tracks: Track[];
 
     public get Id(): number {
@@ -45,5 +45,14 @@ export default class AlbumTracks implements IAlbumTracks, ISelectionItem {
     }
     public get Uri(): string {
         return this.Album.Uri;
+    }
+
+    public GetArtistName(): string {
+        if (this.Artists.length <= 0)
+            return '';
+        if (this.Artists.length === 1)
+            return this.Artists[0].Name;
+
+        return this.Artists[0].Name + ' and more...';
     }
 }

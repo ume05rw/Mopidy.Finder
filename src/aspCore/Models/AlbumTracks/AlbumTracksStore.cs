@@ -23,7 +23,10 @@ namespace MusicFront.Models.AlbumTracks
             using (var trackStore = new TrackStore(this.Dbc))
             using (var albumStore = new AlbumStore(this.Dbc))
             {
-                var albumDictionary = this.Dbc.GetAlbumQuery()
+                var albumDictionary = this.Dbc.Albums
+                    .Include(e => e.GenreAlbums)
+                    .Include(e => e.ArtistAlbums)
+                    .ThenInclude(e2 => e2.Artist)
                     .Where(e => albumIds.Contains(e.Id))
                     .ToDictionary(e => e.Uri);
 
@@ -40,15 +43,12 @@ namespace MusicFront.Models.AlbumTracks
                         continue;
 
                     var album = albumDictionary[pair.Key];
-                    var artistId = album.ArtistAlbums.FirstOrDefault()?.ArtistId;
-                    var artist = (artistId != null)
-                        ? this.Dbc.GetArtistQuery().FirstOrDefault(e => e.Id == artistId)
-                        : null;
+                    var artists = album.ArtistAlbums.Select(e => e.Artist).ToList();
 
                     tmpList.Add(new AlbumTracks()
                     {
                         Album = album,
-                        Artist = artist,
+                        Artists = artists,
                         Tracks = pair.Value
                             .Select(mt => trackStore.CreateTrack(mt))
                             .OrderBy(e => e.TrackNo)

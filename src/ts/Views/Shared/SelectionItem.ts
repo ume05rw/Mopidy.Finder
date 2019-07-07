@@ -7,7 +7,7 @@ import { Events, ISelectionChangedArgs } from '../Events/ListEvents';
 @Component({
     template: `<li class="nav-item"
                    ref="Li" >
-    <a href="javascript:void(0)" class="d-inline-block w-100"
+    <a href="javascript:void(0)" class="d-inline-block w-100 text-nowrap text-truncate"
        @click="OnClick" >
         {{ entity.Name }}
     </a>
