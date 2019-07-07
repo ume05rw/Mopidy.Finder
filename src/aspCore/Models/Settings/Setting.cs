@@ -15,7 +15,9 @@ namespace MusicFront.src.aspCore.Models.Settings
         /// <remarks>
         /// ex) http://192.168.0.1:6680
         /// </remarks>
-        public string Uri { get; set; }
+        public string MopidyUri { get; set; }
+
+        public bool IsInitialized { get; set; }
 
 
 

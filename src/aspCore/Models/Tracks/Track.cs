@@ -9,22 +9,30 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MusicFront.Models.Tracks
 {
-    [NotMapped]
+    [Table("tracks")]
     [JsonObject(MemberSerialization.OptIn)]
     public class Track
     {
+        [Key]
         [JsonProperty("Id")]
         public int Id { get; set; }
 
+        [Required]
         [JsonProperty("Name")]
         public string Name { get; set; }
 
+        [Required]
         [JsonProperty("LowerName")]
         public string LowerName { get; set; }
 
+        [Required]
         [JsonProperty("Uri")]
         public string Uri { get; set; }
 
+        [Required]
+        public int AlbumId { get; set; }
+
+        [NotMapped]
         [JsonProperty("TlId")]
         public int? TlId { get; set; }
 
@@ -48,5 +56,8 @@ namespace MusicFront.Models.Tracks
 
         [JsonProperty("LastModified")]
         public long? LastModified { get; set; }
+
+        [ForeignKey("AlbumId")]
+        public Album Album { get; set; }
     }
 }

@@ -50,44 +50,6 @@ namespace MusicFront.Models.Tracks
         public Track CreateTrack(TlTrack mopidyTlTrack)
             => this.Create(mopidyTlTrack);
 
-
-        //public async Task<List<AlbumTracks.AlbumTracks>> GetTracksByAlbums(List<Albums.Album> albums)
-        //{
-        //    var albumDictionary = albums.ToDictionary(e => e.Uri);
-
-        //    var mopidyTrackDictionary
-        //        = await Library.LookupByAlbumUris(albumDictionary.Keys.ToArray());
-
-        //    if (mopidyTrackDictionary == null || mopidyTrackDictionary.Count() <= 0)
-        //        return new List<AlbumTracks.AlbumTracks>();
-
-        //    var result = new List<AlbumTracks.AlbumTracks>();
-
-        //    foreach (var pair in mopidyTrackDictionary)
-        //    {
-        //        if (!albumDictionary.ContainsKey(pair.Key))
-        //            continue;
-
-        //        var album = albumDictionary[pair.Key];
-        //        var artistId = album.ArtistAlbums.FirstOrDefault()?.ArtistId;
-        //        var artist = (artistId != null)
-        //            ? this.Dbc.GetArtistQuery().FirstOrDefault(e => e.Id == artistId)
-        //            : null;
-
-        //        result.Add(new AlbumTracks.AlbumTracks()
-        //        {
-        //            Album = album,
-        //            Artist = artist,
-        //            Tracks = pair.Value
-        //                .Select(mt => this.Create(mt))
-        //                .OrderBy(e => e.TrackNo)
-        //                .ToList()
-        //        });
-        //    }
-
-        //    return result;
-        //}
-
         public Task<bool> ClearList()
             => Tracklist.Clear();
 

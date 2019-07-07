@@ -19,10 +19,10 @@ namespace MusicFront.Models
 
         private static LockerObject Locker = new LockerObject();
 
-
         public DbSet<Album> Albums { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Artist> Artists { get; set; }
+        public DbSet<Track> Tracks { get; set; }
         public DbSet<ArtistAlbum> ArtistAlbums { get; set; }
         public DbSet<GenreAlbum> GenreAlbums { get; set; }
         public DbSet<GenreArtist> GenreArtists { get; set; }
@@ -41,6 +41,10 @@ namespace MusicFront.Models
             => this.Artists
                 .Include(e => e.GenreArtists)
                 .Include(e => e.ArtistAlbums);
+
+        public IQueryable<Track> GetTrackQuery()
+            => this.Tracks
+                .Include(e => e.Album);
 
         /// <summary>
         /// Constructor
@@ -62,6 +66,8 @@ namespace MusicFront.Models
                 .HasIndex(e => e.Uri);
             modelBuilder.Entity<Artist>()
                 .HasIndex(e => e.Uri);
+            modelBuilder.Entity<Track>()
+                .HasIndex(e => e.AlbumId);
             modelBuilder.Entity<ArtistAlbum>()
                 .HasKey(e => new { e.ArtistId, e.AlbumId });
             modelBuilder.Entity<ArtistAlbum>()
