@@ -5,8 +5,9 @@ import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
 import ViewBase from '../../Bases/ViewBase';
-import { Events } from '../../Events/ListEvents';
+import { Events, ITrackSelected } from '../../Events/FinderEvents';
 import SelectionAlbumTracks from './SelectionAlbumTracks';
+import Libraries from '../../../Libraries';
 
 Vue.use(InfiniteLoading);
 
@@ -32,7 +33,7 @@ Vue.use(InfiniteLoading);
                     <selection-album-tracks
                         ref="AlbumTracks"
                         v-bind:entity="entity"
-                        @click="OnClickItem" />
+                        @TrackSelected="OnTrackSelected" />
                 </template>
                 <infinite-loading @infinite="OnInfinite" ref="InfiniteLoading"></infinite-loading>
             </ul>
@@ -78,8 +79,39 @@ export default class AlbumList extends ViewBase {
         this.$emit(Events.Refreshed);
     }
 
-    private OnClickItem(): void {
+    private async OnTrackSelected(args: ITrackSelected): Promise<boolean> {
+        var albumTracks = Libraries.Enumerable.from(this.entities)
+            .firstOrDefault(e => e.Album.Id === args.AlbumId);
 
+        if (!albumTracks) {
+            console.error('AlbumTracks Not Found: AlbumId=' + args.AlbumId);
+            return false;
+        }
+
+        var tracks = Libraries.Enumerable.from(albumTracks.Tracks);
+        var track = tracks.firstOrDefault(e => e.Id === args.TrackId);
+
+        if (!track) {
+            console.error('Track Not Found: TrackId=' + args.TrackId);
+            return false;
+        }
+
+        var isAllTracksRegistered = tracks.all(e => e.TlId !== null);
+
+        if (isAllTracksRegistered) {
+            var result = await this.store.PlayAlbumByTlId(track.TlId);
+            return result;
+        } else {
+            // TlId未割り当ての場合
+            var resultAtls = await this.store.PlayAlbumByTrack(track);
+            var updatedTracks = Libraries.Enumerable.from(resultAtls.Tracks);
+
+            _.each(albumTracks.Tracks, (track) => {
+                track.TlId = updatedTracks.firstOrDefault(e => e.Id == track.Id).TlId;
+            });
+
+            return true;
+        }
     }
 
     private Refresh(): void {

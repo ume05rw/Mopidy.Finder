@@ -22,7 +22,7 @@ namespace MusicFront.Models.Tracks
             var track = new Track()
             {
                 Name = mopidyTrack.Name,
-                LowerName = mopidyTrack.Name.ToLower(),
+                LowerName = mopidyTrack.Name?.ToLower(),
                 Uri = mopidyTrack.Uri,
                 TrackNo = mopidyTrack.TrackNo,
                 DiscNo = mopidyTrack.DiscNo,

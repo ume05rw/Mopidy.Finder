@@ -1,7 +1,6 @@
 import Component from 'vue-class-component';
-import Libraries from '../../Libraries';
 import ViewBase from '../Bases/ViewBase';
-import { IListAppendedArgs, ISelectionChangedArgs } from '../Events/ListEvents';
+import { ISelectionChangedArgs } from '../Events/FinderEvents';
 import AlbumList from './Lists/AlbumList';
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
@@ -45,12 +44,12 @@ export default class Finder extends ViewBase {
         console.log('Finder.OnGenreSelectionChanged');
         console.log(args);
 
-        if (args.selected) {
-            this.ArtistList.AddFilterGenreId(args.entity.Id);
+        if (args.Selected) {
+            this.ArtistList.AddFilterGenreId(args.Entity.Id);
             this.AlbumList.RemoveAllFilters();
-            this.AlbumList.AddFilterGenreId(args.entity.Id);
+            this.AlbumList.AddFilterGenreId(args.Entity.Id);
         } else {
-            this.ArtistList.RemoveFilterGenreId(args.entity.Id);
+            this.ArtistList.RemoveFilterGenreId(args.Entity.Id);
             this.AlbumList.RemoveAllFilters();
         }
     }
@@ -61,21 +60,15 @@ export default class Finder extends ViewBase {
     }
 
     private OnArtistSelectionChanged(args: ISelectionChangedArgs): void {
-        if (args.selected) {
-            this.AlbumList.AddFilterArtistId(args.entity.Id);
+        if (args.Selected) {
+            this.AlbumList.AddFilterArtistId(args.Entity.Id);
         } else {
-            this.AlbumList.RemoveFilterArtistId(args.entity.Id);
+            this.AlbumList.RemoveFilterArtistId(args.Entity.Id);
         }
     }
 
     private OnArtistRefreshed(): void {
         this.AlbumList.RemoveFilterAllArtists();
-    }
-
-    private OnAlbumListAppended(args: IListAppendedArgs): void {
-        var albumIds = Libraries.Enumerable.from(args.entities)
-            .select(e => e.Id)
-            .toArray();
     }
 
     private OnAlbumSelectionChanged(args: ISelectionChangedArgs): void {

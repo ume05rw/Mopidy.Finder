@@ -16,18 +16,6 @@ namespace MusicFront.Controllers
     [Route("Genre")]
     public class GenreController : Controller
     {
-        [HttpGet("{id}")]
-        public XhrResponse Index(
-            [FromRoute] int id,
-            [FromServices] GenreStore store
-        )
-        {
-            var genre = store.Get(id);
-            return (genre == null)
-                ? XhrResponseFactory.CreateError($"Genre Not Found: id={id}")
-                : XhrResponseFactory.CreateSucceeded(genre);
-        }
-
         /// <summary>
         /// ジャンル一覧
         /// </summary>

@@ -14,6 +14,7 @@ module.exports = {
     // メインとなるJavaScriptファイル（エントリーポイント）
     // 注) 'src/ts/Main.ts' では認識しない。'./src/ts/Main.ts' とする。
     entry: [
+        './src/js/polyfills.js',
         './src/js/libraries.js'
     ],
 

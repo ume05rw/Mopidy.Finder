@@ -4,7 +4,6 @@ import 'admin-lte/dist/css/adminlte.css';
 import '../css/site.css';
 import jQuery from 'jquery';
 import 'admin-lte/dist/js/adminlte.js';
-import * as es6Promise from 'es6-promise';
 import * as _ from 'lodash';
 import Axios from 'axios';
 import * as qs from 'qs';
@@ -15,7 +14,6 @@ import * as VuePropertyDecorator from 'vue-property-decorator';
 import InfiniteLoading from 'vue-infinite-loading';
 
 window.__globals = {
-    'es6-promise': es6Promise,
     'jquery': jQuery,
     'lodash': _,
     'axios': Axios,

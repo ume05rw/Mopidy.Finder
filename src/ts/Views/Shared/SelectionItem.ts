@@ -2,7 +2,7 @@ import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import ISelectionItem from '../../Models/Bases/ISelectionItem';
 import ViewBase from '../Bases/ViewBase';
-import { Events, ISelectionChangedArgs } from '../Events/ListEvents';
+import { Events, ISelectionChangedArgs } from '../Events/FinderEvents';
 
 @Component({
     template: `<li class="nav-item"
@@ -39,8 +39,8 @@ export default class SelectionItem extends ViewBase {
             this.selected = true;
         }
         this.$emit(Events.SelectionChanged, {
-            entity: this.entity,
-            selected: this.selected
+            Entity: this.entity,
+            Selected: this.selected
         } as ISelectionChangedArgs);
     }
 

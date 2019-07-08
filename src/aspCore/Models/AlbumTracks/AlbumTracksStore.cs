@@ -179,5 +179,51 @@ namespace MusicFront.Models.AlbumTracks
                 return result;
             }
         }
+
+        public async Task<AlbumTracks> PlayAlbum(Track track)
+        {
+            using (var trackStore = new TrackStore(this.Dbc))
+            {
+                var targetTrack = this.Dbc.Tracks
+                    .Include(e => e.Album)
+                    .ThenInclude(e2 => e2.ArtistAlbums)
+                    .ThenInclude(e3 => e3.Artist)
+                    .First(e => e.Id == track.Id);
+
+                var tracks = this.Dbc.Tracks
+                    .Where(e => e.AlbumId == targetTrack.AlbumId)
+                    .OrderBy(e => e.DiscNo)
+                    .ThenBy(e => e.TrackNo)
+                    .ToArray();
+
+                var exists = await trackStore.GetList();
+
+                var remainingUris = tracks
+                    .Where(e => exists.All(e2 => e2.Uri != e.Uri))
+                    .Select(e => e.Uri)
+                    .ToArray();
+
+                if (0 < remainingUris.Length)
+                {
+                    var added = await trackStore.SetListByUris(remainingUris);
+                    exists.AddRange(added);
+                }
+
+                foreach (var t in tracks)
+                    t.TlId = exists.First(e => e.Uri == t.Uri).TlId;
+
+                var targetTlId = tracks.First(e => e.Id == track.Id).TlId;
+                await Playback.Play((int)targetTlId);
+
+                var result = new AlbumTracks()
+                {
+                    Album = targetTrack.Album,
+                    Artists = targetTrack.Album.ArtistAlbums.Select(e => e.Artist).ToList(),
+                    Tracks = tracks.ToList()
+                };
+
+                return result;
+            }
+        }
     }
 }

@@ -2,8 +2,8 @@ import Component from 'vue-class-component';
 import Genre from '../../../Models/Genres/Genre';
 import GenreStore from '../../../Models/Genres/GenreStore';
 import ViewBase from '../../Bases/ViewBase';
+import { Events, ISelectionChangedArgs } from '../../Events/FinderEvents';
 import SelectionItem from '../../Shared/SelectionItem';
-import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
 
 @Component({
     template: `<div class="col-md-3">
@@ -47,10 +47,6 @@ export default class GenreList extends ViewBase {
 
         this.entities = (await this.store.GetList())
             .toArray();
-
-        this.$emit(Events.ListAppended, {
-            entities: this.entities
-        } as IListAppendedArgs);
 
         return true;
     }

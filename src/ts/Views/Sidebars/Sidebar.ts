@@ -26,12 +26,6 @@ import Component from 'vue-class-component';
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="fa fa-th-list nav-icon" />
-                                <p>Tracklist</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
                                 <i class="fa fa-bookmark nav-icon" />
                                 <p>Playlists</p>
                             </a>

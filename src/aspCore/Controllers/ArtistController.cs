@@ -10,26 +10,14 @@ namespace MusicFront.Controllers
     [Route("Artist")]
     public class ArtistController : Controller
     {
-        [HttpGet("{id}")]
-        public XhrResponse Index(
-            [FromRoute] int id,
-            [FromServices] ArtistStore store
-        )
-        {
-            var artist = store.Get(id);
-            return (artist == null)
-                ? XhrResponseFactory.CreateError($"Artist Not Found: id={id}")
-                : XhrResponseFactory.CreateSucceeded(artist);
-        }
-
         [HttpGet("GetPagenatedList")]
         public XhrResponse GetPagenatedList(
-            [FromQuery] int[] genreIds,
-            [FromQuery] int? page,
+            [FromQuery] int[] GenreIds,
+            [FromQuery] int? Page,
             [FromServices] ArtistStore store
         )
         {
-            var result = store.GetPagenatedList(genreIds, page);
+            var result = store.GetPagenatedList(GenreIds, Page);
             return XhrResponseFactory.CreateSucceeded(result);
         }
     }

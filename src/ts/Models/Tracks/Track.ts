@@ -73,7 +73,6 @@ export default class Track implements ITrack, ISelectionItem {
     public LastModified: number;
 
     public GetTimeString(): string {
-        console.log('Track.TimeString: Length = ' + this.Length);
         if (!this.Length) {
             return '';
         }

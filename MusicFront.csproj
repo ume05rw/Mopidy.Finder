@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <None Remove="src\Main.ts" />
-    <None Remove="src\ts\Views\Events\ListEvents.ts" />
+    <None Remove="src\ts\Views\Events\FinderEvents.ts" />
     <None Remove="src\ts\Libraries.ts" />
     <None Remove="src\ts\MainController.ts" />
     <None Remove="src\ts\Models\AlbumTracks\AlbumTracks.ts" />
@@ -23,9 +23,7 @@
     <None Remove="src\ts\Views\Finders\ArtistList.ts" />
     <None Remove="src\ts\Views\Finders\Finder.ts" />
     <None Remove="src\ts\Views\Finders\GenreList.ts" />
-    <None Remove="src\ts\Views\Finders\Lists\AlbumList.backup.ts" />
     <None Remove="src\ts\Views\Finders\Lists\SelectionAlbumTracks.ts" />
-    <None Remove="src\ts\Views\Finders\Lists\TrackList.backup.ts" />
     <None Remove="src\ts\Views\Finders\TrackList.ts" />
     <None Remove="src\ts\Views\HeaderBars\HeaderBar.ts" />
     <None Remove="src\ts\Views\RootView.ts" />
@@ -55,7 +53,7 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="src\ts\Controllers\RootContoller.ts" />
-    <TypeScriptCompile Include="src\ts\Views\Events\ListEvents.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Events\FinderEvents.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />
     <TypeScriptCompile Include="src\ts\Main.ts" />
     <TypeScriptCompile Include="src\ts\Models\Albums\Album.ts" />
@@ -69,18 +67,15 @@
     <TypeScriptCompile Include="src\ts\Models\Genres\Genre.ts" />
     <TypeScriptCompile Include="src\ts\Models\Relations\GenreAlbum.ts" />
     <TypeScriptCompile Include="src\ts\Models\Relations\GenreArtist.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Albums\AlbumStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Artists\ArtistStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Genres\GenreStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Bases\StoreBase.ts" />
     <TypeScriptCompile Include="src\ts\Models\Tracks\Track.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\ViewBase.ts" />
-    <TypeScriptCompile Include="src\ts\Views\Finders\Lists\AlbumList.backup.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\ArtistList.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Finder.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\GenreList.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\SelectionAlbumTracks.ts" />
-    <TypeScriptCompile Include="src\ts\Views\Finders\Lists\TrackList.backup.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\AlbumList.ts" />
     <TypeScriptCompile Include="src\ts\Views\HeaderBars\HeaderBar.ts" />
     <TypeScriptCompile Include="src\ts\Views\RootView.ts" />
@@ -90,6 +85,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="src\js\Libs\" />
     <Folder Include="src\ts\Views\Playlists\" />
   </ItemGroup>
 

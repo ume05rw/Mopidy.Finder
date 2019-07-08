@@ -5,8 +5,8 @@ export default class ArtistStore extends StoreBase<Artist> {
 
     public async GetList(genreIds: number[], page: number): Promise<PagenatedResult<Artist>> {
         const response = await this.QueryGet('Artist/GetPagenatedList', {
-            genreIds: genreIds,
-            page: page
+            GenreIds: genreIds,
+            Page: page
         });
 
         if (!response.Succeeded) {

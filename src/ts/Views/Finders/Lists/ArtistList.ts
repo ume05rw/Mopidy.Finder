@@ -2,10 +2,10 @@ import * as _ from 'lodash';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
-import { Events, ISelectionChangedArgs, IListAppendedArgs } from '../../Events/ListEvents';
 import Artist from '../../../Models/Artists/Artist';
 import ArtistStore from '../../../Models/Artists/ArtistStore';
 import ViewBase from '../../Bases/ViewBase';
+import { Events, ISelectionChangedArgs } from '../../Events/FinderEvents';
 import SelectionItem from '../../Shared/SelectionItem';
 
 Vue.use(InfiniteLoading);
@@ -66,12 +66,6 @@ export default class ArtistList extends ViewBase {
             this.page++;
         } else {
             $state.complete();
-        }
-
-        if (0 < result.ResultList.length) {
-            this.$emit(Events.ListAppended, {
-                entities: result.ResultList
-            } as IListAppendedArgs);
         }
 
         return true;

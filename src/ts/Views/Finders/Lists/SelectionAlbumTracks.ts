@@ -2,6 +2,8 @@ import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import ViewBase from '../../Bases/ViewBase';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
+import Libraries from '../../../Libraries';
+import { Events, ITrackSelected } from '../../Events/FinderEvents';
 
 @Component({
     template: `<li class="nav-item w-100"
@@ -27,7 +29,8 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
                 <table class="table table-sm table-hover tracks">
                     <tbody>
                         <template v-for="track in entity.Tracks">
-                        <tr @click="OnClickTrack">
+                        <tr @click="OnClickTrack"
+                            v-bind:data-trackid="track.Id">
                             <td class="tracknum">{{ track.TrackNo }}</td>
                             <td class="trackname text-truncate">{{ track.Name }}</td>
                             <td class="tracklength">{{ track.GetTimeString() }}</td>
@@ -46,10 +49,22 @@ export default class SelectionAlbumTracks extends ViewBase {
     private entity: AlbumTracks;
 
     private OnClickAlbumPlay(): void {
+        var tracks = Libraries.Enumerable.from(this.entity.Tracks);
+        var firstTrack = tracks.first(e => e.TrackNo === tracks.min(e2 => e2.TrackNo));
 
+        this.$emit(Events.TrackSelected, {
+            AlbumId: this.entity.Album.Id,
+            TrackId: firstTrack.Id
+        } as ITrackSelected);
     }
 
-    private OnClickTrack(): void {
+    private OnClickTrack(args: Event): void {
+        var tr = (args.target as HTMLElement).parentElement;
+        var trackId = parseInt(tr.getAttribute('data-trackid'), 10);
 
+        this.$emit(Events.TrackSelected, {
+            AlbumId: this.entity.Album.Id,
+            TrackId: trackId
+        } as ITrackSelected);
     }
 }

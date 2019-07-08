@@ -11,6 +11,13 @@ define('es6-promise', ["exports"], function (exports) {
     exports.default = window.__globals['es6-promise'];
 });
 
+// object.assign
+define('object.assign', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['object.assign'];
+});
+
 // jquery
 define('jquery', ["exports"], function (exports) {
     "use strict";

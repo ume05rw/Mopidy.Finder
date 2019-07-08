@@ -1,10 +1,12 @@
 import 'animate.css/animate.css';
 import 'font-awesome/css/font-awesome.css';
 import 'admin-lte/dist/css/adminlte.css';
-import 'admin-lte/dist/js/adminlte.js';
+import 'animate.css/animate.css';
+import 'font-awesome/css/font-awesome.css';
+import 'admin-lte/dist/css/adminlte.css';
 import '../css/site.css';
+import 'admin-lte/dist/js/adminlte.js';
 import RootContoller from './Controllers/RootContoller';
-import Libraries from './Libraries';
 
 class Main {
 
@@ -13,26 +15,10 @@ class Main {
     public async Init(): Promise<Main> {
         console.log('TS Start');
 
-        this.PolyfillPromise();
-        await this.InitControllers();
-
-        return this;
-    }
-
-    private PolyfillPromise(): void {
-        try {
-            Libraries.es6Promise.polyfill();
-            //console.log('Promise Polyfill OK.');
-        } catch (ex) {
-            throw new Error('Promise Poliyfill Error!');
-        }
-    }
-
-    private async InitControllers(): Promise<boolean> {
         this._rootController = new RootContoller();
         await this._rootController.Init();
 
-        return true;
+        return this;
     }
 }
 

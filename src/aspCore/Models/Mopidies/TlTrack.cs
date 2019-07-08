@@ -17,7 +17,7 @@ namespace MusicFront.Models.Mopidies
     [JsonObject(MemberSerialization.OptIn)]
     public class TlTrack
     {
-        [JsonProperty("tiid")]
+        [JsonProperty("tlid")]
         public int TlId { get; set; }
 
         [JsonProperty("track")]
