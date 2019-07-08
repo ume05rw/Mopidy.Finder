@@ -4,25 +4,18 @@
 // ** defineの引数functionは実際に使用されるまで実行されないため、
 // ** for文などのループで定義出来ない。
 
-// es6-promise
-define('es6-promise', ["exports"], function (exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = window.__globals['es6-promise'];
-});
-
-// object.assign
-define('object.assign', ["exports"], function (exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = window.__globals['object.assign'];
-});
-
 // jquery
 define('jquery', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = window.__globals['jquery'];
+});
+
+// responsive-toolkit
+define('responsive-toolkit', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['responsive-toolkit'];
 });
 
 // lodash
@@ -59,6 +52,17 @@ define('linq', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = window.__globals['linq'];
+});
+
+// admin-lte/dist/js/adminlte.js
+define('admin-lte/dist/js/adminlte.js', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var instance = window.__globals['admin-lte/dist/js/adminlte.js'];
+    for (var key in instance) {
+        var val = instance[key];
+        exports[key] = val;
+    }
 });
 
 // vue

@@ -17,9 +17,6 @@ Vue.use(InfiniteLoading);
         <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Albums</h3>
             <div class="card-tools">
-                <button class="btn btn-tool" data-widget="collapse">
-                    <i class="fa fa-repeat" />
-                </button>
                 <button type="button"
                         class="btn btn-tool"
                         @click="OnClickRefresh" >
@@ -46,6 +43,7 @@ Vue.use(InfiniteLoading);
 })
 export default class AlbumList extends ViewBase {
 
+    private isEntitiesRefreshed: boolean = false;
     private page: number = 1;
     private genreIds: number[] = [];
     private artistIds: number[] = [];
@@ -80,6 +78,18 @@ export default class AlbumList extends ViewBase {
     }
 
     private async OnTrackSelected(args: ITrackSelected): Promise<boolean> {
+
+        if (this.isEntitiesRefreshed) {
+            await this.store.ClearList();
+
+            _.each(this.entities, (entity) => {
+                _.each(entity.Tracks, (track) => {
+                    track.TlId = null;
+                });
+            });
+            this.isEntitiesRefreshed = false;
+        }
+
         var albumTracks = Libraries.Enumerable.from(this.entities)
             .firstOrDefault(e => e.Album.Id === args.AlbumId);
 
@@ -99,6 +109,7 @@ export default class AlbumList extends ViewBase {
         var isAllTracksRegistered = tracks.all(e => e.TlId !== null);
 
         if (isAllTracksRegistered) {
+            // TlId割り当て済みの場合
             var result = await this.store.PlayAlbumByTlId(track.TlId);
             return result;
         } else {
@@ -117,6 +128,7 @@ export default class AlbumList extends ViewBase {
     private Refresh(): void {
         this.page = 1;
         this.entities = [];
+        this.isEntitiesRefreshed = true;
         this.$nextTick(() => {
             this.InfiniteLoading.stateChanger.reset();
             (this.InfiniteLoading as any).attemptLoad();

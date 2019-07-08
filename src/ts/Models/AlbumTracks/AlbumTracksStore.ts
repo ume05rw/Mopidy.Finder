@@ -25,19 +25,8 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
         return result;
     }
 
-    public async PlayAlbumByTlId(tlId: number): Promise<boolean> {
-        const response = await this.QueryPost('AlbumTracks/PlayAlbumByTlId', tlId);
-
-        if (!response.Succeeded) {
-            console.error(response.Errors);
-            throw new Error('Unexpected Error on ApiQuery');
-        }
-        
-        return response.Result as boolean;
-    }
-
     public async PlayAlbumByTrack(track: Track): Promise<AlbumTracks> {
-        const response = await this.QueryPost('AlbumTracks/PlayAlbumByTrack', track);
+        const response = await this.QueryPost('Player/PlayAlbumByTrack', track);
 
         if (!response.Succeeded) {
             console.error(response.Errors);
@@ -46,5 +35,27 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
         var result = AlbumTracks.Create(response.Result as IAlbumTracks);
 
         return result;
+    }
+
+    public async PlayAlbumByTlId(tlId: number): Promise<boolean> {
+        const response = await this.QueryPost('Player/PlayAlbumByTlId', tlId);
+
+        if (!response.Succeeded) {
+            console.error(response.Errors);
+            throw new Error('Unexpected Error on ApiQuery');
+        }
+
+        return response.Result as boolean;
+    }
+
+    public async ClearList(): Promise<boolean> {
+        const response = await this.QueryPost('Player/ClearList');
+
+        if (!response.Succeeded) {
+            console.error(response.Errors);
+            throw new Error('Unexpected Error on ApiQuery');
+        }
+
+        return response.Result as boolean;
     }
 }

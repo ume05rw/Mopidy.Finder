@@ -55,7 +55,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define("Libraries", ["require", "exports", "linq"], function (require, exports, Enumerable) {
+define("Libraries", ["require", "exports", "linq", "jquery"], function (require, exports, Enumerable, jQuery) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -69,7 +69,13 @@ define("Libraries", ["require", "exports", "linq"], function (require, exports, 
         // linq.jsのバージョンは3.1.1に固定する。最新版の型定義がes5に対応しなくなったため。
         Enumerable: ((Enumerable.default)
             ? Enumerable.default
-            : Enumerable)
+            : Enumerable),
+        jQuery: ((jQuery.default)
+            ? jQuery.default
+            : jQuery),
+        $: ((jQuery.default)
+            ? jQuery.default
+            : jQuery)
     };
     exports.default = Libraries;
 });
@@ -588,12 +594,30 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
                 });
             });
         };
+        AlbumTracksStore.prototype.PlayAlbumByTrack = function (track) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Player/PlayAlbumByTrack', track)];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                console.error(response.Errors);
+                                throw new Error('Unexpected Error on ApiQuery');
+                            }
+                            result = AlbumTracks_1.default.Create(response.Result);
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
         AlbumTracksStore.prototype.PlayAlbumByTlId = function (tlId) {
             return __awaiter(this, void 0, void 0, function () {
                 var response;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('AlbumTracks/PlayAlbumByTlId', tlId)];
+                        case 0: return [4 /*yield*/, this.QueryPost('Player/PlayAlbumByTlId', tlId)];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
@@ -605,20 +629,19 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
                 });
             });
         };
-        AlbumTracksStore.prototype.PlayAlbumByTrack = function (track) {
+        AlbumTracksStore.prototype.ClearList = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var response, result;
+                var response;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('AlbumTracks/PlayAlbumByTrack', track)];
+                        case 0: return [4 /*yield*/, this.QueryPost('Player/ClearList')];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
                                 console.error(response.Errors);
                                 throw new Error('Unexpected Error on ApiQuery');
                             }
-                            result = AlbumTracks_1.default.Create(response.Result);
-                            return [2 /*return*/, result];
+                            return [2 /*return*/, response.Result];
                     }
                 });
             });
@@ -672,6 +695,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
         __extends(AlbumList, _super);
         function AlbumList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isEntitiesRefreshed = false;
             _this.page = 1;
             _this.genreIds = [];
             _this.artistIds = [];
@@ -718,6 +742,18 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            if (!this.isEntitiesRefreshed) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.store.ClearList()];
+                        case 1:
+                            _a.sent();
+                            _.each(this.entities, function (entity) {
+                                _.each(entity.Tracks, function (track) {
+                                    track.TlId = null;
+                                });
+                            });
+                            this.isEntitiesRefreshed = false;
+                            _a.label = 2;
+                        case 2:
                             albumTracks = Libraries_3.default.Enumerable.from(this.entities)
                                 .firstOrDefault(function (e) { return e.Album.Id === args.AlbumId; });
                             if (!albumTracks) {
@@ -731,13 +767,13 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
                                 return [2 /*return*/, false];
                             }
                             isAllTracksRegistered = tracks.all(function (e) { return e.TlId !== null; });
-                            if (!isAllTracksRegistered) return [3 /*break*/, 2];
+                            if (!isAllTracksRegistered) return [3 /*break*/, 4];
                             return [4 /*yield*/, this.store.PlayAlbumByTlId(track.TlId)];
-                        case 1:
+                        case 3:
                             result = _a.sent();
                             return [2 /*return*/, result];
-                        case 2: return [4 /*yield*/, this.store.PlayAlbumByTrack(track)];
-                        case 3:
+                        case 4: return [4 /*yield*/, this.store.PlayAlbumByTrack(track)];
+                        case 5:
                             resultAtls = _a.sent();
                             updatedTracks = Libraries_3.default.Enumerable.from(resultAtls.Tracks);
                             _.each(albumTracks.Tracks, function (track) {
@@ -752,6 +788,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
             var _this = this;
             this.page = 1;
             this.entities = [];
+            this.isEntitiesRefreshed = true;
             this.$nextTick(function () {
                 _this.InfiniteLoading.stateChanger.reset();
                 _this.InfiniteLoading.attemptLoad();
@@ -808,7 +845,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
         };
         AlbumList = __decorate([
             vue_class_component_4.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button class=\"btn btn-tool\" data-widget=\"collapse\">\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @TrackSelected=\"OnTrackSelected\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @TrackSelected=\"OnTrackSelected\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-album-tracks': SelectionAlbumTracks_1.default
                 }
@@ -851,6 +888,17 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
         return ArtistStore;
     }(StoreBase_2.default));
     exports.default = ArtistStore;
+});
+define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.WidgetEvents = {
+        Expanded: 'expanded.lte.widget',
+        Collapsed: 'collapsed.lte.widget',
+        Maximized: 'maximized.lte.widget',
+        Minimized: 'minimized.lte.widget',
+        Removed: 'removed.lte.widget'
+    };
 });
 define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Views/Events/FinderEvents"], function (require, exports, vue_class_component_5, vue_property_decorator_2, ViewBase_5, FinderEvents_3) {
     "use strict";
@@ -904,7 +952,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
     }(ViewBase_5.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, _, vue_3, vue_class_component_6, vue_infinite_loading_2, ArtistStore_1, ViewBase_6, FinderEvents_4, SelectionItem_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "responsive-toolkit", "vue", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, responsive_toolkit_1, vue_3, vue_class_component_6, vue_infinite_loading_2, Libraries_4, ArtistStore_1, ViewBase_6, AdminLteEvents_1, FinderEvents_4, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     vue_3.default.use(vue_infinite_loading_2.default);
@@ -916,6 +964,8 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
             _this.page = 1;
             _this.genreIds = [];
             _this.entities = [];
+            _this.viewport = responsive_toolkit_1.default;
+            _this.isExpanded = true;
             return _this;
         }
         Object.defineProperty(ArtistList.prototype, "InfiniteLoading", {
@@ -925,6 +975,51 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
             enumerable: true,
             configurable: true
         });
+        ArtistList.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var button;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            // ResponsiveBootstrapToolkitをbootstrap4に対応させる
+                            // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
+                            this.viewport.use('bs4', {
+                                'xs': Libraries_4.default.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
+                                'sm': Libraries_4.default.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
+                                'md': Libraries_4.default.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
+                                'lg': Libraries_4.default.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
+                                'xl': Libraries_4.default.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
+                            });
+                            button = Libraries_4.default.$(this.$refs.ButtonCollaple);
+                            this.boxWidget = new AdminLte.Widget(button);
+                            button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
+                                console.log('button.lte.collapsed!');
+                                _this.isExpanded = false;
+                            });
+                            button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
+                                console.log('button.lte.expanded!');
+                                _this.isExpanded = true;
+                            });
+                            Libraries_4.default.$(window).resize(this.viewport.changed(function () {
+                                console.log('Current breakpoint: ', _this.viewport.current());
+                                if (_this.viewport.is('<=sm') && _this.isExpanded) {
+                                    _this.boxWidget.collapse();
+                                }
+                                else if (_this.viewport.is('>sm') && !_this.isExpanded) {
+                                    _this.boxWidget.expand();
+                                }
+                            }));
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ArtistList.prototype.OnCollapleClick = function () {
+            this.boxWidget.toggle();
+        };
         ArtistList.prototype.OnInfinite = function ($state) {
             return __awaiter(this, void 0, void 0, function () {
                 var result;
@@ -986,7 +1081,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue",
         };
         ArtistList = __decorate([
             vue_class_component_6.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button class=\"btn btn-tool\" data-widget=\"collapse\">\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div id=\"artistList\" class=\"card\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaple\"\n                    @click=\"OnCollapleClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_2.default
                 }
@@ -1051,7 +1146,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, vue_class_component_7, GenreStore_1, ViewBase_7, FinderEvents_5, SelectionItem_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/FinderEvents", "Views/Shared/SelectionItem", "responsive-toolkit", "admin-lte/dist/js/adminlte.js", "Views/Events/AdminLteEvents", "Libraries"], function (require, exports, vue_class_component_7, GenreStore_1, ViewBase_7, FinderEvents_5, SelectionItem_3, responsive_toolkit_2, AdminLte, AdminLteEvents_2, Libraries_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -1060,25 +1155,52 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.store = new GenreStore_1.default();
             _this.entities = [];
+            _this.viewport = responsive_toolkit_2.default;
+            _this.isExpanded = true;
             return _this;
         }
         GenreList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _a;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var button;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
-                            _b.sent();
-                            _a = this;
-                            return [4 /*yield*/, this.store.GetList()];
-                        case 2:
-                            _a.entities = (_b.sent())
-                                .toArray();
+                            _a.sent();
+                            // ResponsiveBootstrapToolkitをbootstrap4に対応させる
+                            // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
+                            this.viewport.use('bs4', {
+                                'xs': Libraries_5.default.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
+                                'sm': Libraries_5.default.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
+                                'md': Libraries_5.default.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
+                                'lg': Libraries_5.default.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
+                                'xl': Libraries_5.default.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
+                            });
+                            button = Libraries_5.default.$(this.$refs.ButtonCollaple);
+                            this.boxWidget = new AdminLte.Widget(button);
+                            button.on(AdminLteEvents_2.WidgetEvents.Collapsed, function () {
+                                _this.isExpanded = false;
+                            });
+                            button.on(AdminLteEvents_2.WidgetEvents.Expanded, function () {
+                                _this.isExpanded = true;
+                            });
+                            Libraries_5.default.$(window).resize(this.viewport.changed(function () {
+                                if (_this.viewport.is('<=sm') && _this.isExpanded) {
+                                    _this.boxWidget.collapse();
+                                }
+                                else if (_this.viewport.is('>sm') && !_this.isExpanded) {
+                                    _this.boxWidget.expand();
+                                }
+                            }));
+                            this.Refresh();
                             return [2 /*return*/, true];
                     }
                 });
             });
+        };
+        GenreList.prototype.OnCollapleClick = function () {
+            this.boxWidget.toggle();
         };
         GenreList.prototype.OnClickRefresh = function () {
             this.Refresh();
@@ -1088,12 +1210,16 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             this.$emit(FinderEvents_5.Events.SelectionChanged, args);
         };
         GenreList.prototype.Refresh = function () {
+            var _this = this;
             this.entities = [];
-            this.Initialize();
+            this.store.GetList()
+                .then(function (en) {
+                _this.entities = en.toArray();
+            });
         };
         GenreList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button class=\"btn btn-tool\" data-widget=\"collapse\">\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaple\"\n                    @click=\"OnCollapleClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_3.default
                 }

@@ -7,6 +7,7 @@ using MusicFront.Models.Tracks;
 using MusicFront.Models;
 using MusicFront.Models.Mopidies.Methods;
 using MusicFront.Models.Xhrs;
+using MusicFront.Models.AlbumTracks;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,6 +17,26 @@ namespace MusicFront.Controllers
     [Route("Player")]
     public class PlayerController : Controller
     {
+        [HttpPost("PlayAlbumByTlId")]
+        public async Task<XhrResponse> PlayAlbumByTrack(
+            [FromBody] int tlId,
+            [FromServices] AlbumTracksStore store
+        )
+        {
+            var result = await Playback.Play(tlId);
+            return XhrResponseFactory.CreateSucceeded(result);
+        }
+
+        [HttpPost("PlayAlbumByTrack")]
+        public async Task<XhrResponse> PlayAlbumByTrack(
+            [FromBody] Track track,
+            [FromServices] AlbumTracksStore store
+        )
+        {
+            var result = await store.PlayAlbum(track);
+            return XhrResponseFactory.CreateSucceeded(result);
+        }
+
         [HttpPost("ClearList")]
         public async Task<XhrResponse> ClearList(
             [FromServices] TrackStore store
@@ -25,39 +46,6 @@ namespace MusicFront.Controllers
             return (!result)
                 ? XhrResponseFactory.CreateError($"Clear Failed.")
                 : XhrResponseFactory.CreateSucceeded();
-        }
-
-        [HttpPost("SetListByUris")]
-        public async Task<XhrResponse> SetListByUris(
-            [FromBody] string[] uris,
-            [FromServices] TrackStore store
-        )
-        {
-            try
-            {
-                var result = await store.SetListByUris(uris);
-                return XhrResponseFactory.CreateSucceeded(result);
-            }
-            catch (Exception ex)
-            {
-                return XhrResponseFactory.CreateError(ex.Message);
-            }
-        }
-
-        [HttpGet("GetList")]
-        public async Task<XhrResponse> GetList(
-            [FromServices] TrackStore store
-        )
-        {
-            try
-            {
-                var result = await store.GetList();
-                return XhrResponseFactory.CreateSucceeded(result);
-            }
-            catch (Exception ex)
-            {
-                return XhrResponseFactory.CreateError(ex.Message);
-            }
         }
 
         [HttpGet("GetState")]

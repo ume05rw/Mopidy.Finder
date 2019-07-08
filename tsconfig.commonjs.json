@@ -54,6 +54,8 @@
         //"traceResolution": true,
 
         "paths": {
+            "responsive-toolkit": [ "types/responsive-toolkit" ],
+            "admin-lte/dist/js/adminlte.js": [ "types/adminlte" ]
         },
 
         // TSの型定義ファイル参照パス

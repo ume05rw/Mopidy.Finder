@@ -24,26 +24,5 @@ namespace MusicFront.src.aspCore.Controllers
             var result = await store.GetPagenatedList(GenreIds, ArtistIds, Page);
             return XhrResponseFactory.CreateSucceeded(result);
         }
-
-        [HttpPost("PlayAlbumByTlId")]
-        public async Task<XhrResponse> PlayAlbumByTrack(
-            [FromBody] int tlId,
-            [FromServices] AlbumTracksStore store
-        )
-        {
-            var result = await Playback.Play(tlId);
-            return XhrResponseFactory.CreateSucceeded(result);
-        }
-
-        [HttpPost("PlayAlbumByTrack")]
-        public async Task<XhrResponse> PlayAlbumByTrack(
-            [FromBody] Track track,
-            [FromServices] AlbumTracksStore store
-        )
-        {
-            var result = await store.PlayAlbum(track);
-            return XhrResponseFactory.CreateSucceeded(result);
-        }
     }
-
 }
