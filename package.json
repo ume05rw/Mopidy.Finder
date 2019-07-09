@@ -54,6 +54,7 @@
         "vue": "^2.6.10",
         "vue-class-component": "^7.1.0",
         "vue-infinite-loading": "^2.4.4",
-        "vue-property-decorator": "^8.2.1"
+        "vue-property-decorator": "^8.2.1",
+        "vue-slider-component": "^3.0.33"
     }
 }

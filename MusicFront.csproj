@@ -32,6 +32,7 @@
     <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
     <None Remove="tests\Models\Entities\Song.test.ts" />
     <None Remove="types\adminlte\index.d.ts" />
+    <None Remove="types\ion-range-slider\index.d.ts" />
     <None Remove="types\responsive-toolkit\index.d.ts" />
   </ItemGroup>
 
@@ -87,6 +88,7 @@
     <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />
     <TypeScriptCompile Include="types\adminlte\index.d.ts" />
+    <TypeScriptCompile Include="types\ion-range-slider\index.d.ts" />
     <TypeScriptCompile Include="types\responsive-toolkit\index.d.ts" />
   </ItemGroup>
 

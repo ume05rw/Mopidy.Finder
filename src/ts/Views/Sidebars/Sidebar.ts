@@ -1,5 +1,7 @@
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
+import VueSlider from 'vue-slider-component';
+import Libraries from '../../Libraries';
 
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -59,38 +61,17 @@ import Component from 'vue-class-component';
         </nav>
         <div class="row mt-2">
             <div class="col-12">
-
-<!-- admin-lteのプラグインフォルダから色々読み込む必要がある。 -->
-<div class="slider-red">
-    <div class="slider slider-horizontal" id="">
-        <div class="slider-track">
-            <div class="slider-track-low" style="left: 0px; width: 25%;"></div>
-            <div class="slider-selection" style="left: 25%; width: 50%;"></div>
-            <div class="slider-track-high" style="right: 0px; width: 25%;"></div>
-        </div>
-        <div class="tooltip tooltip-main top" role="presentation" style="left: 50%;">
-            <div class="tooltip-arrow"></div>
-            <div class="tooltip-inner">-100 : 100</div>
-        </div>
-        <div class="tooltip tooltip-min top" role="presentation" style="left: 25%; display: none;">
-            <div class="tooltip-arrow"></div>
-            <div class="tooltip-inner">-100</div>
-        </div>
-        <div class="tooltip tooltip-max top" role="presentation" style="left: 75%; display: none;">
-            <div class="tooltip-arrow"></div>
-            <div class="tooltip-inner">100</div>
-        </div>
-        <div class="slider-handle min-slider-handle round" role="slider" aria-valuemin="-200" aria-valuemax="200" aria-valuenow="-100" style="left: 25%;" tabindex="0"></div>
-        <div class="slider-handle max-slider-handle round" role="slider" aria-valuemin="-200" aria-valuemax="200" aria-valuenow="100" style="left: 75%;" tabindex="0"></div>
-    </div>
-    <input type="text" value="-100,100" class="slider form-control" data-slider-min="-200" data-slider-max="200" data-slider-step="5"
-        data-slider-value="[-100,100]" data-slider-orientation="horizontal" data-slider-selection="before" data-slider-tooltip="show" style="display: none;" data-value="-100,100">
-</div>
+                <vue-slider v-model="volume"></vue-slider>
             </div>
         </div>
     </div>
-</aside>`
+</aside>`,
+    components: {
+        'vue-slider': VueSlider
+    }
 })
 export default class Sidebar extends ViewBase {
+
+    private volume: number;
 
 }
