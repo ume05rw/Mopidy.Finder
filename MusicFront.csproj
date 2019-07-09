@@ -27,7 +27,9 @@
     <None Remove="src\ts\Views\Finders\Lists\SelectionAlbumTracks.ts" />
     <None Remove="src\ts\Views\Finders\TrackList.ts" />
     <None Remove="src\ts\Views\HeaderBars\HeaderBar.ts" />
+    <None Remove="src\ts\Views\Playlists\Playlists.ts" />
     <None Remove="src\ts\Views\RootView.ts" />
+    <None Remove="src\ts\Views\Settings\Settings.ts" />
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
     <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
     <None Remove="tests\Models\Entities\Song.test.ts" />
@@ -83,7 +85,9 @@
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\SelectionAlbumTracks.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\AlbumList.ts" />
     <TypeScriptCompile Include="src\ts\Views\HeaderBars\HeaderBar.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Playlists\Playlists.ts" />
     <TypeScriptCompile Include="src\ts\Views\RootView.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Settings\Settings.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionItem.ts" />
     <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />
@@ -94,7 +98,6 @@
 
   <ItemGroup>
     <Folder Include="src\js\Libs\" />
-    <Folder Include="src\ts\Views\Playlists\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

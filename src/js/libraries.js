@@ -5,7 +5,8 @@ import 'vue-slider-component/theme/antd.css'
 import '../css/site.css';
 
 import jQuery from 'jquery';
-import ResponsiveBootstrapToolkit from 'responsive-toolkit';
+import * as Bootstrap from 'admin-lte/plugins/bootstrap/js/bootstrap';
+import ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
 import * as _ from 'lodash';
 import Axios from 'axios';
 import * as qs from 'qs';
@@ -19,7 +20,8 @@ import VueSlider from 'vue-slider-component';
 
 window.__globals = {
     'jquery': jQuery,
-    'responsive-toolkit': ResponsiveBootstrapToolkit,
+    'admin-lte/plugins/bootstrap/js/bootstrap': Bootstrap,
+    'responsive-toolkit/dist/bootstrap-toolkit': ResponsiveBootstrapToolkit,
     'lodash': _,
     'axios': Axios,
     'qs': qs,

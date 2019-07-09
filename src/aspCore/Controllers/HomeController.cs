@@ -24,7 +24,7 @@ namespace MusicFront.Controllers
         {
             await Initializer.Exec();
 
-            return this.File(HomeController.IndexDevBytes, "text/html");
+            return this.File(HomeController.IndexBytes, "text/html");
         }
     }
 }

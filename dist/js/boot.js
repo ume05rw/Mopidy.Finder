@@ -12,10 +12,21 @@ define('jquery', ["exports"], function (exports) {
 });
 
 // responsive-toolkit
-define('responsive-toolkit', ["exports"], function (exports) {
+define('responsive-toolkit/dist/bootstrap-toolkit', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = window.__globals['responsive-toolkit'];
+    exports.default = window.__globals['responsive-toolkit/dist/bootstrap-toolkit'];
+});
+
+// admin-lte/plugins/bootstrap/js/bootstrap
+define('admin-lte/plugins/bootstrap/js/bootstrap', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var instance = window.__globals['admin-lte/plugins/bootstrap/js/bootstrap'];
+    for (var key in instance) {
+        var val = instance[key];
+        exports[key] = val;
+    }
 });
 
 // lodash

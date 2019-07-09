@@ -1,6 +1,7 @@
 import * as Enumerable from 'linq';
 import * as jQuery from 'jquery';
-import ResponsiveBootstrapToolkit from 'responsive-toolkit';
+import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
+import * as VueSlider from 'vue-slider-component';
 
 /**
  * VS開発時のステップデバッグ環境を維持するため、開発環境ではAMD形式で
@@ -20,7 +21,10 @@ const Libraries = {
     $: (((jQuery as any).default)
         ? (jQuery as any).default
         : jQuery) as typeof jQuery,
-    ResponsiveBootstrapToolkit: ResponsiveBootstrapToolkit
+    ResponsiveBootstrapToolkit: (((ResponsiveBootstrapToolkit as any).default)
+        ? (ResponsiveBootstrapToolkit as any).default
+        : ResponsiveBootstrapToolkit) as typeof ResponsiveBootstrapToolkit,
+    VueSlider: VueSlider as Vue.Component,
 };
 
 // ResponsiveBootstrapToolkitをbootstrap4に対応させる

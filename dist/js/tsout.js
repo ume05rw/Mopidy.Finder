@@ -55,7 +55,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit"], function (require, exports, Enumerable, jQuery, responsive_toolkit_1) {
+define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "vue-slider-component"], function (require, exports, Enumerable, jQuery, ResponsiveBootstrapToolkit, VueSlider) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -76,11 +76,14 @@ define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit
         $: ((jQuery.default)
             ? jQuery.default
             : jQuery),
-        ResponsiveBootstrapToolkit: responsive_toolkit_1.default
+        ResponsiveBootstrapToolkit: ((ResponsiveBootstrapToolkit.default)
+            ? ResponsiveBootstrapToolkit.default
+            : ResponsiveBootstrapToolkit),
+        VueSlider: VueSlider,
     };
     // ResponsiveBootstrapToolkitをbootstrap4に対応させる
     // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
-    responsive_toolkit_1.default.use('bs4', {
+    ResponsiveBootstrapToolkit.use('bs4', {
         'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
         'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
         'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
@@ -143,19 +146,21 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "Views/Bases/ViewBas
     }(ViewBase_1.default));
     exports.default = HeaderBar;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "vue-slider-component"], function (require, exports, ViewBase_2, vue_class_component_2, vue_slider_component_1) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Sidebar = /** @class */ (function (_super) {
         __extends(Sidebar, _super);
         function Sidebar() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.volume = 100;
+            return _this;
         }
         Sidebar = __decorate([
             vue_class_component_2.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" data-widget=\"treeview\">\n                <li class=\"nav-item has-treeview menu-open\">\n                    <a href=\"#\" class=\"nav-link\">\n                        <i class=\"nav-icon fa fa-music\" />\n                        <p>\n                            Main\n                            <i class=\"fa fa-angle-left right\" />\n                        </p>\n                    </a>\n                    <ul class=\"nav nav-treeview\">\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link active\">\n                                <i class=\"fa fa-search nav-icon\" />\n                                <p>Finder</p>\n                            </a>\n                        </li>\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-bookmark nav-icon\" />\n                                <p>Playlists</p>\n                            </a>\n                        </li>\n                    </ul>\n                </li>\n                <li class=\"nav-item has-treeview\">\n                    <a href=\"#\" class=\"nav-link\">\n                        <i class=\"nav-icon fa fa-cog\" />\n                        <p>\n                            Settings\n                            <i class=\"fa fa-angle-left right\" />\n                        </p>\n                    </a>\n                    <ul class=\"nav nav-treeview\">\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-server nav-icon\" />\n                                <p>Server</p>\n                            </a>\n                        </li>\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-database nav-icon\" />\n                                <p>Refresh</p>\n                            </a>\n                        </li>\n                    </ul>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <vue-slider v-model=\"volume\"></vue-slider>\n            </div>\n        </div>\n    </div>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-server nav-icon\" />\n                        <p>Server</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <vue-slider v-model=\"volume\"></vue-slider>\n            </div>\n        </div>\n    </div>\n</aside>",
                 components: {
-                    'vue-slider': vue_slider_component_1.default
+                    'vue-slider': Libraries_1.default.VueSlider
                 }
             })
         ], Sidebar);
@@ -562,14 +567,14 @@ define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs"], f
     }());
     exports.default = XhrQueryableBase;
 });
-define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_1, XhrQueryableBase_1) {
+define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_2, XhrQueryableBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var StoreBase = /** @class */ (function (_super) {
         __extends(StoreBase, _super);
         function StoreBase() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.Enumerable = Libraries_1.default.Enumerable;
+            _this.Enumerable = Libraries_2.default.Enumerable;
             return _this;
         }
         return StoreBase;
@@ -663,7 +668,7 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
     }(StoreBase_1.default));
     exports.default = AlbumTracksStore;
 });
-define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries", "Views/Events/FinderEvents"], function (require, exports, vue_class_component_3, vue_property_decorator_1, ViewBase_3, AlbumTracks_2, Libraries_2, FinderEvents_1) {
+define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries", "Views/Events/FinderEvents"], function (require, exports, vue_class_component_3, vue_property_decorator_1, ViewBase_3, AlbumTracks_2, Libraries_3, FinderEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionAlbumTracks = /** @class */ (function (_super) {
@@ -672,7 +677,7 @@ define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-c
             return _super !== null && _super.apply(this, arguments) || this;
         }
         SelectionAlbumTracks.prototype.OnClickAlbumPlay = function () {
-            var tracks = Libraries_2.default.Enumerable.from(this.entity.Tracks);
+            var tracks = Libraries_3.default.Enumerable.from(this.entity.Tracks);
             var firstTrack = tracks.first(function (e) { return e.TrackNo === tracks.min(function (e2) { return e2.TrackNo; }); });
             this.$emit(FinderEvents_1.Events.TrackSelected, {
                 AlbumId: this.entity.Album.Id,
@@ -700,7 +705,7 @@ define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-c
     }(ViewBase_3.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Models/AlbumTracks/AlbumTracksStore", "Views/Bases/ViewBase", "Views/Events/FinderEvents", "Views/Finders/Lists/SelectionAlbumTracks", "Libraries"], function (require, exports, _, vue_2, vue_class_component_4, vue_infinite_loading_1, AlbumTracksStore_1, ViewBase_4, FinderEvents_2, SelectionAlbumTracks_1, Libraries_3) {
+define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Models/AlbumTracks/AlbumTracksStore", "Views/Bases/ViewBase", "Views/Events/FinderEvents", "Views/Finders/Lists/SelectionAlbumTracks", "Libraries"], function (require, exports, _, vue_2, vue_class_component_4, vue_infinite_loading_1, AlbumTracksStore_1, ViewBase_4, FinderEvents_2, SelectionAlbumTracks_1, Libraries_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     vue_2.default.use(vue_infinite_loading_1.default);
@@ -767,13 +772,13 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
                             this.isEntitiesRefreshed = false;
                             _a.label = 2;
                         case 2:
-                            albumTracks = Libraries_3.default.Enumerable.from(this.entities)
+                            albumTracks = Libraries_4.default.Enumerable.from(this.entities)
                                 .firstOrDefault(function (e) { return e.Album.Id === args.AlbumId; });
                             if (!albumTracks) {
                                 console.error('AlbumTracks Not Found: AlbumId=' + args.AlbumId);
                                 return [2 /*return*/, false];
                             }
-                            tracks = Libraries_3.default.Enumerable.from(albumTracks.Tracks);
+                            tracks = Libraries_4.default.Enumerable.from(albumTracks.Tracks);
                             track = tracks.firstOrDefault(function (e) { return e.Id === args.TrackId; });
                             if (!track) {
                                 console.error('Track Not Found: TrackId=' + args.TrackId);
@@ -788,7 +793,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
                         case 4: return [4 /*yield*/, this.store.PlayAlbumByTrack(track)];
                         case 5:
                             resultAtls = _a.sent();
-                            updatedTracks = Libraries_3.default.Enumerable.from(resultAtls.Tracks);
+                            updatedTracks = Libraries_4.default.Enumerable.from(resultAtls.Tracks);
                             _.each(albumTracks.Tracks, function (track) {
                                 track.TlId = updatedTracks.firstOrDefault(function (e) { return e.Id == track.Id; }).TlId;
                             });
@@ -965,7 +970,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
     }(ViewBase_5.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_3, vue_class_component_6, vue_infinite_loading_2, Libraries_4, ArtistStore_1, ViewBase_6, AdminLteEvents_1, FinderEvents_4, SelectionItem_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_3, vue_class_component_6, vue_infinite_loading_2, Libraries_5, ArtistStore_1, ViewBase_6, AdminLteEvents_1, FinderEvents_4, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     vue_3.default.use(vue_infinite_loading_2.default);
@@ -977,7 +982,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/
             _this.page = 1;
             _this.genreIds = [];
             _this.entities = [];
-            _this.viewport = Libraries_4.default.ResponsiveBootstrapToolkit;
+            _this.viewport = Libraries_5.default.ResponsiveBootstrapToolkit;
             _this.isExpanded = true;
             return _this;
         }
@@ -997,7 +1002,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            button = Libraries_4.default.$(this.$refs.ButtonCollaple);
+                            button = Libraries_5.default.$(this.$refs.ButtonCollaple);
                             this.boxWidget = new AdminLte.Widget(button);
                             button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
                                 _this.isExpanded = false;
@@ -1005,7 +1010,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/
                             button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
                                 _this.isExpanded = true;
                             });
-                            Libraries_4.default.$(window).resize(this.viewport.changed(function () {
+                            Libraries_5.default.$(window).resize(this.viewport.changed(function () {
                                 _this.ToggleListByViewport();
                             }));
                             _.delay(function () {
@@ -1153,7 +1158,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "vue-class-component", "Libraries", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_class_component_7, Libraries_5, GenreStore_1, ViewBase_7, AdminLteEvents_2, FinderEvents_5, SelectionItem_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "vue-class-component", "Libraries", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_class_component_7, Libraries_6, GenreStore_1, ViewBase_7, AdminLteEvents_2, FinderEvents_5, SelectionItem_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -1162,7 +1167,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/j
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.store = new GenreStore_1.default();
             _this.entities = [];
-            _this.viewport = Libraries_5.default.ResponsiveBootstrapToolkit;
+            _this.viewport = Libraries_6.default.ResponsiveBootstrapToolkit;
             _this.isExpanded = true;
             return _this;
         }
@@ -1175,7 +1180,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/j
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            button = Libraries_5.default.$(this.$refs.ButtonCollaple);
+                            button = Libraries_6.default.$(this.$refs.ButtonCollaple);
                             this.boxWidget = new AdminLte.Widget(button);
                             button.on(AdminLteEvents_2.WidgetEvents.Collapsed, function () {
                                 _this.isExpanded = false;
@@ -1183,7 +1188,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/j
                             button.on(AdminLteEvents_2.WidgetEvents.Expanded, function () {
                                 _this.isExpanded = true;
                             });
-                            Libraries_5.default.$(window).resize(this.viewport.changed(function () {
+                            Libraries_6.default.$(window).resize(this.viewport.changed(function () {
                                 _this.ToggleListByViewport();
                             }));
                             _.delay(function () {
@@ -1304,7 +1309,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
         };
         Finder = __decorate([
             vue_class_component_8.default({
-                template: "<section class=\"content h-100\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\" />\n    </div>\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade show active\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"finder-tab\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\" />\n    </div>\n</section>",
                 components: {
                     'genre-list': GenreList_1.default,
                     'artist-list': ArtistList_1.default,
@@ -1316,23 +1321,61 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
     }(ViewBase_8.default));
     exports.default = Finder;
 });
-define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/HeaderBars/HeaderBar", "Views/Sidebars/Sidebar", "Views/Finders/Finder"], function (require, exports, ViewBase_9, HeaderBar_1, Sidebar_1, Finder_1) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_9, ViewBase_9) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Playlists = /** @class */ (function (_super) {
+        __extends(Playlists, _super);
+        function Playlists() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Playlists = __decorate([
+            vue_class_component_9.default({
+                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-playlists\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"playlists-tab\">\n</section>",
+                components: {}
+            })
+        ], Playlists);
+        return Playlists;
+    }(ViewBase_9.default));
+    exports.default = Playlists;
+});
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_10, ViewBase_10) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Settings = /** @class */ (function (_super) {
+        __extends(Settings, _super);
+        function Settings() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Settings = __decorate([
+            vue_class_component_10.default({
+                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n</section>",
+                components: {}
+            })
+        ], Settings);
+        return Settings;
+    }(ViewBase_10.default));
+    exports.default = Settings;
+});
+define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/HeaderBars/HeaderBar", "Views/Sidebars/Sidebar", "Views/Finders/Finder", "Views/Playlists/Playlists", "Views/Settings/Settings"], function (require, exports, ViewBase_11, HeaderBar_1, Sidebar_1, Finder_1, Playlists_1, Settings_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
         __extends(RootView, _super);
         function RootView() {
             return _super.call(this, {
-                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3\">\n        <finder ref=\"Finder\" />\n    </div>\n</div>",
+                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder ref=\"Finder\" />\n        <playlists ref=\"Playlists\" />\n        <settings ref=\"Settings\" />\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
                     'sidebar': Sidebar_1.default,
-                    'finder': Finder_1.default
+                    'finder': Finder_1.default,
+                    'playlists': Playlists_1.default,
+                    'settings': Settings_1.default
                 }
             }) || this;
         }
         return RootView;
-    }(ViewBase_9.default));
+    }(ViewBase_11.default));
     exports.default = RootView;
 });
 define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], function (require, exports, RootView_1) {
@@ -1360,7 +1403,7 @@ define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], fu
     }());
     exports.default = RootContoller;
 });
-define("Main", ["require", "exports", "Controllers/RootContoller", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "../css/site.css", "admin-lte/dist/js/adminlte.js"], function (require, exports, RootContoller_1) {
+define("Main", ["require", "exports", "Controllers/RootContoller", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "vue-slider-component/theme/antd.css", "../css/site.css", "admin-lte/dist/js/adminlte.js"], function (require, exports, RootContoller_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {

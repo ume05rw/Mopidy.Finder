@@ -8,7 +8,9 @@
         "test:build": "npx tsc --project tsconfig.commonjs.json --listEmittedFiles --locale ja-JP",
         "test:exec": "mocha tests/**/*.test.js",
         "test:lint": "npx eslint -c ./.eslintrc.json src/**/*.ts",
-        "build:prod": "webpack --config webpack.config.prod.js",
+        "build:prod": "npm run build:prodTs && npm run build:prodWp",
+        "build:prodTs": "npx tsc --project tsconfig.commonjs.json --listEmittedFiles --locale ja-JP",
+        "build:prodWp": "webpack --config webpack.config.prod.js",
         "build:dev": "npm run build:devTs && npm run build:devWp",
         "build:devTs": "npx tsc --project tsconfig.dev.json --listEmittedFiles --locale ja-JP",
         "build:devWp": "webpack --config webpack.config.dev.js"

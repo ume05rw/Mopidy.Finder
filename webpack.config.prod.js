@@ -9,7 +9,8 @@ module.exports = {
 
     // モード値を production に設定すると最適化された状態で、
     // development に設定するとソースマップ有効でJSファイルが出力される
-    mode: 'production',
+    //mode: 'production',
+    mode: 'development',
 
     // メインとなるJavaScriptファイル（エントリーポイント）
     // 注) 'src/ts/Main.ts' では認識しない。'./src/ts/Main.ts' とする。
@@ -73,8 +74,7 @@ module.exports = {
         ],
 
         alias: {
-            'vue$': 'vue/dist/vue.esm.js',
-            'va': 'vue2-admin-lte/src'
+            'vue$': 'vue/dist/vue.esm.js'
         }
     },
 
@@ -86,5 +86,5 @@ module.exports = {
     ]
 
     //devtool: "source-map"
-    //devtool: 'inline-source-map'
+    ,devtool: 'inline-source-map'
 };

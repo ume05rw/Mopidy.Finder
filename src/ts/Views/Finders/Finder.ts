@@ -6,7 +6,10 @@ import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
 
 @Component({
-    template: `<section class="content h-100">
+    template: `<section class="content h-100 tab-pane fade show active"
+                        id="tab-finder"
+                        role="tabpanel"
+                        aria-labelledby="finder-tab">
     <div class="row">
         <genre-list
             ref="GenreList"
