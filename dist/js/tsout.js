@@ -55,7 +55,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define("Libraries", ["require", "exports", "linq", "jquery"], function (require, exports, Enumerable, jQuery) {
+define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit"], function (require, exports, Enumerable, jQuery, responsive_toolkit_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -75,8 +75,18 @@ define("Libraries", ["require", "exports", "linq", "jquery"], function (require,
             : jQuery),
         $: ((jQuery.default)
             ? jQuery.default
-            : jQuery)
+            : jQuery),
+        ResponsiveBootstrapToolkit: responsive_toolkit_1.default
     };
+    // ResponsiveBootstrapToolkitをbootstrap4に対応させる
+    // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
+    responsive_toolkit_1.default.use('bs4', {
+        'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
+        'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
+        'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
+        'lg': Libraries.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
+        'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
+    });
     exports.default = Libraries;
 });
 define("Views/Bases/ViewBase", ["require", "exports", "vue", "lodash"], function (require, exports, vue_1, _) {
@@ -143,7 +153,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
         }
         Sidebar = __decorate([
             vue_class_component_2.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" data-widget=\"treeview\">\n                <li class=\"nav-item has-treeview menu-open\">\n                    <a href=\"#\" class=\"nav-link\">\n                        <i class=\"nav-icon fa fa-music\" />\n                        <p>\n                            Main\n                            <i class=\"fa fa-angle-left right\" />\n                        </p>\n                    </a>\n                    <ul class=\"nav nav-treeview\">\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link active\">\n                                <i class=\"fa fa-search nav-icon\" />\n                                <p>Finder</p>\n                            </a>\n                        </li>\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-bookmark nav-icon\" />\n                                <p>Playlists</p>\n                            </a>\n                        </li>\n                    </ul>\n                </li>\n                <li class=\"nav-item has-treeview\">\n                    <a href=\"#\" class=\"nav-link\">\n                        <i class=\"nav-icon fa fa-cog\" />\n                        <p>\n                            Settings\n                            <i class=\"fa fa-angle-left right\" />\n                        </p>\n                    </a>\n                    <ul class=\"nav nav-treeview\">\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-server nav-icon\" />\n                                <p>Server</p>\n                            </a>\n                        </li>\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-database nav-icon\" />\n                                <p>Refresh</p>\n                            </a>\n                        </li>\n                    </ul>\n                </li>\n            </ul>\n        </nav>\n    </div>\n</aside>"
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" data-widget=\"treeview\">\n                <li class=\"nav-item has-treeview menu-open\">\n                    <a href=\"#\" class=\"nav-link\">\n                        <i class=\"nav-icon fa fa-music\" />\n                        <p>\n                            Main\n                            <i class=\"fa fa-angle-left right\" />\n                        </p>\n                    </a>\n                    <ul class=\"nav nav-treeview\">\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link active\">\n                                <i class=\"fa fa-search nav-icon\" />\n                                <p>Finder</p>\n                            </a>\n                        </li>\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-bookmark nav-icon\" />\n                                <p>Playlists</p>\n                            </a>\n                        </li>\n                    </ul>\n                </li>\n                <li class=\"nav-item has-treeview\">\n                    <a href=\"#\" class=\"nav-link\">\n                        <i class=\"nav-icon fa fa-cog\" />\n                        <p>\n                            Settings\n                            <i class=\"fa fa-angle-left right\" />\n                        </p>\n                    </a>\n                    <ul class=\"nav nav-treeview\">\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-server nav-icon\" />\n                                <p>Server</p>\n                            </a>\n                        </li>\n                        <li class=\"nav-item\">\n                            <a href=\"#\" class=\"nav-link\">\n                                <i class=\"fa fa-database nav-icon\" />\n                                <p>Refresh</p>\n                            </a>\n                        </li>\n                    </ul>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n\n<!-- admin-lte\u306E\u30D7\u30E9\u30B0\u30A4\u30F3\u30D5\u30A9\u30EB\u30C0\u304B\u3089\u8272\u3005\u8AAD\u307F\u8FBC\u3080\u5FC5\u8981\u304C\u3042\u308B\u3002 -->\n<div class=\"slider-red\">\n    <div class=\"slider slider-horizontal\" id=\"\">\n        <div class=\"slider-track\">\n            <div class=\"slider-track-low\" style=\"left: 0px; width: 25%;\"></div>\n            <div class=\"slider-selection\" style=\"left: 25%; width: 50%;\"></div>\n            <div class=\"slider-track-high\" style=\"right: 0px; width: 25%;\"></div>\n        </div>\n        <div class=\"tooltip tooltip-main top\" role=\"presentation\" style=\"left: 50%;\">\n            <div class=\"tooltip-arrow\"></div>\n            <div class=\"tooltip-inner\">-100 : 100</div>\n        </div>\n        <div class=\"tooltip tooltip-min top\" role=\"presentation\" style=\"left: 25%; display: none;\">\n            <div class=\"tooltip-arrow\"></div>\n            <div class=\"tooltip-inner\">-100</div>\n        </div>\n        <div class=\"tooltip tooltip-max top\" role=\"presentation\" style=\"left: 75%; display: none;\">\n            <div class=\"tooltip-arrow\"></div>\n            <div class=\"tooltip-inner\">100</div>\n        </div>\n        <div class=\"slider-handle min-slider-handle round\" role=\"slider\" aria-valuemin=\"-200\" aria-valuemax=\"200\" aria-valuenow=\"-100\" style=\"left: 25%;\" tabindex=\"0\"></div>\n        <div class=\"slider-handle max-slider-handle round\" role=\"slider\" aria-valuemin=\"-200\" aria-valuemax=\"200\" aria-valuenow=\"100\" style=\"left: 75%;\" tabindex=\"0\"></div>\n    </div>\n    <input type=\"text\" value=\"-100,100\" class=\"slider form-control\" data-slider-min=\"-200\" data-slider-max=\"200\" data-slider-step=\"5\"\n        data-slider-value=\"[-100,100]\" data-slider-orientation=\"horizontal\" data-slider-selection=\"before\" data-slider-tooltip=\"show\" style=\"display: none;\" data-value=\"-100,100\">\n</div>\n            </div>\n        </div>\n    </div>\n</aside>"
             })
         ], Sidebar);
         return Sidebar;
@@ -952,7 +962,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
     }(ViewBase_5.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "responsive-toolkit", "vue", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, responsive_toolkit_1, vue_3, vue_class_component_6, vue_infinite_loading_2, Libraries_4, ArtistStore_1, ViewBase_6, AdminLteEvents_1, FinderEvents_4, SelectionItem_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_3, vue_class_component_6, vue_infinite_loading_2, Libraries_4, ArtistStore_1, ViewBase_6, AdminLteEvents_1, FinderEvents_4, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     vue_3.default.use(vue_infinite_loading_2.default);
@@ -964,7 +974,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/
             _this.page = 1;
             _this.genreIds = [];
             _this.entities = [];
-            _this.viewport = responsive_toolkit_1.default;
+            _this.viewport = Libraries_4.default.ResponsiveBootstrapToolkit;
             _this.isExpanded = true;
             return _this;
         }
@@ -984,34 +994,20 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            // ResponsiveBootstrapToolkitをbootstrap4に対応させる
-                            // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
-                            this.viewport.use('bs4', {
-                                'xs': Libraries_4.default.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
-                                'sm': Libraries_4.default.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
-                                'md': Libraries_4.default.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
-                                'lg': Libraries_4.default.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
-                                'xl': Libraries_4.default.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
-                            });
                             button = Libraries_4.default.$(this.$refs.ButtonCollaple);
                             this.boxWidget = new AdminLte.Widget(button);
                             button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
-                                console.log('button.lte.collapsed!');
                                 _this.isExpanded = false;
                             });
                             button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
-                                console.log('button.lte.expanded!');
                                 _this.isExpanded = true;
                             });
                             Libraries_4.default.$(window).resize(this.viewport.changed(function () {
-                                console.log('Current breakpoint: ', _this.viewport.current());
-                                if (_this.viewport.is('<=sm') && _this.isExpanded) {
-                                    _this.boxWidget.collapse();
-                                }
-                                else if (_this.viewport.is('>sm') && !_this.isExpanded) {
-                                    _this.boxWidget.expand();
-                                }
+                                _this.ToggleListByViewport();
                             }));
+                            _.delay(function () {
+                                _this.ToggleListByViewport();
+                            }, 1000);
                             return [2 /*return*/, true];
                     }
                 });
@@ -1057,6 +1053,14 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/
                 _this.InfiniteLoading.stateChanger.reset();
                 _this.InfiniteLoading.attemptLoad();
             });
+        };
+        ArtistList.prototype.ToggleListByViewport = function () {
+            if (this.viewport.is('<=sm') && this.isExpanded) {
+                this.boxWidget.collapse();
+            }
+            else if (this.viewport.is('>sm') && !this.isExpanded) {
+                this.boxWidget.expand();
+            }
         };
         ArtistList.prototype.HasGenre = function (genreId) {
             return (0 <= _.indexOf(this.genreIds, genreId));
@@ -1146,7 +1150,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/FinderEvents", "Views/Shared/SelectionItem", "responsive-toolkit", "admin-lte/dist/js/adminlte.js", "Views/Events/AdminLteEvents", "Libraries"], function (require, exports, vue_class_component_7, GenreStore_1, ViewBase_7, FinderEvents_5, SelectionItem_3, responsive_toolkit_2, AdminLte, AdminLteEvents_2, Libraries_5) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "vue-class-component", "Libraries", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_class_component_7, Libraries_5, GenreStore_1, ViewBase_7, AdminLteEvents_2, FinderEvents_5, SelectionItem_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -1155,7 +1159,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.store = new GenreStore_1.default();
             _this.entities = [];
-            _this.viewport = responsive_toolkit_2.default;
+            _this.viewport = Libraries_5.default.ResponsiveBootstrapToolkit;
             _this.isExpanded = true;
             return _this;
         }
@@ -1168,15 +1172,6 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            // ResponsiveBootstrapToolkitをbootstrap4に対応させる
-                            // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
-                            this.viewport.use('bs4', {
-                                'xs': Libraries_5.default.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
-                                'sm': Libraries_5.default.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
-                                'md': Libraries_5.default.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
-                                'lg': Libraries_5.default.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
-                                'xl': Libraries_5.default.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
-                            });
                             button = Libraries_5.default.$(this.$refs.ButtonCollaple);
                             this.boxWidget = new AdminLte.Widget(button);
                             button.on(AdminLteEvents_2.WidgetEvents.Collapsed, function () {
@@ -1186,13 +1181,11 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                                 _this.isExpanded = true;
                             });
                             Libraries_5.default.$(window).resize(this.viewport.changed(function () {
-                                if (_this.viewport.is('<=sm') && _this.isExpanded) {
-                                    _this.boxWidget.collapse();
-                                }
-                                else if (_this.viewport.is('>sm') && !_this.isExpanded) {
-                                    _this.boxWidget.expand();
-                                }
+                                _this.ToggleListByViewport();
                             }));
+                            _.delay(function () {
+                                _this.ToggleListByViewport();
+                            }, 1000);
                             this.Refresh();
                             return [2 /*return*/, true];
                     }
@@ -1216,6 +1209,14 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                 .then(function (en) {
                 _this.entities = en.toArray();
             });
+        };
+        GenreList.prototype.ToggleListByViewport = function () {
+            if (this.viewport.is('<=sm') && this.isExpanded) {
+                this.boxWidget.collapse();
+            }
+            else if (this.viewport.is('>sm') && !this.isExpanded) {
+                this.boxWidget.expand();
+            }
         };
         GenreList = __decorate([
             vue_class_component_7.default({

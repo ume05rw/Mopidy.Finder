@@ -1,7 +1,6 @@
 /// <reference path="../../../../../types/adminlte/index.d.ts" />
 import * as AdminLte from 'admin-lte/dist/js/adminlte.js';
 import * as _ from 'lodash';
-import ResponsiveBootstrapToolkit from 'responsive-toolkit';
 import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
@@ -57,7 +56,7 @@ export default class ArtistList extends ViewBase {
     private page: number = 1;
     private genreIds: number[] = [];
     private entities: Artist[] = [];
-    private viewport = ResponsiveBootstrapToolkit;
+    private viewport = Libraries.ResponsiveBootstrapToolkit;
     private boxWidget: AdminLte.Widget;
     private isExpanded: boolean = true;
 
@@ -68,40 +67,26 @@ export default class ArtistList extends ViewBase {
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        // ResponsiveBootstrapToolkitをbootstrap4に対応させる
-        // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
-        this.viewport.use('bs4', {
-            'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
-            'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
-            'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
-            'lg': Libraries.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
-            'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
-        });
-
         const button = Libraries.$(this.$refs.ButtonCollaple as HTMLElement);
 
         this.boxWidget = new AdminLte.Widget(button);
 
         button.on(WidgetEvents.Collapsed, () => {
-            console.log('button.lte.collapsed!');
             this.isExpanded = false;
         });
         button.on(WidgetEvents.Expanded, () => {
-            console.log('button.lte.expanded!');
             this.isExpanded = true;
         });
 
         (Libraries.$(window) as any).resize(
             this.viewport.changed(() => {
-                console.log('Current breakpoint: ', this.viewport.current());
-
-                if (this.viewport.is('<=sm') && this.isExpanded) {
-                    this.boxWidget.collapse();
-                } else if (this.viewport.is('>sm') && !this.isExpanded) {
-                    this.boxWidget.expand();
-                }
+                this.ToggleListByViewport();
             })
         );
+
+        _.delay(() => {
+            this.ToggleListByViewport();
+        }, 1000);
 
         return true;
     }
@@ -143,6 +128,14 @@ export default class ArtistList extends ViewBase {
             this.InfiniteLoading.stateChanger.reset();
             (this.InfiniteLoading as any).attemptLoad();
         });
+    }
+
+    private ToggleListByViewport(): void {
+        if (this.viewport.is('<=sm') && this.isExpanded) {
+            this.boxWidget.collapse();
+        } else if (this.viewport.is('>sm') && !this.isExpanded) {
+            this.boxWidget.expand();
+        }
     }
 
     private HasGenre(genreId: number): boolean {

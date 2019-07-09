@@ -1,5 +1,6 @@
 import * as Enumerable from 'linq';
 import * as jQuery from 'jquery';
+import ResponsiveBootstrapToolkit from 'responsive-toolkit';
 
 /**
  * VS開発時のステップデバッグ環境を維持するため、開発環境ではAMD形式で
@@ -18,6 +19,18 @@ const Libraries = {
         : jQuery) as typeof jQuery,
     $: (((jQuery as any).default)
         ? (jQuery as any).default
-        : jQuery) as typeof jQuery
+        : jQuery) as typeof jQuery,
+    ResponsiveBootstrapToolkit: ResponsiveBootstrapToolkit
 };
+
+// ResponsiveBootstrapToolkitをbootstrap4に対応させる
+// https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
+ResponsiveBootstrapToolkit.use('bs4', {
+    'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
+    'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
+    'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
+    'lg': Libraries.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
+    'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
+});
+
 export default Libraries;

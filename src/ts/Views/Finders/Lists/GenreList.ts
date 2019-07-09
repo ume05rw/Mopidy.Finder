@@ -1,14 +1,14 @@
 /// <reference path="../../../../../types/adminlte/index.d.ts" />
+import * as AdminLte from 'admin-lte/dist/js/adminlte.js';
+import * as _ from 'lodash';
 import Component from 'vue-class-component';
+import Libraries from '../../../Libraries';
 import Genre from '../../../Models/Genres/Genre';
 import GenreStore from '../../../Models/Genres/GenreStore';
 import ViewBase from '../../Bases/ViewBase';
+import { WidgetEvents } from '../../Events/AdminLteEvents';
 import { Events, ISelectionChangedArgs } from '../../Events/FinderEvents';
 import SelectionItem from '../../Shared/SelectionItem';
-import ResponsiveBootstrapToolkit from 'responsive-toolkit';
-import * as AdminLte from 'admin-lte/dist/js/adminlte.js';
-import { WidgetEvents } from '../../Events/AdminLteEvents';
-import Libraries from '../../../Libraries';
 
 @Component({
     template: `<div class="col-md-3">
@@ -49,22 +49,12 @@ export default class GenreList extends ViewBase {
 
     private store: GenreStore = new GenreStore();
     private entities: Genre[] = [];
-    private viewport = ResponsiveBootstrapToolkit;
+    private viewport = Libraries.ResponsiveBootstrapToolkit;
     private boxWidget: AdminLte.Widget;
     private isExpanded: boolean = true;
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
-
-        // ResponsiveBootstrapToolkitをbootstrap4に対応させる
-        // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
-        this.viewport.use('bs4', {
-            'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
-            'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
-            'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
-            'lg': Libraries.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
-            'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
-        });
 
         const button = Libraries.$(this.$refs.ButtonCollaple as HTMLElement);
 
@@ -79,13 +69,13 @@ export default class GenreList extends ViewBase {
 
         (Libraries.$(window) as any).resize(
             this.viewport.changed(() => {
-                if (this.viewport.is('<=sm') && this.isExpanded) {
-                    this.boxWidget.collapse();
-                } else if (this.viewport.is('>sm') && !this.isExpanded) {
-                    this.boxWidget.expand();
-                }
+                this.ToggleListByViewport();
             })
         );
+
+        _.delay(() => {
+            this.ToggleListByViewport();
+        }, 1000);
 
         this.Refresh();
 
@@ -112,5 +102,13 @@ export default class GenreList extends ViewBase {
             .then((en) => {
                 this.entities = en.toArray();
             });
+    }
+
+    private ToggleListByViewport(): void {
+        if (this.viewport.is('<=sm') && this.isExpanded) {
+            this.boxWidget.collapse();
+        } else if (this.viewport.is('>sm') && !this.isExpanded) {
+            this.boxWidget.expand();
+        }
     }
 }
