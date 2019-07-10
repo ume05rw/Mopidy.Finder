@@ -1,7 +1,7 @@
 import 'animate.css/animate.css';
 import 'font-awesome/css/font-awesome.css';
 import 'admin-lte/dist/css/adminlte.css';
-import 'vue-slider-component/theme/antd.css'
+import 'admin-lte/plugins/ion-rangeSlider/css/ion.rangeSlider.css';
 import '../css/site.css';
 
 import jQuery from 'jquery';
@@ -16,7 +16,8 @@ import Vue from 'vue';
 import VueClassComponent from 'vue-class-component';
 import * as VuePropertyDecorator from 'vue-property-decorator';
 import InfiniteLoading from 'vue-infinite-loading';
-import VueSlider from 'vue-slider-component';
+
+import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 
 window.__globals = {
     'jquery': jQuery,
@@ -30,6 +31,5 @@ window.__globals = {
     'vue': Vue,
     'vue-class-component': VueClassComponent,
     'vue-property-decorator': VuePropertyDecorator,
-    'vue-infinite-loading': InfiniteLoading,
-    'vue-slider-component': VueSlider
+    'vue-infinite-loading': InfiniteLoading
 };

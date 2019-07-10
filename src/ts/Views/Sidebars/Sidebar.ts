@@ -47,17 +47,23 @@ import Libraries from '../../Libraries';
         </nav>
         <div class="row mt-2">
             <div class="col-12">
-                <vue-slider v-model="volume"></vue-slider>
+                <input type="text" class="js-range-slider" name="my_range" value="" />
             </div>
         </div>
     </div>
 </aside>`,
     components: {
-        'vue-slider': Libraries.VueSlider
     }
 })
 export default class Sidebar extends ViewBase {
 
     private volume: number = 100;
 
+    public async Initialize(): Promise<boolean> {
+        await super.Initialize();
+
+        Libraries.$('.js-range-slider').ionRangeSlider();
+
+        return true;
+    }
 }

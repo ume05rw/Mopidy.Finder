@@ -1,13 +1,18 @@
-import * as Enumerable from 'linq';
+import 'animate.css/animate.css';
+import 'font-awesome/css/font-awesome.css';
+import 'admin-lte/dist/css/adminlte.css';
+import 'admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css';
+import '../css/site.css';
+
 import * as jQuery from 'jquery';
-import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
 
 // 先にJQueryを読ませておく。
 import 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/bootstrap/js/bootstrap';
-import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider'
+import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 
-import * as VueSlider from 'vue-slider-component';
+import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
+import * as Enumerable from 'linq';
 
 /**
  * VS開発時のステップデバッグ環境を維持するため、開発環境ではAMD形式で
@@ -42,13 +47,6 @@ export default class Libraries {
         ? (ResponsiveBootstrapToolkit as any).default
         : ResponsiveBootstrapToolkit) as typeof ResponsiveBootstrapToolkit;
 
-    /**
-     * Vue用スライダーコントロールコンポーネント
-     * やめる予定
-     */
-    public static readonly VueSlider = (((VueSlider as any).default)
-        ? (VueSlider as any).default
-        : VueSlider) as typeof VueSlider as Vue.Component;
 
     public static Initialize(): void {
         // ResponsiveBootstrapToolkitをbootstrap4に対応させる

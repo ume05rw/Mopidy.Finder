@@ -108,14 +108,6 @@ define('vue-infinite-loading', ["exports"], function (exports) {
     exports.default = window.__globals['vue-infinite-loading'];
 });
 
-// vue-slider-component
-define('vue-slider-component', ["exports"], function (exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = window.__globals['vue-slider-component'];
-});
-
-
 
 
 // ダミー: admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider

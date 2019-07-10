@@ -55,7 +55,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "vue-slider-component", "admin-lte/dist/js/adminlte", "admin-lte/plugins/bootstrap/js/bootstrap", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider"], function (require, exports, Enumerable, jQuery, ResponsiveBootstrapToolkit, VueSlider) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "../css/site.css", "admin-lte/dist/js/adminlte", "admin-lte/plugins/bootstrap/js/bootstrap", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -100,13 +100,6 @@ define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit
         Libraries.ResponsiveBootstrapToolkit = ((ResponsiveBootstrapToolkit.default)
             ? ResponsiveBootstrapToolkit.default
             : ResponsiveBootstrapToolkit);
-        /**
-         * Vue用スライダーコントロールコンポーネント
-         * やめる予定
-         */
-        Libraries.VueSlider = ((VueSlider.default)
-            ? VueSlider.default
-            : VueSlider);
         return Libraries;
     }());
     exports.default = Libraries;
@@ -176,12 +169,23 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
             _this.volume = 100;
             return _this;
         }
+        Sidebar.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            Libraries_1.default.$('.js-range-slider').ionRangeSlider();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
         Sidebar = __decorate([
             vue_class_component_2.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-server nav-icon\" />\n                        <p>Server</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <vue-slider v-model=\"volume\"></vue-slider>\n            </div>\n        </div>\n    </div>\n</aside>",
-                components: {
-                    'vue-slider': Libraries_1.default.VueSlider
-                }
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-server nav-icon\" />\n                        <p>Server</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <input type=\"text\" class=\"js-range-slider\" name=\"my_range\" value=\"\" />\n            </div>\n        </div>\n    </div>\n</aside>",
+                components: {}
             })
         ], Sidebar);
         return Sidebar;
@@ -1423,7 +1427,7 @@ define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], fu
     }());
     exports.default = RootContoller;
 });
-define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "vue-slider-component/theme/antd.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "../css/site.css"], function (require, exports, Libraries_7, RootContoller_1) {
+define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"], function (require, exports, Libraries_7, RootContoller_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
