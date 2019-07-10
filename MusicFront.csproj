@@ -7,8 +7,11 @@
 
   <ItemGroup>
     <None Remove="src\Main.ts" />
+    <None Remove="src\ts\Models\Mopidies\IAlbum.ts" />
+    <None Remove="src\ts\Models\Mopidies\IArtist.ts" />
+    <None Remove="src\ts\Models\Mopidies\ITlTrack.ts" />
+    <None Remove="src\ts\Models\Mopidies\ITrack.ts" />
     <None Remove="src\ts\Models\Status\Status.ts" />
-    <None Remove="src\ts\Models\Status\StatusStore.ts" />
     <None Remove="src\ts\Views\Events\AdminLteEvents.ts" />
     <None Remove="src\ts\Views\Events\FinderEvents.ts" />
     <None Remove="src\ts\Libraries.ts" />
@@ -62,8 +65,11 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="src\ts\Controllers\RootContoller.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Mopidies\IAlbum.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Mopidies\IArtist.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Mopidies\ITlTrack.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Mopidies\ITrack.ts" />
     <TypeScriptCompile Include="src\ts\Models\Status\Status.ts" />
-    <TypeScriptCompile Include="src\ts\Models\Status\StatusStore.ts" />
     <TypeScriptCompile Include="src\ts\Views\Events\AdminLteEvents.ts" />
     <TypeScriptCompile Include="src\ts\Views\Events\FinderEvents.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />

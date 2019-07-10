@@ -405,86 +405,158 @@ define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases
     }(XhrQueryableBase_1.default));
     exports.default = JsonRpcQueryableBase;
 });
-define("Models/Status/Status", ["require", "exports"], function (require, exports) {
+define("Models/Mopidies/IArtist", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Status = /** @class */ (function () {
-        function Status() {
-            this.IsPlaying = false;
-            this.TrackName = '';
-            this.TrackLength = 0;
-            this.TrackProgress = 0;
-            this.ArtistName = '';
-            this.AlbumImageUri = '';
-            this.Year = null;
-        }
-        return Status;
-    }());
-    exports.default = Status;
 });
-define("Models/Status/StatusStore", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Status/Status"], function (require, exports, JsonRpcQueryableBase_1, Status_1) {
+define("Models/Mopidies/IAlbum", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var StatusStore = /** @class */ (function (_super) {
-        __extends(StatusStore, _super);
-        function StatusStore() {
+});
+define("Models/Mopidies/ITrack", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Status/Status", ["require", "exports", "Models/Bases/JsonRpcQueryableBase"], function (require, exports, JsonRpcQueryableBase_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Status = /** @class */ (function (_super) {
+        __extends(Status, _super);
+        function Status() {
             var _this = _super.call(this) || this;
-            _this._status = new Status_1.default();
-            _this._methods = {
-                GetState: 'core.playback.get_state',
-                GetCurrentTlTrack: 'core.playback.get_current_tl_track',
-                GetTimePosition: 'core.playback.get_time_position',
-                GetImages: 'core.library.get_images'
-            };
-            _this.Polling();
+            _this._tlId = null;
+            _this._isPlaying = false;
+            _this._trackName = '';
+            _this._trackLength = 0;
+            _this._trackProgress = 0;
+            _this._artistName = '';
+            _this._year = null;
+            _this._imageUri = null;
             return _this;
         }
-        StatusStore.prototype.Polling = function () {
+        Object.defineProperty(Status.prototype, "TlId", {
+            get: function () {
+                return this._tlId;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Status.prototype, "IsPlaying", {
+            get: function () {
+                return this._isPlaying;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Status.prototype, "TrackName", {
+            get: function () {
+                return this._trackName;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Status.prototype, "TrackLength", {
+            get: function () {
+                return this._trackLength;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Status.prototype, "TrackProgress", {
+            get: function () {
+                return this._trackProgress;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Status.prototype, "ArtistName", {
+            get: function () {
+                return this._artistName;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Status.prototype, "ImageUri", {
+            get: function () {
+                return this._imageUri;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Status.prototype, "Year", {
+            get: function () {
+                return this._year;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Status.prototype, "ImageFullUri", {
+            get: function () {
+                return location.protocol + "//" + location.host + this._imageUri;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Status.prototype.StartPolling = function () {
             var _this = this;
             this._timer = setInterval(function () {
-                _this.GetStatus();
-            }, 1000);
+                _this.Polling();
+            }, Status.PollingIntervalMsec);
         };
-        StatusStore.prototype.GetStatus = function () {
+        Status.prototype.Polling = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var resState, resTrack, track, resImages, images, resTs;
+                var resState, resTrack, tlTrack, track, resImages, images, resTs;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(this._methods.GetState)];
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(Status.Methods.GetState)];
                         case 1:
                             resState = _a.sent();
                             if (resState.result)
-                                this._status.IsPlaying = (resState.result == 'playing');
-                            return [4 /*yield*/, this.JsonRpcRequest(this._methods.GetCurrentTlTrack)];
+                                this._isPlaying = (resState.result == 'playing');
+                            return [4 /*yield*/, this.JsonRpcRequest(Status.Methods.GetCurrentTlTrack)];
                         case 2:
                             resTrack = _a.sent();
                             if (!resTrack.result) return [3 /*break*/, 6];
-                            track = resTrack.result.track;
-                            if (!(this._status.TrackName != track.name)) return [3 /*break*/, 5];
-                            this._status.TrackName = track.name;
+                            tlTrack = resTrack.result;
+                            track = tlTrack.track;
+                            if (!(this._trackName != track.name)) return [3 /*break*/, 5];
+                            // 一旦初期化
+                            this._tlId = null;
+                            this._trackName = '--';
+                            this._trackLength = 0;
+                            this._trackProgress = 0;
+                            this._artistName = '--';
+                            this._year = null;
+                            this._imageUri = null;
+                            this._trackName = track.name;
+                            this._tlId = tlTrack.tlid;
                             if (track.artists && 0 < track.artists.length) {
-                                this._status.ArtistName = (track.artists.length === 1)
+                                this._artistName = (track.artists.length === 1)
                                     ? track.artists[0].name
                                     : track.artists[0].name + ' and more...';
                             }
                             else {
-                                this._status.ArtistName = '';
+                                this._artistName = '';
                             }
                             if (track.date && 4 <= track.date.length) {
-                                this._status.Year = (4 < track.date.length)
+                                this._year = (4 < track.date.length)
                                     ? parseInt(track.date.substring(0, 4), 10)
                                     : parseInt(track.date, 10);
                             }
-                            this._status.TrackLength = (track.length)
-                                ? parseInt(track.length, 10)
+                            this._trackLength = (track.length)
+                                ? track.length
                                 : 0;
                             if (!track.album) return [3 /*break*/, 5];
                             if (!(track.album.images && 0 < track.album.images.length)) return [3 /*break*/, 3];
-                            this._status.AlbumImageUri = track.album.images[0];
+                            this._imageUri = track.album.images[0];
                             return [3 /*break*/, 5];
                         case 3:
                             if (!track.album.uri) return [3 /*break*/, 5];
-                            return [4 /*yield*/, this.JsonRpcRequest(this._methods.GetImages, {
+                            return [4 /*yield*/, this.JsonRpcRequest(Status.Methods.GetImages, {
                                     uris: [track.album.uri]
                                 })];
                         case 4:
@@ -492,44 +564,55 @@ define("Models/Status/StatusStore", ["require", "exports", "Models/Bases/JsonRpc
                             if (resImages.result) {
                                 images = resImages.result[track.album.uri];
                                 if (images && 0 < images.length) {
-                                    this._status.AlbumImageUri = images[0];
+                                    this._imageUri = images[0];
                                 }
                             }
                             _a.label = 5;
                         case 5: return [3 /*break*/, 7];
                         case 6:
-                            this._status.TrackName = '--';
-                            this._status.ArtistName = '--';
-                            this._status.Year = null;
-                            this._status.TrackLength = 0;
-                            this._status.AlbumImageUri = null;
+                            this._tlId = null;
+                            this._trackName = '--';
+                            this._trackLength = 0;
+                            this._trackProgress = 0;
+                            this._artistName = '--';
+                            this._year = null;
+                            this._imageUri = null;
                             _a.label = 7;
-                        case 7: return [4 /*yield*/, this.JsonRpcRequest(this._methods.GetTimePosition)];
+                        case 7: return [4 /*yield*/, this.JsonRpcRequest(Status.Methods.GetTimePosition)];
                         case 8:
                             resTs = _a.sent();
-                            this._status.TrackProgress = (resTs.result)
+                            this._trackProgress = (resTs.result)
                                 ? parseInt(resTs.result, 10)
                                 : 0;
-                            console.log(this._status);
+                            console.log(this);
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
-        StatusStore.prototype.Dispose = function () {
-            clearTimeout(this._timer);
+        Status.prototype.Dispose = function () {
+            clearInterval(this._timer);
         };
-        return StatusStore;
+        Status.PollingIntervalMsec = 1000;
+        Status.Methods = {
+            GetState: 'core.playback.get_state',
+            GetCurrentTlTrack: 'core.playback.get_current_tl_track',
+            GetTimePosition: 'core.playback.get_time_position',
+            GetImages: 'core.library.get_images'
+        };
+        return Status;
     }(JsonRpcQueryableBase_1.default));
-    exports.default = StatusStore;
+    exports.default = Status;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries", "Models/Status/StatusStore"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1, StatusStore_1) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries", "Models/Status/Status"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1, Status_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Sidebar = /** @class */ (function (_super) {
         __extends(Sidebar, _super);
         function Sidebar() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.status = new Status_1.default();
+            return _this;
         }
         Sidebar.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
@@ -549,7 +632,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
                                 }
                             });
                             this.volumeData = this.volumeSlider.data('ionRangeSlider');
-                            this.statusStore = new StatusStore_1.default();
+                            this.status.StartPolling();
                             return [2 /*return*/, true];
                     }
                 });
@@ -567,7 +650,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
         };
         Sidebar = __decorate([
             vue_class_component_2.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy Finder</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <div class=\"card siderbar-control\">\n                    <div class=\"card-body\">\n                        <img src=\"null\" class=\"albumart\" />\n                        <h6 class=\"card-title\">Music Title Here.</h6>\n                        <span>Artist Name (year)</span>\n                        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-fast-backward\" />\n                            </button>\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-play\" />\n                            </button>\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-fast-forward\" />\n                            </button>\n                        </div>\n                        <div class=\"row volume-box w-100 mt-2\">\n                            <div class=\"col-1 volume-button volume-min\">\n                                <a @click=\"OnClickVolumeMin\">\n                                    <i class=\"fa fa-volume-off\" />\n                                </a>\n                            </div>\n                            <div class=\"col-10\">\n                                <input type=\"text\"\n                                    data-type=\"single\"\n                                    data-min=\"0\"\n                                    data-max=\"100\"\n                                    data-from=\"100\"\n                                    data-grid=\"true\"\n                                    ref=\"Slider\" />\n                            </div>\n                            <div class=\"col-1 volume-button volume-max\">\n                                <a @click=\"OnClickVolumeMax\">\n                                    <i class=\"fa fa-volume-up\" />\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy Finder</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <div class=\"card siderbar-control\">\n                    <div class=\"card-body\">\n                        <img v-bind:src=\"status.ImageFullUri\" class=\"albumart\" />\n                        <h6 class=\"card-title\">{{ status.TrackName }}</h6>\n                        <span>{{ status.ArtistName }}{{ (status.Year) ? '(' + status.Year + ')' : '' }}</span>\n                        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-fast-backward\" />\n                            </button>\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-play\" />\n                            </button>\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-fast-forward\" />\n                            </button>\n                        </div>\n                        <div class=\"row volume-box w-100 mt-2\">\n                            <div class=\"col-1 volume-button volume-min\">\n                                <a @click=\"OnClickVolumeMin\">\n                                    <i class=\"fa fa-volume-off\" />\n                                </a>\n                            </div>\n                            <div class=\"col-10\">\n                                <input type=\"text\"\n                                    data-type=\"single\"\n                                    data-min=\"0\"\n                                    data-max=\"100\"\n                                    data-from=\"100\"\n                                    data-grid=\"true\"\n                                    ref=\"Slider\" />\n                            </div>\n                            <div class=\"col-1 volume-button volume-max\">\n                                <a @click=\"OnClickVolumeMax\">\n                                    <i class=\"fa fa-volume-up\" />\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</aside>",
                 components: {}
             })
         ], Sidebar);

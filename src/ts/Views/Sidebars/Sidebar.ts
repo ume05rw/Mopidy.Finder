@@ -1,8 +1,7 @@
-/// <reference path="../../../../types/mopidy/index.d.ts" />
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
-import StatusStore from '../../Models/Status/StatusStore';
+import Status from '../../Models/Status/Status';
 
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -51,9 +50,9 @@ import StatusStore from '../../Models/Status/StatusStore';
             <div class="col-12">
                 <div class="card siderbar-control">
                     <div class="card-body">
-                        <img src="null" class="albumart" />
-                        <h6 class="card-title">Music Title Here.</h6>
-                        <span>Artist Name (year)</span>
+                        <img v-bind:src="status.ImageFullUri" class="albumart" />
+                        <h6 class="card-title">{{ status.TrackName }}</h6>
+                        <span>{{ status.ArtistName }}{{ (status.Year) ? '(' + status.Year + ')' : '' }}</span>
                         <div class="player-box btn-group btn-group-sm w-100 mt-2" role="group">
                             <button type="button" class="btn btn-secondary">
                                 <i class="fa fa-fast-backward" />
@@ -97,11 +96,9 @@ import StatusStore from '../../Models/Status/StatusStore';
 })
 export default class Sidebar extends ViewBase {
 
-    
     private volumeSlider: JQuery;
     private volumeData: any;
-    private mopidy: Mopidy;
-    private statusStore: StatusStore;
+    private status: Status = new Status();
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
@@ -118,7 +115,7 @@ export default class Sidebar extends ViewBase {
         });
         this.volumeData = this.volumeSlider.data('ionRangeSlider');
 
-        this.statusStore = new StatusStore();
+        this.status.StartPolling();
 
         return true;
     }
