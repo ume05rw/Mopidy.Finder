@@ -16,7 +16,7 @@ module.exports = {
     // 注) 'src/ts/Main.ts' では認識しない。'./src/ts/Main.ts' とする。
     entry: [
         './src/js/polyfills.js',
-        './src/ts/Main.ts'
+        './src/ts/Main.js'
     ],
 
     // ファイルの出力設定
@@ -46,19 +46,20 @@ module.exports = {
                     }
                 ]
             },
-            // TypeScript
-            {
-                test: /\.ts$|\.tsx$/,
-                loader: 'ts-loader',
-                options: {
-                    configFile: path.resolve(__dirname, "tsconfig.commonjs.json")
-                }
-            },
             // WebFont
             {
                 test: /\.(woff|woff2|eot|ttf|svg)$/,
                 loader: 'file-loader?name=../font/[name].[ext]'
             }
+            //// TypeScript
+            //// 予めtscでコンパイルしておく。
+            //{
+            //    test: /\.ts$|\.tsx$/,
+            //    loader: 'ts-loader',
+            //    options: {
+            //        configFile: path.resolve(__dirname, "tsconfig.commonjs.json")
+            //    }
+            //},
         ]
     },
 
@@ -74,6 +75,8 @@ module.exports = {
         ],
 
         alias: {
+            // Admin-LTE側のJQueryを読ませる。
+            'jquery': 'admin-lte/node_modules/jquery/dist/jquery.js',
             'vue$': 'vue/dist/vue.esm.js'
         }
     },

@@ -55,7 +55,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "vue-slider-component"], function (require, exports, Enumerable, jQuery, ResponsiveBootstrapToolkit, VueSlider) {
+define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "vue-slider-component", "admin-lte/dist/js/adminlte", "admin-lte/plugins/bootstrap/js/bootstrap", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider"], function (require, exports, Enumerable, jQuery, ResponsiveBootstrapToolkit, VueSlider) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -65,32 +65,52 @@ define("Libraries", ["require", "exports", "linq", "jquery", "responsive-toolkit
      * 強制的にdefault-exportしている。
      * プロダクションビルドでは書いた通りで動くため、その差分を吸収するためのロジック。
      */
-    var Libraries = {
-        // linq.jsのバージョンは3.1.1に固定する。最新版の型定義がes5に対応しなくなったため。
-        Enumerable: ((Enumerable.default)
+    var Libraries = /** @class */ (function () {
+        function Libraries() {
+        }
+        Libraries.Initialize = function () {
+            // ResponsiveBootstrapToolkitをbootstrap4に対応させる
+            // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
+            Libraries.ResponsiveBootstrapToolkit.use('bs4', {
+                'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
+                'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
+                'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
+                'lg': Libraries.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
+                'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
+            });
+        };
+        /**
+         * linq.js
+         * ※バージョンは3.1.1に固定する。最新版の型定義がes5に対応しなくなったため。
+         */
+        Libraries.Enumerable = ((Enumerable.default)
             ? Enumerable.default
-            : Enumerable),
-        jQuery: ((jQuery.default)
+            : Enumerable);
+        /**
+         * JQuery: Admin-LTE, Bootsrapが依存している。
+         */
+        Libraries.jQuery = ((jQuery.default)
             ? jQuery.default
-            : jQuery),
-        $: ((jQuery.default)
-            ? jQuery.default
-            : jQuery),
-        ResponsiveBootstrapToolkit: ((ResponsiveBootstrapToolkit.default)
+            : jQuery);
+        Libraries.$ = Libraries.jQuery;
+        /**
+         * Bootstrap Toolkit
+         * 画面サイズ切替判定で使用
+         */
+        Libraries.ResponsiveBootstrapToolkit = ((ResponsiveBootstrapToolkit.default)
             ? ResponsiveBootstrapToolkit.default
-            : ResponsiveBootstrapToolkit),
-        VueSlider: VueSlider,
-    };
-    // ResponsiveBootstrapToolkitをbootstrap4に対応させる
-    // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
-    ResponsiveBootstrapToolkit.use('bs4', {
-        'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
-        'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
-        'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
-        'lg': Libraries.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
-        'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
-    });
+            : ResponsiveBootstrapToolkit);
+        /**
+         * Vue用スライダーコントロールコンポーネント
+         * やめる予定
+         */
+        Libraries.VueSlider = ((VueSlider.default)
+            ? VueSlider.default
+            : VueSlider);
+        return Libraries;
+    }());
     exports.default = Libraries;
+    ;
 });
 define("Views/Bases/ViewBase", ["require", "exports", "vue", "lodash"], function (require, exports, vue_1, _) {
     "use strict";
@@ -158,7 +178,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
         }
         Sidebar = __decorate([
             vue_class_component_2.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-server nav-icon\" />\n                        <p>Server</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <vue-slider v-model=\"volume\"></vue-slider>\n            </div>\n        </div>\n    </div>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-server nav-icon\" />\n                        <p>Server</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <vue-slider v-model=\"volume\"></vue-slider>\n            </div>\n        </div>\n    </div>\n</aside>",
                 components: {
                     'vue-slider': Libraries_1.default.VueSlider
                 }
@@ -970,7 +990,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
     }(ViewBase_5.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_3, vue_class_component_6, vue_infinite_loading_2, Libraries_5, ArtistStore_1, ViewBase_6, AdminLteEvents_1, FinderEvents_4, SelectionItem_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_3, vue_class_component_6, vue_infinite_loading_2, Libraries_5, ArtistStore_1, ViewBase_6, AdminLteEvents_1, FinderEvents_4, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     vue_3.default.use(vue_infinite_loading_2.default);
@@ -1158,7 +1178,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/js/adminlte.js", "lodash", "vue-class-component", "Libraries", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_class_component_7, Libraries_6, GenreStore_1, ViewBase_7, AdminLteEvents_2, FinderEvents_5, SelectionItem_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "vue-class-component", "Libraries", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_class_component_7, Libraries_6, GenreStore_1, ViewBase_7, AdminLteEvents_2, FinderEvents_5, SelectionItem_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -1403,7 +1423,7 @@ define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], fu
     }());
     exports.default = RootContoller;
 });
-define("Main", ["require", "exports", "Controllers/RootContoller", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "vue-slider-component/theme/antd.css", "../css/site.css", "admin-lte/dist/js/adminlte.js"], function (require, exports, RootContoller_1) {
+define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "vue-slider-component/theme/antd.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "../css/site.css"], function (require, exports, Libraries_7, RootContoller_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -1415,6 +1435,7 @@ define("Main", ["require", "exports", "Controllers/RootContoller", "animate.css/
                     switch (_a.label) {
                         case 0:
                             console.log('TS Start');
+                            Libraries_7.default.Initialize();
                             this._rootController = new RootContoller_1.default();
                             return [4 /*yield*/, this._rootController.Init()];
                         case 1:

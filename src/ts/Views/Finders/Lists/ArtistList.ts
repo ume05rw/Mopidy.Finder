@@ -1,5 +1,5 @@
 /// <reference path="../../../../../types/adminlte/index.d.ts" />
-import * as AdminLte from 'admin-lte/dist/js/adminlte.js';
+import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import * as _ from 'lodash';
 import Vue from 'vue';
 import Component from 'vue-class-component';

@@ -14,6 +14,7 @@ import Libraries from '../../Libraries';
                     <a  class="nav-link active"
                         href="#tab-finder"
                         role="tab"
+                        data-toggle="tab"
                         aria-controls="tab-finder"
                         aria-selected="true">
                         <i class="fa fa-search nav-icon" />
@@ -24,6 +25,7 @@ import Libraries from '../../Libraries';
                     <a  class="nav-link"
                         href="#tab-playlists"
                         role="tab"
+                        data-toggle="tab"
                         aria-controls="tab-playlists"
                         aria-selected="false">
                         <i class="fa fa-bookmark nav-icon" />
@@ -34,6 +36,7 @@ import Libraries from '../../Libraries';
                     <a  class="nav-link"
                         href="#tab-settings"
                         role="tab"
+                        data-toggle="tab"
                         aria-controls="tab-settings"
                         aria-selected="false">
                         <i class="fa fa-server nav-icon" />
