@@ -39,15 +39,53 @@ import Libraries from '../../Libraries';
                         data-toggle="tab"
                         aria-controls="tab-settings"
                         aria-selected="false">
-                        <i class="fa fa-server nav-icon" />
-                        <p>Server</p>
+                        <i class="fa fa-cog nav-icon" />
+                        <p>Settings</p>
                     </a>
                 </li>
             </ul>
         </nav>
         <div class="row mt-2">
             <div class="col-12">
-                <input type="text" class="js-range-slider" name="my_range" value="" />
+                <div class="card siderbar-control">
+                    <div class="card-body">
+                        <img src="null" class="albumart" />
+                        <h6 class="card-title">Music Title Here.</h6>
+                        <span>Artist Name (year)</span>
+                        <div class="player-box btn-group w-100 mt-2" role="group">
+                            <button type="button" class="btn btn-secondary">
+                                <i class="fa fa-fast-backward" />
+                            </button>
+                            <button type="button" class="btn btn-secondary">
+                                <i class="fa fa-play" />
+                            </button>
+                            <button type="button" class="btn btn-secondary">
+                                <i class="fa fa-fast-forward" />
+                            </button>
+                        </div>
+                        <div class="row volume-box w-100 mt-2">
+                            <div class="col-1 volume-button volume-min">
+                                <a @click="OnClickVolumeMin">
+                                    <i class="fa fa-volume-off" />
+                                </a>
+                            </div>
+                            <div class="col-10">
+                                <input type="text"
+                                    data-type="single"
+                                    data-min="0"
+                                    data-max="100"
+                                    data-from="100"
+                                    data-grid="true"
+                                    ref="Slider" />
+                            </div>
+                            <div class="col-1 volume-button volume-max">
+                                <a @click="OnClickVolumeMax">
+                                    <i class="fa fa-volume-up" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -57,13 +95,37 @@ import Libraries from '../../Libraries';
 })
 export default class Sidebar extends ViewBase {
 
-    private volume: number = 100;
+    
+    private volumeSlider: JQuery;
+    private volumeData: any;
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        Libraries.$('.js-range-slider').ionRangeSlider();
+        this.volumeSlider = Libraries.$(this.$refs.Slider).ionRangeSlider({
+            onChange: (data) => {
+                // スライダーの値変更都度イベント
+                //console.log(data);
+            },
+            onFinish: (data) => {
+                // スライダー操作完了時のイベント
+                console.log('onFinish');
+            }
+        });
+        this.volumeData = this.volumeSlider.data('ionRangeSlider');
 
         return true;
+    }
+
+    private OnClickVolumeMin(): void {
+        this.volumeData.update({
+            from: 0
+        });
+    }
+
+    private OnClickVolumeMax(): void {
+        this.volumeData.update({
+            from: 100
+        });
     }
 }

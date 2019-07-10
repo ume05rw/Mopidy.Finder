@@ -165,9 +165,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
     var Sidebar = /** @class */ (function (_super) {
         __extends(Sidebar, _super);
         function Sidebar() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.volume = 100;
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         Sidebar.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
@@ -176,15 +174,35 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_1.default.$('.js-range-slider').ionRangeSlider();
+                            this.volumeSlider = Libraries_1.default.$(this.$refs.Slider).ionRangeSlider({
+                                onChange: function (data) {
+                                    // スライダーの値変更都度イベント
+                                    //console.log(data);
+                                },
+                                onFinish: function (data) {
+                                    // スライダー操作完了時のイベント
+                                    console.log('onFinish');
+                                }
+                            });
+                            this.volumeData = this.volumeSlider.data('ionRangeSlider');
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
+        Sidebar.prototype.OnClickVolumeMin = function () {
+            this.volumeData.update({
+                from: 0
+            });
+        };
+        Sidebar.prototype.OnClickVolumeMax = function () {
+            this.volumeData.update({
+                from: 100
+            });
+        };
         Sidebar = __decorate([
             vue_class_component_2.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-server nav-icon\" />\n                        <p>Server</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <input type=\"text\" class=\"js-range-slider\" name=\"my_range\" value=\"\" />\n            </div>\n        </div>\n    </div>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Music Front</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <div class=\"card siderbar-control\">\n                    <div class=\"card-body\">\n                        <img src=\"null\" class=\"albumart\" />\n                        <h6 class=\"card-title\">Music Title Here.</h6>\n                        <span>Artist Name (year)</span>\n                        <div class=\"player-box btn-group w-100 mt-2\" role=\"group\">\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-fast-backward\" />\n                            </button>\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-play\" />\n                            </button>\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-fast-forward\" />\n                            </button>\n                        </div>\n                        <div class=\"row volume-box w-100 mt-2\">\n                            <div class=\"col-1 volume-button volume-min\">\n                                <a @click=\"OnClickVolumeMin\">\n                                    <i class=\"fa fa-volume-off\" />\n                                </a>\n                            </div>\n                            <div class=\"col-10\">\n                                <input type=\"text\"\n                                    data-type=\"single\"\n                                    data-min=\"0\"\n                                    data-max=\"100\"\n                                    data-from=\"100\"\n                                    data-grid=\"true\"\n                                    ref=\"Slider\" />\n                            </div>\n                            <div class=\"col-1 volume-button volume-max\">\n                                <a @click=\"OnClickVolumeMax\">\n                                    <i class=\"fa fa-volume-up\" />\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</aside>",
                 components: {}
             })
         ], Sidebar);

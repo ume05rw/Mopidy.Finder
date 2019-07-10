@@ -3,10 +3,27 @@
     height: calc(100vh - 140px);
     overflow-y: scroll;
 }
+
+/**
+ * サイドバー等
+ */
 .albumart {
     width: 100%;
     height: auto;
 }
+.siderbar-control .volume-box {
+    /*margin-left: -18px;*/
+}
+.siderbar-control .volume-button {
+    padding-top: 19px;
+}
+.siderbar-control .volume-min {
+    text-align: right;
+}
+.siderbar-control .volume-max {
+    text-align: left;
+}
+
 .table.tracks {
     table-layout: fixed;
 }
