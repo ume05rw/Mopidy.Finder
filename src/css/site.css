@@ -11,9 +11,10 @@
     width: 100%;
     height: auto;
 }
-.siderbar-control .volume-box {
-    /*margin-left: -18px;*/
-}
+
+/**
+ * サイドバー
+ */
 .siderbar-control .volume-button {
     padding-top: 19px;
 }
@@ -24,6 +25,9 @@
     text-align: left;
 }
 
+/**
+ * Finder-アルバムリスト
+ */
 .table.tracks {
     table-layout: fixed;
 }

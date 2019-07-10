@@ -5,7 +5,7 @@ import Libraries from '../../Libraries';
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
     <div class="brand-link navbar-secondary">
-        <span class="brand-text font-weight-light">Music Front</span>
+        <span class="brand-text font-weight-light">Mopidy Finder</span>
     </div>
     <div class="sidebar">
         <nav class="mt-2">
@@ -52,7 +52,7 @@ import Libraries from '../../Libraries';
                         <img src="null" class="albumart" />
                         <h6 class="card-title">Music Title Here.</h6>
                         <span>Artist Name (year)</span>
-                        <div class="player-box btn-group w-100 mt-2" role="group">
+                        <div class="player-box btn-group btn-group-sm w-100 mt-2" role="group">
                             <button type="button" class="btn btn-secondary">
                                 <i class="fa fa-fast-backward" />
                             </button>
