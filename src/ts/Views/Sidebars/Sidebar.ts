@@ -1,7 +1,8 @@
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
-import Status from '../../Models/Status/Status';
+import Player, { PlayerState } from '../../Models/Mopidies/Player';
+import * as _ from 'lodash';
 
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -50,17 +51,23 @@ import Status from '../../Models/Status/Status';
             <div class="col-12">
                 <div class="card siderbar-control">
                     <div class="card-body">
-                        <img v-bind:src="status.ImageFullUri" class="albumart" />
-                        <h6 class="card-title">{{ status.TrackName }}</h6>
-                        <span>{{ status.ArtistName }}{{ (status.Year) ? '(' + status.Year + ')' : '' }}</span>
+                        <img v-bind:src="player.ImageFullUri" class="albumart" />
+                        <h6 class="card-title">{{ player.TrackName }}</h6>
+                        <span>{{ player.ArtistName }}{{ (player.Year) ? '(' + player.Year + ')' : '' }}</span>
                         <div class="player-box btn-group btn-group-sm w-100 mt-2" role="group">
-                            <button type="button" class="btn btn-secondary">
+                            <button type="button"
+                                class="btn btn-secondary"
+                                @click="OnClickPrevious">
                                 <i class="fa fa-fast-backward" />
                             </button>
-                            <button type="button" class="btn btn-secondary">
-                                <i class="fa fa-play" />
+                            <button type="button"
+                                class="btn btn-secondary"
+                                @click="OnClickPlayPause">
+                                <i v-bind:class="GetPlayPauseIconClass()" ref="PlayPauseIcon"/>
                             </button>
-                            <button type="button" class="btn btn-secondary">
+                            <button type="button"
+                                class="btn btn-secondary"
+                                @click="OnClickNext">
                                 <i class="fa fa-fast-forward" />
                             </button>
                         </div>
@@ -98,7 +105,7 @@ export default class Sidebar extends ViewBase {
 
     private volumeSlider: JQuery;
     private volumeData: any;
-    private status: Status = new Status();
+    private player: Player = new Player();
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
@@ -110,14 +117,27 @@ export default class Sidebar extends ViewBase {
             },
             onFinish: (data) => {
                 // スライダー操作完了時のイベント
-                console.log('onFinish');
+                this.player.SetVolume(data.from);
             }
         });
         this.volumeData = this.volumeSlider.data('ionRangeSlider');
 
-        this.status.StartPolling();
+        this.player.StartPolling();
+
+        // ポーリング一回目以降の値を取得
+        _.delay(() => {
+            this.volumeData.update({
+                from: this.player.Volume
+            });
+        }, 1500);
 
         return true;
+    }
+
+    private GetPlayPauseIconClass(): string {
+        return (this.player.PlayerState === PlayerState.Playing)
+            ? 'fa fa-pause'
+            : 'fa fa-play';
     }
 
     private OnClickVolumeMin(): void {
@@ -131,4 +151,22 @@ export default class Sidebar extends ViewBase {
             from: 100
         });
     }
+
+    private OnClickPrevious(): void {
+        this.player.Previous();
+    }
+
+    private OnClickPlayPause(): void {
+        if (this.player.PlayerState === PlayerState.Playing) {
+            this.player.Pause();
+        } else {
+            this.player.Play();
+        }
+    }
+
+    private OnClickNext(): void {
+        this.player.Next();
+    }
+
+
 }

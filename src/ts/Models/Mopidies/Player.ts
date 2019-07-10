@@ -1,16 +1,37 @@
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import ITlTrack from '../Mopidies/ITlTrack';
 
-export default class Status extends JsonRpcQueryableBase {
+export enum PlayerState {
+    Playing = 'playing',
+    Stopped = 'stopped',
+    Paused = 'paused'
+}
+
+export default class Player extends JsonRpcQueryableBase {
 
     private static readonly PollingIntervalMsec = 1000;
     private static readonly Methods = {
         GetState: 'core.playback.get_state',
         GetCurrentTlTrack: 'core.playback.get_current_tl_track',
         GetTimePosition: 'core.playback.get_time_position',
-        GetImages: 'core.library.get_images'
+        GetImages: 'core.library.get_images',
+
+        Play: 'core.playback.play',
+        Resume: 'core.playback.resume',
+        Pause: 'core.playback.pause',
+        Stop: 'core.playback.stop',
+        Next: 'core.playback.next',
+        Previous: 'core.playback.previous',
+        Seek: 'core.playback.seek',
+
+        GetRandom: 'core.tracklist.get_random',
+        SetRandom: 'core.tracklist.set_random',
+
+        GetVolume: 'core.mixer.get_volume',
+        SetVolume: 'core.mixer.set_volume'
     };
 
+    private _playerState: PlayerState = PlayerState.Paused;
     private _tlId: number = null;
     private _isPlaying: boolean = false;
     private _trackName: string = '';
@@ -19,10 +40,14 @@ export default class Status extends JsonRpcQueryableBase {
     private _artistName: string = '';
     private _year: number = null;
     private _imageUri: string = null;
+    private _volume: number = 0;
     private _timer: number;
 
     public get TlId(): number {
         return this._tlId;
+    }
+    public get PlayerState(): PlayerState {
+        return this._playerState;
     }
     public get IsPlaying(): boolean {
         return this._isPlaying;
@@ -45,43 +70,42 @@ export default class Status extends JsonRpcQueryableBase {
     public get Year(): number {
         return this._year;
     }
+    public get Volume(): number {
+        return this._volume;
+    }
+
     public get ImageFullUri(): string {
         return `${location.protocol}//${location.host}${this._imageUri}`;
     }
 
 
-    public constructor() {
-        super();
-    }
-
     public StartPolling(): void {
         this._timer = setInterval(() => {
             this.Polling();
-        }, Status.PollingIntervalMsec);
+        }, Player.PollingIntervalMsec);
     }
 
     private async Polling(): Promise<boolean> {
-        const resState = await this.JsonRpcRequest(Status.Methods.GetState);
-        if (resState.result)
+        const resState = await this.JsonRpcRequest(Player.Methods.GetState);
+        if (resState.result) {
             this._isPlaying = (resState.result == 'playing');
+            this._playerState = resState.result as PlayerState;
+        }
 
-        const resTrack = await this.JsonRpcRequest(Status.Methods.GetCurrentTlTrack);
+        const resTrack = await this.JsonRpcRequest(Player.Methods.GetCurrentTlTrack);
         if (resTrack.result) {
             const tlTrack = resTrack.result as ITlTrack;
             const track = tlTrack.track;
-            if (this._trackName != track.name) {
+            if (this._tlId !== tlTrack.tlid) {
 
                 // 一旦初期化
-                this._tlId = null;
-                this._trackName = '--';
+                this._tlId = tlTrack.tlid;
+                this._trackName = track.name;
                 this._trackLength = 0;
                 this._trackProgress = 0;
                 this._artistName = '--';
                 this._year = null;
                 this._imageUri = null;
-
-                this._trackName = track.name;
-                this._tlId = tlTrack.tlid;
 
                 if (track.artists && 0 < track.artists.length) {
                     this._artistName = (track.artists.length === 1)
@@ -105,7 +129,7 @@ export default class Status extends JsonRpcQueryableBase {
                     if (track.album.images && 0 < track.album.images.length) {
                         this._imageUri = track.album.images[0];
                     } else if (track.album.uri) {
-                        const resImages = await this.JsonRpcRequest(Status.Methods.GetImages, {
+                        const resImages = await this.JsonRpcRequest(Player.Methods.GetImages, {
                             uris: [track.album.uri]
                         });
                         if (resImages.result) {
@@ -127,14 +151,71 @@ export default class Status extends JsonRpcQueryableBase {
             this._imageUri = null;
         }
 
-        const resTs = await this.JsonRpcRequest(Status.Methods.GetTimePosition);
+        const resTs = await this.JsonRpcRequest(Player.Methods.GetTimePosition);
         this._trackProgress = (resTs.result)
             ? parseInt(resTs.result, 10)
             : 0;
 
+        const resVol = await this.JsonRpcRequest(Player.Methods.GetVolume);
+        if (resVol.result)
+            this._volume = resVol.result as number;
+
         console.log(this);
 
         return true;
+    }
+
+    public async Play(): Promise<boolean> {
+        if (this._playerState === PlayerState.Playing)
+            return true;
+
+        if (!this._tlId)
+            return false;
+
+        if (this._playerState === PlayerState.Paused) {
+            await this.JsonRpcNotice(Player.Methods.Resume);
+        } else if (this._playerState === PlayerState.Stopped) {
+            await this.JsonRpcNotice(Player.Methods.Play, {
+                tlid: this._tlId
+            });
+        }
+
+        return true;
+    }
+
+    public async Pause(): Promise<boolean> {
+        if (this._playerState !== PlayerState.Playing)
+            return true;
+
+        await this.JsonRpcNotice(Player.Methods.Pause);
+
+        return true;
+    }
+
+    public async Next(): Promise<boolean> {
+        await this.JsonRpcNotice(Player.Methods.Next);
+        return true;
+    }
+
+    public async Previous(): Promise<boolean> {
+        await this.JsonRpcNotice(Player.Methods.Previous);
+        return true;
+    }
+
+    public async Seek(timePosition: number): Promise<boolean> {
+        await this.JsonRpcNotice(Player.Methods.Seek, {
+            time_position: timePosition
+        });
+        return true;
+    }
+
+    public async SetVolume(volume: number): Promise<boolean> {
+        const resSucceeded
+            = await this.JsonRpcRequest(Player.Methods.SetVolume, {
+                volume: volume
+            });
+
+        return resSucceeded.result as boolean;
     }
 
     public Dispose(): void {

@@ -421,13 +421,20 @@ define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, ex
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Status/Status", ["require", "exports", "Models/Bases/JsonRpcQueryableBase"], function (require, exports, JsonRpcQueryableBase_1) {
+define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQueryableBase"], function (require, exports, JsonRpcQueryableBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Status = /** @class */ (function (_super) {
-        __extends(Status, _super);
-        function Status() {
-            var _this = _super.call(this) || this;
+    var PlayerState;
+    (function (PlayerState) {
+        PlayerState["Playing"] = "playing";
+        PlayerState["Stopped"] = "stopped";
+        PlayerState["Paused"] = "paused";
+    })(PlayerState = exports.PlayerState || (exports.PlayerState = {}));
+    var Player = /** @class */ (function (_super) {
+        __extends(Player, _super);
+        function Player() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._playerState = PlayerState.Paused;
             _this._tlId = null;
             _this._isPlaying = false;
             _this._trackName = '';
@@ -436,104 +443,119 @@ define("Models/Status/Status", ["require", "exports", "Models/Bases/JsonRpcQuery
             _this._artistName = '';
             _this._year = null;
             _this._imageUri = null;
+            _this._volume = 0;
             return _this;
         }
-        Object.defineProperty(Status.prototype, "TlId", {
+        Object.defineProperty(Player.prototype, "TlId", {
             get: function () {
                 return this._tlId;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Status.prototype, "IsPlaying", {
+        Object.defineProperty(Player.prototype, "PlayerState", {
+            get: function () {
+                return this._playerState;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Player.prototype, "IsPlaying", {
             get: function () {
                 return this._isPlaying;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Status.prototype, "TrackName", {
+        Object.defineProperty(Player.prototype, "TrackName", {
             get: function () {
                 return this._trackName;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Status.prototype, "TrackLength", {
+        Object.defineProperty(Player.prototype, "TrackLength", {
             get: function () {
                 return this._trackLength;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Status.prototype, "TrackProgress", {
+        Object.defineProperty(Player.prototype, "TrackProgress", {
             get: function () {
                 return this._trackProgress;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Status.prototype, "ArtistName", {
+        Object.defineProperty(Player.prototype, "ArtistName", {
             get: function () {
                 return this._artistName;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Status.prototype, "ImageUri", {
+        Object.defineProperty(Player.prototype, "ImageUri", {
             get: function () {
                 return this._imageUri;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Status.prototype, "Year", {
+        Object.defineProperty(Player.prototype, "Year", {
             get: function () {
                 return this._year;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Status.prototype, "ImageFullUri", {
+        Object.defineProperty(Player.prototype, "Volume", {
+            get: function () {
+                return this._volume;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Player.prototype, "ImageFullUri", {
             get: function () {
                 return location.protocol + "//" + location.host + this._imageUri;
             },
             enumerable: true,
             configurable: true
         });
-        Status.prototype.StartPolling = function () {
+        Player.prototype.StartPolling = function () {
             var _this = this;
             this._timer = setInterval(function () {
                 _this.Polling();
-            }, Status.PollingIntervalMsec);
+            }, Player.PollingIntervalMsec);
         };
-        Status.prototype.Polling = function () {
+        Player.prototype.Polling = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var resState, resTrack, tlTrack, track, resImages, images, resTs;
+                var resState, resTrack, tlTrack, track, resImages, images, resTs, resVol;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(Status.Methods.GetState)];
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetState)];
                         case 1:
                             resState = _a.sent();
-                            if (resState.result)
+                            if (resState.result) {
                                 this._isPlaying = (resState.result == 'playing');
-                            return [4 /*yield*/, this.JsonRpcRequest(Status.Methods.GetCurrentTlTrack)];
+                                this._playerState = resState.result;
+                            }
+                            return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetCurrentTlTrack)];
                         case 2:
                             resTrack = _a.sent();
                             if (!resTrack.result) return [3 /*break*/, 6];
                             tlTrack = resTrack.result;
                             track = tlTrack.track;
-                            if (!(this._trackName != track.name)) return [3 /*break*/, 5];
+                            if (!(this._tlId !== tlTrack.tlid)) return [3 /*break*/, 5];
                             // 一旦初期化
-                            this._tlId = null;
-                            this._trackName = '--';
+                            this._tlId = tlTrack.tlid;
+                            this._trackName = track.name;
                             this._trackLength = 0;
                             this._trackProgress = 0;
                             this._artistName = '--';
                             this._year = null;
                             this._imageUri = null;
-                            this._trackName = track.name;
-                            this._tlId = tlTrack.tlid;
                             if (track.artists && 0 < track.artists.length) {
                                 this._artistName = (track.artists.length === 1)
                                     ? track.artists[0].name
@@ -556,7 +578,7 @@ define("Models/Status/Status", ["require", "exports", "Models/Bases/JsonRpcQuery
                             return [3 /*break*/, 5];
                         case 3:
                             if (!track.album.uri) return [3 /*break*/, 5];
-                            return [4 /*yield*/, this.JsonRpcRequest(Status.Methods.GetImages, {
+                            return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetImages, {
                                     uris: [track.album.uri]
                                 })];
                         case 4:
@@ -578,44 +600,156 @@ define("Models/Status/Status", ["require", "exports", "Models/Bases/JsonRpcQuery
                             this._year = null;
                             this._imageUri = null;
                             _a.label = 7;
-                        case 7: return [4 /*yield*/, this.JsonRpcRequest(Status.Methods.GetTimePosition)];
+                        case 7: return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetTimePosition)];
                         case 8:
                             resTs = _a.sent();
                             this._trackProgress = (resTs.result)
                                 ? parseInt(resTs.result, 10)
                                 : 0;
+                            return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetVolume)];
+                        case 9:
+                            resVol = _a.sent();
+                            if (resVol.result)
+                                this._volume = resVol.result;
                             console.log(this);
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
-        Status.prototype.Dispose = function () {
+        Player.prototype.Play = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this._playerState === PlayerState.Playing)
+                                return [2 /*return*/, true];
+                            if (!this._tlId)
+                                return [2 /*return*/, false];
+                            if (!(this._playerState === PlayerState.Paused)) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Resume)];
+                        case 1:
+                            _a.sent();
+                            return [3 /*break*/, 4];
+                        case 2:
+                            if (!(this._playerState === PlayerState.Stopped)) return [3 /*break*/, 4];
+                            return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Play, {
+                                    tlid: this._tlId
+                                })];
+                        case 3:
+                            _a.sent();
+                            _a.label = 4;
+                        case 4: return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Player.prototype.Pause = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this._playerState !== PlayerState.Playing)
+                                return [2 /*return*/, true];
+                            return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Pause)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Player.prototype.Next = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Next)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Player.prototype.Previous = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Previous)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Player.prototype.Seek = function (timePosition) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Seek, {
+                                time_position: timePosition
+                            })];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Player.prototype.SetVolume = function (volume) {
+            return __awaiter(this, void 0, void 0, function () {
+                var resSucceeded;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.SetVolume, {
+                                volume: volume
+                            })];
+                        case 1:
+                            resSucceeded = _a.sent();
+                            return [2 /*return*/, resSucceeded.result];
+                    }
+                });
+            });
+        };
+        Player.prototype.Dispose = function () {
             clearInterval(this._timer);
         };
-        Status.PollingIntervalMsec = 1000;
-        Status.Methods = {
+        Player.PollingIntervalMsec = 1000;
+        Player.Methods = {
             GetState: 'core.playback.get_state',
             GetCurrentTlTrack: 'core.playback.get_current_tl_track',
             GetTimePosition: 'core.playback.get_time_position',
-            GetImages: 'core.library.get_images'
+            GetImages: 'core.library.get_images',
+            Play: 'core.playback.play',
+            Resume: 'core.playback.resume',
+            Pause: 'core.playback.pause',
+            Stop: 'core.playback.stop',
+            Next: 'core.playback.next',
+            Previous: 'core.playback.previous',
+            Seek: 'core.playback.seek',
+            GetRandom: 'core.tracklist.get_random',
+            SetRandom: 'core.tracklist.set_random',
+            GetVolume: 'core.mixer.get_volume',
+            SetVolume: 'core.mixer.set_volume'
         };
-        return Status;
+        return Player;
     }(JsonRpcQueryableBase_1.default));
-    exports.default = Status;
+    exports.default = Player;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries", "Models/Status/Status"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1, Status_1) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries", "Models/Mopidies/Player", "lodash"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1, Player_1, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Sidebar = /** @class */ (function (_super) {
         __extends(Sidebar, _super);
         function Sidebar() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.status = new Status_1.default();
+            _this.player = new Player_1.default();
             return _this;
         }
         Sidebar.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
@@ -628,15 +762,26 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
                                 },
                                 onFinish: function (data) {
                                     // スライダー操作完了時のイベント
-                                    console.log('onFinish');
+                                    _this.player.SetVolume(data.from);
                                 }
                             });
                             this.volumeData = this.volumeSlider.data('ionRangeSlider');
-                            this.status.StartPolling();
+                            this.player.StartPolling();
+                            // ポーリング一回目以降の値を取得
+                            _.delay(function () {
+                                _this.volumeData.update({
+                                    from: _this.player.Volume
+                                });
+                            }, 1500);
                             return [2 /*return*/, true];
                     }
                 });
             });
+        };
+        Sidebar.prototype.GetPlayPauseIconClass = function () {
+            return (this.player.PlayerState === Player_1.PlayerState.Playing)
+                ? 'fa fa-pause'
+                : 'fa fa-play';
         };
         Sidebar.prototype.OnClickVolumeMin = function () {
             this.volumeData.update({
@@ -648,9 +793,23 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
                 from: 100
             });
         };
+        Sidebar.prototype.OnClickPrevious = function () {
+            this.player.Previous();
+        };
+        Sidebar.prototype.OnClickPlayPause = function () {
+            if (this.player.PlayerState === Player_1.PlayerState.Playing) {
+                this.player.Pause();
+            }
+            else {
+                this.player.Play();
+            }
+        };
+        Sidebar.prototype.OnClickNext = function () {
+            this.player.Next();
+        };
         Sidebar = __decorate([
             vue_class_component_2.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy Finder</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <div class=\"card siderbar-control\">\n                    <div class=\"card-body\">\n                        <img v-bind:src=\"status.ImageFullUri\" class=\"albumart\" />\n                        <h6 class=\"card-title\">{{ status.TrackName }}</h6>\n                        <span>{{ status.ArtistName }}{{ (status.Year) ? '(' + status.Year + ')' : '' }}</span>\n                        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-fast-backward\" />\n                            </button>\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-play\" />\n                            </button>\n                            <button type=\"button\" class=\"btn btn-secondary\">\n                                <i class=\"fa fa-fast-forward\" />\n                            </button>\n                        </div>\n                        <div class=\"row volume-box w-100 mt-2\">\n                            <div class=\"col-1 volume-button volume-min\">\n                                <a @click=\"OnClickVolumeMin\">\n                                    <i class=\"fa fa-volume-off\" />\n                                </a>\n                            </div>\n                            <div class=\"col-10\">\n                                <input type=\"text\"\n                                    data-type=\"single\"\n                                    data-min=\"0\"\n                                    data-max=\"100\"\n                                    data-from=\"100\"\n                                    data-grid=\"true\"\n                                    ref=\"Slider\" />\n                            </div>\n                            <div class=\"col-1 volume-button volume-max\">\n                                <a @click=\"OnClickVolumeMax\">\n                                    <i class=\"fa fa-volume-up\" />\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy Finder</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <div class=\"card siderbar-control\">\n                    <div class=\"card-body\">\n                        <img v-bind:src=\"player.ImageFullUri\" class=\"albumart\" />\n                        <h6 class=\"card-title\">{{ player.TrackName }}</h6>\n                        <span>{{ player.ArtistName }}{{ (player.Year) ? '(' + player.Year + ')' : '' }}</span>\n                        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickPrevious\">\n                                <i class=\"fa fa-fast-backward\" />\n                            </button>\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickPlayPause\">\n                                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n                            </button>\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickNext\">\n                                <i class=\"fa fa-fast-forward\" />\n                            </button>\n                        </div>\n                        <div class=\"row volume-box w-100 mt-2\">\n                            <div class=\"col-1 volume-button volume-min\">\n                                <a @click=\"OnClickVolumeMin\">\n                                    <i class=\"fa fa-volume-off\" />\n                                </a>\n                            </div>\n                            <div class=\"col-10\">\n                                <input type=\"text\"\n                                    data-type=\"single\"\n                                    data-min=\"0\"\n                                    data-max=\"100\"\n                                    data-from=\"100\"\n                                    data-grid=\"true\"\n                                    ref=\"Slider\" />\n                            </div>\n                            <div class=\"col-1 volume-button volume-max\">\n                                <a @click=\"OnClickVolumeMax\">\n                                    <i class=\"fa fa-volume-up\" />\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</aside>",
                 components: {}
             })
         ], Sidebar);
