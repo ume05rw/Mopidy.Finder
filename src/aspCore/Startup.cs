@@ -13,6 +13,7 @@ using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
 using MusicFront.Models.Relations;
 using MusicFront.Models.Tracks;
+using MusicFront.Models.WebSockets;
 using Newtonsoft.Json.Serialization;
 using System.Linq;
 
@@ -20,6 +21,8 @@ namespace MusicFront
 {
     public class Startup
     {
+        private static WebSocketStore _webSocketStore;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -112,6 +115,26 @@ namespace MusicFront
 
             app.UseStaticFiles();
             app.UseCookiePolicy();
+
+            // WebSocketお試し実装、ダメだった。--->
+            if (Startup._webSocketStore == null)
+                Startup._webSocketStore = new WebSocketStore();
+
+            var options = new WebSocketOptions { ReceiveBufferSize = 8192 };
+            app.UseWebSockets(options);
+            app.Use(async (context, next) =>
+            {
+                if (context.WebSockets.IsWebSocketRequest)
+                {
+                    var socket = await context.WebSockets.AcceptWebSocketAsync();
+                    Startup._webSocketStore.Add(socket);
+                }
+                else
+                {
+                    await next();
+                }
+            });
+            // <---
 
             app.UseMvc(routes =>
             {

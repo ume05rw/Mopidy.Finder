@@ -7,6 +7,8 @@
 
   <ItemGroup>
     <None Remove="src\Main.ts" />
+    <None Remove="src\ts\Models\Status\Status.ts" />
+    <None Remove="src\ts\Models\Status\StatusStore.ts" />
     <None Remove="src\ts\Views\Events\AdminLteEvents.ts" />
     <None Remove="src\ts\Views\Events\FinderEvents.ts" />
     <None Remove="src\ts\Libraries.ts" />
@@ -35,6 +37,7 @@
     <None Remove="tests\Models\Entities\Song.test.ts" />
     <None Remove="types\adminlte\index.d.ts" />
     <None Remove="types\ion-range-slider\index.d.ts" />
+    <None Remove="types\mopidy\index.d.ts" />
     <None Remove="types\responsive-toolkit\index.d.ts" />
   </ItemGroup>
 
@@ -59,6 +62,8 @@
 
   <ItemGroup>
     <TypeScriptCompile Include="src\ts\Controllers\RootContoller.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Status\Status.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Status\StatusStore.ts" />
     <TypeScriptCompile Include="src\ts\Views\Events\AdminLteEvents.ts" />
     <TypeScriptCompile Include="src\ts\Views\Events\FinderEvents.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />
@@ -93,11 +98,8 @@
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />
     <TypeScriptCompile Include="types\adminlte\index.d.ts" />
     <TypeScriptCompile Include="types\ion-range-slider\index.d.ts" />
+    <TypeScriptCompile Include="types\mopidy\index.d.ts" />
     <TypeScriptCompile Include="types\responsive-toolkit\index.d.ts" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="src\js\Libs\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

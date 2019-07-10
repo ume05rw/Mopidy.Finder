@@ -1,6 +1,8 @@
+/// <reference path="../../../../types/mopidy/index.d.ts" />
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
+import StatusStore from '../../Models/Status/StatusStore';
 
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -98,6 +100,8 @@ export default class Sidebar extends ViewBase {
     
     private volumeSlider: JQuery;
     private volumeData: any;
+    private mopidy: Mopidy;
+    private statusStore: StatusStore;
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
@@ -113,6 +117,8 @@ export default class Sidebar extends ViewBase {
             }
         });
         this.volumeData = this.volumeSlider.data('ionRangeSlider');
+
+        this.statusStore = new StatusStore();
 
         return true;
     }

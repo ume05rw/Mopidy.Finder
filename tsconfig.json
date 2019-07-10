@@ -55,7 +55,8 @@
 
         "paths": {
             "responsive-toolkit": [ "types/responsive-toolkit" ],
-            "admin-lte/dist/js/adminlte": [ "types/adminlte" ]
+            "admin-lte/dist/js/adminlte": [ "types/adminlte" ],
+            "mopidy": [ "types/mopidy" ]
         },
 
         // TSの型定義ファイル参照パス

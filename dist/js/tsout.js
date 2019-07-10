@@ -55,7 +55,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "../css/site.css", "admin-lte/dist/js/adminlte", "admin-lte/plugins/bootstrap/js/bootstrap", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "../css/site.css", "admin-lte/dist/js/adminlte", "admin-lte/plugins/bootstrap/js/bootstrap", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -100,6 +100,12 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         Libraries.ResponsiveBootstrapToolkit = ((ResponsiveBootstrapToolkit.default)
             ? ResponsiveBootstrapToolkit.default
             : ResponsiveBootstrapToolkit);
+        /**
+         * Mopidy
+         */
+        Libraries.Mopidy = ((Mopidy.default)
+            ? Mopidy.default
+            : Mopidy);
         return Libraries;
     }());
     exports.default = Libraries;
@@ -159,7 +165,365 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "Views/Bases/ViewBas
     }(ViewBase_1.default));
     exports.default = HeaderBar;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1) {
+define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs"], function (require, exports, axios_1, qs) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var XhrQueryableBase = /** @class */ (function () {
+        function XhrQueryableBase() {
+        }
+        // Axios+qsによるURIパラメータ生成
+        // https://blog.ryou103.com/post/axios-send-object-query/
+        XhrQueryableBase.ParamsSerializer = function (params) {
+            return qs.stringify(params);
+        };
+        XhrQueryableBase.prototype.ParseResponse = function (data) {
+            if (!data)
+                return {
+                    Succeeded: false,
+                    Errors: [{
+                            Message: 'Unexpected Error'
+                        }]
+                };
+            return ((typeof data == 'object') && data.hasOwnProperty('Succeeded'))
+                // dataが定型応答のとき
+                ? data
+                // dataが定型応答のとき
+                : {
+                    Succeeded: true,
+                    Result: data
+                };
+        };
+        XhrQueryableBase.prototype.QueryGet = function (url, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var response, ex_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, XhrQueryableBase.XhrInstance.get(url, {
+                                    params: params,
+                                    paramsSerializer: XhrQueryableBase.ParamsSerializer
+                                })];
+                        case 1:
+                            response = _a.sent();
+                            return [2 /*return*/, this.ParseResponse(response.data)];
+                        case 2:
+                            ex_1 = _a.sent();
+                            console.error("QueryGet.Error: url=" + url);
+                            if (params) {
+                                console.error('params:');
+                                console.error(params);
+                            }
+                            console.error(ex_1);
+                            return [3 /*break*/, 3];
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        XhrQueryableBase.prototype.QueryPost = function (url, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var response, ex_2;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, XhrQueryableBase.XhrInstance.post(url, params)];
+                        case 1:
+                            response = _a.sent();
+                            return [2 /*return*/, this.ParseResponse(response.data)];
+                        case 2:
+                            ex_2 = _a.sent();
+                            console.error("QueryPost.Error: url=" + url);
+                            if (params) {
+                                console.error('params:');
+                                console.error(params);
+                            }
+                            console.error(ex_2);
+                            return [2 /*return*/, this.ParseResponse(null)];
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        XhrQueryableBase.prototype.QueryPut = function (url, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var response, ex_3;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, XhrQueryableBase.XhrInstance.put(url, params)];
+                        case 1:
+                            response = _a.sent();
+                            return [2 /*return*/, this.ParseResponse(response.data)];
+                        case 2:
+                            ex_3 = _a.sent();
+                            console.error("QueryPut.Error: url=" + url);
+                            if (params) {
+                                console.error('params:');
+                                console.error(params);
+                            }
+                            console.error(ex_3);
+                            return [2 /*return*/, this.ParseResponse(null)];
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        XhrQueryableBase.prototype.QueryDelete = function (url, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var response, ex_4;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, XhrQueryableBase.XhrInstance.delete(url, params)];
+                        case 1:
+                            response = _a.sent();
+                            return [2 /*return*/, this.ParseResponse(response.data)];
+                        case 2:
+                            ex_4 = _a.sent();
+                            console.error("QueryDelete.Error: url=" + url);
+                            if (params) {
+                                console.error('params:');
+                                console.error(params);
+                            }
+                            console.error(ex_4);
+                            return [2 /*return*/, this.ParseResponse(null)];
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        XhrQueryableBase.XhrInstance = axios_1.default.create({
+            //// APIの基底URLが存在するとき
+            baseURL: 'http://localhost:8080/',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            responseType: 'json'
+        });
+        return XhrQueryableBase;
+    }());
+    exports.default = XhrQueryableBase;
+});
+define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var JsonRpcQueryableBase = /** @class */ (function (_super) {
+        __extends(JsonRpcQueryableBase, _super);
+        function JsonRpcQueryableBase() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        JsonRpcQueryableBase.prototype.QueryJsonRpc = function (params) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result, ex_5, error;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            params.jsonrpc = '2.0';
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 3, , 4]);
+                            return [4 /*yield*/, XhrQueryableBase_1.default.XhrInstance.post(JsonRpcQueryableBase.Url, params)];
+                        case 2:
+                            response = _a.sent();
+                            result = response.data;
+                            if (result.error) {
+                                console.error("JsonRpcError: method=" + params.method);
+                                console.error(result);
+                            }
+                            return [2 /*return*/, result];
+                        case 3:
+                            ex_5 = _a.sent();
+                            error = {
+                                error: "Network Error: " + ex_5
+                            };
+                            if (params.id)
+                                error.id = params.id;
+                            console.error("JsonRpcError: method=" + params.method);
+                            console.error(error);
+                            return [2 /*return*/, error];
+                        case 4: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        ;
+        JsonRpcQueryableBase.prototype.JsonRpcRequest = function (method, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var query, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            query = {
+                                method: method,
+                                id: JsonRpcQueryableBase.IdCounter
+                            };
+                            if (params)
+                                query.params = params;
+                            JsonRpcQueryableBase.IdCounter++;
+                            return [4 /*yield*/, this.QueryJsonRpc(query)];
+                        case 1:
+                            result = _a.sent();
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        JsonRpcQueryableBase.prototype.JsonRpcNotice = function (method, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var query, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            query = {
+                                method: method
+                            };
+                            if (params)
+                                query.params = params;
+                            return [4 /*yield*/, this.QueryJsonRpc(query)];
+                        case 1:
+                            result = _a.sent();
+                            return [2 /*return*/, !(result.error)];
+                    }
+                });
+            });
+        };
+        JsonRpcQueryableBase.Url = 'JsonRpc';
+        JsonRpcQueryableBase.IdCounter = 1;
+        return JsonRpcQueryableBase;
+    }(XhrQueryableBase_1.default));
+    exports.default = JsonRpcQueryableBase;
+});
+define("Models/Status/Status", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Status = /** @class */ (function () {
+        function Status() {
+            this.IsPlaying = false;
+            this.TrackName = '';
+            this.TrackLength = 0;
+            this.TrackProgress = 0;
+            this.ArtistName = '';
+            this.AlbumImageUri = '';
+            this.Year = null;
+        }
+        return Status;
+    }());
+    exports.default = Status;
+});
+define("Models/Status/StatusStore", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Status/Status"], function (require, exports, JsonRpcQueryableBase_1, Status_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var StatusStore = /** @class */ (function (_super) {
+        __extends(StatusStore, _super);
+        function StatusStore() {
+            var _this = _super.call(this) || this;
+            _this._status = new Status_1.default();
+            _this._methods = {
+                GetState: 'core.playback.get_state',
+                GetCurrentTlTrack: 'core.playback.get_current_tl_track',
+                GetTimePosition: 'core.playback.get_time_position',
+                GetImages: 'core.library.get_images'
+            };
+            _this.Polling();
+            return _this;
+        }
+        StatusStore.prototype.Polling = function () {
+            var _this = this;
+            this._timer = setInterval(function () {
+                _this.GetStatus();
+            }, 1000);
+        };
+        StatusStore.prototype.GetStatus = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var resState, resTrack, track, resImages, images, resTs;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(this._methods.GetState)];
+                        case 1:
+                            resState = _a.sent();
+                            if (resState.result)
+                                this._status.IsPlaying = (resState.result == 'playing');
+                            return [4 /*yield*/, this.JsonRpcRequest(this._methods.GetCurrentTlTrack)];
+                        case 2:
+                            resTrack = _a.sent();
+                            if (!resTrack.result) return [3 /*break*/, 6];
+                            track = resTrack.result.track;
+                            if (!(this._status.TrackName != track.name)) return [3 /*break*/, 5];
+                            this._status.TrackName = track.name;
+                            if (track.artists && 0 < track.artists.length) {
+                                this._status.ArtistName = (track.artists.length === 1)
+                                    ? track.artists[0].name
+                                    : track.artists[0].name + ' and more...';
+                            }
+                            else {
+                                this._status.ArtistName = '';
+                            }
+                            if (track.date && 4 <= track.date.length) {
+                                this._status.Year = (4 < track.date.length)
+                                    ? parseInt(track.date.substring(0, 4), 10)
+                                    : parseInt(track.date, 10);
+                            }
+                            this._status.TrackLength = (track.length)
+                                ? parseInt(track.length, 10)
+                                : 0;
+                            if (!track.album) return [3 /*break*/, 5];
+                            if (!(track.album.images && 0 < track.album.images.length)) return [3 /*break*/, 3];
+                            this._status.AlbumImageUri = track.album.images[0];
+                            return [3 /*break*/, 5];
+                        case 3:
+                            if (!track.album.uri) return [3 /*break*/, 5];
+                            return [4 /*yield*/, this.JsonRpcRequest(this._methods.GetImages, {
+                                    uris: [track.album.uri]
+                                })];
+                        case 4:
+                            resImages = _a.sent();
+                            if (resImages.result) {
+                                images = resImages.result[track.album.uri];
+                                if (images && 0 < images.length) {
+                                    this._status.AlbumImageUri = images[0];
+                                }
+                            }
+                            _a.label = 5;
+                        case 5: return [3 /*break*/, 7];
+                        case 6:
+                            this._status.TrackName = '--';
+                            this._status.ArtistName = '--';
+                            this._status.Year = null;
+                            this._status.TrackLength = 0;
+                            this._status.AlbumImageUri = null;
+                            _a.label = 7;
+                        case 7: return [4 /*yield*/, this.JsonRpcRequest(this._methods.GetTimePosition)];
+                        case 8:
+                            resTs = _a.sent();
+                            this._status.TrackProgress = (resTs.result)
+                                ? parseInt(resTs.result, 10)
+                                : 0;
+                            console.log(this._status);
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        StatusStore.prototype.Dispose = function () {
+            clearTimeout(this._timer);
+        };
+        return StatusStore;
+    }(JsonRpcQueryableBase_1.default));
+    exports.default = StatusStore;
+});
+define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries", "Models/Status/StatusStore"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1, StatusStore_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Sidebar = /** @class */ (function (_super) {
@@ -185,6 +549,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
                                 }
                             });
                             this.volumeData = this.volumeSlider.data('ionRangeSlider');
+                            this.statusStore = new StatusStore_1.default();
                             return [2 /*return*/, true];
                     }
                 });
@@ -460,156 +825,7 @@ define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "lodash", "Model
     }());
     exports.default = AlbumTracks;
 });
-define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs"], function (require, exports, axios_1, qs) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var XhrQueryableBase = /** @class */ (function () {
-        function XhrQueryableBase() {
-        }
-        // Axios+qsによるURIパラメータ生成
-        // https://blog.ryou103.com/post/axios-send-object-query/
-        XhrQueryableBase.ParamsSerializer = function (params) {
-            return qs.stringify(params);
-        };
-        XhrQueryableBase.prototype.ParseResponse = function (data) {
-            if (!data)
-                return {
-                    Succeeded: false,
-                    Errors: [{
-                            Message: 'Unexpected Error'
-                        }]
-                };
-            return ((typeof data == 'object') && data.hasOwnProperty('Succeeded'))
-                // dataが定型応答のとき
-                ? data
-                // dataが定型応答のとき
-                : {
-                    Succeeded: true,
-                    Result: data
-                };
-        };
-        XhrQueryableBase.prototype.QueryGet = function (url, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var response, ex_1;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, XhrQueryableBase.XhrInstance.get(url, {
-                                    params: params,
-                                    paramsSerializer: XhrQueryableBase.ParamsSerializer
-                                })];
-                        case 1:
-                            response = _a.sent();
-                            return [2 /*return*/, this.ParseResponse(response.data)];
-                        case 2:
-                            ex_1 = _a.sent();
-                            console.error("QueryGet.Error: url=" + url);
-                            if (params) {
-                                console.error('params:');
-                                console.error(params);
-                            }
-                            console.error(ex_1);
-                            return [3 /*break*/, 3];
-                        case 3: return [2 /*return*/];
-                    }
-                });
-            });
-        };
-        XhrQueryableBase.prototype.QueryPost = function (url, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var response, ex_2;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, XhrQueryableBase.XhrInstance.post(url, params)];
-                        case 1:
-                            response = _a.sent();
-                            return [2 /*return*/, this.ParseResponse(response.data)];
-                        case 2:
-                            ex_2 = _a.sent();
-                            console.error("QueryPost.Error: url=" + url);
-                            if (params) {
-                                console.error('params:');
-                                console.error(params);
-                            }
-                            console.error(ex_2);
-                            return [2 /*return*/, this.ParseResponse(null)];
-                        case 3: return [2 /*return*/];
-                    }
-                });
-            });
-        };
-        XhrQueryableBase.prototype.QueryPut = function (url, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var response, ex_3;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, XhrQueryableBase.XhrInstance.put(url, params)];
-                        case 1:
-                            response = _a.sent();
-                            return [2 /*return*/, this.ParseResponse(response.data)];
-                        case 2:
-                            ex_3 = _a.sent();
-                            console.error("QueryPut.Error: url=" + url);
-                            if (params) {
-                                console.error('params:');
-                                console.error(params);
-                            }
-                            console.error(ex_3);
-                            return [2 /*return*/, this.ParseResponse(null)];
-                        case 3: return [2 /*return*/];
-                    }
-                });
-            });
-        };
-        XhrQueryableBase.prototype.QueryDelete = function (url, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var response, ex_4;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, XhrQueryableBase.XhrInstance.delete(url, params)];
-                        case 1:
-                            response = _a.sent();
-                            return [2 /*return*/, this.ParseResponse(response.data)];
-                        case 2:
-                            ex_4 = _a.sent();
-                            console.error("QueryDelete.Error: url=" + url);
-                            if (params) {
-                                console.error('params:');
-                                console.error(params);
-                            }
-                            console.error(ex_4);
-                            return [2 /*return*/, this.ParseResponse(null)];
-                        case 3: return [2 /*return*/];
-                    }
-                });
-            });
-        };
-        XhrQueryableBase.XhrInstance = axios_1.default.create({
-            //// APIの基底URLが存在するとき
-            baseURL: 'http://localhost:8080/',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            responseType: 'json'
-        });
-        return XhrQueryableBase;
-    }());
-    exports.default = XhrQueryableBase;
-});
-define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_2, XhrQueryableBase_1) {
+define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_2, XhrQueryableBase_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var StoreBase = /** @class */ (function (_super) {
@@ -620,7 +836,7 @@ define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bas
             return _this;
         }
         return StoreBase;
-    }(XhrQueryableBase_1.default));
+    }(XhrQueryableBase_2.default));
     exports.default = StoreBase;
 });
 define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bases/StoreBase", "Models/AlbumTracks/AlbumTracks"], function (require, exports, StoreBase_1, AlbumTracks_1) {
@@ -1470,96 +1686,5 @@ define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"],
         return Main;
     }());
     var main = (new Main()).Init();
-});
-define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var JsonRpcQueryableBase = /** @class */ (function (_super) {
-        __extends(JsonRpcQueryableBase, _super);
-        function JsonRpcQueryableBase() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        JsonRpcQueryableBase.prototype.QueryJsonRpc = function (params) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, result, ex_5, error;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            params.jsonrpc = '2.0';
-                            _a.label = 1;
-                        case 1:
-                            _a.trys.push([1, 3, , 4]);
-                            return [4 /*yield*/, XhrQueryableBase_2.default.XhrInstance.post(JsonRpcQueryableBase.Url, params)];
-                        case 2:
-                            response = _a.sent();
-                            result = response.data;
-                            if (result.error) {
-                                console.error("JsonRpcError: method=" + params.method);
-                                console.error(result);
-                            }
-                            return [2 /*return*/, result];
-                        case 3:
-                            ex_5 = _a.sent();
-                            error = {
-                                error: "Network Error: " + ex_5
-                            };
-                            if (params.id)
-                                error.id = params.id;
-                            console.error("JsonRpcError: method=" + params.method);
-                            console.error(error);
-                            return [2 /*return*/, error];
-                        case 4: return [2 /*return*/];
-                    }
-                });
-            });
-        };
-        ;
-        JsonRpcQueryableBase.prototype.JsonRpcRequest = function (method, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var query, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            query = {
-                                method: method,
-                                id: JsonRpcQueryableBase.IdCounter
-                            };
-                            if (params)
-                                query.params = params;
-                            JsonRpcQueryableBase.IdCounter++;
-                            return [4 /*yield*/, this.QueryJsonRpc(query)];
-                        case 1:
-                            result = _a.sent();
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        JsonRpcQueryableBase.prototype.JsonRpcNotice = function (method, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var query, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            query = {
-                                method: method
-                            };
-                            if (params)
-                                query.params = params;
-                            return [4 /*yield*/, this.QueryJsonRpc(query)];
-                        case 1:
-                            result = _a.sent();
-                            return [2 /*return*/, !(result.error)];
-                    }
-                });
-            });
-        };
-        JsonRpcQueryableBase.Url = 'JsonRpc';
-        JsonRpcQueryableBase.IdCounter = 1;
-        return JsonRpcQueryableBase;
-    }(XhrQueryableBase_2.default));
-    exports.default = JsonRpcQueryableBase;
 });
 //# sourceMappingURL=tsout.js.map

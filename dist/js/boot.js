@@ -65,6 +65,14 @@ define('linq', ["exports"], function (exports) {
     exports.default = window.__globals['linq'];
 });
 
+// mopidy
+define('mopidy', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['mopidy'];
+});
+
+
 // admin-lte/dist/js/adminlte
 define('admin-lte/dist/js/adminlte', ["exports"], function (exports) {
     "use strict";

@@ -1,3 +1,4 @@
+/// <reference path="../../types/mopidy/index.d.ts" />
 import 'animate.css/animate.css';
 import 'font-awesome/css/font-awesome.css';
 import 'admin-lte/dist/css/adminlte.css';
@@ -13,6 +14,7 @@ import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 
 import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
 import * as Enumerable from 'linq';
+import * as Mopidy from 'mopidy';
 
 /**
  * VS開発時のステップデバッグ環境を維持するため、開発環境ではAMD形式で
@@ -47,6 +49,12 @@ export default class Libraries {
         ? (ResponsiveBootstrapToolkit as any).default
         : ResponsiveBootstrapToolkit) as typeof ResponsiveBootstrapToolkit;
 
+    /**
+     * Mopidy
+     */
+    public static readonly Mopidy = (((Mopidy as any).default)
+        ? (Mopidy as any).default
+        : Mopidy) as typeof Mopidy;
 
     public static Initialize(): void {
         // ResponsiveBootstrapToolkitをbootstrap4に対応させる
