@@ -27,7 +27,7 @@ export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
             const response = await XhrQueryableBase.XhrInstance.post(JsonRpcQueryableBase.Url, params);
             const result = response.data as JsonRpcResultParams;
 
-            if (result.error) {
+            if (result && result.error) {
                 console.error(`JsonRpcError: method=${params.method}`);
                 console.error(result);
             }
@@ -75,6 +75,6 @@ export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
 
         const result = await this.QueryJsonRpc(query);
 
-        return !(result.error);
+        return (!result || (result && !result.error));
     }
 }

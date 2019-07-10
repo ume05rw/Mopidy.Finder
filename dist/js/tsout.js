@@ -165,11 +165,108 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "Views/Bases/ViewBas
     }(ViewBase_1.default));
     exports.default = HeaderBar;
 });
-define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs"], function (require, exports, axios_1, qs) {
+define("EventableBase", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var XhrQueryableBase = /** @class */ (function () {
+    var EventReference = /** @class */ (function () {
+        function EventReference() {
+        }
+        return EventReference;
+    }());
+    exports.EventReference = EventReference;
+    /**
+     * イベント機能実装の抽象クラス
+     */
+    var EventableBase = /** @class */ (function () {
+        function EventableBase() {
+            this.eventHandlers = [];
+        }
+        EventableBase.prototype.AddEventListener = function (name, handler, bindTarget) {
+            var eRef = new EventReference();
+            eRef.Name = name;
+            eRef.Handler = handler;
+            // デフォルトでthisバインド、をやめる。
+            eRef.BindTarget = bindTarget;
+            //eRef.BindTarget = (!bindTarget)
+            //    ? this
+            //    : bindTarget;
+            this.eventHandlers.push(eRef);
+        };
+        EventableBase.prototype.RemoveEventListener = function (name, handler) {
+            var _this = this;
+            if (handler) {
+                // handlerが指定されているとき
+                var key_1 = -1;
+                var eRef = _.find(this.eventHandlers, function (er, idx) {
+                    key_1 = idx;
+                    // ※注意※
+                    // 関数は継承関係のプロトタイプ参照都合で同一オブジェクトになりやすい。
+                    // Mittでも同じ実装だった...。
+                    return (er.Name === name
+                        && er.Handler === handler);
+                });
+                if (key_1 >= 0) {
+                    this.eventHandlers.splice(key_1, 1);
+                    eRef.Handler = null;
+                    eRef.Name = null;
+                }
+            }
+            else {
+                // handlerが指定されないとき
+                var eRefs_1 = [];
+                _.each(this.eventHandlers, function (er) {
+                    if (er.Name === name)
+                        eRefs_1.push(er);
+                });
+                _.each(eRefs_1, function (eRef) {
+                    var idx = _this.eventHandlers.indexOf(eRef);
+                    _this.eventHandlers.splice(idx, 1);
+                    eRef.Handler = null;
+                    eRef.Name = null;
+                });
+            }
+        };
+        EventableBase.prototype.DispatchEvent = function (name, params) {
+            if (params === void 0) { params = null; }
+            _.each(this.eventHandlers, function (er) {
+                if (er.Name === name) {
+                    try {
+                        // デフォルトでthisバインド、をやめる。
+                        //// thisをバインドして実行。そのままだとEventReferenceがthisになる。
+                        //er.Handler.bind(er.BindTarget)(params);
+                        (er.BindTarget)
+                            ? er.Handler.bind(er.BindTarget)(params)
+                            : er.Handler(params);
+                    }
+                    catch (e) {
+                        console.error(e);
+                    }
+                }
+            });
+        };
+        EventableBase.prototype.Dispose = function () {
+            var _this = this;
+            _.each(this.eventHandlers, function (eRef, index) {
+                eRef.Handler = null;
+                eRef.Name = null;
+                delete _this.eventHandlers[index];
+            });
+            this.eventHandlers = null;
+            this.AddEventListener = null;
+            this.RemoveEventListener = null;
+            this.DispatchEvent = null;
+        };
+        return EventableBase;
+    }());
+    exports.default = EventableBase;
+});
+define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "EventableBase"], function (require, exports, axios_1, qs, EventableBase_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var XhrQueryableBase = /** @class */ (function (_super) {
+        __extends(XhrQueryableBase, _super);
         function XhrQueryableBase() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         // Axios+qsによるURIパラメータ生成
         // https://blog.ryou103.com/post/axios-send-object-query/
@@ -311,7 +408,7 @@ define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs"], f
             responseType: 'json'
         });
         return XhrQueryableBase;
-    }());
+    }(EventableBase_1.default));
     exports.default = XhrQueryableBase;
 });
 define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_1) {
@@ -336,7 +433,7 @@ define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases
                         case 2:
                             response = _a.sent();
                             result = response.data;
-                            if (result.error) {
+                            if (result && result.error) {
                                 console.error("JsonRpcError: method=" + params.method);
                                 console.error(result);
                             }
@@ -394,7 +491,7 @@ define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases
                             return [4 /*yield*/, this.QueryJsonRpc(query)];
                         case 1:
                             result = _a.sent();
-                            return [2 /*return*/, !(result.error)];
+                            return [2 /*return*/, (!result || (result && !result.error))];
                     }
                 });
             });
@@ -424,6 +521,12 @@ define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, ex
 define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQueryableBase"], function (require, exports, JsonRpcQueryableBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PlayerEvents = {
+        TrackChanged: 'TrackChanged',
+        PlayerStateChanged: 'PlayerStateChanged',
+        ProgressChanged: 'ProgressChanged',
+        VolumeChanged: 'VolumeChanged'
+    };
     var PlayerState;
     (function (PlayerState) {
         PlayerState["Playing"] = "playing";
@@ -444,6 +547,18 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
             _this._year = null;
             _this._imageUri = null;
             _this._volume = 0;
+            _this._backupValues = {
+                TlId: null,
+                PlayerState: PlayerState.Paused,
+                IsPlaying: false,
+                TrackName: '',
+                TrackLength: 0,
+                TrackProgress: 0,
+                ArtistName: '',
+                ImageUri: null,
+                Year: 0,
+                Volume: 0
+            };
             return _this;
         }
         Object.defineProperty(Player.prototype, "TlId", {
@@ -534,7 +649,9 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                 var resState, resTrack, tlTrack, track, resImages, images, resTs, resVol;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetState)];
+                        case 0:
+                            this.SetBackupValues();
+                            return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetState)];
                         case 1:
                             resState = _a.sent();
                             if (resState.result) {
@@ -611,11 +728,35 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                             resVol = _a.sent();
                             if (resVol.result)
                                 this._volume = resVol.result;
-                            console.log(this);
+                            this.DetectChanges();
                             return [2 /*return*/, true];
                     }
                 });
             });
+        };
+        Player.prototype.SetBackupValues = function () {
+            this._backupValues = {
+                TlId: this.TlId,
+                PlayerState: this.PlayerState,
+                IsPlaying: this.IsPlaying,
+                TrackName: this.TrackName,
+                TrackLength: this.TrackLength,
+                TrackProgress: this.TrackProgress,
+                ArtistName: this.ArtistName,
+                ImageUri: this.ImageUri,
+                Year: this.Year,
+                Volume: this.Volume
+            };
+        };
+        Player.prototype.DetectChanges = function () {
+            if (this._backupValues.TlId !== this.TlId)
+                this.DispatchEvent(exports.PlayerEvents.TrackChanged);
+            if (this._backupValues.PlayerState !== this.PlayerState)
+                this.DispatchEvent(exports.PlayerEvents.PlayerStateChanged);
+            if (this._backupValues.TrackProgress !== this.TrackProgress)
+                this.DispatchEvent(exports.PlayerEvents.ProgressChanged);
+            if (this._backupValues.Volume !== this.Volume)
+                this.DispatchEvent(exports.PlayerEvents.VolumeChanged);
         };
         Player.prototype.Play = function () {
             return __awaiter(this, void 0, void 0, function () {
@@ -737,7 +878,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_1.default));
     exports.default = Player;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries", "Models/Mopidies/Player", "lodash"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1, Player_1, _) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries", "Models/Mopidies/Player"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1, Player_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Sidebar = /** @class */ (function (_super) {
@@ -766,13 +907,12 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
                                 }
                             });
                             this.volumeData = this.volumeSlider.data('ionRangeSlider');
-                            this.player.StartPolling();
-                            // ポーリング一回目以降の値を取得
-                            _.delay(function () {
+                            this.player.AddEventListener(Player_1.PlayerEvents.VolumeChanged, function () {
                                 _this.volumeData.update({
                                     from: _this.player.Volume
                                 });
-                            }, 1500);
+                            });
+                            this.player.StartPolling();
                             return [2 /*return*/, true];
                     }
                 });
@@ -809,7 +949,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
         };
         Sidebar = __decorate([
             vue_class_component_2.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy Finder</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <div class=\"card siderbar-control\">\n                    <div class=\"card-body\">\n                        <img v-bind:src=\"player.ImageFullUri\" class=\"albumart\" />\n                        <h6 class=\"card-title\">{{ player.TrackName }}</h6>\n                        <span>{{ player.ArtistName }}{{ (player.Year) ? '(' + player.Year + ')' : '' }}</span>\n                        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickPrevious\">\n                                <i class=\"fa fa-fast-backward\" />\n                            </button>\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickPlayPause\">\n                                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n                            </button>\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickNext\">\n                                <i class=\"fa fa-fast-forward\" />\n                            </button>\n                        </div>\n                        <div class=\"row volume-box w-100 mt-2\">\n                            <div class=\"col-1 volume-button volume-min\">\n                                <a @click=\"OnClickVolumeMin\">\n                                    <i class=\"fa fa-volume-off\" />\n                                </a>\n                            </div>\n                            <div class=\"col-10\">\n                                <input type=\"text\"\n                                    data-type=\"single\"\n                                    data-min=\"0\"\n                                    data-max=\"100\"\n                                    data-from=\"100\"\n                                    data-grid=\"true\"\n                                    ref=\"Slider\" />\n                            </div>\n                            <div class=\"col-1 volume-button volume-max\">\n                                <a @click=\"OnClickVolumeMax\">\n                                    <i class=\"fa fa-volume-up\" />\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy Finder</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\">\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\">\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <div class=\"card siderbar-control\">\n                    <div class=\"card-body\">\n                        <img v-bind:src=\"player.ImageFullUri\" class=\"albumart\" />\n                        <h6 class=\"card-title\">{{ player.TrackName }}</h6>\n                        <span>{{ player.ArtistName }}{{ (player.Year) ? '(' + player.Year + ')' : '' }}</span>\n                        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickPrevious\">\n                                <i class=\"fa fa-fast-backward\" />\n                            </button>\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickPlayPause\">\n                                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n                            </button>\n                            <button type=\"button\"\n                                class=\"btn btn-secondary\"\n                                @click=\"OnClickNext\">\n                                <i class=\"fa fa-fast-forward\" />\n                            </button>\n                        </div>\n                        <div class=\"row volume-box w-100 mt-2\">\n                            <div class=\"col-1 volume-button volume-min\">\n                                <a @click=\"OnClickVolumeMin\">\n                                    <i class=\"fa fa-volume-off\" />\n                                </a>\n                            </div>\n                            <div class=\"col-10\">\n                                <input type=\"text\"\n                                    data-type=\"single\"\n                                    data-min=\"0\"\n                                    data-max=\"100\"\n                                    data-from=\"100\"\n                                    data-grid=\"true\"\n                                    data-hide-min-max=\"true\"\n                                    ref=\"Slider\" />\n                            </div>\n                            <div class=\"col-1 volume-button volume-max\">\n                                <a @click=\"OnClickVolumeMax\">\n                                    <i class=\"fa fa-volume-up\" />\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</aside>",
                 components: {}
             })
         ], Sidebar);

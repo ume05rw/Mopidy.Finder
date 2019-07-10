@@ -1,7 +1,7 @@
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
-import Player, { PlayerState } from '../../Models/Mopidies/Player';
+import Player, { PlayerState, PlayerEvents } from '../../Models/Mopidies/Player';
 import * as _ from 'lodash';
 
 @Component({
@@ -84,6 +84,7 @@ import * as _ from 'lodash';
                                     data-max="100"
                                     data-from="100"
                                     data-grid="true"
+                                    data-hide-min-max="true"
                                     ref="Slider" />
                             </div>
                             <div class="col-1 volume-button volume-max">
@@ -122,14 +123,13 @@ export default class Sidebar extends ViewBase {
         });
         this.volumeData = this.volumeSlider.data('ionRangeSlider');
 
-        this.player.StartPolling();
-
-        // ポーリング一回目以降の値を取得
-        _.delay(() => {
+        this.player.AddEventListener(PlayerEvents.VolumeChanged, () => {
             this.volumeData.update({
                 from: this.player.Volume
             });
-        }, 1500);
+        });
+
+        this.player.StartPolling();
 
         return true;
     }

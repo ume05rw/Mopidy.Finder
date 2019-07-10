@@ -1,5 +1,6 @@
 import Axios, { AxiosInstance } from 'axios';
 import * as qs from 'qs';
+import EventableBase from '../../EventableBase';
 
 export interface XhrError {
     Message: string;
@@ -13,7 +14,7 @@ export interface XhrResult {
     Errors?: XhrError[]
 }
 
-export default abstract class XhrQueryableBase {
+export default abstract class XhrQueryableBase extends EventableBase {
 
     // Axios+qsによるURIパラメータ生成
     // https://blog.ryou103.com/post/axios-send-object-query/

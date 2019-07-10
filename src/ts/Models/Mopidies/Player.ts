@@ -1,15 +1,36 @@
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import ITlTrack from '../Mopidies/ITlTrack';
 
+export const PlayerEvents = {
+    TrackChanged: 'TrackChanged',
+    PlayerStateChanged: 'PlayerStateChanged',
+    ProgressChanged: 'ProgressChanged',
+    VolumeChanged: 'VolumeChanged'
+};
+
 export enum PlayerState {
     Playing = 'playing',
     Stopped = 'stopped',
     Paused = 'paused'
 }
 
-export default class Player extends JsonRpcQueryableBase {
+export interface IStatus {
+    TlId: number;
+    PlayerState: PlayerState;
+    IsPlaying: boolean;
+    TrackName: string;
+    TrackLength: number;
+    TrackProgress: number;
+    ArtistName: string;
+    ImageUri: string;
+    Year: number;
+    Volume: number;
+}
+
+export default class Player extends JsonRpcQueryableBase implements IStatus {
 
     private static readonly PollingIntervalMsec = 1000;
+
     private static readonly Methods = {
         GetState: 'core.playback.get_state',
         GetCurrentTlTrack: 'core.playback.get_current_tl_track',
@@ -42,6 +63,20 @@ export default class Player extends JsonRpcQueryableBase {
     private _imageUri: string = null;
     private _volume: number = 0;
     private _timer: number;
+
+    private _backupValues: IStatus = {
+        TlId: null,
+        PlayerState: PlayerState.Paused,
+        IsPlaying: false,
+        TrackName: '',
+        TrackLength: 0,
+        TrackProgress: 0,
+        ArtistName: '',
+        ImageUri: null,
+        Year: 0,
+        Volume: 0
+    }
+
 
     public get TlId(): number {
         return this._tlId;
@@ -86,6 +121,9 @@ export default class Player extends JsonRpcQueryableBase {
     }
 
     private async Polling(): Promise<boolean> {
+
+        this.SetBackupValues();
+
         const resState = await this.JsonRpcRequest(Player.Methods.GetState);
         if (resState.result) {
             this._isPlaying = (resState.result == 'playing');
@@ -160,9 +198,35 @@ export default class Player extends JsonRpcQueryableBase {
         if (resVol.result)
             this._volume = resVol.result as number;
 
-        console.log(this);
+        this.DetectChanges();
 
         return true;
+    }
+
+    private SetBackupValues(): void {
+        this._backupValues = {
+            TlId: this.TlId,
+            PlayerState: this.PlayerState,
+            IsPlaying: this.IsPlaying,
+            TrackName: this.TrackName,
+            TrackLength: this.TrackLength,
+            TrackProgress: this.TrackProgress,
+            ArtistName: this.ArtistName,
+            ImageUri: this.ImageUri,
+            Year: this.Year,
+            Volume: this.Volume
+        };
+    }
+
+    private DetectChanges(): void {
+        if (this._backupValues.TlId !== this.TlId)
+            this.DispatchEvent(PlayerEvents.TrackChanged);
+        if (this._backupValues.PlayerState !== this.PlayerState)
+            this.DispatchEvent(PlayerEvents.PlayerStateChanged);
+        if (this._backupValues.TrackProgress !== this.TrackProgress)
+            this.DispatchEvent(PlayerEvents.ProgressChanged);
+        if (this._backupValues.Volume !== this.Volume)
+            this.DispatchEvent(PlayerEvents.VolumeChanged);
     }
 
     public async Play(): Promise<boolean> {

@@ -56,7 +56,8 @@
         "paths": {
             "responsive-toolkit": [ "types/responsive-toolkit" ],
             "admin-lte/dist/js/adminlte": [ "types/adminlte" ],
-            "mopidy": [ "types/mopidy" ]
+            "mopidy": [ "types/mopidy" ],
+            "events": [ "node_modules/@types/node/events.d.ts"]
         },
 
         // TSの型定義ファイル参照パス
