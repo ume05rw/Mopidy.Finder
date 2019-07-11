@@ -1,6 +1,5 @@
-import * as _ from 'lodash';
-import { default as GenreArtist, IGenreArtist } from '../Relations/GenreArtist';
 import { default as GenreAlbum, IGenreAlbum } from '../Relations/GenreAlbum';
+import { default as GenreArtist, IGenreArtist } from '../Relations/GenreArtist';
 
 export interface IGenre {
     Id: number;

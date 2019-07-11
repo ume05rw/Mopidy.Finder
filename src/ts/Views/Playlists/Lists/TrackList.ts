@@ -1,13 +1,11 @@
 import Component from 'vue-class-component';
 import { PagenatedResult } from '../../../Models/Bases/StoreBase';
-import ITrack from '../../../Models/Mopidies/ITrack';
 import Playlist from '../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../Models/Playlists/PlaylistStore';
+import Track from '../../../Models/Tracks/Track';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionList from '../../Shared/SelectionList';
 import SelectionTrack from '../Selections/SelectionTrack';
-import Track from '../../../Models/Tracks/Track';
-import * as _ from 'lodash';
 
 @Component({
     template: `<div class="col-md-9">

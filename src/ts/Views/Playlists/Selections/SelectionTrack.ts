@@ -1,8 +1,6 @@
-import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import Track from '../../../Models/Tracks/Track';
-import PlaylistStore from '../../../Models/Playlists/PlaylistStore';
 import ViewBase from '../../Bases/ViewBase';
 import { default as SelectionEvents, ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 

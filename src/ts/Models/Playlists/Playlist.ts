@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import IRef from '../Mopidies/IRef';
 import ITrack from '../Mopidies/ITrack';
 import Track from '../Tracks/Track';
@@ -55,9 +54,12 @@ export default class Playlist {
 
     public static CreateArrayByRefs(entities: IRef[]): Playlist[] {
         const result: Playlist[] = [];
-        _.each(entities, (entity) => {
-            result.push(Playlist.CreateByRef(entity));
-        });
+
+        for (let i = 0; i < entities.length; i++) {
+            const entity = Playlist.CreateByRef(entities[i]);
+            if (entity)
+                result.push(entity);
+        }
 
         return result;
     }

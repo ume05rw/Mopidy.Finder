@@ -1,7 +1,6 @@
-import * as _ from 'lodash';
+import { default as MopidyAlbum } from '../Mopidies/IAlbum';
 import { default as ArtistAlbum, IArtistAlbum } from '../Relations/ArtistAlbum';
 import { default as GenreAlbum, IGenreAlbum } from '../Relations/GenreAlbum';
-import { default as MopidyAlbum } from '../Mopidies/IAlbum';
 
 export interface IAlbum {
     Id: number;

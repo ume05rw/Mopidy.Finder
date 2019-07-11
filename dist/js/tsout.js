@@ -882,7 +882,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_1.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries", "Models/Mopidies/Player"], function (require, exports, ViewBase_2, vue_class_component_2, Libraries_1, Player_1) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_2, Libraries_1, Player_1, ViewBase_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlayerPanel = /** @class */ (function (_super) {
@@ -2048,7 +2048,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
     }(SelectionList_2.default));
     exports.default = ArtistList;
 });
-define("Models/Genres/Genre", ["require", "exports", "Models/Relations/GenreArtist", "Models/Relations/GenreAlbum"], function (require, exports, GenreArtist_2, GenreAlbum_2) {
+define("Models/Genres/Genre", ["require", "exports", "Models/Relations/GenreAlbum", "Models/Relations/GenreArtist"], function (require, exports, GenreAlbum_2, GenreArtist_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Genre = /** @class */ (function () {
@@ -2259,7 +2259,7 @@ define("Models/Mopidies/IRef", ["require", "exports"], function (require, export
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Playlists/Playlist", ["require", "exports", "lodash"], function (require, exports, _) {
+define("Models/Playlists/Playlist", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Playlist = /** @class */ (function () {
@@ -2298,9 +2298,11 @@ define("Models/Playlists/Playlist", ["require", "exports", "lodash"], function (
         };
         Playlist.CreateArrayByRefs = function (entities) {
             var result = [];
-            _.each(entities, function (entity) {
-                result.push(Playlist.CreateByRef(entity));
-            });
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Playlist.CreateByRef(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
             return result;
         };
         return Playlist;
@@ -2518,7 +2520,7 @@ define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-
     }(ViewBase_8.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/Playlists/PlaylistStore", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack", "Models/Tracks/Track"], function (require, exports, vue_class_component_12, PlaylistStore_2, SelectionList_5, SelectionTrack_1, Track_3) {
+define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/Playlists/PlaylistStore", "Models/Tracks/Track", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack"], function (require, exports, vue_class_component_12, PlaylistStore_2, Track_3, SelectionList_5, SelectionTrack_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackList = /** @class */ (function (_super) {

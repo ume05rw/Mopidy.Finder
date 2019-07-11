@@ -1,4 +1,4 @@
-import { default as Album,  IAlbum } from '../Albums/Album';
+import { default as Album, IAlbum } from '../Albums/Album';
 import { default as Artist, IArtist } from '../Artists/Artist';
 import { default as MopidyTrack } from '../Mopidies/ITrack';
 

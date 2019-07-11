@@ -1,7 +1,7 @@
-import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
-import Player, { PlayerState, PlayerEvents } from '../../Models/Mopidies/Player';
+import Player, { PlayerEvents, PlayerState } from '../../Models/Mopidies/Player';
+import ViewBase from '../Bases/ViewBase';
 
 @Component({
     template: `<div class="card siderbar-control">
