@@ -26,6 +26,22 @@ import ViewBase from '../Bases/ViewBase';
                 <i class="fa fa-fast-forward" />
             </button>
         </div>
+
+        <div class="btn-group btn-group-sm w-100 mt-2" role="group">
+            <button type="button"
+                class="btn btn-secondary"
+                @click="OnClickShuffle">
+                <i class="fa fa fa-random"
+                    ref="ShuffleIcon" />
+            </button>
+            <button type="button"
+                class="btn btn-secondary"
+                @click="OnClickRepeat">
+                <i class="fa fa-retweet"
+                    ref="RepeatIcon"/>
+            </button>
+        </div>
+
         <div class="row volume-box w-100 mt-2">
             <div class="col-1 volume-button volume-min">
                 <a @click="OnClickVolumeMin">
@@ -60,10 +76,6 @@ export default class PlayerPanel extends ViewBase {
         await super.Initialize();
 
         this.volumeSlider = Libraries.$(this.$refs.Slider).ionRangeSlider({
-            onChange: (data) => {
-                // スライダーの値変更都度イベント
-                //console.log(data);
-            },
             onFinish: (data) => {
                 // スライダー操作完了時のイベント
                 this.player.SetVolume(data.from);
@@ -114,5 +126,13 @@ export default class PlayerPanel extends ViewBase {
 
     private OnClickNext(): void {
         this.player.Next();
+    }
+
+    private OnClickShuffle(): void {
+
+    }
+
+    private OnClickRepeat(): void {
+
     }
 }
