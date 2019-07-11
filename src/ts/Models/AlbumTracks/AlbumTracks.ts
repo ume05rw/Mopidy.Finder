@@ -12,21 +12,28 @@ export interface IAlbumTracks {
 export default class AlbumTracks implements IAlbumTracks {
 
     public static Create(entity: IAlbumTracks): AlbumTracks {
+        if (!entity)
+            return null;
+
         var result = new AlbumTracks();
-        if (entity) {
-            result.Album = Album.Create(entity.Album);
-            result.Artists = Artist.CreateArray(entity.Artists);
-            result.Tracks = Track.CreateArray(entity.Tracks);
-        }
+        result.Album = Album.Create(entity.Album);
+        result.Artists = Artist.CreateArray(entity.Artists);
+        result.Tracks = Track.CreateArray(entity.Tracks);
 
         return result;
     }
 
     public static CreateArray(entities: IAlbumTracks[]): AlbumTracks[] {
         var result: AlbumTracks[] = [];
-        _.each(entities, (entity) => {
-            result.push(AlbumTracks.Create(entity));
-        });
+
+        if (!entities)
+            return result;
+
+        for (let i = 0; i < entities.length; i++) {
+            const entity = AlbumTracks.Create(entities[i]);
+            if (entity)
+                result.push(entity);
+        }
 
         return result;
     }

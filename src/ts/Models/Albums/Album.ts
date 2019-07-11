@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { default as ArtistAlbum, IArtistAlbum } from '../Relations/ArtistAlbum';
 import { default as GenreAlbum, IGenreAlbum } from '../Relations/GenreAlbum';
+import { default as MopidyAlbum } from '../Mopidies/IAlbum';
 
 export interface IAlbum {
     Id: number;
@@ -16,26 +17,73 @@ export interface IAlbum {
 export default class Album implements IAlbum {
 
     public static Create(entity: IAlbum): Album {
+        if (!entity)
+            return null;
+
         var result = new Album();
-        if (entity) {
-            result.Id = entity.Id;
-            result.Name = entity.Name;
-            result.LowerName = entity.LowerName;
-            result.Uri = entity.Uri;
-            result.Year = entity.Year;
-            result.ImageUri = entity.ImageUri;
-            result.ArtistAlbums = ArtistAlbum.CreateArray(entity.ArtistAlbums);
-            result.GenreAlbums = GenreAlbum.CreateArray(entity.GenreAlbums);
-        }
+        result.Id = entity.Id;
+        result.Name = entity.Name;
+        result.LowerName = entity.LowerName;
+        result.Uri = entity.Uri;
+        result.Year = entity.Year;
+        result.ImageUri = entity.ImageUri;
+        result.ArtistAlbums = ArtistAlbum.CreateArray(entity.ArtistAlbums);
+        result.GenreAlbums = GenreAlbum.CreateArray(entity.GenreAlbums);
+
+        return result;
+    }
+
+    public static CreateByMopidy(entity: MopidyAlbum): Album {
+        if (!entity)
+            return null;
+
+        var result = new Album();
+        result.Id = null;
+        result.Name = entity.name;
+        result.LowerName = (entity.name)
+            ? entity.name.toLowerCase()
+            : null;
+        result.Uri = entity.uri;
+        result.Year = (entity.date && 4 <= entity.date.length)
+            ? (4 < entity.date.length)
+                ? parseInt(entity.date.substr(0, 4), 10)
+                : parseInt(entity.date)
+            : null;
+        result.ImageUri = (entity.images && entity.images[0])
+            ? entity.images[0]
+            : null;
+        result.ArtistAlbums = [];
+        result.GenreAlbums = [];
 
         return result;
     }
 
     public static CreateArray(entities: IAlbum[]): Album[] {
         var result: Album[] = [];
-        _.each(entities, (entity) => {
-            result.push(Album.Create(entity));
-        });
+
+        if (!entities)
+            return result;
+
+        for (let i = 0; i < entities.length; i++) {
+            const entity = Album.Create(entities[i]);
+            if (entity)
+                result.push(entity);
+        }
+
+        return result;
+    }
+
+    public static CreateArrayByMopidy(entities: MopidyAlbum[]): Album[] {
+        var result: Album[] = [];
+
+        if (!entities)
+            return result;
+
+        for (let i = 0; i < entities.length; i++) {
+            const entity = Album.CreateByMopidy(entities[i]);
+            if (entity)
+                result.push(entity);
+        }
 
         return result;
     }

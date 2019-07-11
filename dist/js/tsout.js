@@ -1054,31 +1054,68 @@ define("Models/Relations/GenreAlbum", ["require", "exports", "lodash"], function
     }());
     exports.default = GenreAlbum;
 });
-define("Models/Albums/Album", ["require", "exports", "lodash", "Models/Relations/ArtistAlbum", "Models/Relations/GenreAlbum"], function (require, exports, _, ArtistAlbum_1, GenreAlbum_1) {
+define("Models/Albums/Album", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreAlbum"], function (require, exports, ArtistAlbum_1, GenreAlbum_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Album = /** @class */ (function () {
         function Album() {
         }
         Album.Create = function (entity) {
+            if (!entity)
+                return null;
             var result = new Album();
-            if (entity) {
-                result.Id = entity.Id;
-                result.Name = entity.Name;
-                result.LowerName = entity.LowerName;
-                result.Uri = entity.Uri;
-                result.Year = entity.Year;
-                result.ImageUri = entity.ImageUri;
-                result.ArtistAlbums = ArtistAlbum_1.default.CreateArray(entity.ArtistAlbums);
-                result.GenreAlbums = GenreAlbum_1.default.CreateArray(entity.GenreAlbums);
-            }
+            result.Id = entity.Id;
+            result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
+            result.Uri = entity.Uri;
+            result.Year = entity.Year;
+            result.ImageUri = entity.ImageUri;
+            result.ArtistAlbums = ArtistAlbum_1.default.CreateArray(entity.ArtistAlbums);
+            result.GenreAlbums = GenreAlbum_1.default.CreateArray(entity.GenreAlbums);
+            return result;
+        };
+        Album.CreateByMopidy = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Album();
+            result.Id = null;
+            result.Name = entity.name;
+            result.LowerName = (entity.name)
+                ? entity.name.toLowerCase()
+                : null;
+            result.Uri = entity.uri;
+            result.Year = (entity.date && 4 <= entity.date.length)
+                ? (4 < entity.date.length)
+                    ? parseInt(entity.date.substr(0, 4), 10)
+                    : parseInt(entity.date)
+                : null;
+            result.ImageUri = (entity.images && entity.images[0])
+                ? entity.images[0]
+                : null;
+            result.ArtistAlbums = [];
+            result.GenreAlbums = [];
             return result;
         };
         Album.CreateArray = function (entities) {
             var result = [];
-            _.each(entities, function (entity) {
-                result.push(Album.Create(entity));
-            });
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Album.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Album.CreateArrayByMopidy = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Album.CreateByMopidy(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
             return result;
         };
         Album.prototype.GetImageFullUri = function () {
@@ -1111,76 +1148,145 @@ define("Models/Relations/GenreArtist", ["require", "exports", "lodash"], functio
     }());
     exports.default = GenreArtist;
 });
-define("Models/Artists/Artist", ["require", "exports", "lodash", "Models/Relations/ArtistAlbum", "Models/Relations/GenreArtist"], function (require, exports, _, ArtistAlbum_2, GenreArtist_1) {
+define("Models/Artists/Artist", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreArtist"], function (require, exports, ArtistAlbum_2, GenreArtist_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Artist = /** @class */ (function () {
         function Artist() {
         }
         Artist.Create = function (entity) {
+            if (!entity)
+                return null;
             var result = new Artist();
-            if (entity) {
-                result.Id = entity.Id;
-                result.Name = entity.Name;
-                result.LowerName = entity.LowerName;
-                result.Uri = entity.Uri;
-                result.ImageUri = entity.ImageUri;
-                result.ArtistAlbums = ArtistAlbum_2.default.CreateArray(entity.ArtistAlbums);
-                result.GenreArtists = GenreArtist_1.default.CreateArray(entity.GenreArtists);
-            }
+            result.Id = entity.Id;
+            result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
+            result.Uri = entity.Uri;
+            result.ImageUri = entity.ImageUri;
+            result.ArtistAlbums = ArtistAlbum_2.default.CreateArray(entity.ArtistAlbums);
+            result.GenreArtists = GenreArtist_1.default.CreateArray(entity.GenreArtists);
+            return result;
+        };
+        Artist.CreateByMopidy = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Artist();
+            result.Id = null;
+            result.Name = entity.name;
+            result.LowerName = (entity.name)
+                ? entity.name.toLowerCase()
+                : null;
+            result.Uri = entity.uri;
+            result.ImageUri = null;
+            result.ArtistAlbums = [];
+            result.GenreArtists = [];
             return result;
         };
         Artist.CreateArray = function (entities) {
             var result = [];
-            _.each(entities, function (entity) {
-                result.push(Artist.Create(entity));
-            });
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Artist.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Artist.CreateArrayByMopidy = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Artist.CreateByMopidy(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
             return result;
         };
         return Artist;
     }());
     exports.default = Artist;
 });
-define("Models/Tracks/Track", ["require", "exports", "lodash"], function (require, exports, _) {
+define("Models/Tracks/Track", ["require", "exports", "Models/Albums/Album", "Models/Artists/Artist"], function (require, exports, Album_1, Artist_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Track = /** @class */ (function () {
         function Track() {
         }
         Track.Create = function (entity) {
+            if (!entity)
+                return null;
             var result = new Track();
-            if (entity) {
-                result.Id = entity.Id;
-                result.Name = entity.Name;
-                result.LowerName = entity.LowerName;
-                result.Uri = entity.Uri;
-                result.TlId = entity.TlId;
-                result.DiscNo = entity.DiscNo;
-                result.TrackNo = entity.TrackNo;
-                result.Date = entity.Date;
-                result.Comment = entity.Comment;
-                result.Length = entity.Length;
-                result.BitRate = entity.BitRate;
-                result.LastModified = entity.LastModified;
-                // JSONがアホほどでかくなるのでやめる
-                //result.Genre = Genre.Create(entity.Genre);
-                //result.Album = Album.Create(entity.Album);
-                //result.Artists = Artist.CreateArray(entity.Artists);
-                //result.Composers = Artist.CreateArray(entity.Composers);
-                //result.Performers = Artist.CreateArray(entity.Performers);
-            }
+            result.Id = entity.Id;
+            result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
+            result.Uri = entity.Uri;
+            result.TlId = entity.TlId;
+            result.DiscNo = entity.DiscNo;
+            result.TrackNo = entity.TrackNo;
+            result.Date = entity.Date;
+            result.Comment = entity.Comment;
+            result.Length = entity.Length;
+            result.BitRate = entity.BitRate;
+            result.LastModified = entity.LastModified;
+            result.Album = Album_1.default.Create(entity.Album);
+            result.Artists = Artist_1.default.CreateArray(entity.Artists);
+            // JSONがアホほどでかくなるのでやめる
+            //result.Genre = Genre.Create(entity.Genre);
+            //result.Composers = Artist.CreateArray(entity.Composers);
+            //result.Performers = Artist.CreateArray(entity.Performers);
+            return result;
+        };
+        Track.CreateByMopidy = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Track();
+            result.Id = null;
+            result.Name = entity.name;
+            result.LowerName = (entity.name)
+                ? entity.name.toLowerCase()
+                : null;
+            result.Uri = entity.uri;
+            result.TlId = null;
+            result.DiscNo = entity.disc_no;
+            result.TrackNo = entity.track_no;
+            result.Date = entity.date;
+            result.Comment = entity.comment;
+            result.Length = entity.length;
+            result.BitRate = entity.bitrate;
+            result.LastModified = entity.last_modified;
+            result.Album = Album_1.default.CreateByMopidy(entity.album);
+            result.Artists = Artist_1.default.CreateArrayByMopidy(entity.artists);
+            // JSONがアホほどでかくなるのでやめる
+            //result.Genre = Genre.Create(entity.Genre);
+            //result.Composers = Artist.CreateArray(entity.Composers);
+            //result.Performers = Artist.CreateArray(entity.Performers);
             return result;
         };
         Track.CreateArray = function (entities) {
             var result = [];
-            _.each(entities, function (entity) {
-                result.push(Track.Create(entity));
-            });
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Track.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Track.CreateArrayByMopidy = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Track.CreateByMopidy(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
             return result;
         };
         //public Genre: Genre;
-        //public Album: Album;
-        //public Artists: Artist[];
         //public Composers: Artist[];
         //public Performers: Artist[];
         Track.prototype.GetTimeString = function () {
@@ -1193,30 +1299,59 @@ define("Models/Tracks/Track", ["require", "exports", "lodash"], function (requir
             var secondStr = ('00' + second.toString()).slice(-2);
             return minuteStr + ':' + secondStr;
         };
+        Track.prototype.GetYear = function () {
+            if (!this.Date || this.Date.length < 4)
+                return null;
+            return (4 < this.Date.length)
+                ? parseInt(this.Date.substr(0, 4), 10)
+                : parseInt(this.Date, 10);
+        };
+        Track.prototype.GetFormattedYearString = function () {
+            var year = this.GetYear();
+            return (!year)
+                ? ''
+                : '(' + year.toString() + ')';
+        };
+        Track.prototype.GetAlbumName = function () {
+            return (this.Album && this.Album.Name)
+                ? this.Album.Name
+                : '';
+        };
+        Track.prototype.GetFormattedArtistName = function () {
+            return (!this.Artists || this.Artists.length <= 0)
+                ? '--'
+                : (this.Artists.length === 1)
+                    ? this.Artists[0].Name
+                    : (this.Artists[0].Name + ' and more...');
+        };
         return Track;
     }());
     exports.default = Track;
 });
-define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "lodash", "Models/Albums/Album", "Models/Artists/Artist", "Models/Tracks/Track"], function (require, exports, _, Album_1, Artist_1, Track_1) {
+define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "Models/Albums/Album", "Models/Artists/Artist", "Models/Tracks/Track"], function (require, exports, Album_2, Artist_2, Track_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumTracks = /** @class */ (function () {
         function AlbumTracks() {
         }
         AlbumTracks.Create = function (entity) {
+            if (!entity)
+                return null;
             var result = new AlbumTracks();
-            if (entity) {
-                result.Album = Album_1.default.Create(entity.Album);
-                result.Artists = Artist_1.default.CreateArray(entity.Artists);
-                result.Tracks = Track_1.default.CreateArray(entity.Tracks);
-            }
+            result.Album = Album_2.default.Create(entity.Album);
+            result.Artists = Artist_2.default.CreateArray(entity.Artists);
+            result.Tracks = Track_1.default.CreateArray(entity.Tracks);
             return result;
         };
         AlbumTracks.CreateArray = function (entities) {
             var result = [];
-            _.each(entities, function (entity) {
-                result.push(AlbumTracks.Create(entity));
-            });
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = AlbumTracks.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
             return result;
         };
         Object.defineProperty(AlbumTracks.prototype, "Id", {
@@ -1723,7 +1858,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
     }(SelectionList_1.default));
     exports.default = AlbumList;
 });
-define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Artists/Artist"], function (require, exports, StoreBase_2, Artist_2) {
+define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Artists/Artist"], function (require, exports, StoreBase_2, Artist_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistStore = /** @class */ (function (_super) {
@@ -1747,7 +1882,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
                                 throw new Error('Unexpected Error on ApiQuery');
                             }
                             result = response.Result;
-                            result.ResultList = Artist_2.default.CreateArray(result.ResultList);
+                            result.ResultList = Artist_3.default.CreateArray(result.ResultList);
                             return [2 /*return*/, result];
                     }
                 });
@@ -1913,13 +2048,15 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
     }(SelectionList_2.default));
     exports.default = ArtistList;
 });
-define("Models/Genres/Genre", ["require", "exports", "lodash", "Models/Relations/GenreArtist", "Models/Relations/GenreAlbum"], function (require, exports, _, GenreArtist_2, GenreAlbum_2) {
+define("Models/Genres/Genre", ["require", "exports", "Models/Relations/GenreArtist", "Models/Relations/GenreAlbum"], function (require, exports, GenreArtist_2, GenreAlbum_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Genre = /** @class */ (function () {
         function Genre() {
         }
         Genre.Create = function (entity) {
+            if (!entity)
+                return null;
             var result = new Genre();
             if (entity) {
                 result.Id = entity.Id;
@@ -1933,9 +2070,13 @@ define("Models/Genres/Genre", ["require", "exports", "lodash", "Models/Relations
         };
         Genre.CreateArray = function (entities) {
             var result = [];
-            _.each(entities, function (entity) {
-                result.push(Genre.Create(entity));
-            });
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Genre.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
             return result;
         };
         return Genre;
@@ -2125,28 +2266,34 @@ define("Models/Playlists/Playlist", ["require", "exports", "lodash"], function (
         function Playlist() {
         }
         Playlist.Create = function (entity) {
+            if (!entity)
+                return null;
             var result = new Playlist();
-            if (entity) {
-                result.Name = entity.Name;
-                result.Uri = entity.Uri;
-                result.Tracks = entity.Tracks;
-            }
+            result.Name = entity.Name;
+            result.Uri = entity.Uri;
+            result.MopidyTracks = entity.MopidyTracks;
+            result.Tracks = entity.Tracks;
             return result;
         };
         Playlist.CreateArray = function (entities) {
             var result = [];
-            _.each(entities, function (entity) {
-                result.push(Playlist.Create(entity));
-            });
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Playlist.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
             return result;
         };
         Playlist.CreateByRef = function (entity) {
+            if (!entity)
+                return null;
             var result = new Playlist();
-            if (entity) {
-                result.Name = entity.name;
-                result.Uri = entity.uri;
-                result.Tracks = [];
-            }
+            result.Name = entity.name;
+            result.Uri = entity.uri;
+            result.Tracks = [];
+            result.MopidyTracks = [];
             return result;
         };
         Playlist.CreateArrayByRefs = function (entities) {
@@ -2344,80 +2491,14 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "v
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-class-component", "vue-property-decorator", "Models/Playlists/PlaylistStore", "Views/Bases/ViewBase", "Views/Shared/SelectionEvents"], function (require, exports, vue_class_component_11, vue_property_decorator_3, PlaylistStore_2, ViewBase_8, SelectionEvents_2) {
+define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionEvents"], function (require, exports, vue_class_component_11, vue_property_decorator_3, Track_2, ViewBase_8, SelectionEvents_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionTrack = /** @class */ (function (_super) {
         __extends(SelectionTrack, _super);
         function SelectionTrack() {
-            var _this = _super.call(this) || this;
-            _this.trackName = '--';
-            _this.timeString = '--';
-            _this.yearString = '';
-            _this.albumName = '--';
-            _this.albumImage = '';
-            _this.artistNames = '--';
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        SelectionTrack.prototype.Refresh = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var year, imageUri;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            if (this.entity.name)
-                                this.trackName = this.entity.name;
-                            if (this.entity.length)
-                                this.timeString = this.GetTimeString(this.entity.length);
-                            if (this.entity.date) {
-                                year = this.GetYear(this.entity.date);
-                                if (year)
-                                    this.yearString = "(" + year + ")";
-                            }
-                            if (this.entity.album && this.entity.album.name)
-                                this.albumName = this.entity.album.name;
-                            if (this.entity.artists && 1 <= this.entity.artists.length) {
-                                this.artistNames = (this.entity.artists.length === 1)
-                                    ? this.entity.artists[0].name
-                                    : (this.entity.artists[0].name + ' and more...');
-                            }
-                            if (!this.entity.album) return [3 /*break*/, 3];
-                            if (!(this.entity.album.images && 1 <= this.entity.album.images.length)) return [3 /*break*/, 1];
-                            this.albumImage = this.GetImageFullUri(this.entity.album.images[0]);
-                            return [3 /*break*/, 3];
-                        case 1:
-                            if (!this.entity.album.uri) return [3 /*break*/, 3];
-                            return [4 /*yield*/, this.store.GetImageUri(this.entity.album.uri)];
-                        case 2:
-                            imageUri = _a.sent();
-                            if (imageUri)
-                                this.albumImage = this.GetImageFullUri(imageUri);
-                            _a.label = 3;
-                        case 3: return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        SelectionTrack.prototype.GetYear = function (date) {
-            if (!date)
-                return null;
-            if (date.length <= 4)
-                return parseInt(date, 10);
-            return parseInt(date.substr(0, 4), 10);
-        };
-        SelectionTrack.prototype.GetTimeString = function (length) {
-            if (!length) {
-                return '';
-            }
-            var minute = Math.floor(length / 60000);
-            var second = Math.floor((length % 60000) / 1000);
-            var minuteStr = ('00' + minute.toString()).slice(-2);
-            var secondStr = ('00' + second.toString()).slice(-2);
-            return minuteStr + ':' + secondStr;
-        };
-        SelectionTrack.prototype.GetImageFullUri = function (uri) {
-            return location.protocol + "//" + location.host + uri;
-        };
         SelectionTrack.prototype.OnClick = function () {
             this.$emit(SelectionEvents_2.default.SelectionChanged, {
                 Selected: true,
@@ -2426,30 +2507,25 @@ define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-
         };
         __decorate([
             vue_property_decorator_3.Prop(),
-            __metadata("design:type", Object)
+            __metadata("design:type", Track_2.default)
         ], SelectionTrack.prototype, "entity", void 0);
-        __decorate([
-            vue_property_decorator_3.Prop(),
-            __metadata("design:type", PlaylistStore_2.default)
-        ], SelectionTrack.prototype, "store", void 0);
         SelectionTrack = __decorate([
             vue_class_component_11.default({
-                template: "<li class=\"item w-100\"\n                    ref=\"Li\" >\n    <a href=\"javascript:void(0)\" class=\"w-100\"\n        @click=\"OnClick\">\n        <div class=\"product-img\">\n            <img v-bind:src=\"albumImage\" alt=\"ALbum Image\">\n        </div>\n        <div class=\"product-info\">\n            <span class=\"product-title\">\n                {{ trackName }}\n                <span class=\"pull-right\">{{ timeString }}</span>\n            </span>\n            <span class=\"product-description\">\n                {{ albumName }} {{ yearString }} {{ (artistNames) ? ' : ' + artistNames : '' }}\n            </span>\n        </div>\n    </a>\n</li>"
-            }),
-            __metadata("design:paramtypes", [])
+                template: "<li class=\"item w-100\"\n                    ref=\"Li\" >\n    <a href=\"javascript:void(0)\" class=\"w-100\"\n        @click=\"OnClick\">\n        <div class=\"product-img\">\n            <img v-bind:src=\"((entity.Album) ? entity.Album.GetImageFullUri() : '')\" alt=\"ALbum Image\">\n        </div>\n        <div class=\"product-info\">\n            <span class=\"product-title\">\n                {{ entity.Name }}\n                <span class=\"pull-right\">{{ entity.GetTimeString() }}</span>\n            </span>\n            <span class=\"product-description\">\n                {{ entity.GetAlbumName() }} {{ entity.GetFormattedYearString() }} {{ ' : ' + entity.GetFormattedArtistName() }}\n            </span>\n        </div>\n    </a>\n</li>"
+            })
         ], SelectionTrack);
         return SelectionTrack;
     }(ViewBase_8.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/Playlists/PlaylistStore", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack", "lodash"], function (require, exports, vue_class_component_12, PlaylistStore_3, SelectionList_5, SelectionTrack_1, _) {
+define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/Playlists/PlaylistStore", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack", "Models/Tracks/Track"], function (require, exports, vue_class_component_12, PlaylistStore_2, SelectionList_5, SelectionTrack_1, Track_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackList = /** @class */ (function (_super) {
         __extends(TrackList, _super);
         function TrackList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.store = new PlaylistStore_3.default();
+            _this.store = new PlaylistStore_2.default();
             _this.entities = [];
             _this.playlist = null;
             return _this;
@@ -2470,10 +2546,9 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
         };
         TrackList.prototype.SetPlaylist = function (playlist) {
             return __awaiter(this, void 0, void 0, function () {
-                var _a;
-                var _this = this;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var mpTracks;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0:
                             if (!playlist) {
                                 this.playlist = null;
@@ -2481,19 +2556,15 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
                                 return [2 /*return*/, false];
                             }
                             this.playlist = playlist;
-                            if (!(!this.playlist.Tracks || this.playlist.Tracks.length <= 0)) return [3 /*break*/, 2];
-                            _a = this.playlist;
+                            if (!(!this.playlist.MopidyTracks || this.playlist.MopidyTracks.length <= 0)) return [3 /*break*/, 2];
                             return [4 /*yield*/, this.store.GetTracksByPlaylist(this.playlist)];
                         case 1:
-                            _a.Tracks = _b.sent();
-                            _b.label = 2;
+                            mpTracks = _a.sent();
+                            this.playlist.MopidyTracks = mpTracks;
+                            this.playlist.Tracks = Track_3.default.CreateArrayByMopidy(mpTracks);
+                            _a.label = 2;
                         case 2:
                             this.entities = this.playlist.Tracks;
-                            this.$nextTick(function () {
-                                _.each(_this.$refs.Items, function (item) {
-                                    item.Refresh();
-                                });
-                            });
                             return [2 /*return*/, true];
                     }
                 });
@@ -2517,7 +2588,7 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
         };
         TrackList = __decorate([
             vue_class_component_12.default({
-                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    v-bind:store=\"store\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-track': SelectionTrack_1.default
                 }

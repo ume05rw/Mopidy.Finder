@@ -6,6 +6,7 @@ import PlaylistStore from '../../../Models/Playlists/PlaylistStore';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionList from '../../Shared/SelectionList';
 import SelectionTrack from '../Selections/SelectionTrack';
+import Track from '../../../Models/Tracks/Track';
 import * as _ from 'lodash';
 
 @Component({
@@ -20,7 +21,6 @@ import * as _ from 'lodash';
                 <selection-track
                     ref="Items"
                     v-bind:entity="entity"
-                    v-bind:store="store"
                     @SelectionChanged="OnSelectionChanged" />
                 </template>
             </ul>
@@ -31,10 +31,10 @@ import * as _ from 'lodash';
         'selection-track': SelectionTrack
     }
 })
-export default class TrackList extends SelectionList<ITrack, PlaylistStore> {
+export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
     protected store: PlaylistStore = new PlaylistStore();
-    protected entities: ITrack[] = [];
+    protected entities: Track[] = [];
     private playlist: Playlist = null;
 
     public async Initialize(): Promise<boolean> {
@@ -51,16 +51,13 @@ export default class TrackList extends SelectionList<ITrack, PlaylistStore> {
         }
 
         this.playlist = playlist;
-        if (!this.playlist.Tracks || this.playlist.Tracks.length <= 0)
-            this.playlist.Tracks = await this.store.GetTracksByPlaylist(this.playlist);
+        if (!this.playlist.MopidyTracks || this.playlist.MopidyTracks.length <= 0) {
+            const mpTracks = await this.store.GetTracksByPlaylist(this.playlist);
+            this.playlist.MopidyTracks = mpTracks;
+            this.playlist.Tracks = Track.CreateArrayByMopidy(mpTracks);
+        }
 
         this.entities = this.playlist.Tracks;
-
-        this.$nextTick(() => {
-            _.each(this.$refs.Items, (item: SelectionTrack) => {
-                item.Refresh();
-            });
-        });
 
         return true;
     }
@@ -71,11 +68,11 @@ export default class TrackList extends SelectionList<ITrack, PlaylistStore> {
      * バインドされずにnullになってしまう。
      * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
      */
-    protected OnSelectionChanged(args: ISelectionChangedArgs<ITrack>): void {
+    protected OnSelectionChanged(args: ISelectionChangedArgs<Track>): void {
         super.OnSelectionChanged(args);
     }
 
-    protected async GetPagenatedList(): Promise<PagenatedResult<ITrack>> {
+    protected async GetPagenatedList(): Promise<PagenatedResult<Track>> {
         return null;
     }
 }

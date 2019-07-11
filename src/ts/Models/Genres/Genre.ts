@@ -14,6 +14,9 @@ export interface IGenre {
 export default class Genre implements IGenre {
 
     public static Create(entity: IGenre): Genre {
+        if (!entity)
+            return null;
+
         const result = new Genre();
         if (entity) {
             result.Id = entity.Id;
@@ -29,9 +32,15 @@ export default class Genre implements IGenre {
 
     public static CreateArray(entities: IGenre[]): Genre[] {
         const result: Genre[] = [];
-        _.each(entities, (entity) => {
-            result.push(Genre.Create(entity));
-        });
+
+        if (!entities)
+            return result;
+
+        for (let i = 0; i < entities.length; i++) {
+            const entity = Genre.Create(entities[i]);
+            if (entity)
+                result.push(entity);
+        }
 
         return result;
     }
