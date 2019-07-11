@@ -976,18 +976,19 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "Views/Bases/ViewBase", 
     }(ViewBase_3.default));
     exports.default = Sidebar;
 });
+define("Views/Shared/SelectionEvents", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var SelectionEvents = {
+        ListUpdated: 'ListUpdated',
+        SelectionChanged: 'SelectionChanged',
+        Refreshed: 'Refreshed',
+    };
+    exports.default = SelectionEvents;
+});
 define("Models/Bases/ISelectionItem", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Views/Events/FinderEvents", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Events = {
-        SelectionChanged: 'SelectionChanged',
-        Refreshed: 'Refreshed',
-        TrackSelected: 'TrackSelected'
-    };
 });
 define("Models/Relations/ArtistAlbum", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
@@ -1327,28 +1328,184 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
     }(StoreBase_1.default));
     exports.default = AlbumTracksStore;
 });
-define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries", "Views/Events/FinderEvents"], function (require, exports, vue_class_component_4, vue_property_decorator_1, ViewBase_4, AlbumTracks_2, Libraries_3, FinderEvents_1) {
+define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.WidgetEvents = {
+        Expanded: 'expanded.lte.widget',
+        Collapsed: 'collapsed.lte.widget',
+        Maximized: 'maximized.lte.widget',
+        Minimized: 'minimized.lte.widget',
+        Removed: 'removed.lte.widget'
+    };
+});
+define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Shared/SelectionEvents"], function (require, exports, AdminLte, _, Libraries_3, ViewBase_4, AdminLteEvents_1, SelectionEvents_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var SelectionList = /** @class */ (function (_super) {
+        __extends(SelectionList, _super);
+        function SelectionList() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isAutoCollapse = true;
+            _this.page = 1;
+            _this.viewport = Libraries_3.default.ResponsiveBootstrapToolkit;
+            _this.isCollapsed = false;
+            return _this;
+        }
+        Object.defineProperty(SelectionList.prototype, "Page", {
+            get: function () {
+                return this.page;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SelectionList.prototype, "InfiniteLoading", {
+            get: function () {
+                return this.$refs.InfiniteLoading;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SelectionList.prototype, "ButtonCollaplse", {
+            get: function () {
+                return (this.$refs.ButtonCollaplse)
+                    ? this.$refs.ButtonCollaplse
+                    : null;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * サブクラス上でsuper.Initialize()呼び出し前に isAutoCollapse をセットしておくこと。
+         */
+        SelectionList.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var button;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            if (this.isAutoCollapse) {
+                                button = Libraries_3.default.$(this.ButtonCollaplse);
+                                this.boxWidget = new AdminLte.Widget(button);
+                                button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
+                                    _this.isCollapsed = true;
+                                });
+                                button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
+                                    _this.isCollapsed = false;
+                                });
+                                Libraries_3.default.$(window).resize(this.viewport.changed(function () {
+                                    _this.ToggleListByViewport();
+                                }));
+                                _.delay(function () {
+                                    _this.ToggleListByViewport();
+                                }, 1000);
+                            }
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        SelectionList.prototype.OnInfinite = function ($state) {
+            return __awaiter(this, void 0, void 0, function () {
+                var result, isUpdated, e_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, this.GetPagenatedList()];
+                        case 1:
+                            result = _a.sent();
+                            isUpdated = false;
+                            if (0 < result.ResultList.length) {
+                                this.entities = this.entities.concat(result.ResultList);
+                                isUpdated = true;
+                            }
+                            if (this.entities.length < result.TotalLength) {
+                                $state.loaded();
+                                this.page++;
+                            }
+                            else {
+                                $state.complete();
+                            }
+                            if (isUpdated) {
+                                this.$emit(SelectionEvents_1.default.ListUpdated, {
+                                    Entities: this.entities
+                                });
+                            }
+                            return [3 /*break*/, 3];
+                        case 2:
+                            e_1 = _a.sent();
+                            console.error(e_1);
+                            console.error(this);
+                            return [3 /*break*/, 3];
+                        case 3: return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        SelectionList.prototype.OnCollapleClick = function () {
+            this.boxWidget.toggle();
+        };
+        SelectionList.prototype.OnClickRefresh = function () {
+            this.Refresh();
+            this.$emit(SelectionEvents_1.default.Refreshed);
+        };
+        SelectionList.prototype.OnSelectionChanged = function (args) {
+            this.$emit(SelectionEvents_1.default.SelectionChanged, args);
+        };
+        SelectionList.prototype.Refresh = function () {
+            var _this = this;
+            this.page = 1;
+            this.entities = [];
+            this.$nextTick(function () {
+                _this.InfiniteLoading.stateChanger.reset();
+                _this.InfiniteLoading.attemptLoad();
+            });
+        };
+        SelectionList.prototype.ToggleListByViewport = function () {
+            if (!this.isAutoCollapse)
+                return;
+            if (this.viewport.is('<=sm') && !this.isCollapsed) {
+                this.boxWidget.collapse();
+            }
+            else if (this.viewport.is('>sm') && this.isCollapsed) {
+                this.boxWidget.expand();
+            }
+        };
+        return SelectionList;
+    }(ViewBase_4.default));
+    exports.default = SelectionList;
+});
+define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries"], function (require, exports, vue_class_component_4, vue_property_decorator_1, ViewBase_5, AlbumTracks_2, Libraries_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.SelectionAlbumEvents = {
+        AlbumTracksSelected: 'AlbumTracksSelected'
+    };
     var SelectionAlbumTracks = /** @class */ (function (_super) {
         __extends(SelectionAlbumTracks, _super);
         function SelectionAlbumTracks() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         SelectionAlbumTracks.prototype.OnClickAlbumPlay = function () {
-            var tracks = Libraries_3.default.Enumerable.from(this.entity.Tracks);
-            var firstTrack = tracks.first(function (e) { return e.TrackNo === tracks.min(function (e2) { return e2.TrackNo; }); });
-            this.$emit(FinderEvents_1.Events.TrackSelected, {
-                AlbumId: this.entity.Album.Id,
-                TrackId: firstTrack.Id
+            var tracks = Libraries_4.default.Enumerable.from(this.entity.Tracks);
+            var track = tracks.first(function (e) { return e.TrackNo === tracks.min(function (e2) { return e2.TrackNo; }); });
+            this.$emit(exports.SelectionAlbumEvents.AlbumTracksSelected, {
+                Entity: this.entity,
+                Track: track
             });
         };
         SelectionAlbumTracks.prototype.OnClickTrack = function (args) {
             var tr = args.target.parentElement;
             var trackId = parseInt(tr.getAttribute('data-trackid'), 10);
-            this.$emit(FinderEvents_1.Events.TrackSelected, {
-                AlbumId: this.entity.Album.Id,
-                TrackId: trackId
+            var tracks = Libraries_4.default.Enumerable.from(this.entity.Tracks);
+            var track = tracks.first(function (e) { return e.Id === trackId; });
+            this.$emit(exports.SelectionAlbumEvents.AlbumTracksSelected, {
+                Entity: this.entity,
+                Track: track
             });
         };
         __decorate([
@@ -1361,61 +1518,69 @@ define("Views/Finders/Lists/SelectionAlbumTracks", ["require", "exports", "vue-c
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
-    }(ViewBase_4.default));
+    }(ViewBase_5.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Models/AlbumTracks/AlbumTracksStore", "Views/Bases/ViewBase", "Views/Events/FinderEvents", "Views/Finders/Lists/SelectionAlbumTracks", "Libraries"], function (require, exports, _, vue_2, vue_class_component_5, vue_infinite_loading_1, AlbumTracksStore_1, ViewBase_5, FinderEvents_2, SelectionAlbumTracks_1, Libraries_4) {
+define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Views/Shared/SelectionList", "Views/Finders/Lists/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_5, vue_infinite_loading_1, Libraries_5, AlbumTracksStore_1, SelectionList_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    vue_2.default.use(vue_infinite_loading_1.default);
     var AlbumList = /** @class */ (function (_super) {
         __extends(AlbumList, _super);
         function AlbumList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.isEntitiesRefreshed = false;
-            _this.page = 1;
-            _this.genreIds = [];
-            _this.artistIds = [];
             _this.store = new AlbumTracksStore_1.default();
             _this.entities = [];
+            _this.isEntitiesRefreshed = false;
+            _this.genreIds = [];
+            _this.artistIds = [];
             return _this;
         }
-        Object.defineProperty(AlbumList.prototype, "InfiniteLoading", {
-            get: function () {
-                return this.$refs.InfiniteLoading;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        AlbumList.prototype.OnInfinite = function ($state) {
+        AlbumList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.store.GetList(this.genreIds, this.artistIds, this.page)];
+                        case 0:
+                            this.isAutoCollapse = false;
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
-                            result = _a.sent();
-                            if (0 < result.ResultList.length)
-                                this.entities = this.entities.concat(result.ResultList);
-                            if (this.entities.length < result.TotalLength) {
-                                $state.loaded();
-                                this.page++;
-                            }
-                            else {
-                                $state.complete();
-                            }
+                            _a.sent();
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
-        AlbumList.prototype.OnClickRefresh = function () {
-            this.Refresh();
-            this.$emit(FinderEvents_2.Events.Refreshed);
-        };
-        AlbumList.prototype.OnTrackSelected = function (args) {
+        /**
+         * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
+         * superクラスの同名メソッドが実行されるが、superクラス上のthisが
+         * バインドされずにnullになってしまう。
+         * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
+         */
+        AlbumList.prototype.OnInfinite = function ($state) {
             return __awaiter(this, void 0, void 0, function () {
-                var albumTracks, tracks, track, isAllTracksRegistered, result, resultAtls, updatedTracks;
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, _super.prototype.OnInfinite.call(this, $state)];
+                });
+            });
+        };
+        AlbumList.prototype.OnCollapleClick = function () {
+            _super.prototype.OnCollapleClick.call(this);
+        };
+        AlbumList.prototype.OnClickRefresh = function () {
+            _super.prototype.OnClickRefresh.call(this);
+        };
+        AlbumList.prototype.GetPagenatedList = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.store.GetList(this.genreIds, this.artistIds, this.Page)];
+                        case 1: return [2 /*return*/, _a.sent()];
+                    }
+                });
+            });
+        };
+        AlbumList.prototype.OnAlbumTracksSelected = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                var albumTracks, track, isAllTracksRegistered, result, resultAtls, updatedTracks;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1431,19 +1596,20 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
                             this.isEntitiesRefreshed = false;
                             _a.label = 2;
                         case 2:
-                            albumTracks = Libraries_4.default.Enumerable.from(this.entities)
-                                .firstOrDefault(function (e) { return e.Album.Id === args.AlbumId; });
+                            albumTracks = args.Entity;
                             if (!albumTracks) {
-                                console.error('AlbumTracks Not Found: AlbumId=' + args.AlbumId);
+                                console.error('AlbumTracks Not Found - AlbumTrack;');
+                                console.error(args.Entity);
                                 return [2 /*return*/, false];
                             }
-                            tracks = Libraries_4.default.Enumerable.from(albumTracks.Tracks);
-                            track = tracks.firstOrDefault(function (e) { return e.Id === args.TrackId; });
+                            track = args.Track;
                             if (!track) {
-                                console.error('Track Not Found: TrackId=' + args.TrackId);
+                                console.error('Track Not Found - Track:');
+                                console.error(args.Track);
                                 return [2 /*return*/, false];
                             }
-                            isAllTracksRegistered = tracks.all(function (e) { return e.TlId !== null; });
+                            isAllTracksRegistered = Libraries_5.default.Enumerable.from(albumTracks.Tracks)
+                                .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
                             return [4 /*yield*/, this.store.PlayAlbumByTlId(track.TlId)];
                         case 3:
@@ -1452,7 +1618,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
                         case 4: return [4 /*yield*/, this.store.PlayAlbumByTrack(track)];
                         case 5:
                             resultAtls = _a.sent();
-                            updatedTracks = Libraries_4.default.Enumerable.from(resultAtls.Tracks);
+                            updatedTracks = Libraries_5.default.Enumerable.from(resultAtls.Tracks);
                             _.each(albumTracks.Tracks, function (track) {
                                 track.TlId = updatedTracks.firstOrDefault(function (e) { return e.Id == track.Id; }).TlId;
                             });
@@ -1462,14 +1628,8 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
             });
         };
         AlbumList.prototype.Refresh = function () {
-            var _this = this;
-            this.page = 1;
-            this.entities = [];
+            _super.prototype.Refresh.call(this);
             this.isEntitiesRefreshed = true;
-            this.$nextTick(function () {
-                _this.InfiniteLoading.stateChanger.reset();
-                _this.InfiniteLoading.attemptLoad();
-            });
         };
         AlbumList.prototype.HasGenre = function (genreId) {
             return (0 <= _.indexOf(this.genreIds, genreId));
@@ -1522,14 +1682,15 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue", 
         };
         AlbumList = __decorate([
             vue_class_component_5.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @TrackSelected=\"OnTrackSelected\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
-                    'selection-album-tracks': SelectionAlbumTracks_1.default
+                    'selection-album-tracks': SelectionAlbumTracks_1.default,
+                    'infinite-loading': vue_infinite_loading_1.default
                 }
             })
         ], AlbumList);
         return AlbumList;
-    }(ViewBase_5.default));
+    }(SelectionList_1.default));
     exports.default = AlbumList;
 });
 define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Artists/Artist"], function (require, exports, StoreBase_2, Artist_2) {
@@ -1566,20 +1727,12 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
     }(StoreBase_2.default));
     exports.default = ArtistStore;
 });
-define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
+define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_6, vue_property_decorator_2, ViewBase_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.WidgetEvents = {
-        Expanded: 'expanded.lte.widget',
-        Collapsed: 'collapsed.lte.widget',
-        Maximized: 'maximized.lte.widget',
-        Minimized: 'minimized.lte.widget',
-        Removed: 'removed.lte.widget'
+    exports.SelectionItemEvents = {
+        SelectionChanged: 'SelectionChanged'
     };
-});
-define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Views/Events/FinderEvents"], function (require, exports, vue_class_component_6, vue_property_decorator_2, ViewBase_6, FinderEvents_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionItem = /** @class */ (function (_super) {
         __extends(SelectionItem, _super);
         function SelectionItem() {
@@ -1606,7 +1759,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
                     this.Li.classList.add(SelectionItem_1.SelectedColor);
                 this.selected = true;
             }
-            this.$emit(FinderEvents_3.Events.SelectionChanged, {
+            this.$emit(exports.SelectionItemEvents.SelectionChanged, {
                 Entity: this.entity,
                 Selected: this.selected
             });
@@ -1629,105 +1782,63 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
     }(ViewBase_6.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "vue", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_3, vue_class_component_7, vue_infinite_loading_2, Libraries_5, ArtistStore_1, ViewBase_7, AdminLteEvents_1, FinderEvents_4, SelectionItem_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, ArtistStore_1, SelectionItem_2, SelectionList_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    vue_3.default.use(vue_infinite_loading_2.default);
     var ArtistList = /** @class */ (function (_super) {
         __extends(ArtistList, _super);
         function ArtistList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.store = new ArtistStore_1.default();
-            _this.page = 1;
-            _this.genreIds = [];
             _this.entities = [];
-            _this.viewport = Libraries_5.default.ResponsiveBootstrapToolkit;
-            _this.isExpanded = true;
+            _this.genreIds = [];
             return _this;
         }
-        Object.defineProperty(ArtistList.prototype, "InfiniteLoading", {
-            get: function () {
-                return this.$refs.InfiniteLoading;
-            },
-            enumerable: true,
-            configurable: true
-        });
         ArtistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var button;
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            this.isAutoCollapse = true;
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            button = Libraries_5.default.$(this.$refs.ButtonCollaple);
-                            this.boxWidget = new AdminLte.Widget(button);
-                            button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
-                                _this.isExpanded = false;
-                            });
-                            button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
-                                _this.isExpanded = true;
-                            });
-                            Libraries_5.default.$(window).resize(this.viewport.changed(function () {
-                                _this.ToggleListByViewport();
-                            }));
-                            _.delay(function () {
-                                _this.ToggleListByViewport();
-                            }, 1000);
                             return [2 /*return*/, true];
                     }
+                });
+            });
+        };
+        /**
+         * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
+         * superクラスの同名メソッドが実行されるが、superクラス上のthisが
+         * バインドされずにnullになってしまう。
+         * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
+         */
+        ArtistList.prototype.OnInfinite = function ($state) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, _super.prototype.OnInfinite.call(this, $state)];
                 });
             });
         };
         ArtistList.prototype.OnCollapleClick = function () {
-            this.boxWidget.toggle();
+            _super.prototype.OnCollapleClick.call(this);
         };
-        ArtistList.prototype.OnInfinite = function ($state) {
+        ArtistList.prototype.OnClickRefresh = function () {
+            _super.prototype.OnClickRefresh.call(this);
+        };
+        ArtistList.prototype.OnSelectionChanged = function (args) {
+            _super.prototype.OnSelectionChanged.call(this, args);
+        };
+        ArtistList.prototype.GetPagenatedList = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.store.GetList(this.genreIds, this.page)];
-                        case 1:
-                            result = _a.sent();
-                            if (0 < result.ResultList.length)
-                                this.entities = this.entities.concat(result.ResultList);
-                            if (this.entities.length < result.TotalLength) {
-                                $state.loaded();
-                                this.page++;
-                            }
-                            else {
-                                $state.complete();
-                            }
-                            return [2 /*return*/, true];
+                        case 0: return [4 /*yield*/, this.store.GetList(this.genreIds, this.Page)];
+                        case 1: return [2 /*return*/, _a.sent()];
                     }
                 });
             });
-        };
-        ArtistList.prototype.OnClickRefresh = function () {
-            this.Refresh();
-            this.$emit(FinderEvents_4.Events.Refreshed);
-        };
-        ArtistList.prototype.OnSelectionChanged = function (args) {
-            this.$emit(FinderEvents_4.Events.SelectionChanged, args);
-        };
-        ArtistList.prototype.Refresh = function () {
-            var _this = this;
-            this.page = 1;
-            this.entities = [];
-            this.$nextTick(function () {
-                _this.InfiniteLoading.stateChanger.reset();
-                _this.InfiniteLoading.attemptLoad();
-            });
-        };
-        ArtistList.prototype.ToggleListByViewport = function () {
-            if (this.viewport.is('<=sm') && this.isExpanded) {
-                this.boxWidget.collapse();
-            }
-            else if (this.viewport.is('>sm') && !this.isExpanded) {
-                this.boxWidget.expand();
-            }
         };
         ArtistList.prototype.HasGenre = function (genreId) {
             return (0 <= _.indexOf(this.genreIds, genreId));
@@ -1752,14 +1863,15 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "admin-lte/dist/
         };
         ArtistList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-3\">\n    <div id=\"artistList\" class=\"card\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaple\"\n                    @click=\"OnCollapleClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div id=\"artistList\" class=\"card\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapleClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
-                    'selection-item': SelectionItem_2.default
+                    'selection-item': SelectionItem_2.default,
+                    'infinite-loading': vue_infinite_loading_2.default
                 }
             })
         ], ArtistList);
         return ArtistList;
-    }(ViewBase_7.default));
+    }(SelectionList_2.default));
     exports.default = ArtistList;
 });
 define("Models/Genres/Genre", ["require", "exports", "lodash", "Models/Relations/GenreArtist", "Models/Relations/GenreAlbum"], function (require, exports, _, GenreArtist_2, GenreAlbum_2) {
@@ -1797,18 +1909,23 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
         function GenreStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        GenreStore.prototype.GetList = function () {
+        GenreStore.prototype.GetList = function (page) {
             return __awaiter(this, void 0, void 0, function () {
-                var result, entities;
+                var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Genre/GetList')];
+                        case 0: return [4 /*yield*/, this.QueryGet('Genre/GetPagenatedList', {
+                                Page: page
+                            })];
                         case 1:
-                            result = _a.sent();
-                            entities = (result.Succeeded)
-                                ? Genre_1.default.CreateArray(result.Result)
-                                : [];
-                            return [2 /*return*/, this.Enumerable.from(entities)];
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                console.error(response.Errors);
+                                throw new Error('Unexpected Error on ApiQuery');
+                            }
+                            result = response.Result;
+                            result.ResultList = Genre_1.default.CreateArray(result.ResultList);
+                            return [2 /*return*/, result];
                     }
                 });
             });
@@ -1817,7 +1934,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "vue-class-component", "Libraries", "Models/Genres/GenreStore", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Events/FinderEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, vue_class_component_8, Libraries_6, GenreStore_1, ViewBase_8, AdminLteEvents_2, FinderEvents_5, SelectionItem_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, GenreStore_1, SelectionItem_3, SelectionList_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -1826,78 +1943,68 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "admin-lte/dist/j
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.store = new GenreStore_1.default();
             _this.entities = [];
-            _this.viewport = Libraries_6.default.ResponsiveBootstrapToolkit;
-            _this.isExpanded = true;
             return _this;
         }
         GenreList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var button;
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            this.isAutoCollapse = true;
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            button = Libraries_6.default.$(this.$refs.ButtonCollaple);
-                            this.boxWidget = new AdminLte.Widget(button);
-                            button.on(AdminLteEvents_2.WidgetEvents.Collapsed, function () {
-                                _this.isExpanded = false;
-                            });
-                            button.on(AdminLteEvents_2.WidgetEvents.Expanded, function () {
-                                _this.isExpanded = true;
-                            });
-                            Libraries_6.default.$(window).resize(this.viewport.changed(function () {
-                                _this.ToggleListByViewport();
-                            }));
-                            _.delay(function () {
-                                _this.ToggleListByViewport();
-                            }, 1000);
-                            this.Refresh();
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
-        GenreList.prototype.OnCollapleClick = function () {
-            this.boxWidget.toggle();
-        };
-        GenreList.prototype.OnClickRefresh = function () {
-            this.Refresh();
-            this.$emit(FinderEvents_5.Events.Refreshed);
-        };
-        GenreList.prototype.OnSelectionChanged = function (args) {
-            this.$emit(FinderEvents_5.Events.SelectionChanged, args);
-        };
-        GenreList.prototype.Refresh = function () {
-            var _this = this;
-            this.entities = [];
-            this.store.GetList()
-                .then(function (en) {
-                _this.entities = en.toArray();
+        /**
+         * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
+         * superクラスの同名メソッドが実行されるが、superクラス上のthisが
+         * バインドされずにnullになってしまう。
+         * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
+         */
+        GenreList.prototype.OnInfinite = function ($state) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, _super.prototype.OnInfinite.call(this, $state)];
+                });
             });
         };
-        GenreList.prototype.ToggleListByViewport = function () {
-            if (this.viewport.is('<=sm') && this.isExpanded) {
-                this.boxWidget.collapse();
-            }
-            else if (this.viewport.is('>sm') && !this.isExpanded) {
-                this.boxWidget.expand();
-            }
+        GenreList.prototype.OnCollapleClick = function () {
+            _super.prototype.OnCollapleClick.call(this);
+        };
+        GenreList.prototype.OnClickRefresh = function () {
+            _super.prototype.OnClickRefresh.call(this);
+        };
+        GenreList.prototype.OnSelectionChanged = function (args) {
+            _super.prototype.OnSelectionChanged.call(this, args);
+        };
+        GenreList.prototype.GetPagenatedList = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.store.GetList(this.Page)];
+                        case 1: return [2 /*return*/, _a.sent()];
+                    }
+                });
+            });
         };
         GenreList = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaple\"\n                    @click=\"OnCollapleClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n            <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n            </template>\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapleClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
-                    'selection-item': SelectionItem_3.default
+                    'selection-item': SelectionItem_3.default,
+                    'infinite-loading': vue_infinite_loading_3.default
                 }
             })
         ], GenreList);
         return GenreList;
-    }(ViewBase_8.default));
+    }(SelectionList_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Lists/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, ViewBase_9, AlbumList_1, ArtistList_1, GenreList_1) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Lists/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, ViewBase_7, AlbumList_1, ArtistList_1, GenreList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -1927,8 +2034,6 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
             configurable: true
         });
         Finder.prototype.OnGenreSelectionChanged = function (args) {
-            console.log('Finder.OnGenreSelectionChanged');
-            console.log(args);
             if (args.Selected) {
                 this.ArtistList.AddFilterGenreId(args.Entity.Id);
                 this.AlbumList.RemoveAllFilters();
@@ -1954,18 +2059,6 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
         Finder.prototype.OnArtistRefreshed = function () {
             this.AlbumList.RemoveFilterAllArtists();
         };
-        Finder.prototype.OnAlbumSelectionChanged = function (args) {
-            console.log('Finder.OnAlbumSelectionChanged');
-            console.log(args);
-        };
-        Finder.prototype.OnAlbumRefreshed = function () {
-        };
-        Finder.prototype.OnTrackSelectionChanged = function (args) {
-            console.log('Finder.OnTrackSelectionChanged');
-            console.log(args);
-        };
-        Finder.prototype.OnTrackRefreshed = function () {
-        };
         Finder = __decorate([
             vue_class_component_9.default({
                 template: "<section class=\"content h-100 tab-pane fade show active\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"finder-tab\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\" />\n    </div>\n</section>",
@@ -1977,10 +2070,10 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
             })
         ], Finder);
         return Finder;
-    }(ViewBase_9.default));
+    }(ViewBase_7.default));
     exports.default = Finder;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_10, ViewBase_10) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_10, ViewBase_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Playlists = /** @class */ (function (_super) {
@@ -1990,15 +2083,15 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
         }
         Playlists = __decorate([
             vue_class_component_10.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-playlists\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"playlists-tab\">\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-playlists\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n    </div>\n</section>",
                 components: {}
             })
         ], Playlists);
         return Playlists;
-    }(ViewBase_10.default));
+    }(ViewBase_8.default));
     exports.default = Playlists;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_11, ViewBase_11) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_11, ViewBase_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Settings = /** @class */ (function (_super) {
@@ -2013,10 +2106,10 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             })
         ], Settings);
         return Settings;
-    }(ViewBase_11.default));
+    }(ViewBase_9.default));
     exports.default = Settings;
 });
-define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/HeaderBars/HeaderBar", "Views/Sidebars/Sidebar", "Views/Finders/Finder", "Views/Playlists/Playlists", "Views/Settings/Settings"], function (require, exports, ViewBase_12, HeaderBar_1, Sidebar_1, Finder_1, Playlists_1, Settings_1) {
+define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/HeaderBars/HeaderBar", "Views/Sidebars/Sidebar", "Views/Finders/Finder", "Views/Playlists/Playlists", "Views/Settings/Settings"], function (require, exports, ViewBase_10, HeaderBar_1, Sidebar_1, Finder_1, Playlists_1, Settings_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -2034,7 +2127,7 @@ define("Views/RootView", ["require", "exports", "Views/Bases/ViewBase", "Views/H
             }) || this;
         }
         return RootView;
-    }(ViewBase_12.default));
+    }(ViewBase_10.default));
     exports.default = RootView;
 });
 define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], function (require, exports, RootView_1) {
@@ -2062,7 +2155,7 @@ define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], fu
     }());
     exports.default = RootContoller;
 });
-define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"], function (require, exports, Libraries_7, RootContoller_1) {
+define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"], function (require, exports, Libraries_6, RootContoller_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -2074,7 +2167,7 @@ define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"],
                     switch (_a.label) {
                         case 0:
                             console.log('TS Start');
-                            Libraries_7.default.Initialize();
+                            Libraries_6.default.Initialize();
                             this._rootController = new RootContoller_1.default();
                             return [4 /*yield*/, this._rootController.Init()];
                         case 1:
@@ -2087,5 +2180,26 @@ define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"],
         return Main;
     }());
     var main = (new Main()).Init();
+});
+define("Views/Playlists/Lists/TitleList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Views/Bases/ViewBase", "vue", "Views/Shared/SelectionItem"], function (require, exports, vue_class_component_12, vue_infinite_loading_4, ViewBase_11, vue_2, SelectionItem_4) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    vue_2.default.use(vue_infinite_loading_4.default);
+    var ArtistList = /** @class */ (function (_super) {
+        __extends(ArtistList, _super);
+        function ArtistList() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ArtistList = __decorate([
+            vue_class_component_12.default({
+                template: "<div class=\"col-md-3\">\n    <div id=\"artistList\" class=\"card\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaple\"\n                    @click=\"OnCollapleClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading @infinite=\"OnInfinite\" ref=\"InfiniteLoading\"></infinite-loading>\n            </ul>\n        </div>\n    </div>\n</div>",
+                components: {
+                    'selection-item': SelectionItem_4.default
+                }
+            })
+        ], ArtistList);
+        return ArtistList;
+    }(ViewBase_11.default));
+    exports.default = ArtistList;
 });
 //# sourceMappingURL=tsout.js.map

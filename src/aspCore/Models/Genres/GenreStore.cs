@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MusicFront.Models.Genres
 {
-    public class GenreStore : StoreBase<Genre>
+    public class GenreStore : PagenagedStoreBase<Genre>
     {
         private const string QueryString = "local:directory?type=genre";
 
@@ -18,10 +18,33 @@ namespace MusicFront.Models.Genres
         public Genre Get(int genreId)
             => this.Dbc.GetGenreQuery().FirstOrDefault(e => e.Id == genreId);
 
-        public List<Genre> GetList()
-            => this.Dbc.GetGenreQuery()
-                .OrderBy(e => e.LowerName)
-                .ToList();
+        public PagenatedResult GetPagenatedList(int? page)
+        {
+            var query = this.Dbc.GetGenreQuery();
+
+            var totalLength = query.Count();
+
+            query = query.OrderBy(e => e.LowerName);
+
+            if (page != null)
+            {
+                query = query
+                    .Skip(((int)page - 1) * this.PageLength)
+                    .Take(this.PageLength);
+            }
+
+            var array = query.ToArray();
+
+            var result = new PagenatedResult()
+            {
+                TotalLength = totalLength,
+                ResultLength = array.Length,
+                ResultPage = page,
+                ResultList = array
+            };
+
+            return result;
+        }
 
         public async Task<bool> Refresh()
         {

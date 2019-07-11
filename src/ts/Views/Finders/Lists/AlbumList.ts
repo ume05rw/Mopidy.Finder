@@ -1,15 +1,12 @@
 import * as _ from 'lodash';
-import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
+import Libraries from '../../../Libraries';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
-import ViewBase from '../../Bases/ViewBase';
-import { Events, ITrackSelected } from '../../Events/FinderEvents';
-import SelectionAlbumTracks from './SelectionAlbumTracks';
-import Libraries from '../../../Libraries';
-
-Vue.use(InfiniteLoading);
+import { PagenatedResult } from '../../../Models/Bases/StoreBase';
+import SelectionList from '../../Shared/SelectionList';
+import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './SelectionAlbumTracks';
 
 @Component({
     template: `<div class="col-md-6">
@@ -30,54 +27,57 @@ Vue.use(InfiniteLoading);
                     <selection-album-tracks
                         ref="AlbumTracks"
                         v-bind:entity="entity"
-                        @TrackSelected="OnTrackSelected" />
+                        @AlbumTracksSelected="OnAlbumTracksSelected" />
                 </template>
-                <infinite-loading @infinite="OnInfinite" ref="InfiniteLoading"></infinite-loading>
+                <infinite-loading
+                    @infinite="OnInfinite"
+                    ref="InfiniteLoading" />
             </ul>
         </div>
     </div>
 </div>`,
     components: {
-        'selection-album-tracks': SelectionAlbumTracks
+        'selection-album-tracks': SelectionAlbumTracks,
+        'infinite-loading': InfiniteLoading
     }
 })
-export default class AlbumList extends ViewBase {
+export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksStore> {
+
+    protected store: AlbumTracksStore = new AlbumTracksStore();
+    protected entities: AlbumTracks[] = [];
 
     private isEntitiesRefreshed: boolean = false;
-    private page: number = 1;
     private genreIds: number[] = [];
     private artistIds: number[] = [];
 
-    private store: AlbumTracksStore = new AlbumTracksStore();
-    private entities: AlbumTracks[] = [];
-
-    private get InfiniteLoading(): InfiniteLoading {
-        return this.$refs.InfiniteLoading as InfiniteLoading;
-    }
-
-    public async OnInfinite($state: StateChanger): Promise<boolean> {
-
-        var result = await this.store.GetList(this.genreIds, this.artistIds, this.page);
-
-        if (0 < result.ResultList.length)
-            this.entities = this.entities.concat(result.ResultList);
-
-        if (this.entities.length < result.TotalLength) {
-            $state.loaded();
-            this.page++;
-        } else {
-            $state.complete();
-        }
-
+    public async Initialize(): Promise<boolean> {
+        this.isAutoCollapse = false;
+        await super.Initialize();
         return true;
     }
 
-    private OnClickRefresh(): void {
-        this.Refresh();
-        this.$emit(Events.Refreshed);
+    /**
+     * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
+     * superクラスの同名メソッドが実行されるが、superクラス上のthisが
+     * バインドされずにnullになってしまう。
+     * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
+     */
+    protected async OnInfinite($state: StateChanger): Promise<boolean> {
+        return super.OnInfinite($state);
+    }
+    protected OnCollapleClick(): void {
+        super.OnCollapleClick();
     }
 
-    private async OnTrackSelected(args: ITrackSelected): Promise<boolean> {
+    protected OnClickRefresh(): void {
+        super.OnClickRefresh();
+    }
+
+    protected async GetPagenatedList(): Promise<PagenatedResult<AlbumTracks>> {
+        return await this.store.GetList(this.genreIds, this.artistIds, this.Page);
+    }
+
+    private async OnAlbumTracksSelected(args: IAlbumTracksSelectedArgs): Promise<boolean> {
 
         if (this.isEntitiesRefreshed) {
             await this.store.ClearList();
@@ -90,23 +90,22 @@ export default class AlbumList extends ViewBase {
             this.isEntitiesRefreshed = false;
         }
 
-        var albumTracks = Libraries.Enumerable.from(this.entities)
-            .firstOrDefault(e => e.Album.Id === args.AlbumId);
-
+        var albumTracks = args.Entity;
         if (!albumTracks) {
-            console.error('AlbumTracks Not Found: AlbumId=' + args.AlbumId);
+            console.error('AlbumTracks Not Found - AlbumTrack;');
+            console.error(args.Entity);
             return false;
         }
 
-        var tracks = Libraries.Enumerable.from(albumTracks.Tracks);
-        var track = tracks.firstOrDefault(e => e.Id === args.TrackId);
-
+        var track = args.Track;
         if (!track) {
-            console.error('Track Not Found: TrackId=' + args.TrackId);
+            console.error('Track Not Found - Track:');
+            console.error(args.Track);
             return false;
         }
 
-        var isAllTracksRegistered = tracks.all(e => e.TlId !== null);
+        var isAllTracksRegistered = Libraries.Enumerable.from(albumTracks.Tracks)
+                .all(e => e.TlId !== null);
 
         if (isAllTracksRegistered) {
             // TlId割り当て済みの場合
@@ -125,14 +124,9 @@ export default class AlbumList extends ViewBase {
         }
     }
 
-    private Refresh(): void {
-        this.page = 1;
-        this.entities = [];
+    protected Refresh(): void {
+        super.Refresh();
         this.isEntitiesRefreshed = true;
-        this.$nextTick(() => {
-            this.InfiniteLoading.stateChanger.reset();
-            (this.InfiniteLoading as any).attemptLoad();
-        });
     }
 
     private HasGenre(genreId: number): boolean {

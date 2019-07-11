@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.Models.Albums;
-using MusicFront.Models.Artists;
 using MusicFront.Models.Genres;
 using MusicFront.Models.Xhrs;
 
@@ -24,10 +18,13 @@ namespace MusicFront.Controllers
         /// <remarks>
         /// こちらはページング無しの全件取得。
         /// </remarks>
-        [HttpGet("GetList")]
-        public XhrResponse GetList([FromServices] GenreStore store)
+        [HttpGet("GetPagenatedList")]
+        public XhrResponse GetPagenatedList(
+            [FromQuery] int? Page,
+            [FromServices] GenreStore store
+        )
         {
-            var genres = store.GetList();
+            var genres = store.GetPagenatedList(Page);
             return XhrResponseFactory.CreateSucceeded(genres);
         }
     }

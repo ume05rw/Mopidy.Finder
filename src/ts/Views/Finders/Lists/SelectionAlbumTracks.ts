@@ -3,7 +3,15 @@ import { Prop } from 'vue-property-decorator';
 import ViewBase from '../../Bases/ViewBase';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import Libraries from '../../../Libraries';
-import { Events, ITrackSelected } from '../../Events/FinderEvents';
+import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
+import Track from '../../../Models/Tracks/Track';
+
+export interface IAlbumTracksSelectedArgs extends ISelectionChangedArgs<AlbumTracks> {
+    Track: Track;
+}
+export const SelectionAlbumEvents = {
+    AlbumTracksSelected: 'AlbumTracksSelected'
+};
 
 @Component({
     template: `<li class="nav-item w-100"
@@ -50,21 +58,23 @@ export default class SelectionAlbumTracks extends ViewBase {
 
     private OnClickAlbumPlay(): void {
         var tracks = Libraries.Enumerable.from(this.entity.Tracks);
-        var firstTrack = tracks.first(e => e.TrackNo === tracks.min(e2 => e2.TrackNo));
+        var track = tracks.first(e => e.TrackNo === tracks.min(e2 => e2.TrackNo));
 
-        this.$emit(Events.TrackSelected, {
-            AlbumId: this.entity.Album.Id,
-            TrackId: firstTrack.Id
-        } as ITrackSelected);
+        this.$emit(SelectionAlbumEvents.AlbumTracksSelected, {
+            Entity: this.entity,
+            Track: track
+        } as IAlbumTracksSelectedArgs);
     }
 
     private OnClickTrack(args: Event): void {
         var tr = (args.target as HTMLElement).parentElement;
         var trackId = parseInt(tr.getAttribute('data-trackid'), 10);
+        var tracks = Libraries.Enumerable.from(this.entity.Tracks);
+        var track = tracks.first(e => e.Id === trackId);
 
-        this.$emit(Events.TrackSelected, {
-            AlbumId: this.entity.Album.Id,
-            TrackId: trackId
-        } as ITrackSelected);
+        this.$emit(SelectionAlbumEvents.AlbumTracksSelected, {
+            Entity: this.entity,
+            Track: track
+        } as IAlbumTracksSelectedArgs);
     }
 }

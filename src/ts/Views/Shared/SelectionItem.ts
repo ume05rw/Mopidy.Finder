@@ -1,8 +1,15 @@
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import ISelectionItem from '../../Models/Bases/ISelectionItem';
 import ViewBase from '../Bases/ViewBase';
-import { Events, ISelectionChangedArgs } from '../Events/FinderEvents';
+
+export const SelectionItemEvents = {
+    SelectionChanged: 'SelectionChanged'
+}
+
+export interface ISelectionChangedArgs<TEntity> {
+    Entity: TEntity;
+    Selected: boolean;
+}
 
 @Component({
     template: `<li class="nav-item"
@@ -13,12 +20,12 @@ import { Events, ISelectionChangedArgs } from '../Events/FinderEvents';
     </a>
 </li>`
 })
-export default class SelectionItem extends ViewBase {
+export default class SelectionItem<TEntity> extends ViewBase {
 
     private static readonly SelectedColor: string = 'bg-gray';
 
     @Prop()
-    public entity!: ISelectionItem;
+    public entity!: TEntity;
 
     private selected: boolean = false;
 
@@ -38,10 +45,10 @@ export default class SelectionItem extends ViewBase {
 
             this.selected = true;
         }
-        this.$emit(Events.SelectionChanged, {
+        this.$emit(SelectionItemEvents.SelectionChanged, {
             Entity: this.entity,
             Selected: this.selected
-        } as ISelectionChangedArgs);
+        } as ISelectionChangedArgs<TEntity>);
     }
 
     public IsSelected(): boolean {

@@ -6,6 +6,8 @@ import ViewBase from '../Bases/ViewBase';
                         id="tab-playlists"
                         role="tabpanel"
                         aria-labelledby="playlists-tab">
+    <div class="row">
+    </div>
 </section>`,
     components: {
     }

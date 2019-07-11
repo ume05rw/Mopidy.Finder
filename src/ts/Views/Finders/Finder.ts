@@ -1,9 +1,11 @@
 import Component from 'vue-class-component';
 import ViewBase from '../Bases/ViewBase';
-import { ISelectionChangedArgs } from '../Events/FinderEvents';
+import { ISelectionChangedArgs } from '../Shared/SelectionEvents';
 import AlbumList from './Lists/AlbumList';
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
+import Genre from '../../Models/Genres/Genre';
+import Artist from '../../Models/Artists/Artist';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade show active"
@@ -43,10 +45,7 @@ export default class Finder extends ViewBase {
         return this.$refs.AlbumList as AlbumList;
     }
 
-    private OnGenreSelectionChanged(args: ISelectionChangedArgs): void {
-        console.log('Finder.OnGenreSelectionChanged');
-        console.log(args);
-
+    private OnGenreSelectionChanged(args: ISelectionChangedArgs<Genre>): void {
         if (args.Selected) {
             this.ArtistList.AddFilterGenreId(args.Entity.Id);
             this.AlbumList.RemoveAllFilters();
@@ -62,7 +61,7 @@ export default class Finder extends ViewBase {
         this.AlbumList.RemoveAllFilters();
     }
 
-    private OnArtistSelectionChanged(args: ISelectionChangedArgs): void {
+    private OnArtistSelectionChanged(args: ISelectionChangedArgs<Artist>): void {
         if (args.Selected) {
             this.AlbumList.AddFilterArtistId(args.Entity.Id);
         } else {
@@ -72,22 +71,5 @@ export default class Finder extends ViewBase {
 
     private OnArtistRefreshed(): void {
         this.AlbumList.RemoveFilterAllArtists();
-    }
-
-    private OnAlbumSelectionChanged(args: ISelectionChangedArgs): void {
-        console.log('Finder.OnAlbumSelectionChanged');
-        console.log(args);
-    }
-
-    private OnAlbumRefreshed(): void {
-    }
-
-    private OnTrackSelectionChanged(args: ISelectionChangedArgs): void {
-        console.log('Finder.OnTrackSelectionChanged');
-        console.log(args);
-    }
-
-    private OnTrackRefreshed(): void {
-
     }
 }

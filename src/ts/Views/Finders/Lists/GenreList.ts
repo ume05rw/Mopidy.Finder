@@ -1,14 +1,11 @@
-/// <reference path="../../../../../types/adminlte/index.d.ts" />
-import * as AdminLte from 'admin-lte/dist/js/adminlte';
-import * as _ from 'lodash';
 import Component from 'vue-class-component';
-import Libraries from '../../../Libraries';
+import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
+import { PagenatedResult } from '../../../Models/Bases/StoreBase';
 import Genre from '../../../Models/Genres/Genre';
 import GenreStore from '../../../Models/Genres/GenreStore';
-import ViewBase from '../../Bases/ViewBase';
-import { WidgetEvents } from '../../Events/AdminLteEvents';
-import { Events, ISelectionChangedArgs } from '../../Events/FinderEvents';
+import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
+import SelectionList from '../../Shared/SelectionList';
 
 @Component({
     template: `<div class="col-md-3">
@@ -18,7 +15,7 @@ import SelectionItem from '../../Shared/SelectionItem';
             <div class="card-tools">
                 <button
                     class="btn btn-tool d-inline d-md-none collapse"
-                    ref="ButtonCollaple"
+                    ref="ButtonCollaplse"
                     @click="OnCollapleClick" >
                     <i class="fa fa-minus" />
                 </button>
@@ -31,84 +28,56 @@ import SelectionItem from '../../Shared/SelectionItem';
         </div>
         <div class="card-body list-scrollable">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
-            <template v-for="entity in entities">
-                <selection-item
-                    ref="Items"
-                    v-bind:entity="entity"
-                    @SelectionChanged="OnSelectionChanged" />
-            </template>
+                <template v-for="entity in entities">
+                    <selection-item
+                        ref="Items"
+                        v-bind:entity="entity"
+                        @SelectionChanged="OnSelectionChanged" />
+                </template>
+                <infinite-loading
+                    @infinite="OnInfinite"
+                    ref="InfiniteLoading" />
             </ul>
         </div>
     </div>
 </div>`,
     components: {
-        'selection-item': SelectionItem
+        'selection-item': SelectionItem,
+        'infinite-loading': InfiniteLoading
     }
 })
-export default class GenreList extends ViewBase {
+export default class GenreList extends SelectionList<Genre, GenreStore> {
 
-    private store: GenreStore = new GenreStore();
-    private entities: Genre[] = [];
-    private viewport = Libraries.ResponsiveBootstrapToolkit;
-    private boxWidget: AdminLte.Widget;
-    private isExpanded: boolean = true;
+    protected store: GenreStore = new GenreStore();
+    protected entities: Genre[] = [];
 
     public async Initialize(): Promise<boolean> {
+        this.isAutoCollapse = true;
         await super.Initialize();
-
-        const button = Libraries.$(this.$refs.ButtonCollaple as HTMLElement);
-
-        this.boxWidget = new AdminLte.Widget(button);
-
-        button.on(WidgetEvents.Collapsed, () => {
-            this.isExpanded = false;
-        });
-        button.on(WidgetEvents.Expanded, () => {
-            this.isExpanded = true;
-        });
-
-        (Libraries.$(window) as any).resize(
-            this.viewport.changed(() => {
-                this.ToggleListByViewport();
-            })
-        );
-
-        _.delay(() => {
-            this.ToggleListByViewport();
-        }, 1000);
-
-        this.Refresh();
-
         return true;
     }
 
-    private OnCollapleClick(): void {
-        this.boxWidget.toggle();
+    /**
+     * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
+     * superクラスの同名メソッドが実行されるが、superクラス上のthisが
+     * バインドされずにnullになってしまう。
+     * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
+     */
+    protected async OnInfinite($state: StateChanger): Promise<boolean> {
+        return super.OnInfinite($state);
+    }
+    protected OnCollapleClick(): void {
+        super.OnCollapleClick();
     }
 
-    private OnClickRefresh(): void {
-        this.Refresh();
-        this.$emit(Events.Refreshed);
+    protected OnClickRefresh(): void {
+        super.OnClickRefresh();
+    }
+    protected OnSelectionChanged(args: ISelectionChangedArgs<Genre>): void {
+        super.OnSelectionChanged(args);
     }
 
-    private OnSelectionChanged(args: ISelectionChangedArgs): void {
-        this.$emit(Events.SelectionChanged, args);
-    }
-
-    public Refresh(): void {
-        this.entities = [];
-
-        this.store.GetList()
-            .then((en) => {
-                this.entities = en.toArray();
-            });
-    }
-
-    private ToggleListByViewport(): void {
-        if (this.viewport.is('<=sm') && this.isExpanded) {
-            this.boxWidget.collapse();
-        } else if (this.viewport.is('>sm') && !this.isExpanded) {
-            this.boxWidget.expand();
-        }
+    protected async GetPagenatedList(): Promise<PagenatedResult<Genre>> {
+        return await this.store.GetList(this.Page);
     }
 }

@@ -1,18 +1,12 @@
-/// <reference path="../../../../../types/adminlte/index.d.ts" />
-import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import * as _ from 'lodash';
-import Vue from 'vue';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
-import Libraries from '../../../Libraries';
 import Artist from '../../../Models/Artists/Artist';
 import ArtistStore from '../../../Models/Artists/ArtistStore';
-import ViewBase from '../../Bases/ViewBase';
-import { WidgetEvents } from '../../Events/AdminLteEvents';
-import { Events, ISelectionChangedArgs } from '../../Events/FinderEvents';
+import { PagenatedResult } from '../../../Models/Bases/StoreBase';
+import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
-
-Vue.use(InfiniteLoading);
+import SelectionList from '../../Shared/SelectionList';
 
 @Component({
     template: `<div class="col-md-3">
@@ -22,7 +16,7 @@ Vue.use(InfiniteLoading);
             <div class="card-tools">
                 <button
                     class="btn btn-tool d-inline d-md-none collapse"
-                    ref="ButtonCollaple"
+                    ref="ButtonCollaplse"
                     @click="OnCollapleClick" >
                     <i class="fa fa-minus" />
                 </button>
@@ -41,101 +35,51 @@ Vue.use(InfiniteLoading);
                     v-bind:entity="entity"
                     @SelectionChanged="OnSelectionChanged" />
                 </template>
-                <infinite-loading @infinite="OnInfinite" ref="InfiniteLoading"></infinite-loading>
+                <infinite-loading
+                    @infinite="OnInfinite"
+                    ref="InfiniteLoading" />
             </ul>
         </div>
     </div>
 </div>`,
     components: {
-        'selection-item': SelectionItem
+        'selection-item': SelectionItem,
+        'infinite-loading': InfiniteLoading
     }
 })
-export default class ArtistList extends ViewBase {
+export default class ArtistList extends SelectionList<Artist, ArtistStore> {
 
-    private store: ArtistStore = new ArtistStore();
-    private page: number = 1;
+    protected store: ArtistStore = new ArtistStore();
+    protected entities: Artist[] = [];
     private genreIds: number[] = [];
-    private entities: Artist[] = [];
-    private viewport = Libraries.ResponsiveBootstrapToolkit;
-    private boxWidget: AdminLte.Widget;
-    private isExpanded: boolean = true;
-
-    private get InfiniteLoading(): InfiniteLoading {
-        return this.$refs.InfiniteLoading as InfiniteLoading;
-    }
 
     public async Initialize(): Promise<boolean> {
+        this.isAutoCollapse = true;
         await super.Initialize();
-
-        const button = Libraries.$(this.$refs.ButtonCollaple as HTMLElement);
-
-        this.boxWidget = new AdminLte.Widget(button);
-
-        button.on(WidgetEvents.Collapsed, () => {
-            this.isExpanded = false;
-        });
-        button.on(WidgetEvents.Expanded, () => {
-            this.isExpanded = true;
-        });
-
-        (Libraries.$(window) as any).resize(
-            this.viewport.changed(() => {
-                this.ToggleListByViewport();
-            })
-        );
-
-        _.delay(() => {
-            this.ToggleListByViewport();
-        }, 1000);
-
         return true;
     }
 
-    private OnCollapleClick(): void {
-        this.boxWidget.toggle();
+    /**
+     * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
+     * superクラスの同名メソッドが実行されるが、superクラス上のthisが
+     * バインドされずにnullになってしまう。
+     * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
+     */
+    protected async OnInfinite($state: StateChanger): Promise<boolean> {
+        return super.OnInfinite($state);
+    }
+    protected OnCollapleClick(): void {
+        super.OnCollapleClick();
+    }
+    protected OnClickRefresh(): void {
+        super.OnClickRefresh();
+    }
+    protected OnSelectionChanged(args: ISelectionChangedArgs<Artist>): void {
+        super.OnSelectionChanged(args);
     }
 
-    private async OnInfinite($state: StateChanger): Promise<boolean> {
-        
-        var result = await this.store.GetList(this.genreIds, this.page);
-
-        if (0 < result.ResultList.length)
-            this.entities = this.entities.concat(result.ResultList);
-
-        if (this.entities.length < result.TotalLength) {
-            $state.loaded();
-            this.page++;
-        } else {
-            $state.complete();
-        }
-
-        return true;
-    }
-
-    private OnClickRefresh(): void {
-        this.Refresh();
-        this.$emit(Events.Refreshed);
-    }
-
-    private OnSelectionChanged(args: ISelectionChangedArgs): void {
-        this.$emit(Events.SelectionChanged, args);
-    }
-
-    private Refresh(): void {
-        this.page = 1;
-        this.entities = [];
-        this.$nextTick(() => {
-            this.InfiniteLoading.stateChanger.reset();
-            (this.InfiniteLoading as any).attemptLoad();
-        });
-    }
-
-    private ToggleListByViewport(): void {
-        if (this.viewport.is('<=sm') && this.isExpanded) {
-            this.boxWidget.collapse();
-        } else if (this.viewport.is('>sm') && !this.isExpanded) {
-            this.boxWidget.expand();
-        }
+    protected async GetPagenatedList(): Promise<PagenatedResult<Artist>> {
+        return await this.store.GetList(this.genreIds, this.Page);
     }
 
     private HasGenre(genreId: number): boolean {
