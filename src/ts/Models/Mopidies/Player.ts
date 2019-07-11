@@ -29,7 +29,7 @@ export interface IStatus {
 
 export default class Player extends JsonRpcQueryableBase implements IStatus {
 
-    private static readonly PollingIntervalMsec = 1000;
+    private static readonly PollingMsec = 2000;
 
     private static readonly Methods = {
         GetState: 'core.playback.get_state',
@@ -117,7 +117,7 @@ export default class Player extends JsonRpcQueryableBase implements IStatus {
     public StartPolling(): void {
         this._timer = setInterval(() => {
             this.Polling();
-        }, Player.PollingIntervalMsec);
+        }, Player.PollingMsec);
     }
 
     private async Polling(): Promise<boolean> {
@@ -126,8 +126,8 @@ export default class Player extends JsonRpcQueryableBase implements IStatus {
 
         const resState = await this.JsonRpcRequest(Player.Methods.GetState);
         if (resState.result) {
-            this._isPlaying = (resState.result == 'playing');
             this._playerState = resState.result as PlayerState;
+            this._isPlaying = (this._playerState === PlayerState.Playing);
         }
 
         const resTrack = await this.JsonRpcRequest(Player.Methods.GetCurrentTlTrack);

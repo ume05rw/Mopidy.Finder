@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import { default as Album, IAlbum } from '../Albums/Album';
 import { default as Artist, IArtist } from '../Artists/Artist';
 import { default as Track, ITrack } from '../Tracks/Track'
-import ISelectionItem from '../Bases/ISelectionItem';
 
 export interface IAlbumTracks {
     Album: IAlbum;
@@ -10,13 +9,15 @@ export interface IAlbumTracks {
     Tracks: ITrack[];
 }
 
-export default class AlbumTracks implements IAlbumTracks, ISelectionItem {
+export default class AlbumTracks implements IAlbumTracks {
 
     public static Create(entity: IAlbumTracks): AlbumTracks {
         var result = new AlbumTracks();
-        result.Album = Album.Create(entity.Album);
-        result.Artists = Artist.CreateArray(entity.Artists);
-        result.Tracks = Track.CreateArray(entity.Tracks);
+        if (entity) {
+            result.Album = Album.Create(entity.Album);
+            result.Artists = Artist.CreateArray(entity.Artists);
+            result.Tracks = Track.CreateArray(entity.Tracks);
+        }
 
         return result;
     }

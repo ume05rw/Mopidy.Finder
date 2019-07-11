@@ -1,8 +1,8 @@
+import * as _ from 'lodash';
 import Component from 'vue-class-component';
-import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import { PagenatedResult } from '../../../Models/Bases/StoreBase';
-import Genre from '../../../Models/Genres/Genre';
-import GenreStore from '../../../Models/Genres/GenreStore';
+import Playlist from '../../../Models/Playlists/Playlist';
+import PlaylistStore from '../../../Models/Playlists/PlaylistStore';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
 import SelectionList from '../../Shared/SelectionList';
@@ -10,8 +10,8 @@ import SelectionList from '../../Shared/SelectionList';
 @Component({
     template: `<div class="col-md-3">
     <div class="card">
-        <div class="card-header with-border bg-green">
-            <h3 class="card-title">Genres</h3>
+        <div class="card-header with-border bg-info">
+            <h3 class="card-title">Playlists</h3>
             <div class="card-tools">
                 <button
                     class="btn btn-tool d-inline d-md-none collapse"
@@ -19,41 +19,39 @@ import SelectionList from '../../Shared/SelectionList';
                     @click="OnCollapseClick" >
                     <i class="fa fa-minus" />
                 </button>
-                <button type="button"
-                        class="btn btn-tool"
-                        @click="OnClickRefresh" >
-                    <i class="fa fa-repeat" />
-                </button>
             </div>
         </div>
         <div class="card-body list-scrollable">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
-                    <selection-item
-                        ref="Items"
-                        v-bind:entity="entity"
-                        @SelectionChanged="OnSelectionChanged" />
+                <selection-item
+                    ref="Items"
+                    v-bind:entity="entity"
+                    @SelectionChanged="OnSelectionChanged" />
                 </template>
-                <infinite-loading
-                    @infinite="OnInfinite"
-                    ref="InfiniteLoading" />
             </ul>
         </div>
     </div>
 </div>`,
     components: {
-        'selection-item': SelectionItem,
-        'infinite-loading': InfiniteLoading
+        'selection-item': SelectionItem
     }
 })
-export default class GenreList extends SelectionList<Genre, GenreStore> {
+export default class PlaylistList extends SelectionList<Playlist, PlaylistStore> {
 
-    protected store: GenreStore = new GenreStore();
-    protected entities: Genre[] = [];
+    protected store: PlaylistStore = new PlaylistStore();
+    protected entities: Playlist[] = [];
+
+    private get Items(): SelectionItem<Playlist>[] {
+        return this.$refs.Items as SelectionItem<Playlist>[];
+    }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
+
+        this.entities = await this.store.GetPlaylists();
+
         return true;
     }
 
@@ -63,21 +61,21 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
      * バインドされずにnullになってしまう。
      * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
      */
-    protected async OnInfinite($state: StateChanger): Promise<boolean> {
-        return super.OnInfinite($state);
-    }
     protected OnCollapseClick(): void {
         super.OnCollapseClick();
     }
 
-    protected OnClickRefresh(): void {
-        super.OnClickRefresh();
-    }
-    protected OnSelectionChanged(args: ISelectionChangedArgs<Genre>): void {
+    protected OnSelectionChanged(args: ISelectionChangedArgs<Playlist>): void {
+        _.each(this.Items, (si) => {
+            if (si.GetEntity() !== args.Entity && si.GetSelected()) {
+                si.SetSelected(false);
+            }
+        });
+
         super.OnSelectionChanged(args);
     }
 
-    protected async GetPagenatedList(): Promise<PagenatedResult<Genre>> {
-        return await this.store.GetList(this.Page);
+    protected async GetPagenatedList(): Promise<PagenatedResult<Playlist>> {
+        return null;
     }
 }

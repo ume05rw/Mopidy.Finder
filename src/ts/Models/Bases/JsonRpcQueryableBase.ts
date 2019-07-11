@@ -24,6 +24,7 @@ export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
         params.jsonrpc = '2.0';
 
         try {
+            const a = 1;
             const response = await XhrQueryableBase.XhrInstance.post(JsonRpcQueryableBase.Url, params);
             const result = response.data as JsonRpcResultParams;
 

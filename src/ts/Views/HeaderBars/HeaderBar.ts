@@ -10,11 +10,15 @@ import Component from 'vue-class-component';
             </a>
         </li>
         <li class="nav-item">
-            <h3>{{ contentTitle }}</h3>
+            <h3>{{ title }}</h3>
         </li>
     </ul>
 </nav>`
 })
 export default class HeaderBar extends ViewBase {
-    private contentTitle: string = 'Finder';
+    private title: string = 'Finder';
+
+    public SetTitle(title: string): void {
+        this.title = title;
+    }
 }

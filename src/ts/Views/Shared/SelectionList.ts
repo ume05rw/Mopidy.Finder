@@ -8,7 +8,7 @@ import ViewBase from '../Bases/ViewBase';
 import { WidgetEvents } from '../Events/AdminLteEvents';
 import { default as SelectionEvents, IListUpdatedArgs, ISelectionChangedArgs } from './SelectionEvents';
 
-export default abstract class SelectionList<TEntity, TStore extends StoreBase<TEntity>> extends ViewBase {
+export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
 
     protected abstract store: TStore;
     protected abstract entities: TEntity[];
@@ -24,7 +24,9 @@ export default abstract class SelectionList<TEntity, TStore extends StoreBase<TE
     }
 
     protected get InfiniteLoading(): InfiniteLoading {
-        return this.$refs.InfiniteLoading as InfiniteLoading;
+        return (this.$refs.InfiniteLoading)
+            ? this.$refs.InfiniteLoading as InfiniteLoading
+            : null;
     }
     protected get ButtonCollaplse(): HTMLElement {
         return (this.$refs.ButtonCollaplse)
@@ -94,7 +96,7 @@ export default abstract class SelectionList<TEntity, TStore extends StoreBase<TE
         return true;
     }
 
-    protected OnCollapleClick(): void {
+    protected OnCollapseClick(): void {
         this.boxWidget.toggle();
     }
 

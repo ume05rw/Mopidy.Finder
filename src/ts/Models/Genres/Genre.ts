@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import ISelectionItem from '../Bases/ISelectionItem';
 import { default as GenreArtist, IGenreArtist } from '../Relations/GenreArtist';
 import { default as GenreAlbum, IGenreAlbum } from '../Relations/GenreAlbum';
 
@@ -12,22 +11,24 @@ export interface IGenre {
     GenreAlbums: IGenreAlbum[];
 }
 
-export default class Genre implements IGenre, ISelectionItem {
+export default class Genre implements IGenre {
 
     public static Create(entity: IGenre): Genre {
-        var result = new Genre();
-        result.Id = entity.Id;
-        result.Name = entity.Name;
-        result.LowerName = entity.LowerName;
-        result.Uri = entity.Uri;
-        result.GenreArtists = GenreArtist.CreateArray(entity.GenreArtists);
-        result.GenreAlbums = GenreAlbum.CreateArray(entity.GenreAlbums);
+        const result = new Genre();
+        if (entity) {
+            result.Id = entity.Id;
+            result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
+            result.Uri = entity.Uri;
+            result.GenreArtists = GenreArtist.CreateArray(entity.GenreArtists);
+            result.GenreAlbums = GenreAlbum.CreateArray(entity.GenreAlbums);
+        }
 
         return result;
     }
 
     public static CreateArray(entities: IGenre[]): Genre[] {
-        var result: Genre[] = [];
+        const result: Genre[] = [];
         _.each(entities, (entity) => {
             result.push(Genre.Create(entity));
         });

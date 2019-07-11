@@ -6,7 +6,7 @@ import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
 import { PagenatedResult } from '../../../Models/Bases/StoreBase';
 import SelectionList from '../../Shared/SelectionList';
-import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './SelectionAlbumTracks';
+import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from '../Selections/SelectionAlbumTracks';
 
 @Component({
     template: `<div class="col-md-6">
@@ -65,10 +65,6 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     protected async OnInfinite($state: StateChanger): Promise<boolean> {
         return super.OnInfinite($state);
     }
-    protected OnCollapleClick(): void {
-        super.OnCollapleClick();
-    }
-
     protected OnClickRefresh(): void {
         super.OnClickRefresh();
     }

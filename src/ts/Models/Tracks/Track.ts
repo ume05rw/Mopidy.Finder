@@ -1,5 +1,4 @@
 import * as _ from 'lodash';
-import ISelectionItem from '../Bases/ISelectionItem';
 
 export interface ITrack {
     Id: number;
@@ -20,32 +19,34 @@ export interface ITrack {
     //Album: IAlbum;
     //Artists: IArtist[];
     //Composers: IArtist[];
-    //Performaers: IArtist[];
+    //Performers: IArtist[];
 }
 
-export default class Track implements ITrack, ISelectionItem {
+export default class Track implements ITrack {
 
     public static Create(entity: ITrack): Track {
         var result = new Track();
-        result.Id = entity.Id;
-        result.Name = entity.Name;
-        result.LowerName = entity.LowerName;
-        result.Uri = entity.Uri;
-        result.TlId = entity.TlId;
-        result.DiscNo = entity.DiscNo;
-        result.TrackNo = entity.TrackNo;
-        result.Date = entity.Date;
-        result.Comment = entity.Comment;
-        result.Length = entity.Length;
-        result.BitRate = entity.BitRate;
-        result.LastModified = entity.LastModified;
+        if (entity) {
+            result.Id = entity.Id;
+            result.Name = entity.Name;
+            result.LowerName = entity.LowerName;
+            result.Uri = entity.Uri;
+            result.TlId = entity.TlId;
+            result.DiscNo = entity.DiscNo;
+            result.TrackNo = entity.TrackNo;
+            result.Date = entity.Date;
+            result.Comment = entity.Comment;
+            result.Length = entity.Length;
+            result.BitRate = entity.BitRate;
+            result.LastModified = entity.LastModified;
 
-        // JSONがアホほどでかくなるのでやめる
-        //result.Genre = Genre.Create(entity.Genre);
-        //result.Album = Album.Create(entity.Album);
-        //result.Artists = Artist.CreateArray(entity.Artists);
-        //result.Composers = Artist.CreateArray(entity.Composers);
-        //result.Performaers = Artist.CreateArray(entity.Performaers);
+            // JSONがアホほどでかくなるのでやめる
+            //result.Genre = Genre.Create(entity.Genre);
+            //result.Album = Album.Create(entity.Album);
+            //result.Artists = Artist.CreateArray(entity.Artists);
+            //result.Composers = Artist.CreateArray(entity.Composers);
+            //result.Performers = Artist.CreateArray(entity.Performers);
+        }
 
         return result;
     }
@@ -71,6 +72,12 @@ export default class Track implements ITrack, ISelectionItem {
     public Length: number;
     public BitRate: number;
     public LastModified: number;
+
+    //public Genre: Genre;
+    //public Album: Album;
+    //public Artists: Artist[];
+    //public Composers: Artist[];
+    //public Performers: Artist[];
 
     public GetTimeString(): string {
         if (!this.Length) {

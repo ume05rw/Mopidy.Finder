@@ -1,9 +1,16 @@
 import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
-import Player, { PlayerState, PlayerEvents } from '../../Models/Mopidies/Player';
 import * as _ from 'lodash';
 import PlayerPanel from './PlayerPanel';
+
+export interface IContentChanged {
+    Name: string;
+}
+
+export const SidebarEvents = {
+    ContentChanged: 'ContentChanged'
+}
 
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -19,7 +26,8 @@ import PlayerPanel from './PlayerPanel';
                         role="tab"
                         data-toggle="tab"
                         aria-controls="tab-finder"
-                        aria-selected="true">
+                        aria-selected="true"
+                        @click="OnClickFinder" >
                         <i class="fa fa-search nav-icon" />
                         <p>Finder</p>
                     </a>
@@ -30,7 +38,8 @@ import PlayerPanel from './PlayerPanel';
                         role="tab"
                         data-toggle="tab"
                         aria-controls="tab-playlists"
-                        aria-selected="false">
+                        aria-selected="false"
+                        @click="OnClickPlaylists" >
                         <i class="fa fa-bookmark nav-icon" />
                         <p>Playlists</p>
                     </a>
@@ -41,7 +50,8 @@ import PlayerPanel from './PlayerPanel';
                         role="tab"
                         data-toggle="tab"
                         aria-controls="tab-settings"
-                        aria-selected="false">
+                        aria-selected="false"
+                        @click="OnClickSettings" >
                         <i class="fa fa-cog nav-icon" />
                         <p>Settings</p>
                     </a>
@@ -60,4 +70,23 @@ import PlayerPanel from './PlayerPanel';
     }
 })
 export default class Sidebar extends ViewBase {
+
+    private OnClickFinder(): void {
+        this.$emit(SidebarEvents.ContentChanged, {
+            Name: 'Finder'
+        } as IContentChanged)
+    }
+
+    private OnClickPlaylists(): void {
+        this.$emit(SidebarEvents.ContentChanged, {
+            Name: 'Playlists'
+        } as IContentChanged)
+    }
+
+    private OnClickSettings(): void {
+        this.$emit(SidebarEvents.ContentChanged, {
+            Name: 'Settings'
+        } as IContentChanged)
+    }
+   
 }

@@ -10,14 +10,14 @@ import SelectionList from '../../Shared/SelectionList';
 
 @Component({
     template: `<div class="col-md-3">
-    <div id="artistList" class="card">
+    <div class="card">
         <div class="card-header with-border bg-info">
             <h3 class="card-title">Artists</h3>
             <div class="card-tools">
                 <button
                     class="btn btn-tool d-inline d-md-none collapse"
                     ref="ButtonCollaplse"
-                    @click="OnCollapleClick" >
+                    @click="OnCollapseClick" >
                     <i class="fa fa-minus" />
                 </button>
                 <button type="button"
@@ -68,8 +68,8 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     protected async OnInfinite($state: StateChanger): Promise<boolean> {
         return super.OnInfinite($state);
     }
-    protected OnCollapleClick(): void {
-        super.OnCollapleClick();
+    protected OnCollapseClick(): void {
+        super.OnCollapseClick();
     }
     protected OnClickRefresh(): void {
         super.OnClickRefresh();
