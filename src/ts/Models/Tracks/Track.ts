@@ -54,7 +54,7 @@ export default class Track implements ITrack {
         return result;
     }
 
-    public static CreateByMopidy(entity: MopidyTrack): Track {
+    public static CreateFromMopidy(entity: MopidyTrack): Track {
         if (!entity)
             return null;
 
@@ -73,8 +73,8 @@ export default class Track implements ITrack {
         result.Length = entity.length;
         result.BitRate = entity.bitrate;
         result.LastModified = entity.last_modified;
-        result.Album = Album.CreateByMopidy(entity.album);
-        result.Artists = Artist.CreateArrayByMopidy(entity.artists);
+        result.Album = Album.CreateFromMopidy(entity.album);
+        result.Artists = Artist.CreateArrayFromMopidy(entity.artists);
 
         // JSONがアホほどでかくなるのでやめる
         //result.Genre = Genre.Create(entity.Genre);
@@ -99,14 +99,14 @@ export default class Track implements ITrack {
         return result;
     }
 
-    public static CreateArrayByMopidy(entities: MopidyTrack[]): Track[] {
+    public static CreateArrayFromMopidy(entities: MopidyTrack[]): Track[] {
         var result: Track[] = [];
 
         if (!entities)
             return result;
 
         for (let i = 0; i < entities.length; i++) {
-            const entity = Track.CreateByMopidy(entities[i]);
+            const entity = Track.CreateFromMopidy(entities[i]);
             if (entity)
                 result.push(entity);
         }

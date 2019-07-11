@@ -32,7 +32,7 @@ export default class Album implements IAlbum {
         return result;
     }
 
-    public static CreateByMopidy(entity: MopidyAlbum): Album {
+    public static CreateFromMopidy(entity: MopidyAlbum): Album {
         if (!entity)
             return null;
 
@@ -72,14 +72,14 @@ export default class Album implements IAlbum {
         return result;
     }
 
-    public static CreateArrayByMopidy(entities: MopidyAlbum[]): Album[] {
+    public static CreateArrayFromMopidy(entities: MopidyAlbum[]): Album[] {
         var result: Album[] = [];
 
         if (!entities)
             return result;
 
         for (let i = 0; i < entities.length; i++) {
-            const entity = Album.CreateByMopidy(entities[i]);
+            const entity = Album.CreateFromMopidy(entities[i]);
             if (entity)
                 result.push(entity);
         }

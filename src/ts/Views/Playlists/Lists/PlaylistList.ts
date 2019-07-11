@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import Component from 'vue-class-component';
-import { PagenatedResult } from '../../../Models/Bases/StoreBase';
+import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
+import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Playlist from '../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../Models/Playlists/PlaylistStore';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
@@ -29,12 +30,16 @@ import SelectionList from '../../Shared/SelectionList';
                     v-bind:entity="entity"
                     @SelectionChanged="OnSelectionChanged" />
                 </template>
+                <infinite-loading
+                    @infinite="OnInfinite"
+                    ref="InfiniteLoading" />
             </ul>
         </div>
     </div>
 </div>`,
     components: {
-        'selection-item': SelectionItem
+        'selection-item': SelectionItem,
+        'infinite-loading': InfiniteLoading
     }
 })
 export default class PlaylistList extends SelectionList<Playlist, PlaylistStore> {
@@ -61,6 +66,9 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
      * バインドされずにnullになってしまう。
      * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
      */
+    protected async OnInfinite($state: StateChanger): Promise<boolean> {
+        return super.OnInfinite($state);
+    }
     protected OnCollapseClick(): void {
         super.OnCollapseClick();
     }
@@ -75,7 +83,16 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         super.OnSelectionChanged(args);
     }
 
-    protected async GetPagenatedList(): Promise<PagenatedResult<Playlist>> {
-        return null;
+    protected async GetPagenatedList(): Promise<IPagenatedResult<Playlist>> {
+        const playlists = await this.store.GetPlaylists();
+
+        const result: IPagenatedResult<Playlist> = {
+            TotalLength: playlists.length,
+            ResultLength: playlists.length,
+            ResultList: playlists,
+            ResultPage: 1
+        };
+
+        return result;
     }
 }

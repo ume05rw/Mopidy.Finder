@@ -2,7 +2,7 @@ import Libraries from '../../Libraries';
 import * as Enumerable from 'linq';
 import XhrQueryableBase from './XhrQueryableBase';
 
-export interface PagenatedResult<T> {
+export interface IPagenatedResult<T> {
     TotalLength: number;
     ResultPage?: number;
     ResultLength: number;

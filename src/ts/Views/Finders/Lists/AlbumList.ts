@@ -4,7 +4,7 @@ import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../../Libraries';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
-import { PagenatedResult } from '../../../Models/Bases/StoreBase';
+import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import SelectionList from '../../Shared/SelectionList';
 import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from '../Selections/SelectionAlbumTracks';
 
@@ -69,7 +69,7 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         super.OnClickRefresh();
     }
 
-    protected async GetPagenatedList(): Promise<PagenatedResult<AlbumTracks>> {
+    protected async GetPagenatedList(): Promise<IPagenatedResult<AlbumTracks>> {
         return await this.store.GetList(this.genreIds, this.artistIds, this.Page);
     }
 

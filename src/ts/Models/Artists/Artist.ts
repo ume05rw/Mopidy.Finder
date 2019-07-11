@@ -30,7 +30,7 @@ export default class Artist implements IArtist {
         return result;
     }
 
-    public static CreateByMopidy(entity: MopidyArtist): Artist {
+    public static CreateFromMopidy(entity: MopidyArtist): Artist {
         if (!entity)
             return null;
 
@@ -63,14 +63,14 @@ export default class Artist implements IArtist {
         return result;
     }
 
-    public static CreateArrayByMopidy(entities: MopidyArtist[]): Artist[] {
+    public static CreateArrayFromMopidy(entities: MopidyArtist[]): Artist[] {
         var result: Artist[] = [];
 
         if (!entities)
             return result;
 
         for (let i = 0; i < entities.length; i++) {
-            const entity = Artist.CreateByMopidy(entities[i]);
+            const entity = Artist.CreateFromMopidy(entities[i]);
             if (entity)
                 result.push(entity);
         }

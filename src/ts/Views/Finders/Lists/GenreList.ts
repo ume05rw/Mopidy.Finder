@@ -1,6 +1,6 @@
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
-import { PagenatedResult } from '../../../Models/Bases/StoreBase';
+import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Genre from '../../../Models/Genres/Genre';
 import GenreStore from '../../../Models/Genres/GenreStore';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
@@ -77,7 +77,7 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
         super.OnSelectionChanged(args);
     }
 
-    protected async GetPagenatedList(): Promise<PagenatedResult<Genre>> {
+    protected async GetPagenatedList(): Promise<IPagenatedResult<Genre>> {
         return await this.store.GetList(this.Page);
     }
 }

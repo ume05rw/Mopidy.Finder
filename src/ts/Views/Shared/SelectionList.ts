@@ -3,7 +3,7 @@ import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import * as _ from 'lodash';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../Libraries';
-import { default as StoreBase, PagenatedResult } from '../../Models/Bases/StoreBase';
+import { default as StoreBase, IPagenatedResult } from '../../Models/Bases/StoreBase';
 import ViewBase from '../Bases/ViewBase';
 import { WidgetEvents } from '../Events/AdminLteEvents';
 import { default as SelectionEvents, IListUpdatedArgs, ISelectionChangedArgs } from './SelectionEvents';
@@ -109,7 +109,7 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
         this.$emit(SelectionEvents.SelectionChanged, args);
     }
 
-    protected abstract async GetPagenatedList(): Promise<PagenatedResult<TEntity>>;
+    protected abstract async GetPagenatedList(): Promise<IPagenatedResult<TEntity>>;
 
     protected Refresh(): void {
         this.page = 1;

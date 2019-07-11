@@ -1,4 +1,4 @@
-import { default as StoreBase, PagenatedResult } from '../Bases/StoreBase';
+import { default as StoreBase, IPagenatedResult } from '../Bases/StoreBase';
 import { default as AlbumTracks, IAlbumTracks } from './AlbumTracks';
 import Track from '../Tracks/Track';
 
@@ -8,7 +8,7 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
         genreIds: number[],
         artistIds: number[],
         page: number
-    ): Promise<PagenatedResult<AlbumTracks>> {
+    ): Promise<IPagenatedResult<AlbumTracks>> {
         const response = await this.QueryGet('AlbumTracks/GetPagenatedList', {
             GenreIds: genreIds,
             ArtistIds: artistIds,
@@ -19,7 +19,7 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
             console.error(response.Errors);
             throw new Error('Unexpected Error on ApiQuery');
         }
-        var result = response.Result as PagenatedResult<AlbumTracks>;
+        var result = response.Result as IPagenatedResult<AlbumTracks>;
         result.ResultList = AlbumTracks.CreateArray(result.ResultList);
 
         return result;

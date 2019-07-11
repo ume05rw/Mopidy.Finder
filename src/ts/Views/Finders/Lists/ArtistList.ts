@@ -3,7 +3,7 @@ import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Artist from '../../../Models/Artists/Artist';
 import ArtistStore from '../../../Models/Artists/ArtistStore';
-import { PagenatedResult } from '../../../Models/Bases/StoreBase';
+import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
 import SelectionList from '../../Shared/SelectionList';
@@ -78,7 +78,7 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
         super.OnSelectionChanged(args);
     }
 
-    protected async GetPagenatedList(): Promise<PagenatedResult<Artist>> {
+    protected async GetPagenatedList(): Promise<IPagenatedResult<Artist>> {
         return await this.store.GetList(this.genreIds, this.Page);
     }
 

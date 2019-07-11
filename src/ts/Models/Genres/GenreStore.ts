@@ -1,9 +1,9 @@
-import { default as StoreBase, PagenatedResult } from '../Bases/StoreBase';
+import { default as StoreBase, IPagenatedResult } from '../Bases/StoreBase';
 import Genre from './Genre';
 
 export default class GenreStore extends StoreBase<Genre> {
 
-    public async GetList(page: number): Promise<PagenatedResult<Genre>> {
+    public async GetList(page: number): Promise<IPagenatedResult<Genre>> {
         const response = await this.QueryGet('Genre/GetPagenatedList', {
             Page: page
         });
@@ -13,7 +13,7 @@ export default class GenreStore extends StoreBase<Genre> {
             throw new Error('Unexpected Error on ApiQuery');
         }
 
-        var result = response.Result as PagenatedResult<Genre>;
+        var result = response.Result as IPagenatedResult<Genre>;
         result.ResultList = Genre.CreateArray(result.ResultList);
 
         return result;
