@@ -35,6 +35,7 @@
     <None Remove="src\ts\Views\RootView.ts" />
     <None Remove="src\ts\Views\Settings\Settings.ts" />
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
+    <None Remove="src\ts\Views\Sidebars\PlayerPanel.ts" />
     <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
     <None Remove="tests\Models\Entities\Song.test.ts" />
     <None Remove="types\adminlte\index.d.ts" />
@@ -99,6 +100,7 @@
     <TypeScriptCompile Include="src\ts\Views\RootView.ts" />
     <TypeScriptCompile Include="src\ts\Views\Settings\Settings.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionItem.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Sidebars\PlayerPanel.ts" />
     <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />
     <TypeScriptCompile Include="tests\Models\Entities\Song.test.ts" />
     <TypeScriptCompile Include="types\adminlte\index.d.ts" />
