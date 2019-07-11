@@ -55,6 +55,10 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             ? playlist
             : null;
         this.entities = [];
+
+        for (let i = 0; i < this.playlist.Tracks.length; i++)
+            this.playlist.Tracks[i].TlId = null;
+
         this.Refresh();
 
         return true;
@@ -70,7 +74,12 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return super.OnInfinite($state);
     }
     protected OnSelectionChanged(args: ISelectionChangedArgs<Track>): void {
-        super.OnSelectionChanged(args);
+        var isAllTracksRegistered = Libraries.Enumerable.from(this.playlist.Tracks)
+            .all(e => e.TlId !== null);
+
+        (isAllTracksRegistered)
+            ? this.store.PlayByTlId(args.Entity.TlId)
+            : this.store.PlayPlaylist(this.playlist, args.Entity);
     }
 
     protected async GetPagenatedList(): Promise<IPagenatedResult<Track>> {

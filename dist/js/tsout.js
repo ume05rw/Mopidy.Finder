@@ -2304,7 +2304,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                 var response, refs, ordered, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.AsList)];
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistAsList)];
                         case 1:
                             response = _a.sent();
                             refs = response.result;
@@ -2356,7 +2356,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                 var resImages, images;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.GetImages, {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.LibraryGetImages, {
                                 uris: [uri]
                             })];
                         case 1:
@@ -2371,28 +2371,72 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                 });
             });
         };
-        PlaylistStore.prototype.ClearList = function () {
+        PlaylistStore.prototype.PlayPlaylist = function (playlist, track) {
             return __awaiter(this, void 0, void 0, function () {
-                var response;
+                var resClear, uris, resAdd, tlTracks, tlDictionary, i, tr;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Player/ClearList')];
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.TracklistClearList)];
                         case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded) {
-                                console.error(response.Errors);
-                                throw new Error('Unexpected Error on ApiQuery');
+                            resClear = _a.sent();
+                            if (resClear.error) {
+                                console.error(resClear.error);
+                                return [2 /*return*/, false];
                             }
-                            return [2 /*return*/, response.Result];
+                            uris = Libraries_6.default.Enumerable.from(playlist.Tracks)
+                                .select(function (e) { return e.Uri; })
+                                .toArray();
+                            return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.TracklistAdd, {
+                                    uris: uris
+                                })];
+                        case 2:
+                            resAdd = _a.sent();
+                            if (resAdd.error) {
+                                console.error(resAdd.error);
+                                return [2 /*return*/, false];
+                            }
+                            tlTracks = resAdd.result;
+                            tlDictionary = Libraries_6.default.Enumerable.from(tlTracks)
+                                .toDictionary(function (e) { return e.track.uri; }, function (e2) { return e2.tlid; });
+                            for (i = 0; i < playlist.Tracks.length; i++) {
+                                tr = playlist.Tracks[i];
+                                tr.TlId = (tlDictionary.contains(tr.Uri))
+                                    ? tlDictionary.get(tr.Uri)
+                                    : null;
+                            }
+                            if (track.TlId === null)
+                                return [2 /*return*/, false];
+                            return [4 /*yield*/, this.PlayByTlId(track.TlId)];
+                        case 3:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        PlaylistStore.prototype.PlayByTlId = function (tlId) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcNotice(PlaylistStore.Methods.PlaybackPlay, {
+                                tlid: tlId
+                            })];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
                     }
                 });
             });
         };
         PlaylistStore.Methods = {
-            AsList: 'core.playlists.as_list',
+            PlaylistAsList: 'core.playlists.as_list',
             PlaylistLookup: 'core.playlists.lookup',
             LibraryLookup: 'core.library.lookup',
-            GetImages: 'core.library.get_images',
+            LibraryGetImages: 'core.library.get_images',
+            TracklistClearList: 'core.tracklist.clear',
+            TracklistAdd: 'core.tracklist.add',
+            TracklistGetTlTracks: 'core.tracklist.get_tl_tracks',
+            PlaybackPlay: 'core.playback.play'
         };
         return PlaylistStore;
     }(JsonRpcQueryableBase_2.default));
@@ -2547,11 +2591,14 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
         };
         TrackList.prototype.SetPlaylist = function (playlist) {
             return __awaiter(this, void 0, void 0, function () {
+                var i;
                 return __generator(this, function (_a) {
                     this.playlist = (playlist)
                         ? playlist
                         : null;
                     this.entities = [];
+                    for (i = 0; i < this.playlist.Tracks.length; i++)
+                        this.playlist.Tracks[i].TlId = null;
                     this.Refresh();
                     return [2 /*return*/, true];
                 });
@@ -2571,7 +2618,11 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
             });
         };
         TrackList.prototype.OnSelectionChanged = function (args) {
-            _super.prototype.OnSelectionChanged.call(this, args);
+            var isAllTracksRegistered = Libraries_7.default.Enumerable.from(this.playlist.Tracks)
+                .all(function (e) { return e.TlId !== null; });
+            (isAllTracksRegistered)
+                ? this.store.PlayByTlId(args.Entity.TlId)
+                : this.store.PlayPlaylist(this.playlist, args.Entity);
         };
         TrackList.prototype.GetPagenatedList = function () {
             return __awaiter(this, void 0, void 0, function () {

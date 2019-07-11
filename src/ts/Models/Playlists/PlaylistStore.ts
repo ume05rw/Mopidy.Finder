@@ -4,18 +4,25 @@ import IPlaylist from '../Mopidies/IPlaylist';
 import IRef from '../Mopidies/IRef';
 import ITrack from '../Mopidies/ITrack';
 import Playlist from './Playlist';
+import Track from '../Tracks/Track';
+import ITlTrack from '../Mopidies/ITlTrack';
 
 export default class PlaylistStore extends JsonRpcQueryableBase {
 
     private static readonly Methods = {
-        AsList: 'core.playlists.as_list',
+        PlaylistAsList: 'core.playlists.as_list',
         PlaylistLookup: 'core.playlists.lookup',
         LibraryLookup: 'core.library.lookup',
-        GetImages: 'core.library.get_images',
+        LibraryGetImages: 'core.library.get_images',
+        TracklistClearList: 'core.tracklist.clear',
+        TracklistAdd: 'core.tracklist.add',
+        TracklistGetTlTracks: 'core.tracklist.get_tl_tracks',
+        PlaybackPlay: 'core.playback.play'
     }
 
     public async GetPlaylists(): Promise<Playlist[]> {
-        const response = await this.JsonRpcRequest(PlaylistStore.Methods.AsList);
+        const response
+            = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistAsList);
 
         const refs = response.result as IRef[];
         const ordered = Libraries.Enumerable.from(refs)
@@ -27,18 +34,20 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
     }
 
     public async GetTracksByPlaylist(playlist: Playlist): Promise<ITrack[]> {
-        const response = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
-            uri: playlist.Uri
-        });
+        const response
+            = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
+                uri: playlist.Uri
+            });
 
         const mpPlaylist = response.result as IPlaylist;
         const trackUris = Libraries.Enumerable.from(mpPlaylist.tracks)
             .select(e => e.uri)
             .toArray();
 
-        const response2 = await this.JsonRpcRequest(PlaylistStore.Methods.LibraryLookup, {
-            uris: trackUris
-        });
+        const response2
+            = await this.JsonRpcRequest(PlaylistStore.Methods.LibraryLookup, {
+                uris: trackUris
+            });
 
         const pairList = response2.result as { [uri: string]: ITrack[] };
 
@@ -59,9 +68,10 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
     }
 
     public async GetImageUri(uri: string): Promise<string> {
-        const resImages = await this.JsonRpcRequest(PlaylistStore.Methods.GetImages, {
-            uris: [uri]
-        });
+        const resImages
+            = await this.JsonRpcRequest(PlaylistStore.Methods.LibraryGetImages, {
+                uris: [uri]
+            });
 
         if (resImages.result) {
             const images = resImages.result[uri];
@@ -72,14 +82,53 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         return null;
     }
 
-    private async ClearList(): Promise<boolean> {
-        const response = await this.QueryPost('Player/ClearList');
+    public async PlayPlaylist(playlist: Playlist, track: Track): Promise<boolean> {
+        const resClear
+            = await this.JsonRpcRequest(PlaylistStore.Methods.TracklistClearList);
 
-        if (!response.Succeeded) {
-            console.error(response.Errors);
-            throw new Error('Unexpected Error on ApiQuery');
+        if (resClear.error) {
+            console.error(resClear.error);
+            return false;
         }
 
-        return response.Result as boolean;
+        const uris = Libraries.Enumerable.from(playlist.Tracks)
+            .select(e => e.Uri)
+            .toArray();
+        const resAdd
+            = await this.JsonRpcRequest(PlaylistStore.Methods.TracklistAdd, {
+                uris: uris
+            });
+
+        if (resAdd.error) {
+            console.error(resAdd.error);
+            return false;
+        }
+
+        const tlTracks = resAdd.result as ITlTrack[];
+        const tlDictionary = Libraries.Enumerable.from(tlTracks)
+            .toDictionary<string, number>(e => e.track.uri, e2 => e2.tlid);
+
+        for (let i = 0; i < playlist.Tracks.length; i++) {
+            const tr = playlist.Tracks[i];
+            tr.TlId = (tlDictionary.contains(tr.Uri))
+                ? tlDictionary.get(tr.Uri)
+                : null;
+        }
+
+        if (track.TlId === null)
+            return false;
+
+        await this.PlayByTlId(track.TlId);
+
+        return true;
+    }
+
+    public async PlayByTlId(tlId: number): Promise<boolean> {
+
+        await this.JsonRpcNotice(PlaylistStore.Methods.PlaybackPlay, {
+            tlid: tlId
+        });
+
+        return true;
     }
 }
