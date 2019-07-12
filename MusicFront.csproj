@@ -45,6 +45,7 @@
     <None Remove="src\ts\Views\Shared\SelectionList.ts" />
     <None Remove="src\ts\Views\Sidebars\PlayerPanel.ts" />
     <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
+    <None Remove="tests\Models\Entities\Album.test.ts" />
     <None Remove="tests\Models\Entities\Track.test.ts" />
     <None Remove="types\adminlte\index.d.ts" />
     <None Remove="types\ion-range-slider\index.d.ts" />
@@ -118,6 +119,7 @@
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionList.ts" />
     <TypeScriptCompile Include="src\ts\Views\Sidebars\PlayerPanel.ts" />
     <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />
+    <TypeScriptCompile Include="tests\Models\Entities\Album.test.ts" />
     <TypeScriptCompile Include="tests\Models\Entities\Track.test.ts" />
     <TypeScriptCompile Include="types\adminlte\index.d.ts" />
     <TypeScriptCompile Include="types\ion-range-slider\index.d.ts" />
