@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.Models;
+using MopidyFinder.Models;
 using System.Threading.Tasks;
 
-namespace MusicFront.Controllers
+namespace MopidyFinder.Controllers
 {
     public class HomeController : Controller
     {

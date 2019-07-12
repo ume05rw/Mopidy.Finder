@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MusicFront.Models.Bases;
-using MusicFront.Models.Mopidies.Methods;
+using MopidyFinder.Models.Bases;
+using MopidyFinder.Models.Mopidies.Methods;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Artists
+namespace MopidyFinder.Models.Artists
 {
     public class ArtistStore : PagenagedStoreBase<Artist>
     {

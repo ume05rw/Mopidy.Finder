@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.Models.Bases;
+using MopidyFinder.Models.Bases;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MusicFront.Models.Relations
+namespace MopidyFinder.Models.Relations
 {
     public class GenreArtistStore : StoreBase<GenreArtist>
     {

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MusicFront.Models.JsonRpcs
+namespace MopidyFinder.Models.JsonRpcs
 {
     [NotMapped]
     public static class JsonRpcFactory

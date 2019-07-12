@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace MusicFront.Migrations
+namespace MopidyFinder.Migrations
 {
     public partial class CreateTables : Migration
     {

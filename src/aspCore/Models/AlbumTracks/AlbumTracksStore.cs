@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MusicFront.Models.Albums;
-using MusicFront.Models.Bases;
-using MusicFront.Models.Mopidies.Methods;
-using MusicFront.Models.Tracks;
+using MopidyFinder.Models.Albums;
+using MopidyFinder.Models.Bases;
+using MopidyFinder.Models.Mopidies.Methods;
+using MopidyFinder.Models.Tracks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.AlbumTracks
+namespace MopidyFinder.Models.AlbumTracks
 {
     public class AlbumTracksStore : PagenagedStoreBase<AlbumTracks>
     {

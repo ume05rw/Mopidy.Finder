@@ -1,11 +1,11 @@
-using MusicFront.Models.Artists;
-using MusicFront.Models.Tracks;
-using MusicFront.Models.Albums;
+using MopidyFinder.Models.Artists;
+using MopidyFinder.Models.Tracks;
+using MopidyFinder.Models.Albums;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MusicFront.Models.AlbumTracks
+namespace MopidyFinder.Models.AlbumTracks
 {
     [NotMapped]
     [JsonObject(MemberSerialization.OptIn)]

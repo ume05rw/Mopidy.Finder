@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MusicFront.Models.Mopidies
+namespace MopidyFinder.Models.Mopidies
 {
     /// <summary>
     /// 

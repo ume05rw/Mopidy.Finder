@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Xhrs
+namespace MopidyFinder.Models.Xhrs
 {
     public static class XhrResponseFactory
     {

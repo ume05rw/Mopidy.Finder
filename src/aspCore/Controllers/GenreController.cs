@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.Models.Genres;
-using MusicFront.Models.Xhrs;
+using MopidyFinder.Models.Genres;
+using MopidyFinder.Models.Xhrs;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace MusicFront.Controllers
+namespace MopidyFinder.Controllers
 {
     [Produces("application/json")]
     [Route("Genre")]

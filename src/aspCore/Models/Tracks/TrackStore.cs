@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MusicFront.Models.Albums;
-using MusicFront.Models.Bases;
-using MusicFront.Models.Genres;
-using MusicFront.Models.Mopidies;
-using MusicFront.Models.Mopidies.Methods;
+using MopidyFinder.Models.Albums;
+using MopidyFinder.Models.Bases;
+using MopidyFinder.Models.Genres;
+using MopidyFinder.Models.Mopidies;
+using MopidyFinder.Models.Mopidies.Methods;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Tracks
+namespace MopidyFinder.Models.Tracks
 {
     public class TrackStore : StoreBase<Track>
     {

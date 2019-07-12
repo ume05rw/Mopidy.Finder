@@ -1,10 +1,10 @@
-using MusicFront.Models.Albums;
-using MusicFront.Models.Artists;
+using MopidyFinder.Models.Albums;
+using MopidyFinder.Models.Artists;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MusicFront.Models.Relations
+namespace MopidyFinder.Models.Relations
 {
     [Table("artist_albums")]
     [JsonObject(MemberSerialization.OptIn)]

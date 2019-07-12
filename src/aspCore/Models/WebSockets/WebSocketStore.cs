@@ -6,7 +6,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.WebSockets
+namespace MopidyFinder.Models.WebSockets
 {
     /// <summary>
     /// WebSocketプロキシお試し版

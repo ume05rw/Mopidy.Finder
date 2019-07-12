@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.Models.Bases;
-using MusicFront.Models.Genres;
-using MusicFront.Models.Mopidies;
-using MusicFront.Models.Mopidies.Methods;
+using MopidyFinder.Models.Bases;
+using MopidyFinder.Models.Genres;
+using MopidyFinder.Models.Mopidies;
+using MopidyFinder.Models.Mopidies.Methods;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Relations
+namespace MopidyFinder.Models.Relations
 {
     public class GenreAlbumStore : StoreBase<GenreAlbum>
     {

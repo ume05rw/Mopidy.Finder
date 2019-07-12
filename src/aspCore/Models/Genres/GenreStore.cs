@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.Models.Bases;
-using MusicFront.Models.Mopidies.Methods;
+using MopidyFinder.Models.Bases;
+using MopidyFinder.Models.Mopidies.Methods;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Genres
+namespace MopidyFinder.Models.Genres
 {
     public class GenreStore : PagenagedStoreBase<Genre>
     {

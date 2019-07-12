@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace MusicFront.Models.JsonRpcs
+namespace MopidyFinder.Models.JsonRpcs
 {
     [JsonObject(MemberSerialization.OptIn)]
     public class JsonRpcParamsResponse : JsonRpcBase

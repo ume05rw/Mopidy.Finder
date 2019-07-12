@@ -1,13 +1,13 @@
-using MusicFront.Models.Albums;
-using MusicFront.Models.Artists;
-using MusicFront.Models.Genres;
-using MusicFront.Models.Relations;
+using MopidyFinder.Models.Albums;
+using MopidyFinder.Models.Artists;
+using MopidyFinder.Models.Genres;
+using MopidyFinder.Models.Relations;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MusicFront.Models.Tracks
+namespace MopidyFinder.Models.Tracks
 {
     [Table("tracks")]
     [JsonObject(MemberSerialization.OptIn)]

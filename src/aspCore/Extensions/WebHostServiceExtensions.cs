@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting.WindowsServices;
 using System;
 using System.ServiceProcess;
 
-namespace MusicFront.Extensions
+namespace MopidyFinder.Extensions
 {
     public static class WebHostServiceExtensions
     {

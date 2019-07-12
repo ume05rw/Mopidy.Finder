@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using MusicFront.Models.Albums;
-using MusicFront.Models.Artists;
-using MusicFront.Models.Genres;
-using MusicFront.Models.Relations;
-using MusicFront.Models.Tracks;
+using MopidyFinder.Models.Albums;
+using MopidyFinder.Models.Artists;
+using MopidyFinder.Models.Genres;
+using MopidyFinder.Models.Relations;
+using MopidyFinder.Models.Tracks;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models
+namespace MopidyFinder.Models
 {
     public class Dbc: DbContext
     {

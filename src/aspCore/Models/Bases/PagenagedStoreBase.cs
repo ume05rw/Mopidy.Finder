@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Bases
+namespace MopidyFinder.Models.Bases
 {
     public class PagenagedStoreBase<T> : StoreBase<T>
     {

@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using MusicFront.Extensions;
+using MopidyFinder.Extensions;
 using NLog.Web;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace MusicFront
+namespace MopidyFinder
 {
     public class Program
     {

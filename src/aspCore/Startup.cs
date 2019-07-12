@@ -6,18 +6,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MusicFront.Models;
-using MusicFront.Models.Albums;
-using MusicFront.Models.AlbumTracks;
-using MusicFront.Models.Artists;
-using MusicFront.Models.Genres;
-using MusicFront.Models.Relations;
-using MusicFront.Models.Tracks;
-using MusicFront.Models.WebSockets;
+using MopidyFinder.Models;
+using MopidyFinder.Models.Albums;
+using MopidyFinder.Models.AlbumTracks;
+using MopidyFinder.Models.Artists;
+using MopidyFinder.Models.Genres;
+using MopidyFinder.Models.Relations;
+using MopidyFinder.Models.Tracks;
+using MopidyFinder.Models.WebSockets;
 using Newtonsoft.Json.Serialization;
 using System.Linq;
 
-namespace MusicFront
+namespace MopidyFinder
 {
     public class Startup
     {

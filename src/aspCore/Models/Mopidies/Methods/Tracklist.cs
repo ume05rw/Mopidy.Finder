@@ -1,10 +1,10 @@
-using MusicFront.Models.JsonRpcs;
+using MopidyFinder.Models.JsonRpcs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace MusicFront.Models.Mopidies.Methods
+namespace MopidyFinder.Models.Mopidies.Methods
 {
     public static class Tracklist
     {

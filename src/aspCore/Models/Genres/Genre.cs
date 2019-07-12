@@ -1,10 +1,10 @@
-using MusicFront.Models.Relations;
+using MopidyFinder.Models.Relations;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MusicFront.Models.Genres
+namespace MopidyFinder.Models.Genres
 {
     [Table("genres")]
     [JsonObject(MemberSerialization.OptIn)]

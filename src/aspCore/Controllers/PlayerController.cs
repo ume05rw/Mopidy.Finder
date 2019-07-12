@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MusicFront.Models.Tracks;
-using MusicFront.Models;
-using MusicFront.Models.Mopidies.Methods;
-using MusicFront.Models.Xhrs;
-using MusicFront.Models.AlbumTracks;
+using MopidyFinder.Models.Tracks;
+using MopidyFinder.Models;
+using MopidyFinder.Models.Mopidies.Methods;
+using MopidyFinder.Models.Xhrs;
+using MopidyFinder.Models.AlbumTracks;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace MusicFront.Controllers
+namespace MopidyFinder.Controllers
 {
     [Produces("application/json")]
     [Route("Player")]

@@ -14,7 +14,7 @@ export const SidebarEvents = {
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-primary elevation-4">
     <div class="brand-link navbar-secondary">
-        <span class="brand-text font-weight-light">Mopidy Finder</span>
+        <span class="brand-text font-weight-light">Mopidy.Finder</span>
     </div>
     <section
         class="sidebar"

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MusicFront.src.aspCore.Models.Settings
+namespace MopidyFinder.Models.Settings
 {
     [Table("settings")]
     public class Setting

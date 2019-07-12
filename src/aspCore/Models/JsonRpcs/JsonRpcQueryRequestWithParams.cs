@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MusicFront.Models.JsonRpcs
+namespace MopidyFinder.Models.JsonRpcs
 {
     [NotMapped]
     [JsonObject(MemberSerialization.OptIn)]

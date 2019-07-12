@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 
-namespace MusicFront.Models.Mopidies
+namespace MopidyFinder.Models.Mopidies
 {
     [NotMapped]
     [JsonObject(MemberSerialization.OptIn)]

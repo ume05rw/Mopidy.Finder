@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MusicFront.Models.Bases
+namespace MopidyFinder.Models.Bases
 {
     public abstract class StoreBase<T> : IDisposable
     {
