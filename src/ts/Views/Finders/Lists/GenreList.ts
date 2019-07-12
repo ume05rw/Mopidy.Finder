@@ -2,17 +2,24 @@ import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Genre from '../../../Models/Genres/Genre';
-import GenreStore from '../../../Models/Genres/GenreStore';
+import { default as GenreStore, IPagenateQueryArgs } from '../../../Models/Genres/GenreStore';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
 import SelectionList from '../../Shared/SelectionList';
+import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 
 @Component({
     template: `<div class="col-md-3">
-    <div class="card">
+    <div class="card plain-list">
         <div class="card-header with-border bg-green">
             <h3 class="card-title">Genres</h3>
-            <div class="card-tools">
+            <div class="card-tools form-row">
+                <input class="form-control form-control-navbar form-control-sm text-search"
+                    type="search"
+                    placeholder="Genre Name"
+                    aria-label="Genre Name"
+                    ref="TextSearch"
+                    @input="OnInputSearchText"/>
                 <button
                     class="btn btn-tool d-inline d-md-none collapse"
                     ref="ButtonCollaplse"
@@ -50,10 +57,19 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
 
     protected store: GenreStore = new GenreStore();
     protected entities: Genre[] = [];
+    private searchTextFilter: DelayedOnceExecuter;
+
+    private get TextSearch(): HTMLInputElement {
+        return this.$refs.TextSearch as HTMLInputElement;
+    }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
+
+        this.searchTextFilter = Delay.DelayedOnce((): void => {
+            this.Refresh();
+        }, 800);
 
         return true;
     }
@@ -79,6 +95,15 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
     }
 
     protected async GetPagenatedList(): Promise<IPagenatedResult<Genre>> {
-        return await this.store.GetList(this.Page);
+        const args: IPagenateQueryArgs = {
+            FilterText: this.TextSearch.value,
+            Page: this.Page
+        };
+
+        return await this.store.GetList(args);
+    }
+
+    private OnInputSearchText(): void {
+        this.searchTextFilter.Exec();
     }
 }

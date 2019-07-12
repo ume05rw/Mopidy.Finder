@@ -13,30 +13,39 @@ namespace MusicFront.Models.AlbumTracks
 {
     public class AlbumTracksStore : PagenagedStoreBase<AlbumTracks>
     {
+        public class PagenagedQueryArgs
+        {
+            public int[] GenreIds { get; set; }
+            public int[] ArtistIds { get; set; }
+            public string FilterText { get; set; }
+            public int? Page { get; set; }
+        }
+
+
         public AlbumTracksStore([FromServices] Dbc dbc) : base(dbc)
         {
         }
 
         protected new int PageLength = 10;
 
-        public async Task<PagenatedResult> GetPagenatedList(
-            int[] genreIds,
-            int[] artistIds,
-            int? page
-        )
+        public async Task<PagenatedResult> GetPagenatedList(PagenagedQueryArgs args)
         {
             var query = (IQueryable<Album>)this.Dbc.Albums
                 .Include(e => e.GenreAlbums)
                 .Include(e => e.ArtistAlbums)
                 .ThenInclude(e2 => e2.Artist);
 
-            if (genreIds != null && 0 < genreIds.Length)
+            if (args.GenreIds != null && 0 < args.GenreIds.Length)
                 query = query
-                    .Where(e => e.GenreAlbums.Any(e2 => genreIds.Contains(e2.GenreId)));
+                    .Where(e => e.GenreAlbums.Any(e2 => args.GenreIds.Contains(e2.GenreId)));
 
-            if (artistIds != null && 0 < artistIds.Length)
+            if (args.ArtistIds != null && 0 < args.ArtistIds.Length)
                 query = query
-                    .Where(e => e.ArtistAlbums.Any(e2 => artistIds.Contains(e2.ArtistId)));
+                    .Where(e => e.ArtistAlbums.Any(e2 => args.ArtistIds.Contains(e2.ArtistId)));
+
+            if (!string.IsNullOrEmpty(args.FilterText))
+                query = query
+                    .Where(e => e.LowerName.Contains(args.FilterText.ToLower()));
 
             var ordered = query
                 .OrderBy(e => e.ArtistAlbums.Min(e2 => e2.Artist.LowerName))
@@ -45,9 +54,9 @@ namespace MusicFront.Models.AlbumTracks
 
             var totalLength = ordered.Count();
 
-            var albums = (page != null)
+            var albums = (args.Page != null)
                 ? ordered
-                    .Skip(((int)page - 1) * this.PageLength)
+                    .Skip(((int)args.Page - 1) * this.PageLength)
                     .Take(this.PageLength)
                     .ToList()
                 : ordered
@@ -59,7 +68,7 @@ namespace MusicFront.Models.AlbumTracks
             {
                 TotalLength = totalLength,
                 ResultLength = albums.Count(),
-                ResultPage = page,
+                ResultPage = args.Page,
                 ResultList = albumTracksList.ToArray()
             };
 

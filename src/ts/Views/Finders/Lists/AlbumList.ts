@@ -3,23 +3,25 @@ import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../../Libraries';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
-import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
+import AlbumTracksStore, { IPagenateQueryArgs } from '../../../Models/AlbumTracks/AlbumTracksStore';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import SelectionList from '../../Shared/SelectionList';
 import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from '../Selections/SelectionAlbumTracks';
 import Exception from '../../../Utils/Exception';
+import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 
 @Component({
     template: `<div class="col-md-6">
     <div class="card">
         <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Albums</h3>
-            <div class="card-tools">
-                <button type="button"
-                        class="btn btn-tool"
-                        @click="OnClickRefresh" >
-                    <i class="fa fa-repeat" />
-                </button>
+            <div class="card-tools form-row">
+                <input class="form-control form-control-navbar form-control-sm text-search"
+                    type="search"
+                    placeholder="Album Name"
+                    aria-label="Album Name"
+                    ref="TextSearch"
+                    @input="OnInputSearchText"/>
             </div>
         </div>
         <div class="card-body list-scrollable">
@@ -50,10 +52,19 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     private isEntitiesRefreshed: boolean = false;
     private genreIds: number[] = [];
     private artistIds: number[] = [];
+    private searchTextFilter: DelayedOnceExecuter;
+
+    private get TextSearch(): HTMLInputElement {
+        return this.$refs.TextSearch as HTMLInputElement;
+    }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = false;
         await super.Initialize();
+
+        this.searchTextFilter = Delay.DelayedOnce((): void => {
+            this.Refresh();
+        }, 800);
 
         return true;
     }
@@ -67,12 +78,21 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     protected async OnInfinite($state: StateChanger): Promise<boolean> {
         return super.OnInfinite($state);
     }
-    protected OnClickRefresh(): void {
-        super.OnClickRefresh();
-    }
 
     protected async GetPagenatedList(): Promise<IPagenatedResult<AlbumTracks>> {
-        return await this.store.GetList(this.genreIds, this.artistIds, this.Page);
+        const args: IPagenateQueryArgs = {
+            GenreIds: this.genreIds,
+            ArtistIds: this.artistIds,
+            FilterText: this.TextSearch.value,
+            Page: this.Page
+        };
+
+        return await this.store.GetList(args);
+    }
+
+
+    private OnInputSearchText(): void {
+        this.searchTextFilter.Exec();
     }
 
     private async OnAlbumTracksSelected(args: IAlbumTracksSelectedArgs): Promise<boolean> {

@@ -13,15 +13,36 @@ namespace MusicFront.src.aspCore.Controllers
     [Route("AlbumTracks")]
     public class AlbumTracksController : Controller
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="GenreIds"></param>
+        /// <param name="ArtistIds"></param>
+        /// <param name="FilterText"></param>
+        /// <param name="Page"></param>
+        /// <param name="store"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Getクエリにつき、JSONオブジェクトでなくパラメータごとに取得する。
+        /// </remarks>
         [HttpGet("GetPagenatedList")]
         public async Task<XhrResponse> GetPagenatedList(
             [FromQuery] int[] GenreIds,
             [FromQuery] int[] ArtistIds,
+            [FromQuery] string FilterText,
             [FromQuery] int? Page,
             [FromServices] AlbumTracksStore store
         )
         {
-            var result = await store.GetPagenatedList(GenreIds, ArtistIds, Page);
+            var args = new AlbumTracksStore.PagenagedQueryArgs()
+            {
+                GenreIds = GenreIds,
+                ArtistIds = ArtistIds,
+                FilterText = FilterText,
+                Page = Page
+            };
+            var result = await store.GetPagenatedList(args);
+
             return XhrResponseFactory.CreateSucceeded(result);
         }
     }

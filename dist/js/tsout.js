@@ -843,16 +843,12 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
         function AlbumTracksStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        AlbumTracksStore.prototype.GetList = function (genreIds, artistIds, page) {
+        AlbumTracksStore.prototype.GetList = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('AlbumTracks/GetPagenatedList', {
-                                GenreIds: genreIds,
-                                ArtistIds: artistIds,
-                                Page: page
-                            })];
+                        case 0: return [4 /*yield*/, this.QueryGet('AlbumTracks/GetPagenatedList', args)];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
@@ -932,12 +928,18 @@ define("Utils/Exception", ["require", "exports"], function (require, exports) {
         function Exception() {
         }
         Exception.Throw = function (message, data) {
+            throw new Error(Exception.CreateDump(message, data));
+        };
+        Exception.Dump = function (message, data) {
+            console.error(Exception.CreateDump(message, data)); // eslint-disable-line
+        };
+        Exception.CreateDump = function (message, data) {
             if (!message)
                 message = 'Unexpexted Error';
-            throw new Error(JSON.stringify({
+            return JSON.stringify({
                 Message: message,
                 Data: data
-            }));
+            });
         };
         return Exception;
     }());
@@ -1132,7 +1134,143 @@ define("Views/Finders/Selections/SelectionAlbumTracks", ["require", "exports", "
     }(ViewBase_2.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Views/Shared/SelectionList", "Views/Finders/Selections/SelectionAlbumTracks", "Utils/Exception"], function (require, exports, _, vue_class_component_2, vue_infinite_loading_1, Libraries_4, AlbumTracksStore_1, SelectionList_1, SelectionAlbumTracks_1, Exception_2) {
+define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (require, exports, Exception_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var DelayedOnceExecuter = /** @class */ (function () {
+        function DelayedOnceExecuter(callback, delay, timeout, isMonitor) {
+            var _this = this;
+            if (delay === void 0) { delay = 100; }
+            if (timeout === void 0) { timeout = -1; }
+            if (isMonitor === void 0) { isMonitor = false; }
+            this.Name = '';
+            this._callback = callback;
+            this._delay = delay;
+            this._timeout = timeout;
+            this._startTime = null;
+            this._timer = null;
+            this._isActive = false;
+            this._suppressCount = 0;
+            this._timeoutExecStartTime = null;
+            if (isMonitor) {
+                setInterval(function () {
+                    if (!_this._isActive)
+                        return;
+                    if (_this._startTime || _this._timeoutExecStartTime) {
+                        var now = new Date();
+                        var elapsed = (_this._timeoutExecStartTime)
+                            ? now.getTime() - _this._timeoutExecStartTime.getTime()
+                            : now.getTime() - _this._startTime.getTime();
+                        if (DelayedOnceExecuter.DelayThreshold < elapsed) {
+                            // Delay閾値より長い時間の間、一度も実行されていない。
+                            // 無限ループの可能性がある。
+                            Exception_2.default.Dump('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
+                        }
+                    }
+                    if (DelayedOnceExecuter.SuppressThreshold < _this._suppressCount) {
+                        // Suppress閾値より多くの回数分、実行が抑制されている。
+                        // 呼び出し回数が多すぎる可能性がある。
+                        Exception_2.default.Dump('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
+                    }
+                }, DelayedOnceExecuter.MonitorInterval);
+            }
+        }
+        Object.defineProperty(DelayedOnceExecuter.prototype, "Delay", {
+            get: function () {
+                return this._delay;
+            },
+            set: function (value) {
+                this._delay = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DelayedOnceExecuter.prototype, "Timeout", {
+            get: function () {
+                return this._timeout;
+            },
+            set: function (value) {
+                this._timeout = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DelayedOnceExecuter.prototype.Exec = function (args) {
+            var _this = this;
+            this._isActive = true;
+            if (this._timer === null) {
+                // これから開始するとき
+                this._startTime = new Date();
+                this._suppressCount = 0;
+            }
+            else {
+                // 既に開始中のとき
+                clearInterval(this._timer);
+                this._timer = null;
+                this._suppressCount++;
+            }
+            var now = new Date();
+            var elapsed = (now.getTime() - this._startTime.getTime());
+            if (0 < this._timeout && elapsed > this._timeout) {
+                // タイムアウト実行が連続するときの、最初の開始時間を保持しておく。
+                if (this._timeoutExecStartTime === null)
+                    this._timeoutExecStartTime = this._startTime;
+                this.InnerExec(args);
+            }
+            else {
+                this._timer = setTimeout(function () {
+                    _this._timeoutExecStartTime = null;
+                    _this.InnerExec(args);
+                }, this._delay);
+            }
+        };
+        DelayedOnceExecuter.prototype.InnerExec = function (args) {
+            try {
+                this._callback(args);
+            }
+            catch (ex) {
+                Exception_2.default.Dump('Callback FAILED!!', ex);
+            }
+            if (this._timer) {
+                clearInterval(this._timer);
+                this._timer = null;
+            }
+            this._startTime = null;
+            this._suppressCount = 0;
+            this._isActive = false;
+        };
+        DelayedOnceExecuter.MonitorInterval = 10000;
+        DelayedOnceExecuter.DelayThreshold = 3000;
+        DelayedOnceExecuter.SuppressThreshold = 100;
+        return DelayedOnceExecuter;
+    }());
+    exports.DelayedOnceExecuter = DelayedOnceExecuter;
+    var Delay = /** @class */ (function () {
+        function Delay() {
+        }
+        Delay.Wait = function (msec) {
+            return new Promise(function (resolve) {
+                window.setTimeout(function () {
+                    try {
+                        resolve(true);
+                    }
+                    catch (ex) {
+                        Exception_2.default.Throw('Delay Exception.', ex);
+                    }
+                }, msec);
+            });
+        };
+        Delay.DelayedOnce = function (callback, delay, timeout, isMonitor) {
+            if (delay === void 0) { delay = 100; }
+            if (timeout === void 0) { timeout = -1; }
+            if (isMonitor === void 0) { isMonitor = false; }
+            return new DelayedOnceExecuter(callback, delay, timeout, isMonitor);
+        };
+        return Delay;
+    }());
+    exports.default = Delay;
+});
+define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Views/Shared/SelectionList", "Views/Finders/Selections/SelectionAlbumTracks", "Utils/Exception", "Utils/Delay"], function (require, exports, _, vue_class_component_2, vue_infinite_loading_1, Libraries_4, AlbumTracksStore_1, SelectionList_1, SelectionAlbumTracks_1, Exception_3, Delay_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumList = /** @class */ (function (_super) {
@@ -1146,8 +1284,16 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
             _this.artistIds = [];
             return _this;
         }
+        Object.defineProperty(AlbumList.prototype, "TextSearch", {
+            get: function () {
+                return this.$refs.TextSearch;
+            },
+            enumerable: true,
+            configurable: true
+        });
         AlbumList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1155,6 +1301,9 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            this.searchTextFilter = Delay_1.default.DelayedOnce(function () {
+                                _this.Refresh();
+                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -1173,18 +1322,26 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
                 });
             });
         };
-        AlbumList.prototype.OnClickRefresh = function () {
-            _super.prototype.OnClickRefresh.call(this);
-        };
         AlbumList.prototype.GetPagenatedList = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var args;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.store.GetList(this.genreIds, this.artistIds, this.Page)];
+                        case 0:
+                            args = {
+                                GenreIds: this.genreIds,
+                                ArtistIds: this.artistIds,
+                                FilterText: this.TextSearch.value,
+                                Page: this.Page
+                            };
+                            return [4 /*yield*/, this.store.GetList(args)];
                         case 1: return [2 /*return*/, _a.sent()];
                     }
                 });
             });
+        };
+        AlbumList.prototype.OnInputSearchText = function () {
+            this.searchTextFilter.Exec();
         };
         AlbumList.prototype.OnAlbumTracksSelected = function (args) {
             return __awaiter(this, void 0, void 0, function () {
@@ -1206,10 +1363,10 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
                         case 2:
                             albumTracks = args.Entity;
                             if (!albumTracks)
-                                Exception_2.default.Throw('AlbumTracks Not Found', args);
+                                Exception_3.default.Throw('AlbumTracks Not Found', args);
                             track = args.Track;
                             if (!track)
-                                Exception_2.default.Throw('Track Not Found', args);
+                                Exception_3.default.Throw('Track Not Found', args);
                             isAllTracksRegistered = Libraries_4.default.Enumerable.from(albumTracks.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
@@ -1284,7 +1441,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
         };
         AlbumList = __decorate([
             vue_class_component_2.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"Album Name\"\n                    aria-label=\"Album Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
                     'infinite-loading': vue_infinite_loading_1.default
@@ -1303,15 +1460,12 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
         function ArtistStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        ArtistStore.prototype.GetList = function (genreIds, page) {
+        ArtistStore.prototype.GetList = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Artist/GetPagenatedList', {
-                                GenreIds: genreIds,
-                                Page: page
-                            })];
+                        case 0: return [4 /*yield*/, this.QueryGet('Artist/GetPagenatedList', args)];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
@@ -1392,7 +1546,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
     }(ViewBase_3.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, vue_class_component_4, vue_infinite_loading_2, ArtistStore_1, SelectionItem_2, SelectionList_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Utils/Delay"], function (require, exports, _, vue_class_component_4, vue_infinite_loading_2, ArtistStore_1, SelectionItem_2, SelectionList_2, Delay_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistList = /** @class */ (function (_super) {
@@ -1404,8 +1558,16 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             _this.genreIds = [];
             return _this;
         }
+        Object.defineProperty(ArtistList.prototype, "TextSearch", {
+            get: function () {
+                return this.$refs.TextSearch;
+            },
+            enumerable: true,
+            configurable: true
+        });
         ArtistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1413,6 +1575,9 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            this.searchTextFilter = Delay_2.default.DelayedOnce(function () {
+                                _this.Refresh();
+                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -1442,13 +1607,23 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList.prototype.GetPagenatedList = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var args;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.store.GetList(this.genreIds, this.Page)];
+                        case 0:
+                            args = {
+                                GenreIds: this.genreIds,
+                                FilterText: this.TextSearch.value,
+                                Page: this.Page
+                            };
+                            return [4 /*yield*/, this.store.GetList(args)];
                         case 1: return [2 /*return*/, _a.sent()];
                     }
                 });
             });
+        };
+        ArtistList.prototype.OnInputSearchText = function () {
+            this.searchTextFilter.Exec();
         };
         ArtistList.prototype.HasGenre = function (genreId) {
             return (0 <= _.indexOf(this.genreIds, genreId));
@@ -1473,7 +1648,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList = __decorate([
             vue_class_component_4.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"Artist Name\"\n                    aria-label=\"Artist Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_2.default,
                     'infinite-loading': vue_infinite_loading_2.default
@@ -1533,14 +1708,12 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
         function GenreStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        GenreStore.prototype.GetList = function (page) {
+        GenreStore.prototype.GetList = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Genre/GetPagenatedList', {
-                                Page: page
-                            })];
+                        case 0: return [4 /*yield*/, this.QueryGet('Genre/GetPagenatedList', args)];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
@@ -1556,7 +1729,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_5, vue_infinite_loading_3, GenreStore_1, SelectionItem_3, SelectionList_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Utils/Delay"], function (require, exports, vue_class_component_5, vue_infinite_loading_3, GenreStore_1, SelectionItem_3, SelectionList_3, Delay_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -1567,8 +1740,16 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             _this.entities = [];
             return _this;
         }
+        Object.defineProperty(GenreList.prototype, "TextSearch", {
+            get: function () {
+                return this.$refs.TextSearch;
+            },
+            enumerable: true,
+            configurable: true
+        });
         GenreList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1576,6 +1757,9 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            this.searchTextFilter = Delay_3.default.DelayedOnce(function () {
+                                _this.Refresh();
+                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -1605,17 +1789,26 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         };
         GenreList.prototype.GetPagenatedList = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var args;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.store.GetList(this.Page)];
+                        case 0:
+                            args = {
+                                FilterText: this.TextSearch.value,
+                                Page: this.Page
+                            };
+                            return [4 /*yield*/, this.store.GetList(args)];
                         case 1: return [2 /*return*/, _a.sent()];
                     }
                 });
             });
         };
+        GenreList.prototype.OnInputSearchText = function () {
+            this.searchTextFilter.Exec();
+        };
         GenreList = __decorate([
             vue_class_component_5.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"Genre Name\"\n                    aria-label=\"Genre Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_3.default,
                     'infinite-loading': vue_infinite_loading_3.default
@@ -2007,7 +2200,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
     }(JsonRpcQueryableBase_1.default));
     exports.default = PlaylistStore;
 });
-define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Playlists/PlaylistStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, vue_class_component_8, vue_infinite_loading_4, PlaylistStore_1, SelectionItem_4, SelectionList_4) {
+define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Playlists/PlaylistStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Utils/Delay", "Libraries"], function (require, exports, _, vue_class_component_8, vue_infinite_loading_4, PlaylistStore_1, SelectionItem_4, SelectionList_4, Delay_4, Libraries_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlaylistList = /** @class */ (function (_super) {
@@ -2016,8 +2209,10 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "v
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.store = new PlaylistStore_1.default();
             _this.entities = [];
+            _this.allEntities = [];
             return _this;
         }
+        PlaylistList_1 = PlaylistList;
         Object.defineProperty(PlaylistList.prototype, "Items", {
             get: function () {
                 return this.$refs.Items;
@@ -2025,20 +2220,26 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "v
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(PlaylistList.prototype, "TextSearch", {
+            get: function () {
+                return this.$refs.TextSearch;
+            },
+            enumerable: true,
+            configurable: true
+        });
         PlaylistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _a;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0:
                             this.isAutoCollapse = true;
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
-                            _b.sent();
-                            _a = this;
-                            return [4 /*yield*/, this.store.GetPlaylists()];
-                        case 2:
-                            _a.entities = _b.sent();
+                            _a.sent();
+                            this.searchTextFilter = Delay_4.default.DelayedOnce(function () {
+                                _this.Refresh();
+                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -2070,26 +2271,46 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "v
         };
         PlaylistList.prototype.GetPagenatedList = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var playlists, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.store.GetPlaylists()];
+                var _a, entities, filterText, totalLength, pagenated, result;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            if (!(!this.allEntities || this.allEntities.length <= 0)) return [3 /*break*/, 2];
+                            _a = this;
+                            return [4 /*yield*/, this.store.GetPlaylists()];
                         case 1:
-                            playlists = _a.sent();
+                            _a.allEntities = _b.sent();
+                            _b.label = 2;
+                        case 2:
+                            entities = Libraries_6.default.Enumerable.from(this.allEntities);
+                            filterText = (this.TextSearch.value || '').toLowerCase();
+                            if (0 < filterText.length)
+                                entities = entities
+                                    .where(function (e) { return 0 <= e.Name.toLowerCase().indexOf(filterText); });
+                            totalLength = entities.count();
+                            pagenated = entities
+                                .skip((this.Page - 1) * PlaylistList_1.PageLength)
+                                .take(PlaylistList_1.PageLength)
+                                .toArray();
                             result = {
-                                TotalLength: playlists.length,
-                                ResultLength: playlists.length,
-                                ResultList: playlists,
-                                ResultPage: 1
+                                TotalLength: totalLength,
+                                ResultLength: pagenated.length,
+                                ResultList: pagenated,
+                                ResultPage: this.Page
                             };
                             return [2 /*return*/, result];
                     }
                 });
             });
         };
-        PlaylistList = __decorate([
+        PlaylistList.prototype.OnInputSearchText = function () {
+            this.searchTextFilter.Exec();
+        };
+        var PlaylistList_1;
+        PlaylistList.PageLength = 30;
+        PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools\">\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"List Name\"\n                    aria-label=\"List Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_4.default,
                     'infinite-loading': vue_infinite_loading_4.default
@@ -2128,7 +2349,7 @@ define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-
     }(ViewBase_6.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/Playlists/PlaylistStore", "Models/Tracks/Track", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack", "vue-infinite-loading", "Libraries"], function (require, exports, vue_class_component_10, PlaylistStore_2, Track_3, SelectionList_5, SelectionTrack_1, vue_infinite_loading_5, Libraries_6) {
+define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/Playlists/PlaylistStore", "Models/Tracks/Track", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack", "vue-infinite-loading", "Libraries", "Utils/Delay"], function (require, exports, vue_class_component_10, PlaylistStore_2, Track_3, SelectionList_5, SelectionTrack_1, vue_infinite_loading_5, Libraries_7, Delay_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackList = /** @class */ (function (_super) {
@@ -2141,8 +2362,16 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
             return _this;
         }
         TrackList_1 = TrackList;
+        Object.defineProperty(TrackList.prototype, "TextSearch", {
+            get: function () {
+                return this.$refs.TextSearch;
+            },
+            enumerable: true,
+            configurable: true
+        });
         TrackList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -2150,6 +2379,9 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            this.searchTextFilter = Delay_5.default.DelayedOnce(function () {
+                                _this.Refresh();
+                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -2184,7 +2416,7 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
             });
         };
         TrackList.prototype.OnSelectionChanged = function (args) {
-            var isAllTracksRegistered = Libraries_6.default.Enumerable.from(this.playlist.Tracks)
+            var isAllTracksRegistered = Libraries_7.default.Enumerable.from(this.playlist.Tracks)
                 .all(function (e) { return e.TlId !== null; });
             (isAllTracksRegistered)
                 ? this.store.PlayByTlId(args.Entity.TlId)
@@ -2192,7 +2424,7 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
         };
         TrackList.prototype.GetPagenatedList = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var result_1, mpTracks, entities, result;
+                var result_1, mpTracks, entities, filterText, totalLength, pagenated, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -2212,14 +2444,20 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
                             this.playlist.Tracks = Track_3.default.CreateArrayFromMopidy(mpTracks);
                             _a.label = 2;
                         case 2:
-                            entities = Libraries_6.default.Enumerable.from(this.playlist.Tracks)
+                            entities = Libraries_7.default.Enumerable.from(this.playlist.Tracks);
+                            filterText = (this.TextSearch.value || '').toLowerCase();
+                            if (0 < filterText.length)
+                                entities = entities
+                                    .where(function (e) { return 0 <= e.LowerName.indexOf(filterText); });
+                            totalLength = entities.count();
+                            pagenated = entities
                                 .skip((this.Page - 1) * TrackList_1.PageLength)
                                 .take(TrackList_1.PageLength)
                                 .toArray();
                             result = {
-                                TotalLength: this.playlist.Tracks.length,
-                                ResultLength: entities.length,
-                                ResultList: entities,
+                                TotalLength: totalLength,
+                                ResultLength: pagenated.length,
+                                ResultList: pagenated,
                                 ResultPage: this.Page
                             };
                             return [2 /*return*/, result];
@@ -2227,11 +2465,14 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
                 });
             });
         };
+        TrackList.prototype.OnInputSearchText = function () {
+            this.searchTextFilter.Exec();
+        };
         var TrackList_1;
         TrackList.PageLength = 20;
         TrackList = TrackList_1 = __decorate([
             vue_class_component_10.default({
-                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"Track Name\"\n                    aria-label=\"Track Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-track': SelectionTrack_1.default,
                     'infinite-loading': vue_infinite_loading_5.default
@@ -2242,7 +2483,7 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
     }(SelectionList_5.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/PlaylistList", "Views/Playlists/Lists/TrackList"], function (require, exports, vue_class_component_11, ViewBase_7, PlaylistList_1, TrackList_2) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/PlaylistList", "Views/Playlists/Lists/TrackList"], function (require, exports, vue_class_component_11, ViewBase_7, PlaylistList_2, TrackList_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Playlists = /** @class */ (function (_super) {
@@ -2276,7 +2517,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             vue_class_component_11.default({
                 template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-playlists\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\" />\n        <track-list\n            ref=\"TrackList\" />\n    </div>\n</section>",
                 components: {
-                    'playlist-list': PlaylistList_1.default,
+                    'playlist-list': PlaylistList_2.default,
                     'track-list': TrackList_2.default
                 }
             })
@@ -2788,7 +3029,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_3.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_13, Libraries_7, Monitor_2, Player_1, ViewBase_9) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_13, Libraries_8, Monitor_2, Player_1, ViewBase_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlayerPanel = /** @class */ (function (_super) {
@@ -2822,7 +3063,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.volumeSlider = Libraries_7.default.$(this.$refs.Slider).ionRangeSlider({
+                            this.volumeSlider = Libraries_8.default.$(this.$refs.Slider).ionRangeSlider({
                                 onFinish: function (data) {
                                     // スライダー操作完了時のイベント
                                     _this.player.SetVolume(data.from);
@@ -2904,7 +3145,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_9.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel", "Libraries"], function (require, exports, vue_class_component_14, ViewBase_10, PlayerPanel_2, Libraries_8) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel", "Libraries"], function (require, exports, vue_class_component_14, ViewBase_10, PlayerPanel_2, Libraries_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -2929,7 +3170,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_8.default.$('.sidebar').slimScroll({
+                            Libraries_9.default.$('.sidebar').slimScroll({
                                 height: '100%'
                             });
                             return [2 /*return*/, true];
@@ -3026,7 +3267,7 @@ define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], fu
     }());
     exports.default = RootContoller;
 });
-define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"], function (require, exports, Libraries_9, RootContoller_1) {
+define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"], function (require, exports, Libraries_10, RootContoller_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -3037,7 +3278,7 @@ define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"],
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Libraries_9.default.Initialize();
+                            Libraries_10.default.Initialize();
                             this._rootController = new RootContoller_1.default();
                             return [4 /*yield*/, this._rootController.Init()];
                         case 1:

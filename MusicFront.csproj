@@ -16,6 +16,7 @@
     <None Remove="src\ts\Models\Mopidies\Monitor.ts" />
     <None Remove="src\ts\Models\Playlists\Playlist.ts" />
     <None Remove="src\ts\Models\Playlists\PlaylistStore.ts" />
+    <None Remove="src\ts\Utils\Delay.ts" />
     <None Remove="src\ts\Utils\Exception.ts" />
     <None Remove="src\ts\Views\Events\AdminLteEvents.ts" />
     <None Remove="src\ts\Libraries.ts" />
@@ -86,6 +87,7 @@
     <TypeScriptCompile Include="src\ts\Models\Mopidies\Player.ts" />
     <TypeScriptCompile Include="src\ts\Models\Playlists\Playlist.ts" />
     <TypeScriptCompile Include="src\ts\Models\Playlists\PlaylistStore.ts" />
+    <TypeScriptCompile Include="src\ts\Utils\Delay.ts" />
     <TypeScriptCompile Include="src\ts\Utils\Exception.ts" />
     <TypeScriptCompile Include="src\ts\Views\Events\AdminLteEvents.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />

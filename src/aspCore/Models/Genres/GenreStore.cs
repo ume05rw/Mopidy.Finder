@@ -9,6 +9,12 @@ namespace MusicFront.Models.Genres
 {
     public class GenreStore : PagenagedStoreBase<Genre>
     {
+        public class PagenagedQueryArgs
+        {
+            public string FilterText { get; set; }
+            public int? Page { get; set; }
+        }
+
         private const string QueryString = "local:directory?type=genre";
 
         public GenreStore([FromServices] Dbc dbc) : base(dbc)
@@ -18,20 +24,23 @@ namespace MusicFront.Models.Genres
         public Genre Get(int genreId)
             => this.Dbc.GetGenreQuery().FirstOrDefault(e => e.Id == genreId);
 
-        public PagenatedResult GetPagenatedList(int? page)
+        public PagenatedResult GetPagenatedList(PagenagedQueryArgs args)
         {
             var query = this.Dbc.GetGenreQuery();
+
+            if (!string.IsNullOrEmpty(args.FilterText))
+                query = query
+                    .Where(e => e.LowerName.Contains(args.FilterText.ToLower()));
 
             var totalLength = query.Count();
 
             query = query.OrderBy(e => e.LowerName);
 
-            if (page != null)
-            {
+            if (args.Page != null)
                 query = query
-                    .Skip(((int)page - 1) * this.PageLength)
+                    .Skip(((int)args.Page - 1) * this.PageLength)
                     .Take(this.PageLength);
-            }
+
 
             var array = query.ToArray();
 
@@ -39,7 +48,7 @@ namespace MusicFront.Models.Genres
             {
                 TotalLength = totalLength,
                 ResultLength = array.Length,
-                ResultPage = page,
+                ResultPage = args.Page,
                 ResultList = array
             };
 

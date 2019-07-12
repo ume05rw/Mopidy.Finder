@@ -8,12 +8,21 @@ import SelectionList from '../../Shared/SelectionList';
 import SelectionTrack from '../Selections/SelectionTrack';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../../Libraries';
+import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 
 @Component({
     template: `<div class="col-md-9">
     <div class="card">
         <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Tracks</h3>
+            <div class="card-tools form-row">
+                <input class="form-control form-control-navbar form-control-sm text-search"
+                    type="search"
+                    placeholder="Track Name"
+                    aria-label="Track Name"
+                    ref="TextSearch"
+                    @input="OnInputSearchText"/>
+            </div>
         </div>
         <div class="card-body list-scrollable">
             <ul class="products-list product-list-in-box">
@@ -42,10 +51,19 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Track[] = [];
     private playlist: Playlist = null;
+    private searchTextFilter: DelayedOnceExecuter;
+
+    private get TextSearch(): HTMLInputElement {
+        return this.$refs.TextSearch as HTMLInputElement;
+    }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = false;
         await super.Initialize();
+
+        this.searchTextFilter = Delay.DelayedOnce((): void => {
+            this.Refresh();
+        }, 800);
 
         return true;
     }
@@ -99,18 +117,29 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             this.playlist.Tracks = Track.CreateArrayFromMopidy(mpTracks);
         }
 
-        const entities = Libraries.Enumerable.from(this.playlist.Tracks)
+        let entities = Libraries.Enumerable.from(this.playlist.Tracks);
+        const filterText = (this.TextSearch.value || '').toLowerCase();
+        if (0 < filterText.length)
+            entities = entities
+                .where((e): boolean => 0 <= e.LowerName.indexOf(filterText));
+
+        const totalLength = entities.count();
+        const pagenated = entities
             .skip((this.Page - 1) * TrackList.PageLength)
             .take(TrackList.PageLength)
             .toArray();
 
         const result: IPagenatedResult<Track> = {
-            TotalLength: this.playlist.Tracks.length,
-            ResultLength: entities.length,
-            ResultList: entities,
+            TotalLength: totalLength,
+            ResultLength: pagenated.length,
+            ResultList: pagenated,
             ResultPage: this.Page
         };
 
         return result;
+    }
+
+    private OnInputSearchText(): void {
+        this.searchTextFilter.Exec();
     }
 }

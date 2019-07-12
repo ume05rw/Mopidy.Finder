@@ -13,11 +13,19 @@ namespace MusicFront.Controllers
         [HttpGet("GetPagenatedList")]
         public XhrResponse GetPagenatedList(
             [FromQuery] int[] GenreIds,
+            [FromQuery] string FilterText,
             [FromQuery] int? Page,
             [FromServices] ArtistStore store
         )
         {
-            var result = store.GetPagenatedList(GenreIds, Page);
+            var args = new ArtistStore.PagenagedQueryArgs()
+            {
+                GenreIds = GenreIds,
+                FilterText = FilterText,
+                Page = Page
+            };
+            var result = store.GetPagenatedList(args);
+
             return XhrResponseFactory.CreateSucceeded(result);
         }
     }

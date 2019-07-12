@@ -20,11 +20,18 @@ namespace MusicFront.Controllers
         /// </remarks>
         [HttpGet("GetPagenatedList")]
         public XhrResponse GetPagenatedList(
+            [FromQuery] string FilterText,
             [FromQuery] int? Page,
             [FromServices] GenreStore store
         )
         {
-            var genres = store.GetPagenatedList(Page);
+            var args = new GenreStore.PagenagedQueryArgs()
+            {
+                FilterText = FilterText,
+                Page = Page
+            };
+            var genres = store.GetPagenatedList(args);
+
             return XhrResponseFactory.CreateSucceeded(genres);
         }
     }

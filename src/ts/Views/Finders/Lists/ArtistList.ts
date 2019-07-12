@@ -2,18 +2,25 @@ import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Artist from '../../../Models/Artists/Artist';
-import ArtistStore from '../../../Models/Artists/ArtistStore';
+import { default as ArtistStore, IPagenateQueryArgs } from '../../../Models/Artists/ArtistStore';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
 import SelectionList from '../../Shared/SelectionList';
+import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 
 @Component({
     template: `<div class="col-md-3">
-    <div class="card">
+    <div class="card plain-list">
         <div class="card-header with-border bg-info">
             <h3 class="card-title">Artists</h3>
-            <div class="card-tools">
+            <div class="card-tools form-row">
+                <input class="form-control form-control-navbar form-control-sm text-search"
+                    type="search"
+                    placeholder="Artist Name"
+                    aria-label="Artist Name"
+                    ref="TextSearch"
+                    @input="OnInputSearchText"/>
                 <button
                     class="btn btn-tool d-inline d-md-none collapse"
                     ref="ButtonCollaplse"
@@ -52,10 +59,19 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     protected store: ArtistStore = new ArtistStore();
     protected entities: Artist[] = [];
     private genreIds: number[] = [];
+    private searchTextFilter: DelayedOnceExecuter;
+
+    private get TextSearch(): HTMLInputElement {
+        return this.$refs.TextSearch as HTMLInputElement;
+    }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
+
+        this.searchTextFilter = Delay.DelayedOnce((): void => {
+            this.Refresh();
+        }, 800);
 
         return true;
     }
@@ -78,9 +94,19 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     protected OnSelectionChanged(args: ISelectionChangedArgs<Artist>): void {
         super.OnSelectionChanged(args);
     }
-
     protected async GetPagenatedList(): Promise<IPagenatedResult<Artist>> {
-        return await this.store.GetList(this.genreIds, this.Page);
+        const args: IPagenateQueryArgs = {
+            GenreIds: this.genreIds,
+            FilterText: this.TextSearch.value,
+            Page: this.Page
+        };
+
+        return await this.store.GetList(args);
+    }
+
+
+    private OnInputSearchText(): void {
+        this.searchTextFilter.Exec();
     }
 
     private HasGenre(genreId: number): boolean {

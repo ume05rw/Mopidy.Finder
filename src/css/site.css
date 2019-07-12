@@ -26,6 +26,17 @@
 }
 
 /**
+ * 各種リスト
+ */
+.plain-list .nav-item a {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.card-tools .text-search {
+    max-width: 120px;
+}
+
+/**
  * Finder-アルバムリスト
  */
 .table.tracks {
