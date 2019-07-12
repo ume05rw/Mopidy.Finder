@@ -5,10 +5,10 @@ import Libraries from '../../../Libraries';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import AlbumTracksStore, { IPagenateQueryArgs } from '../../../Models/AlbumTracks/AlbumTracksStore';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
+import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
+import Exception from '../../../Utils/Exception';
 import SelectionList from '../../Shared/SelectionList';
 import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from '../Selections/SelectionAlbumTracks';
-import Exception from '../../../Utils/Exception';
-import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 
 @Component({
     template: `<div class="col-md-6">

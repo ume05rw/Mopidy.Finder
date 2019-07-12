@@ -910,17 +910,6 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
     }(StoreBase_1.default));
     exports.default = AlbumTracksStore;
 });
-define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.WidgetEvents = {
-        Expanded: 'expanded.lte.widget',
-        Collapsed: 'collapsed.lte.widget',
-        Maximized: 'maximized.lte.widget',
-        Minimized: 'minimized.lte.widget',
-        Removed: 'removed.lte.widget'
-    };
-});
 define("Utils/Exception", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -945,7 +934,154 @@ define("Utils/Exception", ["require", "exports"], function (require, exports) {
     }());
     exports.default = Exception;
 });
-define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Shared/SelectionEvents", "Utils/Exception"], function (require, exports, AdminLte, _, Libraries_2, ViewBase_1, AdminLteEvents_1, SelectionEvents_1, Exception_1) {
+define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (require, exports, Exception_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var DelayedOnceExecuter = /** @class */ (function () {
+        function DelayedOnceExecuter(callback, delay, timeout, isMonitor) {
+            var _this = this;
+            if (delay === void 0) { delay = 100; }
+            if (timeout === void 0) { timeout = -1; }
+            if (isMonitor === void 0) { isMonitor = false; }
+            this.Name = '';
+            this._callback = callback;
+            this._delay = delay;
+            this._timeout = timeout;
+            this._startTime = null;
+            this._timer = null;
+            this._isActive = false;
+            this._suppressCount = 0;
+            this._timeoutExecStartTime = null;
+            if (isMonitor) {
+                setInterval(function () {
+                    if (!_this._isActive)
+                        return;
+                    if (_this._startTime || _this._timeoutExecStartTime) {
+                        var now = new Date();
+                        var elapsed = (_this._timeoutExecStartTime)
+                            ? now.getTime() - _this._timeoutExecStartTime.getTime()
+                            : now.getTime() - _this._startTime.getTime();
+                        if (DelayedOnceExecuter.DelayThreshold < elapsed) {
+                            // Delay閾値より長い時間の間、一度も実行されていない。
+                            // 無限ループの可能性がある。
+                            Exception_1.default.Dump('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
+                        }
+                    }
+                    if (DelayedOnceExecuter.SuppressThreshold < _this._suppressCount) {
+                        // Suppress閾値より多くの回数分、実行が抑制されている。
+                        // 呼び出し回数が多すぎる可能性がある。
+                        Exception_1.default.Dump('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
+                    }
+                }, DelayedOnceExecuter.MonitorInterval);
+            }
+        }
+        Object.defineProperty(DelayedOnceExecuter.prototype, "Delay", {
+            get: function () {
+                return this._delay;
+            },
+            set: function (value) {
+                this._delay = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DelayedOnceExecuter.prototype, "Timeout", {
+            get: function () {
+                return this._timeout;
+            },
+            set: function (value) {
+                this._timeout = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DelayedOnceExecuter.prototype.Exec = function (args) {
+            var _this = this;
+            this._isActive = true;
+            if (this._timer === null) {
+                // これから開始するとき
+                this._startTime = new Date();
+                this._suppressCount = 0;
+            }
+            else {
+                // 既に開始中のとき
+                clearInterval(this._timer);
+                this._timer = null;
+                this._suppressCount++;
+            }
+            var now = new Date();
+            var elapsed = (now.getTime() - this._startTime.getTime());
+            if (0 < this._timeout && elapsed > this._timeout) {
+                // タイムアウト実行が連続するときの、最初の開始時間を保持しておく。
+                if (this._timeoutExecStartTime === null)
+                    this._timeoutExecStartTime = this._startTime;
+                this.InnerExec(args);
+            }
+            else {
+                this._timer = setTimeout(function () {
+                    _this._timeoutExecStartTime = null;
+                    _this.InnerExec(args);
+                }, this._delay);
+            }
+        };
+        DelayedOnceExecuter.prototype.InnerExec = function (args) {
+            try {
+                this._callback(args);
+            }
+            catch (ex) {
+                Exception_1.default.Dump('Callback FAILED!!', ex);
+            }
+            if (this._timer) {
+                clearInterval(this._timer);
+                this._timer = null;
+            }
+            this._startTime = null;
+            this._suppressCount = 0;
+            this._isActive = false;
+        };
+        DelayedOnceExecuter.MonitorInterval = 10000;
+        DelayedOnceExecuter.DelayThreshold = 3000;
+        DelayedOnceExecuter.SuppressThreshold = 100;
+        return DelayedOnceExecuter;
+    }());
+    exports.DelayedOnceExecuter = DelayedOnceExecuter;
+    var Delay = /** @class */ (function () {
+        function Delay() {
+        }
+        Delay.Wait = function (msec) {
+            return new Promise(function (resolve) {
+                window.setTimeout(function () {
+                    try {
+                        resolve(true);
+                    }
+                    catch (ex) {
+                        Exception_1.default.Throw('Delay Exception.', ex);
+                    }
+                }, msec);
+            });
+        };
+        Delay.DelayedOnce = function (callback, delay, timeout, isMonitor) {
+            if (delay === void 0) { delay = 100; }
+            if (timeout === void 0) { timeout = -1; }
+            if (isMonitor === void 0) { isMonitor = false; }
+            return new DelayedOnceExecuter(callback, delay, timeout, isMonitor);
+        };
+        return Delay;
+    }());
+    exports.default = Delay;
+});
+define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.WidgetEvents = {
+        Expanded: 'expanded.lte.widget',
+        Collapsed: 'collapsed.lte.widget',
+        Maximized: 'maximized.lte.widget',
+        Minimized: 'minimized.lte.widget',
+        Removed: 'removed.lte.widget'
+    };
+});
+define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Shared/SelectionEvents", "Utils/Exception"], function (require, exports, AdminLte, _, Libraries_2, ViewBase_1, AdminLteEvents_1, SelectionEvents_1, Exception_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionList = /** @class */ (function (_super) {
@@ -1047,7 +1183,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
                             return [3 /*break*/, 3];
                         case 2:
                             e_1 = _a.sent();
-                            Exception_1.default.Throw(null, e_1);
+                            Exception_2.default.Throw(null, e_1);
                             return [3 /*break*/, 3];
                         case 3: return [2 /*return*/, true];
                     }
@@ -1134,143 +1270,7 @@ define("Views/Finders/Selections/SelectionAlbumTracks", ["require", "exports", "
     }(ViewBase_2.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (require, exports, Exception_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var DelayedOnceExecuter = /** @class */ (function () {
-        function DelayedOnceExecuter(callback, delay, timeout, isMonitor) {
-            var _this = this;
-            if (delay === void 0) { delay = 100; }
-            if (timeout === void 0) { timeout = -1; }
-            if (isMonitor === void 0) { isMonitor = false; }
-            this.Name = '';
-            this._callback = callback;
-            this._delay = delay;
-            this._timeout = timeout;
-            this._startTime = null;
-            this._timer = null;
-            this._isActive = false;
-            this._suppressCount = 0;
-            this._timeoutExecStartTime = null;
-            if (isMonitor) {
-                setInterval(function () {
-                    if (!_this._isActive)
-                        return;
-                    if (_this._startTime || _this._timeoutExecStartTime) {
-                        var now = new Date();
-                        var elapsed = (_this._timeoutExecStartTime)
-                            ? now.getTime() - _this._timeoutExecStartTime.getTime()
-                            : now.getTime() - _this._startTime.getTime();
-                        if (DelayedOnceExecuter.DelayThreshold < elapsed) {
-                            // Delay閾値より長い時間の間、一度も実行されていない。
-                            // 無限ループの可能性がある。
-                            Exception_2.default.Dump('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
-                        }
-                    }
-                    if (DelayedOnceExecuter.SuppressThreshold < _this._suppressCount) {
-                        // Suppress閾値より多くの回数分、実行が抑制されている。
-                        // 呼び出し回数が多すぎる可能性がある。
-                        Exception_2.default.Dump('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
-                    }
-                }, DelayedOnceExecuter.MonitorInterval);
-            }
-        }
-        Object.defineProperty(DelayedOnceExecuter.prototype, "Delay", {
-            get: function () {
-                return this._delay;
-            },
-            set: function (value) {
-                this._delay = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(DelayedOnceExecuter.prototype, "Timeout", {
-            get: function () {
-                return this._timeout;
-            },
-            set: function (value) {
-                this._timeout = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        DelayedOnceExecuter.prototype.Exec = function (args) {
-            var _this = this;
-            this._isActive = true;
-            if (this._timer === null) {
-                // これから開始するとき
-                this._startTime = new Date();
-                this._suppressCount = 0;
-            }
-            else {
-                // 既に開始中のとき
-                clearInterval(this._timer);
-                this._timer = null;
-                this._suppressCount++;
-            }
-            var now = new Date();
-            var elapsed = (now.getTime() - this._startTime.getTime());
-            if (0 < this._timeout && elapsed > this._timeout) {
-                // タイムアウト実行が連続するときの、最初の開始時間を保持しておく。
-                if (this._timeoutExecStartTime === null)
-                    this._timeoutExecStartTime = this._startTime;
-                this.InnerExec(args);
-            }
-            else {
-                this._timer = setTimeout(function () {
-                    _this._timeoutExecStartTime = null;
-                    _this.InnerExec(args);
-                }, this._delay);
-            }
-        };
-        DelayedOnceExecuter.prototype.InnerExec = function (args) {
-            try {
-                this._callback(args);
-            }
-            catch (ex) {
-                Exception_2.default.Dump('Callback FAILED!!', ex);
-            }
-            if (this._timer) {
-                clearInterval(this._timer);
-                this._timer = null;
-            }
-            this._startTime = null;
-            this._suppressCount = 0;
-            this._isActive = false;
-        };
-        DelayedOnceExecuter.MonitorInterval = 10000;
-        DelayedOnceExecuter.DelayThreshold = 3000;
-        DelayedOnceExecuter.SuppressThreshold = 100;
-        return DelayedOnceExecuter;
-    }());
-    exports.DelayedOnceExecuter = DelayedOnceExecuter;
-    var Delay = /** @class */ (function () {
-        function Delay() {
-        }
-        Delay.Wait = function (msec) {
-            return new Promise(function (resolve) {
-                window.setTimeout(function () {
-                    try {
-                        resolve(true);
-                    }
-                    catch (ex) {
-                        Exception_2.default.Throw('Delay Exception.', ex);
-                    }
-                }, msec);
-            });
-        };
-        Delay.DelayedOnce = function (callback, delay, timeout, isMonitor) {
-            if (delay === void 0) { delay = 100; }
-            if (timeout === void 0) { timeout = -1; }
-            if (isMonitor === void 0) { isMonitor = false; }
-            return new DelayedOnceExecuter(callback, delay, timeout, isMonitor);
-        };
-        return Delay;
-    }());
-    exports.default = Delay;
-});
-define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Views/Shared/SelectionList", "Views/Finders/Selections/SelectionAlbumTracks", "Utils/Exception", "Utils/Delay"], function (require, exports, _, vue_class_component_2, vue_infinite_loading_1, Libraries_4, AlbumTracksStore_1, SelectionList_1, SelectionAlbumTracks_1, Exception_3, Delay_1) {
+define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Delay", "Utils/Exception", "Views/Shared/SelectionList", "Views/Finders/Selections/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_2, vue_infinite_loading_1, Libraries_4, AlbumTracksStore_1, Delay_1, Exception_3, SelectionList_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumList = /** @class */ (function (_super) {
@@ -1546,7 +1546,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
     }(ViewBase_3.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Utils/Delay"], function (require, exports, _, vue_class_component_4, vue_infinite_loading_2, ArtistStore_1, SelectionItem_2, SelectionList_2, Delay_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Utils/Delay", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, vue_class_component_4, vue_infinite_loading_2, ArtistStore_1, Delay_2, SelectionItem_2, SelectionList_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistList = /** @class */ (function (_super) {
@@ -1729,7 +1729,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Utils/Delay"], function (require, exports, vue_class_component_5, vue_infinite_loading_3, GenreStore_1, SelectionItem_3, SelectionList_3, Delay_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Utils/Delay", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_5, vue_infinite_loading_3, GenreStore_1, Delay_3, SelectionItem_3, SelectionList_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -2200,7 +2200,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
     }(JsonRpcQueryableBase_1.default));
     exports.default = PlaylistStore;
 });
-define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Playlists/PlaylistStore", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Utils/Delay", "Libraries"], function (require, exports, _, vue_class_component_8, vue_infinite_loading_4, PlaylistStore_1, SelectionItem_4, SelectionList_4, Delay_4, Libraries_6) {
+define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "Libraries", "vue-class-component", "vue-infinite-loading", "Models/Playlists/PlaylistStore", "Utils/Delay", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, Libraries_6, vue_class_component_8, vue_infinite_loading_4, PlaylistStore_1, Delay_4, SelectionItem_4, SelectionList_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlaylistList = /** @class */ (function (_super) {
@@ -2349,7 +2349,7 @@ define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-
     }(ViewBase_6.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "Models/Playlists/PlaylistStore", "Models/Tracks/Track", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack", "vue-infinite-loading", "Libraries", "Utils/Delay"], function (require, exports, vue_class_component_10, PlaylistStore_2, Track_3, SelectionList_5, SelectionTrack_1, vue_infinite_loading_5, Libraries_7, Delay_5) {
+define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Models/Tracks/Track", "Utils/Delay", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack"], function (require, exports, vue_class_component_10, vue_infinite_loading_5, Libraries_7, PlaylistStore_2, Track_3, Delay_5, SelectionList_5, SelectionTrack_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackList = /** @class */ (function (_super) {

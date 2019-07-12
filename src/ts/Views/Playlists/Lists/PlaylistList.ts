@@ -1,14 +1,14 @@
 import * as _ from 'lodash';
+import Libraries from 'src/ts/Libraries';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Playlist from '../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../Models/Playlists/PlaylistStore';
+import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
 import SelectionList from '../../Shared/SelectionList';
-import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
-import Libraries from 'src/ts/Libraries';
 
 @Component({
     template: `<div class="col-md-3">
