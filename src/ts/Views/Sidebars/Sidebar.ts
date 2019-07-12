@@ -1,7 +1,7 @@
 import Component from 'vue-class-component';
 import ViewBase from '../Bases/ViewBase';
 import PlayerPanel from './PlayerPanel';
-import Libraries from 'src/ts/Libraries';
+import Libraries from '../../Libraries';
 
 export interface IContentChanged {
     Name: string;
@@ -16,7 +16,9 @@ export const SidebarEvents = {
     <div class="brand-link navbar-secondary">
         <span class="brand-text font-weight-light">Mopidy Finder</span>
     </div>
-    <section class="sidebar" style="height: 100%;">
+    <section
+        class="sidebar"
+        ref="SidebarSection">
         <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" role="tablist">
                 <li class="nav-item">
@@ -69,6 +71,10 @@ export const SidebarEvents = {
     }
 })
 export default class Sidebar extends ViewBase {
+
+    private get SidebarSection(): HTMLTableSectionElement {
+        return this.$refs.SidebarSection as HTMLTableSectionElement;
+    }
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();

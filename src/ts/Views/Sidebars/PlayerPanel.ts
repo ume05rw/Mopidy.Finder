@@ -5,7 +5,7 @@ import Player from '../../Models/Mopidies/Player';
 import ViewBase from '../Bases/ViewBase';
 
 @Component({
-    template: `<div class="card siderbar-control">
+    template: `<div class="card siderbar-control pb-10">
     <div class="card-body">
         <img v-bind:src="monitor.ImageFullUri" class="albumart" />
         <h6 class="card-title">{{ monitor.TrackName }}</h6>

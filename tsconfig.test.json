@@ -1,77 +1,8 @@
 {
-    // tsconfig.json で指定できる全 compilerOptions をまとめた (TypeScript v2.5 版)
-    // http://neos21.hatenablog.com/entry/2017/10/24/080000
-    //
-    // tsconfig 日本語訳
-    // https://qiita.com/alfas/items/539ade65926deb530e0e
-
-    // 保存時にコンパイルするように、IDEに通知する。
-    // VSでは効果無い？出力されない...。
-    "compileOnSave": true,
-
-    // 保存時のビルド
-    // compileOnSaveとの違いが分からん。
-    // こちらも、VSでは自動ビルドが走る訳ではないらしい。
-    "buildOnSave": true,
-
-    // なお、プロジェクト定義ファイル(*.csproj)の PropertyGroupディレクティブに
-    // <TypeScriptCompileOnSaveEnabled>True</TypeScriptCompileOnSaveEnabled>
-    // という定義がある。
-    // こちらを追記しても、ソースファイル保存時の自動ビルドは動かなかった。
+    // 基底の定義
+    "extends": "./tsconfig.base.json",
 
     "compilerOptions": {
-
-        // 暗黙のany型を許可するか否か
-        "noImplicitAny": false,
-
-        // コンパイルエラーがあった場合に、ファイルを生成するか否か
-        "noEmitOnError": true,
-
-        // 出力形式: es5, es2015, etc...
-        "target": "es5",
-
-        // コンパイルに含めるライブラリの指定
-        "lib": [ "dom", "es2015.promise", "es5" ],
-
-        // すべての厳密な型チェックオプションを有効にするか否か
-        "strict": false,
-
-        // モジュールパス解決方法
-        "moduleResolution": "node",
-
-        // https://qiita.com/alfas/items/539ade65926deb530e0e
-        // CommonJSモジュールとESモジュール間の相互運用性を、
-        // すべてのインポート用に名前空間オブジェクトを作成することで可能にします。
-        // 「allowSyntheticDefaultImports」を暗示します。
-        // ...なるほどわからん。勝手に上位の名前空間を作るってこと？
-        "esModuleInterop": false,
-
-        // TSコンパイル時の基底フォルダ
-        "baseUrl": "./", // プロジェクトルートにしている
-
-        // モジュール解決ログを出力する。
-        // 型定義ファイル追加時のデバッグに使用。
-        //"traceResolution": true,
-
-        "paths": {
-            "responsive-toolkit": [ "types/responsive-toolkit" ],
-            "admin-lte/dist/js/adminlte": [ "types/adminlte" ],
-            "mopidy": [ "types/mopidy" ]
-        },
-
-        // TSの型定義ファイル参照パス
-        "typeRoots": [
-            // プロジェクト固有定義
-            // ※ここを読んでくれない...？
-            "types",
-
-            // npm@typesの定義
-            "node_modules/@types"
-        ],
-
-        // VueのDecorator用定義
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
 
         // ソースマップファイルを出力するか否か
         "sourceMap": true,
@@ -81,19 +12,11 @@
 
         // モジュール単位の出力形式指定: commonjs, amd, system, umd, es2015
         "module": "commonjs"
-
-        // 単一ファイル出力時のパスとファイル名
-        //"outFile": "dist/js/tsout.js"
     },
 
     // tsconfig.json がプロジェクトルートに無いとき、パスを教える。
     "include": [
         "./src/ts/**/*",
         "./tests/**/*"
-    ],
-
-    // コンパイル時に無視するフォルダ
-    "exclude": [
-        "./node_modules"
     ]
 }

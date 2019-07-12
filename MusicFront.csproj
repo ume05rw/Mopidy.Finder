@@ -135,6 +135,12 @@
     <Folder Include="dist\img\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="tsconfig - コピー.base.prod.json">
+      <DependentUpon>tsconfig - コピー.base.json</DependentUpon>
+    </Content>
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptJSXEmit>None</TypeScriptJSXEmit>

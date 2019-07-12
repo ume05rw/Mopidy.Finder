@@ -1,5 +1,4 @@
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
-import ITlTrack from '../Mopidies/ITlTrack';
 import { default as Monitor, PlayerState } from './Monitor';
 
 export default class Player extends JsonRpcQueryableBase {
@@ -77,16 +76,15 @@ export default class Player extends JsonRpcQueryableBase {
     }
 
     public async SetVolume(volume: number): Promise<boolean> {
-        const resSucceeded
-            = await this.JsonRpcNotice(Player.Methods.SetVolume, {
-                volume: volume
-            });
+        await this.JsonRpcNotice(Player.Methods.SetVolume, {
+            volume: volume
+        });
 
         return true;
     }
 
     public async SetShuffle(isShuffle: boolean): Promise<boolean> {
-        const response = await this.JsonRpcNotice(Player.Methods.SetRandom, {
+        await this.JsonRpcNotice(Player.Methods.SetRandom, {
             value: isShuffle
         });
 
@@ -94,7 +92,7 @@ export default class Player extends JsonRpcQueryableBase {
     }
 
     public async SetRepeat(isRepeat: boolean): Promise<boolean> {
-        const response = await this.JsonRpcNotice(Player.Methods.SetRepeat, {
+        await this.JsonRpcNotice(Player.Methods.SetRepeat, {
             value: isRepeat
         });
 
