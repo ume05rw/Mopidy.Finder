@@ -1190,7 +1190,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
                 });
             });
         };
-        SelectionList.prototype.OnCollapseClick = function () {
+        SelectionList.prototype.OnClickCollapse = function () {
             this.boxWidget.toggle();
         };
         SelectionList.prototype.OnClickRefresh = function () {
@@ -1343,6 +1343,16 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
         AlbumList.prototype.OnInputSearchText = function () {
             this.searchTextFilter.Exec();
         };
+        AlbumList.prototype.OnClickSearch = function () {
+            if (this.TextSearch.classList.contains('bounceOut')) {
+                this.TextSearch.classList.remove('bounceOut');
+                this.TextSearch.classList.add('bounceIn');
+            }
+            else {
+                this.TextSearch.classList.remove('bounceIn');
+                this.TextSearch.classList.add('bounceOut');
+            }
+        };
         AlbumList.prototype.OnAlbumTracksSelected = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 var albumTracks, track, isAllTracksRegistered, result, resultAtls, updatedTracks_1;
@@ -1441,7 +1451,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
         };
         AlbumList = __decorate([
             vue_class_component_2.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"Album Name\"\n                    aria-label=\"Album Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"Album Name\"\n                    aria-label=\"Album Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
                     'infinite-loading': vue_infinite_loading_1.default
@@ -1596,8 +1606,8 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                 });
             });
         };
-        ArtistList.prototype.OnCollapseClick = function () {
-            _super.prototype.OnCollapseClick.call(this);
+        ArtistList.prototype.OnClickCollapse = function () {
+            _super.prototype.OnClickCollapse.call(this);
         };
         ArtistList.prototype.OnClickRefresh = function () {
             _super.prototype.OnClickRefresh.call(this);
@@ -1621,6 +1631,16 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                     }
                 });
             });
+        };
+        ArtistList.prototype.OnClickSearch = function () {
+            if (this.TextSearch.classList.contains('bounceOut')) {
+                this.TextSearch.classList.remove('bounceOut');
+                this.TextSearch.classList.add('bounceIn');
+            }
+            else {
+                this.TextSearch.classList.remove('bounceIn');
+                this.TextSearch.classList.add('bounceOut');
+            }
         };
         ArtistList.prototype.OnInputSearchText = function () {
             this.searchTextFilter.Exec();
@@ -1648,7 +1668,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList = __decorate([
             vue_class_component_4.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"Artist Name\"\n                    aria-label=\"Artist Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"Artist Name\"\n                    aria-label=\"Artist Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    style=\"z-index: 1;\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_2.default,
                     'infinite-loading': vue_infinite_loading_2.default
@@ -1778,8 +1798,8 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                 });
             });
         };
-        GenreList.prototype.OnCollapseClick = function () {
-            _super.prototype.OnCollapseClick.call(this);
+        GenreList.prototype.OnClickCollapse = function () {
+            _super.prototype.OnClickCollapse.call(this);
         };
         GenreList.prototype.OnClickRefresh = function () {
             _super.prototype.OnClickRefresh.call(this);
@@ -1803,12 +1823,22 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                 });
             });
         };
+        GenreList.prototype.OnClickSearch = function () {
+            if (this.TextSearch.classList.contains('bounceOut')) {
+                this.TextSearch.classList.remove('bounceOut');
+                this.TextSearch.classList.add('bounceIn');
+            }
+            else {
+                this.TextSearch.classList.remove('bounceIn');
+                this.TextSearch.classList.add('bounceOut');
+            }
+        };
         GenreList.prototype.OnInputSearchText = function () {
             this.searchTextFilter.Exec();
         };
         GenreList = __decorate([
             vue_class_component_5.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"Genre Name\"\n                    aria-label=\"Genre Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"Genre Name\"\n                    aria-label=\"Genre Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    style=\"z-index: 1;\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_3.default,
                     'infinite-loading': vue_infinite_loading_3.default
@@ -2258,8 +2288,8 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
                 });
             });
         };
-        PlaylistList.prototype.OnCollapseClick = function () {
-            _super.prototype.OnCollapseClick.call(this);
+        PlaylistList.prototype.OnClickCollapse = function () {
+            _super.prototype.OnClickCollapse.call(this);
         };
         PlaylistList.prototype.OnSelectionChanged = function (args) {
             _.each(this.Items, function (si) {
@@ -2303,6 +2333,16 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
                 });
             });
         };
+        PlaylistList.prototype.OnClickSearch = function () {
+            if (this.TextSearch.classList.contains('bounceOut')) {
+                this.TextSearch.classList.remove('bounceOut');
+                this.TextSearch.classList.add('bounceIn');
+            }
+            else {
+                this.TextSearch.classList.remove('bounceIn');
+                this.TextSearch.classList.add('bounceOut');
+            }
+        };
         PlaylistList.prototype.OnInputSearchText = function () {
             this.searchTextFilter.Exec();
         };
@@ -2310,7 +2350,7 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
         PlaylistList.PageLength = 30;
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"List Name\"\n                    aria-label=\"List Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnCollapseClick\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"List Name\"\n                    aria-label=\"List Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-item': SelectionItem_4.default,
                     'infinite-loading': vue_infinite_loading_4.default
@@ -2465,6 +2505,16 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
                 });
             });
         };
+        TrackList.prototype.OnClickSearch = function () {
+            if (this.TextSearch.classList.contains('bounceOut')) {
+                this.TextSearch.classList.remove('bounceOut');
+                this.TextSearch.classList.add('bounceIn');
+            }
+            else {
+                this.TextSearch.classList.remove('bounceIn');
+                this.TextSearch.classList.add('bounceOut');
+            }
+        };
         TrackList.prototype.OnInputSearchText = function () {
             this.searchTextFilter.Exec();
         };
@@ -2472,7 +2522,7 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
         TrackList.PageLength = 20;
         TrackList = TrackList_1 = __decorate([
             vue_class_component_10.default({
-                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search\"\n                    type=\"search\"\n                    placeholder=\"Track Name\"\n                    aria-label=\"Track Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"Track Name\"\n                    aria-label=\"Track Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'selection-track': SelectionTrack_1.default,
                     'infinite-loading': vue_infinite_loading_5.default

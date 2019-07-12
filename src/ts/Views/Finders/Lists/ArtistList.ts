@@ -15,22 +15,32 @@ import SelectionList from '../../Shared/SelectionList';
         <div class="card-header with-border bg-info">
             <h3 class="card-title">Artists</h3>
             <div class="card-tools form-row">
-                <input class="form-control form-control-navbar form-control-sm text-search"
+                <input class="form-control form-control-navbar form-control-sm text-search animated bounceOut"
+                    style="z-index: 0;"
                     type="search"
                     placeholder="Artist Name"
                     aria-label="Artist Name"
                     ref="TextSearch"
                     @input="OnInputSearchText"/>
                 <button
-                    class="btn btn-tool d-inline d-md-none collapse"
+                    class="btn btn-tool d-inline"
+                    style="z-index: 1;"
                     ref="ButtonCollaplse"
-                    @click="OnCollapseClick" >
-                    <i class="fa fa-minus" />
+                    @click="OnClickSearch" >
+                    <i class="fa fa-search" />
                 </button>
                 <button type="button"
-                        class="btn btn-tool"
-                        @click="OnClickRefresh" >
+                    class="btn btn-tool"
+                    style="z-index: 1;"
+                    @click="OnClickRefresh" >
                     <i class="fa fa-repeat" />
+                </button>
+                <button
+                    class="btn btn-tool d-inline d-md-none collapse"
+                    style="z-index: 1;"
+                    ref="ButtonCollaplse"
+                    @click="OnClickCollapse" >
+                    <i class="fa fa-minus" />
                 </button>
             </div>
         </div>
@@ -85,8 +95,8 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     protected async OnInfinite($state: StateChanger): Promise<boolean> {
         return super.OnInfinite($state);
     }
-    protected OnCollapseClick(): void {
-        super.OnCollapseClick();
+    protected OnClickCollapse(): void {
+        super.OnClickCollapse();
     }
     protected OnClickRefresh(): void {
         super.OnClickRefresh();
@@ -104,6 +114,15 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
         return await this.store.GetList(args);
     }
 
+    private OnClickSearch(): void {
+        if (this.TextSearch.classList.contains('bounceOut')) {
+            this.TextSearch.classList.remove('bounceOut');
+            this.TextSearch.classList.add('bounceIn');
+        } else {
+            this.TextSearch.classList.remove('bounceIn');
+            this.TextSearch.classList.add('bounceOut');
+        }
+    }
 
     private OnInputSearchText(): void {
         this.searchTextFilter.Exec();

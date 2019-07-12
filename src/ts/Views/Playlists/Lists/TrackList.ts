@@ -16,12 +16,20 @@ import SelectionTrack from '../Selections/SelectionTrack';
         <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Tracks</h3>
             <div class="card-tools form-row">
-                <input class="form-control form-control-navbar form-control-sm text-search"
+                <input class="form-control form-control-navbar form-control-sm text-search animated bounceOut"
+                    style="z-index: 0;"
                     type="search"
                     placeholder="Track Name"
                     aria-label="Track Name"
                     ref="TextSearch"
                     @input="OnInputSearchText"/>
+                <button
+                    class="btn btn-tool d-inline"
+                    style="z-index: 1;"
+                    ref="ButtonCollaplse"
+                    @click="OnClickSearch" >
+                    <i class="fa fa-search" />
+                </button>
             </div>
         </div>
         <div class="card-body list-scrollable">
@@ -137,6 +145,16 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         };
 
         return result;
+    }
+
+    private OnClickSearch(): void {
+        if (this.TextSearch.classList.contains('bounceOut')) {
+            this.TextSearch.classList.remove('bounceOut');
+            this.TextSearch.classList.add('bounceIn');
+        } else {
+            this.TextSearch.classList.remove('bounceIn');
+            this.TextSearch.classList.add('bounceOut');
+        }
     }
 
     private OnInputSearchText(): void {

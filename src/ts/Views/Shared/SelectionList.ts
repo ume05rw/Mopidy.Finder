@@ -96,7 +96,7 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
         return true;
     }
 
-    protected OnCollapseClick(): void {
+    protected OnClickCollapse(): void {
         this.boxWidget.toggle();
     }
 
