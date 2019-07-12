@@ -13,6 +13,7 @@
     <None Remove="src\ts\Models\Mopidies\IRef.ts" />
     <None Remove="src\ts\Models\Mopidies\ITlTrack.ts" />
     <None Remove="src\ts\Models\Mopidies\ITrack.ts" />
+    <None Remove="src\ts\Models\Mopidies\Monitor.ts" />
     <None Remove="src\ts\Models\Playlists\Playlist.ts" />
     <None Remove="src\ts\Models\Playlists\PlaylistStore.ts" />
     <None Remove="src\ts\Utils\Exception.ts" />
@@ -80,6 +81,7 @@
     <TypeScriptCompile Include="src\ts\Models\Mopidies\IRef.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\ITlTrack.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\ITrack.ts" />
+    <TypeScriptCompile Include="src\ts\Models\Mopidies\Monitor.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\Player.ts" />
     <TypeScriptCompile Include="src\ts\Models\Playlists\Playlist.ts" />
     <TypeScriptCompile Include="src\ts\Models\Playlists\PlaylistStore.ts" />
@@ -125,6 +127,10 @@
     <TypeScriptCompile Include="types\ion-range-slider\index.d.ts" />
     <TypeScriptCompile Include="types\mopidy\index.d.ts" />
     <TypeScriptCompile Include="types\responsive-toolkit\index.d.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="dist\img\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

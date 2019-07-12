@@ -1,14 +1,15 @@
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
-import Player, { PlayerEvents, PlayerState } from '../../Models/Mopidies/Player';
+import Monitor, { MonitorEvents, PlayerState } from '../../Models/Mopidies/Monitor';
+import Player from '../../Models/Mopidies/Player';
 import ViewBase from '../Bases/ViewBase';
 
 @Component({
     template: `<div class="card siderbar-control">
     <div class="card-body">
-        <img v-bind:src="player.ImageFullUri" class="albumart" />
-        <h6 class="card-title">{{ player.TrackName }}</h6>
-        <span>{{ player.ArtistName }}{{ (player.Year) ? '(' + player.Year + ')' : '' }}</span>
+        <img v-bind:src="monitor.ImageFullUri" class="albumart" />
+        <h6 class="card-title">{{ monitor.TrackName }}</h6>
+        <span>{{ monitor.ArtistName }}{{ (monitor.Year) ? '(' + monitor.Year + ')' : '' }}</span>
         <div class="player-box btn-group btn-group-sm w-100 mt-2" role="group">
             <button type="button"
                 class="btn btn-secondary"
@@ -29,16 +30,16 @@ import ViewBase from '../Bases/ViewBase';
 
         <div class="btn-group btn-group-sm w-100 mt-2" role="group">
             <button type="button"
-                class="btn btn-secondary"
+                class="btn btn-secondary disabled"
+                ref="ButtonShuffle"
                 @click="OnClickShuffle">
-                <i class="fa fa fa-random"
-                    ref="ShuffleIcon" />
+                <i class="fa fa fa-random" />
             </button>
             <button type="button"
-                class="btn btn-secondary"
-                @click="OnClickRepeat">
-                <i class="fa fa-retweet"
-                    ref="RepeatIcon"/>
+                class="btn btn-secondary disabled"
+                ref="ButtonRepeat"
+                @click="OnClickRepeat" >
+                <i class="fa fa-retweet" />
             </button>
         </div>
 
@@ -68,9 +69,20 @@ import ViewBase from '../Bases/ViewBase';
 </div>`})
 export default class PlayerPanel extends ViewBase {
 
+    private static readonly ClassDisabled: string = 'disabled';
+
     private volumeSlider: JQuery;
     private volumeData: any;
     private player: Player = new Player();
+    private monitor: Monitor = this.player.Monitor;
+
+    private get ButtonShuffle(): HTMLButtonElement {
+        return this.$refs.ButtonShuffle as HTMLButtonElement;
+    }
+
+    private get ButtonRepeat(): HTMLButtonElement {
+        return this.$refs.ButtonRepeat as HTMLButtonElement;
+    }
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
@@ -83,19 +95,37 @@ export default class PlayerPanel extends ViewBase {
         });
         this.volumeData = this.volumeSlider.data('ionRangeSlider');
 
-        this.player.AddEventListener(PlayerEvents.VolumeChanged, (): void => {
+        this.monitor.AddEventListener(MonitorEvents.VolumeChanged, (): void => {
             this.volumeData.update({
-                from: this.player.Volume
+                from: this.monitor.Volume
             });
         });
 
-        this.player.StartPolling();
+        this.monitor.AddEventListener(MonitorEvents.ShuffleChanged, (): void => {
+            const enabled = !this.ButtonShuffle.classList.contains(PlayerPanel.ClassDisabled);
+
+            if (this.monitor.IsShuffle && !enabled)
+                this.ButtonShuffle.classList.remove(PlayerPanel.ClassDisabled);
+            else if (!this.monitor.IsShuffle && enabled)
+                this.ButtonShuffle.classList.add(PlayerPanel.ClassDisabled);
+        });
+
+        this.monitor.AddEventListener(MonitorEvents.RepeatChanged, (): void => {
+            const enabled = !this.ButtonRepeat.classList.contains(PlayerPanel.ClassDisabled);
+
+            if (this.monitor.IsRepeat && !enabled)
+                this.ButtonRepeat.classList.remove(PlayerPanel.ClassDisabled);
+            else if (!this.monitor.IsRepeat && enabled)
+                this.ButtonRepeat.classList.add(PlayerPanel.ClassDisabled);
+        });
+
+        this.monitor.StartPolling();
 
         return true;
     }
 
     private GetPlayPauseIconClass(): string {
-        return (this.player.PlayerState === PlayerState.Playing)
+        return (this.monitor.PlayerState === PlayerState.Playing)
             ? 'fa fa-pause'
             : 'fa fa-play';
     }
@@ -117,7 +147,7 @@ export default class PlayerPanel extends ViewBase {
     }
 
     private OnClickPlayPause(): void {
-        if (this.player.PlayerState === PlayerState.Playing) {
+        if (this.monitor.PlayerState === PlayerState.Playing) {
             this.player.Pause();
         } else {
             this.player.Play();
@@ -129,10 +159,12 @@ export default class PlayerPanel extends ViewBase {
     }
 
     private OnClickShuffle(): void {
-
+        const enabled = !this.ButtonShuffle.classList.contains(PlayerPanel.ClassDisabled);
+        this.player.SetShuffle(!enabled);
     }
 
     private OnClickRepeat(): void {
-
+        const enabled = !this.ButtonRepeat.classList.contains(PlayerPanel.ClassDisabled);
+        this.player.SetRepeat(!enabled);
     }
 }

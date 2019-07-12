@@ -2303,14 +2303,16 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ViewBase_8.default));
     exports.default = Settings;
 });
-define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQueryableBase"], function (require, exports, JsonRpcQueryableBase_2) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase"], function (require, exports, JsonRpcQueryableBase_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.PlayerEvents = {
+    exports.MonitorEvents = {
         TrackChanged: 'TrackChanged',
         PlayerStateChanged: 'PlayerStateChanged',
         ProgressChanged: 'ProgressChanged',
-        VolumeChanged: 'VolumeChanged'
+        VolumeChanged: 'VolumeChanged',
+        ShuffleChanged: 'ShuffleChanged',
+        RepeatChanged: 'RepeatChanged'
     };
     var PlayerState;
     (function (PlayerState) {
@@ -2318,9 +2320,9 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
         PlayerState["Stopped"] = "stopped";
         PlayerState["Paused"] = "paused";
     })(PlayerState = exports.PlayerState || (exports.PlayerState = {}));
-    var Player = /** @class */ (function (_super) {
-        __extends(Player, _super);
-        function Player() {
+    var Monitor = /** @class */ (function (_super) {
+        __extends(Monitor, _super);
+        function Monitor() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this._playerState = PlayerState.Paused;
             _this._tlId = null;
@@ -2332,6 +2334,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
             _this._year = null;
             _this._imageUri = null;
             _this._volume = 0;
+            _this._isShuffle = false;
             _this._backupValues = {
                 TlId: null,
                 PlayerState: PlayerState.Paused,
@@ -2342,108 +2345,135 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                 ArtistName: '',
                 ImageUri: null,
                 Year: 0,
-                Volume: 0
+                Volume: 0,
+                IsShuffle: false,
+                IsRepeat: false
             };
             return _this;
         }
-        Object.defineProperty(Player.prototype, "TlId", {
+        Object.defineProperty(Monitor.prototype, "TlId", {
             get: function () {
                 return this._tlId;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "PlayerState", {
+        Object.defineProperty(Monitor.prototype, "PlayerState", {
             get: function () {
                 return this._playerState;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "IsPlaying", {
+        Object.defineProperty(Monitor.prototype, "IsPlaying", {
             get: function () {
                 return this._isPlaying;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "TrackName", {
+        Object.defineProperty(Monitor.prototype, "TrackName", {
             get: function () {
                 return this._trackName;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "TrackLength", {
+        Object.defineProperty(Monitor.prototype, "TrackLength", {
             get: function () {
                 return this._trackLength;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "TrackProgress", {
+        Object.defineProperty(Monitor.prototype, "TrackProgress", {
             get: function () {
                 return this._trackProgress;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "ArtistName", {
+        Object.defineProperty(Monitor.prototype, "ArtistName", {
             get: function () {
                 return this._artistName;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "ImageUri", {
+        Object.defineProperty(Monitor.prototype, "ImageUri", {
             get: function () {
                 return this._imageUri;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "Year", {
+        Object.defineProperty(Monitor.prototype, "Year", {
             get: function () {
                 return this._year;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "Volume", {
+        Object.defineProperty(Monitor.prototype, "Volume", {
             get: function () {
                 return this._volume;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Player.prototype, "ImageFullUri", {
+        Object.defineProperty(Monitor.prototype, "IsShuffle", {
+            get: function () {
+                return this._isShuffle;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Monitor.prototype, "IsRepeat", {
+            get: function () {
+                return this._isRepeat;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Monitor.prototype, "ImageFullUri", {
             get: function () {
                 return location.protocol + "//" + location.host + this._imageUri;
             },
             enumerable: true,
             configurable: true
         });
-        Player.prototype.StartPolling = function () {
+        Monitor.prototype.StartPolling = function () {
             var _this = this;
+            if (this._timer !== null)
+                this.StopPolling();
             this._timer = setInterval(function () {
                 _this.Polling();
-            }, Player.PollingMsec);
+            }, Monitor.PollingMsec);
         };
-        Player.prototype.Polling = function () {
+        Monitor.prototype.StopPolling = function () {
+            try {
+                clearInterval(this._timer);
+            }
+            catch (e) {
+                // 握りつぶす。
+            }
+            this._timer = null;
+        };
+        Monitor.prototype.Polling = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var resState, resTrack, tlTrack, track, _a, resTs, resVol;
+                var resState, resTrack, tlTrack, track, _a, resTs, resVol, resRandom, resRepeat;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
                             this.SetBackupValues();
-                            return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetState)];
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetState)];
                         case 1:
                             resState = _b.sent();
                             if (resState.result) {
                                 this._playerState = resState.result;
                                 this._isPlaying = (this._playerState === PlayerState.Playing);
                             }
-                            return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetCurrentTlTrack)];
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetCurrentTlTrack)];
                         case 2:
                             resTrack = _b.sent();
                             if (!resTrack.result) return [3 /*break*/, 6];
@@ -2495,29 +2525,48 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                             this._year = null;
                             this._imageUri = null;
                             _b.label = 7;
-                        case 7: return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetTimePosition)];
+                        case 7:
+                            if (!this._isPlaying) return [3 /*break*/, 9];
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetTimePosition)];
                         case 8:
                             resTs = _b.sent();
                             this._trackProgress = (resTs.result)
                                 ? parseInt(resTs.result, 10)
                                 : 0;
-                            return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetVolume)];
+                            return [3 /*break*/, 10];
                         case 9:
+                            this._trackProgress = 0;
+                            _b.label = 10;
+                        case 10: return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetVolume)];
+                        case 11:
                             resVol = _b.sent();
-                            if (resVol.result)
-                                this._volume = resVol.result;
+                            this._volume = (resVol.result)
+                                ? resVol.result
+                                : 0;
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetRandom)];
+                        case 12:
+                            resRandom = _b.sent();
+                            this._isShuffle = (resRandom.result)
+                                ? resRandom.result
+                                : false;
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetRepeat)];
+                        case 13:
+                            resRepeat = _b.sent();
+                            this._isRepeat = (resRepeat.result)
+                                ? resRepeat.result
+                                : false;
                             this.DetectChanges();
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
-        Player.prototype.GetAlbumImageUri = function (uri) {
+        Monitor.prototype.GetAlbumImageUri = function (uri) {
             return __awaiter(this, void 0, void 0, function () {
                 var response, results, images;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetImages, {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetImages, {
                                 uris: [uri]
                             })];
                         case 1:
@@ -2533,7 +2582,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                 });
             });
         };
-        Player.prototype.SetBackupValues = function () {
+        Monitor.prototype.SetBackupValues = function () {
             this._backupValues = {
                 TlId: this.TlId,
                 PlayerState: this.PlayerState,
@@ -2544,37 +2593,77 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                 ArtistName: this.ArtistName,
                 ImageUri: this.ImageUri,
                 Year: this.Year,
-                Volume: this.Volume
+                Volume: this.Volume,
+                IsShuffle: this.IsShuffle,
+                IsRepeat: this.IsRepeat
             };
         };
-        Player.prototype.DetectChanges = function () {
+        Monitor.prototype.DetectChanges = function () {
             if (this._backupValues.TlId !== this.TlId)
-                this.DispatchEvent(exports.PlayerEvents.TrackChanged);
+                this.DispatchEvent(exports.MonitorEvents.TrackChanged);
             if (this._backupValues.PlayerState !== this.PlayerState)
-                this.DispatchEvent(exports.PlayerEvents.PlayerStateChanged);
+                this.DispatchEvent(exports.MonitorEvents.PlayerStateChanged);
             if (this._backupValues.TrackProgress !== this.TrackProgress)
-                this.DispatchEvent(exports.PlayerEvents.ProgressChanged);
+                this.DispatchEvent(exports.MonitorEvents.ProgressChanged);
             if (this._backupValues.Volume !== this.Volume)
-                this.DispatchEvent(exports.PlayerEvents.VolumeChanged);
+                this.DispatchEvent(exports.MonitorEvents.VolumeChanged);
+            if (this._backupValues.IsShuffle !== this.IsShuffle)
+                this.DispatchEvent(exports.MonitorEvents.ShuffleChanged);
+            if (this._backupValues.IsRepeat !== this.IsRepeat)
+                this.DispatchEvent(exports.MonitorEvents.RepeatChanged);
         };
+        Monitor.prototype.Dispose = function () {
+            clearInterval(this._timer);
+        };
+        Monitor.PollingMsec = 2000;
+        Monitor.Methods = {
+            GetState: 'core.playback.get_state',
+            GetCurrentTlTrack: 'core.playback.get_current_tl_track',
+            GetTimePosition: 'core.playback.get_time_position',
+            GetImages: 'core.library.get_images',
+            GetVolume: 'core.mixer.get_volume',
+            GetRandom: 'core.tracklist.get_random',
+            GetRepeat: 'core.tracklist.get_repeat'
+        };
+        return Monitor;
+    }(JsonRpcQueryableBase_2.default));
+    exports.default = Monitor;
+});
+define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Mopidies/Monitor"], function (require, exports, JsonRpcQueryableBase_3, Monitor_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Player = /** @class */ (function (_super) {
+        __extends(Player, _super);
+        function Player() {
+            var _this = _super.call(this) || this;
+            _this._monitor = new Monitor_1.default();
+            return _this;
+        }
+        Object.defineProperty(Player.prototype, "Monitor", {
+            get: function () {
+                return this._monitor;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Player.prototype.Play = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (this._playerState === PlayerState.Playing)
+                            if (this._monitor.PlayerState === Monitor_1.PlayerState.Playing)
                                 return [2 /*return*/, true];
-                            if (!this._tlId)
+                            if (!this._monitor.TlId)
                                 return [2 /*return*/, false];
-                            if (!(this._playerState === PlayerState.Paused)) return [3 /*break*/, 2];
+                            if (!(this._monitor.PlayerState === Monitor_1.PlayerState.Paused)) return [3 /*break*/, 2];
                             return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Resume)];
                         case 1:
                             _a.sent();
                             return [3 /*break*/, 4];
                         case 2:
-                            if (!(this._playerState === PlayerState.Stopped)) return [3 /*break*/, 4];
+                            if (!(this._monitor.PlayerState === Monitor_1.PlayerState.Stopped)) return [3 /*break*/, 4];
                             return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Play, {
-                                    tlid: this._tlId
+                                    tlid: this._monitor.TlId
                                 })];
                         case 3:
                             _a.sent();
@@ -2589,7 +2678,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (this._playerState !== PlayerState.Playing)
+                            if (this._monitor.PlayerState !== Monitor_1.PlayerState.Playing)
                                 return [2 /*return*/, true];
                             return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Pause)];
                         case 1:
@@ -2642,25 +2731,51 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                 var resSucceeded;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.SetVolume, {
+                        case 0: return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.SetVolume, {
                                 volume: volume
                             })];
                         case 1:
                             resSucceeded = _a.sent();
-                            return [2 /*return*/, resSucceeded.result];
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Player.prototype.SetShuffle = function (isShuffle) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.SetRandom, {
+                                value: isShuffle
+                            })];
+                        case 1:
+                            response = _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Player.prototype.SetRepeat = function (isRepeat) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.SetRepeat, {
+                                value: isRepeat
+                            })];
+                        case 1:
+                            response = _a.sent();
+                            return [2 /*return*/, true];
                     }
                 });
             });
         };
         Player.prototype.Dispose = function () {
-            clearInterval(this._timer);
+            this._monitor.Dispose();
+            this._monitor = null;
         };
-        Player.PollingMsec = 2000;
         Player.Methods = {
-            GetState: 'core.playback.get_state',
-            GetCurrentTlTrack: 'core.playback.get_current_tl_track',
-            GetTimePosition: 'core.playback.get_time_position',
-            GetImages: 'core.library.get_images',
             Play: 'core.playback.play',
             Resume: 'core.playback.resume',
             Pause: 'core.playback.pause',
@@ -2668,16 +2783,15 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
             Next: 'core.playback.next',
             Previous: 'core.playback.previous',
             Seek: 'core.playback.seek',
-            GetRandom: 'core.tracklist.get_random',
+            SetVolume: 'core.mixer.set_volume',
             SetRandom: 'core.tracklist.set_random',
-            GetVolume: 'core.mixer.get_volume',
-            SetVolume: 'core.mixer.set_volume'
+            SetRepeat: 'core.tracklist.set_repeat'
         };
         return Player;
-    }(JsonRpcQueryableBase_2.default));
+    }(JsonRpcQueryableBase_3.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_13, Libraries_7, Player_1, ViewBase_9) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_13, Libraries_7, Monitor_2, Player_1, ViewBase_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlayerPanel = /** @class */ (function (_super) {
@@ -2685,8 +2799,24 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
         function PlayerPanel() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.player = new Player_1.default();
+            _this.monitor = _this.player.Monitor;
             return _this;
         }
+        PlayerPanel_1 = PlayerPanel;
+        Object.defineProperty(PlayerPanel.prototype, "ButtonShuffle", {
+            get: function () {
+                return this.$refs.ButtonShuffle;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PlayerPanel.prototype, "ButtonRepeat", {
+            get: function () {
+                return this.$refs.ButtonRepeat;
+            },
+            enumerable: true,
+            configurable: true
+        });
         PlayerPanel.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
@@ -2702,19 +2832,33 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                                 }
                             });
                             this.volumeData = this.volumeSlider.data('ionRangeSlider');
-                            this.player.AddEventListener(Player_1.PlayerEvents.VolumeChanged, function () {
+                            this.monitor.AddEventListener(Monitor_2.MonitorEvents.VolumeChanged, function () {
                                 _this.volumeData.update({
-                                    from: _this.player.Volume
+                                    from: _this.monitor.Volume
                                 });
                             });
-                            this.player.StartPolling();
+                            this.monitor.AddEventListener(Monitor_2.MonitorEvents.ShuffleChanged, function () {
+                                var enabled = !_this.ButtonShuffle.classList.contains(PlayerPanel_1.ClassDisabled);
+                                if (_this.monitor.IsShuffle && !enabled)
+                                    _this.ButtonShuffle.classList.remove(PlayerPanel_1.ClassDisabled);
+                                else if (!_this.monitor.IsShuffle && enabled)
+                                    _this.ButtonShuffle.classList.add(PlayerPanel_1.ClassDisabled);
+                            });
+                            this.monitor.AddEventListener(Monitor_2.MonitorEvents.RepeatChanged, function () {
+                                var enabled = !_this.ButtonRepeat.classList.contains(PlayerPanel_1.ClassDisabled);
+                                if (_this.monitor.IsRepeat && !enabled)
+                                    _this.ButtonRepeat.classList.remove(PlayerPanel_1.ClassDisabled);
+                                else if (!_this.monitor.IsRepeat && enabled)
+                                    _this.ButtonRepeat.classList.add(PlayerPanel_1.ClassDisabled);
+                            });
+                            this.monitor.StartPolling();
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
         PlayerPanel.prototype.GetPlayPauseIconClass = function () {
-            return (this.player.PlayerState === Player_1.PlayerState.Playing)
+            return (this.monitor.PlayerState === Monitor_2.PlayerState.Playing)
                 ? 'fa fa-pause'
                 : 'fa fa-play';
         };
@@ -2732,7 +2876,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
             this.player.Previous();
         };
         PlayerPanel.prototype.OnClickPlayPause = function () {
-            if (this.player.PlayerState === Player_1.PlayerState.Playing) {
+            if (this.monitor.PlayerState === Monitor_2.PlayerState.Playing) {
                 this.player.Pause();
             }
             else {
@@ -2743,19 +2887,25 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
             this.player.Next();
         };
         PlayerPanel.prototype.OnClickShuffle = function () {
+            var enabled = !this.ButtonShuffle.classList.contains(PlayerPanel_1.ClassDisabled);
+            this.player.SetShuffle(!enabled);
         };
         PlayerPanel.prototype.OnClickRepeat = function () {
+            var enabled = !this.ButtonRepeat.classList.contains(PlayerPanel_1.ClassDisabled);
+            this.player.SetRepeat(!enabled);
         };
-        PlayerPanel = __decorate([
+        var PlayerPanel_1;
+        PlayerPanel.ClassDisabled = 'disabled';
+        PlayerPanel = PlayerPanel_1 = __decorate([
             vue_class_component_13.default({
-                template: "<div class=\"card siderbar-control\">\n    <div class=\"card-body\">\n        <img v-bind:src=\"player.ImageFullUri\" class=\"albumart\" />\n        <h6 class=\"card-title\">{{ player.TrackName }}</h6>\n        <span>{{ player.ArtistName }}{{ (player.Year) ? '(' + player.Year + ')' : '' }}</span>\n        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickPrevious\">\n                <i class=\"fa fa-fast-backward\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickPlayPause\">\n                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickNext\">\n                <i class=\"fa fa-fast-forward\" />\n            </button>\n        </div>\n\n        <div class=\"btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickShuffle\">\n                <i class=\"fa fa fa-random\"\n                    ref=\"ShuffleIcon\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickRepeat\">\n                <i class=\"fa fa-retweet\"\n                    ref=\"RepeatIcon\"/>\n            </button>\n        </div>\n\n        <div class=\"row volume-box w-100 mt-2\">\n            <div class=\"col-1 volume-button volume-min\">\n                <a @click=\"OnClickVolumeMin\">\n                    <i class=\"fa fa-volume-off\" />\n                </a>\n            </div>\n            <div class=\"col-10\">\n                <input type=\"text\"\n                    data-type=\"single\"\n                    data-min=\"0\"\n                    data-max=\"100\"\n                    data-from=\"100\"\n                    data-grid=\"true\"\n                    data-hide-min-max=\"true\"\n                    ref=\"Slider\" />\n            </div>\n            <div class=\"col-1 volume-button volume-max\">\n                <a @click=\"OnClickVolumeMax\">\n                    <i class=\"fa fa-volume-up\" />\n                </a>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"card siderbar-control\">\n    <div class=\"card-body\">\n        <img v-bind:src=\"monitor.ImageFullUri\" class=\"albumart\" />\n        <h6 class=\"card-title\">{{ monitor.TrackName }}</h6>\n        <span>{{ monitor.ArtistName }}{{ (monitor.Year) ? '(' + monitor.Year + ')' : '' }}</span>\n        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickPrevious\">\n                <i class=\"fa fa-fast-backward\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickPlayPause\">\n                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickNext\">\n                <i class=\"fa fa-fast-forward\" />\n            </button>\n        </div>\n\n        <div class=\"btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-secondary disabled\"\n                ref=\"ButtonShuffle\"\n                @click=\"OnClickShuffle\">\n                <i class=\"fa fa fa-random\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary disabled\"\n                ref=\"ButtonRepeat\"\n                @click=\"OnClickRepeat\" >\n                <i class=\"fa fa-retweet\" />\n            </button>\n        </div>\n\n        <div class=\"row volume-box w-100 mt-2\">\n            <div class=\"col-1 volume-button volume-min\">\n                <a @click=\"OnClickVolumeMin\">\n                    <i class=\"fa fa-volume-off\" />\n                </a>\n            </div>\n            <div class=\"col-10\">\n                <input type=\"text\"\n                    data-type=\"single\"\n                    data-min=\"0\"\n                    data-max=\"100\"\n                    data-from=\"100\"\n                    data-grid=\"true\"\n                    data-hide-min-max=\"true\"\n                    ref=\"Slider\" />\n            </div>\n            <div class=\"col-1 volume-button volume-max\">\n                <a @click=\"OnClickVolumeMax\">\n                    <i class=\"fa fa-volume-up\" />\n                </a>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], PlayerPanel);
         return PlayerPanel;
     }(ViewBase_9.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_14, ViewBase_10, PlayerPanel_1) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_14, ViewBase_10, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -2786,9 +2936,9 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
         };
         Sidebar = __decorate([
             vue_class_component_14.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy Finder</span>\n    </div>\n    <div class=\"sidebar\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\"\n                        @click=\"OnClickFinder\" >\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\"\n                        @click=\"OnClickPlaylists\" >\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\"\n                        @click=\"OnClickSettings\" >\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <player-panel ref=\"PlayerPanel\" />\n            </div>\n        </div>\n    </div>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy Finder</span>\n    </div>\n    <div class=\"slimScrollDiv\" style=\"position: relative; overflow: hidden; width: auto;\">\n        <section class=\"sidebar\" style=\"overflow: hidden; width: auto;\">\n            <nav class=\"mt-2\">\n                <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link active\"\n                            href=\"#tab-finder\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-finder\"\n                            aria-selected=\"true\"\n                            @click=\"OnClickFinder\" >\n                            <i class=\"fa fa-search nav-icon\" />\n                            <p>Finder</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-playlists\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-playlists\"\n                            aria-selected=\"false\"\n                            @click=\"OnClickPlaylists\" >\n                            <i class=\"fa fa-bookmark nav-icon\" />\n                            <p>Playlists</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-settings\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-settings\"\n                            aria-selected=\"false\"\n                            @click=\"OnClickSettings\" >\n                            <i class=\"fa fa-cog nav-icon\" />\n                            <p>Settings</p>\n                        </a>\n                    </li>\n                </ul>\n            </nav>\n            <div class=\"row mt-2\">\n                <div class=\"col-12\">\n                    <player-panel ref=\"PlayerPanel\" />\n                </div>\n            </div>\n        </section>\n        <div class=\"slimScrollBar\" />\n        <div class=\"slimScrollRail\" />\n    </div>\n</aside>",
                 components: {
-                    'player-panel': PlayerPanel_1.default
+                    'player-panel': PlayerPanel_2.default
                 }
             })
         ], Sidebar);
