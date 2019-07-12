@@ -5,11 +5,11 @@
     "main": "index.js",
     "scripts": {
         "test": "npm run test:build && npm run test:exec && npm run test:lint",
-        "test:build": "npx tsc --project tsconfig.commonjs.json --listEmittedFiles --locale ja-JP",
+        "test:build": "npx tsc --project tsconfig.test.json --listEmittedFiles --locale ja-JP",
         "test:exec": "mocha tests/**/*.test.js",
         "test:lint": "npx eslint -c ./.eslintrc.json src/**/*.ts",
         "build:prod": "npm run build:prodTs && npm run build:prodWp",
-        "build:prodTs": "npx tsc --project tsconfig.commonjs.json --listEmittedFiles --locale ja-JP",
+        "build:prodTs": "npx tsc --project tsconfig.prod.json --listEmittedFiles --locale ja-JP",
         "build:prodWp": "webpack --config webpack.config.prod.js",
         "build:dev": "npm run build:devTs && npm run build:devWp",
         "build:devTs": "npx tsc --project tsconfig.dev.json --listEmittedFiles --locale ja-JP",

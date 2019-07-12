@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 export interface IArtistAlbum {
     ArtistId: number;
     AlbumId: number;
@@ -8,22 +6,30 @@ export interface IArtistAlbum {
 export default class ArtistAlbum implements IArtistAlbum {
 
     public static Create(entity: IArtistAlbum): ArtistAlbum {
-        var result = new ArtistAlbum();
-        result.ArtistId = entity.ArtistId;
-        result.AlbumId = entity.AlbumId;
+        if (!entity)
+            return null;
+
+        const result = new ArtistAlbum();
+        result.ArtistId = entity.ArtistId || null;
+        result.AlbumId = entity.AlbumId || null;
         
         return result;
     }
 
     public static CreateArray(entities: IArtistAlbum[]): ArtistAlbum[] {
-        var result: ArtistAlbum[] = [];
-        _.each(entities, (entity) => {
-            result.push(ArtistAlbum.Create(entity));
-        });
+        const result: ArtistAlbum[] = [];
+        if (!entities)
+            return result;
+
+        for (let i = 0; i < entities.length; i++) {
+            const entity = ArtistAlbum.Create(entities[i]);
+            if (entity)
+                result.push(entity);
+        }
 
         return result;
     }
 
-    public ArtistId: number;
-    public AlbumId: number;
+    public ArtistId: number = null;
+    public AlbumId: number = null;
 }

@@ -57,24 +57,30 @@ export default class SelectionAlbumTracks extends ViewBase {
     private entity: AlbumTracks;
 
     private OnClickAlbumPlay(): void {
-        var tracks = Libraries.Enumerable.from(this.entity.Tracks);
-        var track = tracks.first(e => e.TrackNo === tracks.min(e2 => e2.TrackNo));
+        const tracks = Libraries.Enumerable.from(this.entity.Tracks);
+        const track = tracks
+            .first((e): boolean => e.TrackNo === tracks.min((e2): number => e2.TrackNo));
 
-        this.$emit(SelectionAlbumEvents.AlbumTracksSelected, {
+        const selectionArgs: IAlbumTracksSelectedArgs = {
             Entity: this.entity,
-            Track: track
-        } as IAlbumTracksSelectedArgs);
+            Track: track,
+            Selected: true
+        };
+        this.$emit(SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
     }
 
     private OnClickTrack(args: Event): void {
-        var tr = (args.target as HTMLElement).parentElement;
-        var trackId = parseInt(tr.getAttribute('data-trackid'), 10);
-        var tracks = Libraries.Enumerable.from(this.entity.Tracks);
-        var track = tracks.first(e => e.Id === trackId);
+        const tr = (args.target as HTMLElement).parentElement;
+        const trackId = parseInt(tr.getAttribute('data-trackid'), 10);
+        const tracks = Libraries.Enumerable.from(this.entity.Tracks);
+        const track = tracks.first((e): boolean => e.Id === trackId);
 
-        this.$emit(SelectionAlbumEvents.AlbumTracksSelected, {
+        const selectionArgs: IAlbumTracksSelectedArgs = {
             Entity: this.entity,
-            Track: track
-        } as IAlbumTracksSelectedArgs);
+            Track: track,
+            Selected: true
+        };
+
+        this.$emit(SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
     }
 }

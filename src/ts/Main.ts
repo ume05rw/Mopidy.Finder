@@ -6,8 +6,6 @@ class Main {
     private _rootController: RootContoller;
 
     public async Init(): Promise<Main> {
-        console.log('TS Start');
-
         Libraries.Initialize();
 
         this._rootController = new RootContoller();
@@ -17,4 +15,4 @@ class Main {
     }
 }
 
-const main = (new Main()).Init();
+const main = (new Main()).Init(); // eslint-disable-line

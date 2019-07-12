@@ -1,60 +1,73 @@
 import XhrQueryableBase from './XhrQueryableBase';
+import { AxiosResponse } from 'axios';
 
-interface JsonRpcParamsBase {
+interface IJsonRpcParamsBase {
     jsonrpc: string;
 }
 
-interface JsonRpcQueryParams extends JsonRpcParamsBase {
+interface IJsonRpcQueryParams extends IJsonRpcParamsBase {
     method: string;
     params?: { [name: string]: any };
     id?: number;
 }
 
-interface JsonRpcResultParams extends JsonRpcParamsBase {
+interface IJsonRpcResultParams extends IJsonRpcParamsBase {
     result?: any;
     error?: any;
-    id: number;
+    id?: number;
 }
 
 export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
     private static readonly Url: string = 'JsonRpc';
     private static IdCounter: number = 1;
 
-    private async QueryJsonRpc(params: JsonRpcQueryParams): Promise<JsonRpcResultParams> {
+    private async QueryJsonRpc(params: IJsonRpcQueryParams): Promise<IJsonRpcResultParams> {
         params.jsonrpc = '2.0';
 
-        try {
-            const a = 1;
-            const response = await XhrQueryableBase.XhrInstance.post(JsonRpcQueryableBase.Url, params);
-            const result = response.data as JsonRpcResultParams;
+        const response
+            = await XhrQueryableBase.XhrInstance.post(JsonRpcQueryableBase.Url, params)
+                .catch((e): AxiosResponse => {
+                    const resultData: IJsonRpcResultParams = {
+                        jsonrpc: '2.0',
+                        error: e
+                    };
+                    if (params.id)
+                        resultData.id = params.id;
 
-            if (result && result.error) {
-                console.error(`JsonRpcError: method=${params.method}`);
-                console.error(result);
-            }
+                    const result: AxiosResponse = {
+                        status: 406,
+                        statusText: 'Network Error',
+                        config: null,
+                        headers: null,
+                        data: resultData
+                    };
 
-            return result;
+                    return result
+                });
 
-        } catch (ex) {
-            const error = {
-                error: `Network Error: ${ex}`
-            } as JsonRpcResultParams;
+        const result = response.data as IJsonRpcResultParams;
 
-            if (params.id)
-                error.id = params.id;
-
-            console.error(`JsonRpcError: method=${params.method}`);
-            console.error(error);
-
-            return error;
+        if (params.id && !result) {
+            // id付きにも拘らず、応答が無いとき
+            console.error(`JsonRpcError: method=${params.method}`); // eslint-disable-line
+            console.error('returns null'); // eslint-disable-line
         }
-    };
 
-    protected async JsonRpcRequest(method: string, params: any = null): Promise<JsonRpcResultParams> {
-        const query = {
+        if (result && result.error) {
+            // 応答にerrorが含まれるとき
+            console.error(`JsonRpcError: method=${params.method}`); // eslint-disable-line
+            console.error(result); // eslint-disable-line
+        }
+
+        return result;
+    }
+
+    protected async JsonRpcRequest(method: string, params: any = null): Promise<IJsonRpcResultParams> {
+        const query: IJsonRpcQueryParams = {
+            jsonrpc: '2.0',
             method: method,
             id: JsonRpcQueryableBase.IdCounter
-        } as JsonRpcQueryParams;
+        };
 
         if (params)
             query.params = params;
@@ -67,9 +80,10 @@ export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
     }
 
     protected async JsonRpcNotice(method: string, params: any = null): Promise<boolean> {
-        const query = {
+        const query: IJsonRpcQueryParams = {
+            jsonrpc: '2.0',
             method: method
-        } as JsonRpcQueryParams;
+        };
 
         if (params)
             query.params = params;

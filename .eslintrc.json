@@ -20,7 +20,10 @@
         "@typescript-eslint/explicit-member-accessibility": "error",
         "indent": "off",
         "@typescript-eslint/indent": "error",
-        "@typescript-eslint/interface-name-prefix": "error",
+
+        // インタフェースにプレフィクス"I"があること
+        "@typescript-eslint/interface-name-prefix": [ "error", "always" ],
+
         "@typescript-eslint/member-delimiter-style": "error",
         "@typescript-eslint/no-angle-bracket-type-assertion": "error",
         "no-array-constructor": "off",
@@ -90,6 +93,6 @@
     },
     "parserOptions": {
         "sourceType": "module",
-        "project": "./tsconfig.commonjs.json"
+        "project": "./tsconfig.test.json"
     }
 }

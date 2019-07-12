@@ -1,17 +1,17 @@
-import Axios, { AxiosInstance } from 'axios';
+import Axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import * as qs from 'qs';
 import EventableBase from '../../EventableBase';
 
-export interface XhrError {
+export interface IXhrError {
     Message: string;
     Code?: number;
     FieldName?: string;
 }
 
-export interface XhrResult {
+export interface IXhrResult {
     Succeeded: boolean;
     Result?: any;
-    Errors?: XhrError[]
+    Errors?: IXhrError[];
 }
 
 export default abstract class XhrQueryableBase extends EventableBase {
@@ -33,91 +33,93 @@ export default abstract class XhrQueryableBase extends EventableBase {
         responseType: 'json'
     });
 
-    private ParseResponse(data: any): XhrResult {
-        if (!data)
-            return {
+    private ParseResponse(data: any): IXhrResult {
+        if (!data) {
+            const error: IXhrError = {
+                Message: 'Unexpected Error'
+            };
+            const result: IXhrResult = {
                 Succeeded: false,
-                Errors: [{
-                    Message: 'Unexpected Error'
-                }]
-            } as XhrResult;
+                Errors: [error]
+            };
 
-        return ((typeof data == 'object') && data.hasOwnProperty('Succeeded'))
+            return result;
+        }
+
+        if ((typeof data == 'object') && data.hasOwnProperty('Succeeded')) {
             // dataが定型応答のとき
-            ? data as XhrResult
+            const result = data as IXhrResult;
+            if (!result.Succeeded) {
+                console.error('Network Error:'); // eslint-disable-line
+                console.error(result.Errors); // eslint-disable-line
+            }
+
+            return data as IXhrResult
+        } else {
             // dataが定型応答のとき
-            : {
+            const result: IXhrResult = {
                 Succeeded: true,
                 Result: data
-            } as XhrResult;
+            };
+
+            return result;
+        }
     }
 
-    protected async QueryGet(url: string, params: any = null): Promise<XhrResult> {
-        try {
-            const response = await XhrQueryableBase.XhrInstance.get(url, {
-                params: params,
-                paramsSerializer: XhrQueryableBase.ParamsSerializer
+    private CreateErrorResponse(error: any): AxiosResponse {
+        const formattedError: IXhrResult = {
+            Succeeded: false,
+            Errors: error,
+        };
+        const result: AxiosResponse = {
+            status: 406,
+            statusText: 'Network Error',
+            config: null,
+            headers: null,
+            data: formattedError
+        };
+
+        return result;
+    }
+
+    protected async QueryGet(url: string, params: any = null): Promise<IXhrResult> {
+        const config: AxiosRequestConfig = {
+            params: params,
+            paramsSerializer: XhrQueryableBase.ParamsSerializer            
+        };
+        const response = await XhrQueryableBase.XhrInstance.get(url, config)
+            .catch((e): AxiosResponse => {
+                return this.CreateErrorResponse(e);
             });
 
-            return this.ParseResponse(response.data);
-        } catch (ex) {
-            console.error(`QueryGet.Error: url=${url}`);
-            if (params) {
-                console.error('params:')
-                console.error(params);
-            }
-            console.error(ex);
-        }
+        return this.ParseResponse(response.data);
     }
 
-    protected async QueryPost(url: string, params: any = null): Promise<XhrResult> {
-        try {
-            const response = await XhrQueryableBase.XhrInstance.post(url, params);
+    protected async QueryPost(url: string, params: any = null): Promise<IXhrResult> {
+        const response = await XhrQueryableBase.XhrInstance.post(url, params)
+            .catch((e): AxiosResponse => {
+                return this.CreateErrorResponse(e);
+            });
 
-            return this.ParseResponse(response.data);
-        } catch (ex) {
-            console.error(`QueryPost.Error: url=${url}`);
-            if (params) {
-                console.error('params:')
-                console.error(params);
-            }
-            console.error(ex);
+        return this.ParseResponse(response.data);
 
-            return this.ParseResponse(null);
-        }
     }
 
-    protected async QueryPut(url: string, params: any = null): Promise<XhrResult> {
-        try {
-            const response = await XhrQueryableBase.XhrInstance.put(url, params);
+    protected async QueryPut(url: string, params: any = null): Promise<IXhrResult> {
+        const response = await XhrQueryableBase.XhrInstance.put(url, params)
+            .catch((e): AxiosResponse => {
+                return this.CreateErrorResponse(e);
+            });
 
-            return this.ParseResponse(response.data);
-        } catch (ex) {
-            console.error(`QueryPut.Error: url=${url}`);
-            if (params) {
-                console.error('params:')
-                console.error(params);
-            }
-            console.error(ex);
-
-            return this.ParseResponse(null);
-        }
+        return this.ParseResponse(response.data);
     }
 
-    protected async QueryDelete(url: string, params: any = null): Promise<XhrResult> {
-        try {
-            const response = await XhrQueryableBase.XhrInstance.delete(url, params);
+    protected async QueryDelete(url: string, params: any = null): Promise<IXhrResult> {
+        const response = await XhrQueryableBase.XhrInstance.delete(url, params)
+            .catch((e): AxiosResponse => {
+                return this.CreateErrorResponse(e);
+            });
 
-            return this.ParseResponse(response.data);
-        } catch (ex) {
-            console.error(`QueryDelete.Error: url=${url}`);
-            if (params) {
-                console.error('params:')
-                console.error(params);
-            }
-            console.error(ex);
-
-            return this.ParseResponse(null);
-        }
+        return this.ParseResponse(response.data);
     }
 }

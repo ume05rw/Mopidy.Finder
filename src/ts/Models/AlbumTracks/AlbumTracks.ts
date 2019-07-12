@@ -1,7 +1,6 @@
-import * as _ from 'lodash';
 import { default as Album, IAlbum } from '../Albums/Album';
 import { default as Artist, IArtist } from '../Artists/Artist';
-import { default as Track, ITrack } from '../Tracks/Track'
+import { default as Track, ITrack } from '../Tracks/Track';
 
 export interface IAlbumTracks {
     Album: IAlbum;
@@ -15,7 +14,7 @@ export default class AlbumTracks implements IAlbumTracks {
         if (!entity)
             return null;
 
-        var result = new AlbumTracks();
+        const result = new AlbumTracks();
         result.Album = Album.Create(entity.Album);
         result.Artists = Artist.CreateArray(entity.Artists);
         result.Tracks = Track.CreateArray(entity.Tracks);
@@ -24,7 +23,7 @@ export default class AlbumTracks implements IAlbumTracks {
     }
 
     public static CreateArray(entities: IAlbumTracks[]): AlbumTracks[] {
-        var result: AlbumTracks[] = [];
+        const result: AlbumTracks[] = [];
 
         if (!entities)
             return result;
@@ -38,22 +37,9 @@ export default class AlbumTracks implements IAlbumTracks {
         return result;
     }
 
-    public Album: Album;
-    public Artists: Artist[];
-    public Tracks: Track[];
-
-    public get Id(): number {
-        return this.Album.Id;
-    }
-    public get Name(): string {
-        return this.Album.Name;
-    }
-    public get LowerName(): string {
-        return this.Album.LowerName;
-    }
-    public get Uri(): string {
-        return this.Album.Uri;
-    }
+    public Album: Album = null;
+    public Artists: Artist[] = [];
+    public Tracks: Track[] = [];
 
     public GetArtistName(): string {
         if (this.Artists.length <= 0)

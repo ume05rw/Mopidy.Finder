@@ -56,6 +56,7 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
+
         return true;
     }
 

@@ -54,6 +54,7 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
+
         return true;
     }
 

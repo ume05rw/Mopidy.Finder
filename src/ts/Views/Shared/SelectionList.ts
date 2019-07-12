@@ -1,12 +1,12 @@
-/// <reference path="../../../../types/adminlte/index.d.ts" />
 import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import * as _ from 'lodash';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../Libraries';
-import { default as StoreBase, IPagenatedResult } from '../../Models/Bases/StoreBase';
+import { IPagenatedResult } from '../../Models/Bases/StoreBase';
 import ViewBase from '../Bases/ViewBase';
 import { WidgetEvents } from '../Events/AdminLteEvents';
 import { default as SelectionEvents, IListUpdatedArgs, ISelectionChangedArgs } from './SelectionEvents';
+import Exception from '../../Utils/Exception';
 
 export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
 
@@ -44,20 +44,20 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
             const button = Libraries.$(this.ButtonCollaplse);
             this.boxWidget = new AdminLte.Widget(button);
 
-            button.on(WidgetEvents.Collapsed, () => {
+            button.on(WidgetEvents.Collapsed, (): void => {
                 this.isCollapsed = true;
             });
-            button.on(WidgetEvents.Expanded, () => {
+            button.on(WidgetEvents.Expanded, (): void => {
                 this.isCollapsed = false;
             });
 
             (Libraries.$(window) as any).resize(
-                this.viewport.changed(() => {
+                this.viewport.changed((): void => {
                     this.ToggleListByViewport();
                 })
             );
 
-            _.delay(() => {
+            _.delay((): void => {
                 this.ToggleListByViewport();
             }, 1000);
         }
@@ -84,13 +84,13 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
             }
 
             if (isUpdated) {
-                this.$emit(SelectionEvents.ListUpdated, {
+                const args: IListUpdatedArgs<TEntity> = {
                     Entities: this.entities
-                } as IListUpdatedArgs<TEntity>);
+                };
+                this.$emit(SelectionEvents.ListUpdated, args);
             }
         } catch (e) {
-            console.error(e);
-            console.error(this);
+            Exception.Throw(null, e);
         }
 
         return true;
@@ -114,7 +114,7 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
     protected Refresh(): void {
         this.page = 1;
         this.entities = [];
-        this.$nextTick(() => {
+        this.$nextTick((): void => {
             this.InfiniteLoading.stateChanger.reset();
             (this.InfiniteLoading as any).attemptLoad();
         });

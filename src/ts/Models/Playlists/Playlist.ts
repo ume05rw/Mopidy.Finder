@@ -1,12 +1,5 @@
 import IRef from '../Mopidies/IRef';
-import ITrack from '../Mopidies/ITrack';
 import Track from '../Tracks/Track';
-
-export interface IPlaylist {
-    Name: string;
-    Uri: string;
-    Tracks: Track[];
-}
 
 export default class Playlist {
 
@@ -15,8 +8,8 @@ export default class Playlist {
             return null;
 
         const result = new Playlist();
-        result.Name = entity.name;
-        result.Uri = entity.uri;
+        result.Name = entity.name || null;
+        result.Uri = entity.uri || null;
         result.Tracks = [];
 
         return result;
@@ -34,7 +27,7 @@ export default class Playlist {
         return result;
     }
 
-    public Name: string;
-    public Uri: string;
-    public Tracks: Track[];
+    public Name: string = null;
+    public Uri: string = null;
+    public Tracks: Track[] = [];
 }

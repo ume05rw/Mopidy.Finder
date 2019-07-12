@@ -30,9 +30,10 @@ export default class SelectionTrack extends ViewBase {
     private entity: Track;
 
     private OnClick(): void {
-        this.$emit(SelectionEvents.SelectionChanged, {
+        const args: ISelectionChangedArgs<Track> = {
             Selected: true,
             Entity: this.entity
-        } as ISelectionChangedArgs<Track>);
+        };
+        this.$emit(SelectionEvents.SelectionChanged, args);
     }
 }

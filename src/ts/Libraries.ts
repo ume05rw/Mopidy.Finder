@@ -1,4 +1,3 @@
-/// <reference path="../../types/mopidy/index.d.ts" />
 import 'animate.css/animate.css';
 import 'font-awesome/css/font-awesome.css';
 import 'admin-lte/dist/css/adminlte.css';
@@ -67,4 +66,4 @@ export default class Libraries {
             'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
         });
     }
-};
+}

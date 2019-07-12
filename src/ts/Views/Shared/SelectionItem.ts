@@ -37,10 +37,11 @@ export default class SelectionItem<TEntity> extends ViewBase {
         this.selected = !this.selected;
         this.SetClassBySelection();
 
-        this.$emit(SelectionItemEvents.SelectionChanged, {
+        const args: ISelectionChangedArgs<TEntity> = {
             Entity: this.entity,
             Selected: this.selected
-        } as ISelectionChangedArgs<TEntity>);
+        };
+        this.$emit(SelectionItemEvents.SelectionChanged, args);
     }
 
     private SetClassBySelection(): void {

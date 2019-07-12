@@ -6,7 +6,7 @@ export interface IPagenatedResult<T> {
     TotalLength: number;
     ResultPage?: number;
     ResultLength: number;
-    ResultList: T[]
+    ResultList: T[];
 }
 
 export default abstract class StoreBase<T> extends XhrQueryableBase {

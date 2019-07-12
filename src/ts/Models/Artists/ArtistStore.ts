@@ -9,12 +9,10 @@ export default class ArtistStore extends StoreBase<Artist> {
             Page: page
         });
 
-        if (!response.Succeeded) {
-            console.error(response.Errors);
+        if (!response.Succeeded)
             throw new Error('Unexpected Error on ApiQuery');
-        }
 
-        var result = response.Result as IPagenatedResult<Artist>;
+        const result = response.Result as IPagenatedResult<Artist>;
         result.ResultList = Artist.CreateArray(result.ResultList);
 
         return result;

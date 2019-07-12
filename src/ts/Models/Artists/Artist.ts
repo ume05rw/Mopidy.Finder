@@ -18,12 +18,12 @@ export default class Artist implements IArtist {
         if (!entity)
             return null;
 
-        var result = new Artist();
-        result.Id = entity.Id;
-        result.Name = entity.Name;
-        result.LowerName = entity.LowerName;
-        result.Uri = entity.Uri;
-        result.ImageUri = entity.ImageUri;
+        const result = new Artist();
+        result.Id = entity.Id || null;
+        result.Name = entity.Name || null;
+        result.LowerName = entity.LowerName || null;
+        result.Uri = entity.Uri || null;
+        result.ImageUri = entity.ImageUri || null;
         result.ArtistAlbums = ArtistAlbum.CreateArray(entity.ArtistAlbums);
         result.GenreArtists = GenreArtist.CreateArray(entity.GenreArtists);
 
@@ -34,13 +34,13 @@ export default class Artist implements IArtist {
         if (!entity)
             return null;
 
-        var result = new Artist();
+        const result = new Artist();
         result.Id = null;
-        result.Name = entity.name;
+        result.Name = entity.name || null;
         result.LowerName = (entity.name)
             ? entity.name.toLowerCase()
             : null;
-        result.Uri = entity.uri;
+        result.Uri = entity.uri || null;
         result.ImageUri = null;
         result.ArtistAlbums = [];
         result.GenreArtists = [];
@@ -49,7 +49,7 @@ export default class Artist implements IArtist {
     }
 
     public static CreateArray(entities: IArtist[]): Artist[] {
-        var result: Artist[] = [];
+        const result: Artist[] = [];
 
         if (!entities)
             return result;
@@ -64,7 +64,7 @@ export default class Artist implements IArtist {
     }
 
     public static CreateArrayFromMopidy(entities: MopidyArtist[]): Artist[] {
-        var result: Artist[] = [];
+        const result: Artist[] = [];
 
         if (!entities)
             return result;
@@ -78,11 +78,11 @@ export default class Artist implements IArtist {
         return result;
     }
 
-    public Id: number;
-    public Name: string;
-    public LowerName: string;
-    public Uri: string;
-    public ImageUri: string;
-    public ArtistAlbums: ArtistAlbum[];
-    public GenreArtists: GenreArtist[];
+    public Id: number = null;
+    public Name: string = null;
+    public LowerName: string = null;
+    public Uri: string = null;
+    public ImageUri: string = null;
+    public ArtistAlbums: ArtistAlbum[] = [];
+    public GenreArtists: GenreArtist[] = [];
 }

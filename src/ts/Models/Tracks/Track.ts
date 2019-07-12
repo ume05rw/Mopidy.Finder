@@ -30,19 +30,19 @@ export default class Track implements ITrack {
         if (!entity)
             return null;
 
-        var result = new Track();
-        result.Id = entity.Id;
-        result.Name = entity.Name;
-        result.LowerName = entity.LowerName;
-        result.Uri = entity.Uri;
-        result.TlId = entity.TlId;
-        result.DiscNo = entity.DiscNo;
-        result.TrackNo = entity.TrackNo;
-        result.Date = entity.Date;
-        result.Comment = entity.Comment;
-        result.Length = entity.Length;
-        result.BitRate = entity.BitRate;
-        result.LastModified = entity.LastModified;
+        const result = new Track();
+        result.Id = entity.Id || null;
+        result.Name = entity.Name || null;
+        result.LowerName = entity.LowerName || null;
+        result.Uri = entity.Uri || null;
+        result.TlId = entity.TlId || null;
+        result.DiscNo = entity.DiscNo || null;
+        result.TrackNo = entity.TrackNo || null;
+        result.Date = entity.Date || null;
+        result.Comment = entity.Comment || null;
+        result.Length = entity.Length || null;
+        result.BitRate = entity.BitRate || null;
+        result.LastModified = entity.LastModified || null;
         result.Album = Album.Create(entity.Album);
         result.Artists = Artist.CreateArray(entity.Artists);
 
@@ -58,21 +58,21 @@ export default class Track implements ITrack {
         if (!entity)
             return null;
 
-        var result = new Track();
+        const result = new Track();
         result.Id = null;
-        result.Name = entity.name;
+        result.Name = entity.name || null;
         result.LowerName = (entity.name)
             ? entity.name.toLowerCase()
             : null;
-        result.Uri = entity.uri;
+        result.Uri = entity.uri || null;
         result.TlId = null;
-        result.DiscNo = entity.disc_no;
-        result.TrackNo = entity.track_no;
-        result.Date = entity.date;
-        result.Comment = entity.comment;
-        result.Length = entity.length;
-        result.BitRate = entity.bitrate;
-        result.LastModified = entity.last_modified;
+        result.DiscNo = entity.disc_no || null;
+        result.TrackNo = entity.track_no || null;
+        result.Date = entity.date || null;
+        result.Comment = entity.comment || null;
+        result.Length = entity.length || null;
+        result.BitRate = entity.bitrate || null;
+        result.LastModified = entity.last_modified || null;
         result.Album = Album.CreateFromMopidy(entity.album);
         result.Artists = Artist.CreateArrayFromMopidy(entity.artists);
 
@@ -85,7 +85,7 @@ export default class Track implements ITrack {
     }
 
     public static CreateArray(entities: ITrack[]): Track[] {
-        var result: Track[] = [];
+        const result: Track[] = [];
 
         if (!entities)
             return result;
@@ -100,7 +100,7 @@ export default class Track implements ITrack {
     }
 
     public static CreateArrayFromMopidy(entities: MopidyTrack[]): Track[] {
-        var result: Track[] = [];
+        const result: Track[] = [];
 
         if (!entities)
             return result;
@@ -114,39 +114,39 @@ export default class Track implements ITrack {
         return result;
     }
 
-    public Id: number;
-    public Name: string;
-    public LowerName: string;
-    public Uri: string;
-    public TlId: number;
-    public DiscNo: number;
-    public TrackNo: number;
-    public Date: string;
-    public Comment: string;
-    public Length: number;
-    public BitRate: number;
-    public LastModified: number;
-    public Album: Album;
-    public Artists: Artist[];
+    public Id: number = null;
+    public Name: string = null;
+    public LowerName: string = null;
+    public Uri: string = null;
+    public TlId: number = null;
+    public DiscNo: number = null;
+    public TrackNo: number = null;
+    public Date: string = null;
+    public Comment: string = null;
+    public Length: number = null;
+    public BitRate: number = null;
+    public LastModified: number = null;
+    public Album: Album = null;
+    public Artists: Artist[] = [];
 
     //public Genre: Genre;
     //public Composers: Artist[];
     //public Performers: Artist[];
 
     public GetTimeString(): string {
-        if (!this.Length) {
+        if (!this.Length)
             return '';
-        }
 
         const minute = Math.floor(this.Length / 60000);
         const second = Math.floor((this.Length % 60000) / 1000);
         const minuteStr = ('00' + minute.toString()).slice(-2);
         const secondStr = ('00' + second.toString()).slice(-2);
+
         return minuteStr + ':' + secondStr;
     }
 
     public GetYear(): number {
-        if (!this.Date || this.Date.length < 4)
+        if (!this.Date || this.Date.length < 1)
             return null;
 
         return (4 < this.Date.length)
@@ -156,6 +156,7 @@ export default class Track implements ITrack {
 
     public GetFormattedYearString(): string {
         const year = this.GetYear();
+
         return (!year)
             ? ''
             : '(' + year.toString() + ')';

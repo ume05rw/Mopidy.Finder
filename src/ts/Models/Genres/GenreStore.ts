@@ -8,12 +8,10 @@ export default class GenreStore extends StoreBase<Genre> {
             Page: page
         });
 
-        if (!response.Succeeded) {
-            console.error(response.Errors);
+        if (!response.Succeeded)
             throw new Error('Unexpected Error on ApiQuery');
-        }
 
-        var result = response.Result as IPagenatedResult<Genre>;
+        const result = response.Result as IPagenatedResult<Genre>;
         result.ResultList = Genre.CreateArray(result.ResultList);
 
         return result;

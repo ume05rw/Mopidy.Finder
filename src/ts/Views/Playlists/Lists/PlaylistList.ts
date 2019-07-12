@@ -74,7 +74,7 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
     }
 
     protected OnSelectionChanged(args: ISelectionChangedArgs<Playlist>): void {
-        _.each(this.Items, (si) => {
+        _.each(this.Items, (si): void => {
             if (si.GetEntity() !== args.Entity && si.GetSelected()) {
                 si.SetSelected(false);
             }

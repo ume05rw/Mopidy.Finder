@@ -115,7 +115,7 @@ export default class Player extends JsonRpcQueryableBase implements IStatus {
 
 
     public StartPolling(): void {
-        this._timer = setInterval(() => {
+        this._timer = setInterval((): void => {
             this.Polling();
         }, Player.PollingMsec);
     }
@@ -167,15 +167,7 @@ export default class Player extends JsonRpcQueryableBase implements IStatus {
                     if (track.album.images && 0 < track.album.images.length) {
                         this._imageUri = track.album.images[0];
                     } else if (track.album.uri) {
-                        const resImages = await this.JsonRpcRequest(Player.Methods.GetImages, {
-                            uris: [track.album.uri]
-                        });
-                        if (resImages.result) {
-                            const images = resImages.result[track.album.uri];
-                            if (images && 0 < images.length) {
-                                this._imageUri = images[0];
-                            }
-                        }
+                        this._imageUri = await this.GetAlbumImageUri(track.album.uri);
                     }
                 }
             }
@@ -201,6 +193,23 @@ export default class Player extends JsonRpcQueryableBase implements IStatus {
         this.DetectChanges();
 
         return true;
+    }
+
+    private async GetAlbumImageUri(uri: string): Promise<string> {
+        const response = await this.JsonRpcRequest(Player.Methods.GetImages, {
+            uris: [uri]
+        });
+
+        if (!response || !response.result)
+            return null;
+
+        const results = response.result as { [uri: string]: string[] };
+        const images = results[uri];
+
+        if (!images || images.length < 0)
+            return null;
+
+        return images[0];
     }
 
     private SetBackupValues(): void {
@@ -258,18 +267,21 @@ export default class Player extends JsonRpcQueryableBase implements IStatus {
 
     public async Next(): Promise<boolean> {
         await this.JsonRpcNotice(Player.Methods.Next);
+
         return true;
     }
 
     public async Previous(): Promise<boolean> {
         await this.JsonRpcNotice(Player.Methods.Previous);
+
         return true;
     }
 
     public async Seek(timePosition: number): Promise<boolean> {
         await this.JsonRpcNotice(Player.Methods.Seek, {
-            time_position: timePosition
+            time_position: timePosition // eslint-disable-line
         });
+
         return true;
     }
 

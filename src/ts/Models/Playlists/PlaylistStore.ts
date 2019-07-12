@@ -26,7 +26,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
 
         const refs = response.result as IRef[];
         const ordered = Libraries.Enumerable.from(refs)
-            .orderBy(e => e.name)
+            .orderBy((e): string => e.name)
             .toArray();
         const result = Playlist.CreateArrayByRefs(ordered);
 
@@ -41,7 +41,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
 
         const mpPlaylist = response.result as IPlaylist;
         const trackUris = Libraries.Enumerable.from(mpPlaylist.tracks)
-            .select(e => e.uri)
+            .select((e): string => e.uri)
             .toArray();
 
         const response2
@@ -86,27 +86,23 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         const resClear
             = await this.JsonRpcRequest(PlaylistStore.Methods.TracklistClearList);
 
-        if (resClear.error) {
-            console.error(resClear.error);
-            return false;
-        }
+        if (resClear.error)
+            throw new Error(resClear.error);
 
         const uris = Libraries.Enumerable.from(playlist.Tracks)
-            .select(e => e.Uri)
+            .select((e): string => e.Uri)
             .toArray();
         const resAdd
             = await this.JsonRpcRequest(PlaylistStore.Methods.TracklistAdd, {
                 uris: uris
             });
 
-        if (resAdd.error) {
-            console.error(resAdd.error);
-            return false;
-        }
+        if (resAdd.error)
+            throw new Error(resAdd.error);
 
         const tlTracks = resAdd.result as ITlTrack[];
         const tlDictionary = Libraries.Enumerable.from(tlTracks)
-            .toDictionary<string, number>(e => e.track.uri, e2 => e2.tlid);
+            .toDictionary<string, number>((e): string => e.track.uri, (e2): number => e2.tlid);
 
         for (let i = 0; i < playlist.Tracks.length; i++) {
             const tr = playlist.Tracks[i];
@@ -116,7 +112,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         }
 
         if (track.TlId === null)
-            return false;
+            throw new Error(`track: ${track.Name} not assigned TlId`);
 
         await this.PlayByTlId(track.TlId);
 

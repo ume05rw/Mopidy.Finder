@@ -7,6 +7,7 @@ import AlbumTracksStore from '../../../Models/AlbumTracks/AlbumTracksStore';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import SelectionList from '../../Shared/SelectionList';
 import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from '../Selections/SelectionAlbumTracks';
+import Exception from '../../../Utils/Exception';
 
 @Component({
     template: `<div class="col-md-6">
@@ -53,6 +54,7 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = false;
         await super.Initialize();
+
         return true;
     }
 
@@ -78,42 +80,37 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         if (this.isEntitiesRefreshed) {
             await this.store.ClearList();
 
-            _.each(this.entities, (entity) => {
-                _.each(entity.Tracks, (track) => {
+            _.each(this.entities, (entity): void => {
+                _.each(entity.Tracks, (track): void => {
                     track.TlId = null;
                 });
             });
             this.isEntitiesRefreshed = false;
         }
 
-        var albumTracks = args.Entity;
-        if (!albumTracks) {
-            console.error('AlbumTracks Not Found - AlbumTrack;');
-            console.error(args.Entity);
-            return false;
-        }
+        const albumTracks = args.Entity;
+        if (!albumTracks)
+            Exception.Throw('AlbumTracks Not Found', args);
 
-        var track = args.Track;
-        if (!track) {
-            console.error('Track Not Found - Track:');
-            console.error(args.Track);
-            return false;
-        }
+        const track = args.Track;
+        if (!track)
+            Exception.Throw('Track Not Found', args);
 
-        var isAllTracksRegistered = Libraries.Enumerable.from(albumTracks.Tracks)
-                .all(e => e.TlId !== null);
+        const isAllTracksRegistered = Libraries.Enumerable.from(albumTracks.Tracks)
+            .all((e): boolean => e.TlId !== null);
 
         if (isAllTracksRegistered) {
             // TlId割り当て済みの場合
-            var result = await this.store.PlayAlbumByTlId(track.TlId);
+            const result = await this.store.PlayAlbumByTlId(track.TlId);
+
             return result;
         } else {
             // TlId未割り当ての場合
-            var resultAtls = await this.store.PlayAlbumByTrack(track);
-            var updatedTracks = Libraries.Enumerable.from(resultAtls.Tracks);
+            const resultAtls = await this.store.PlayAlbumByTrack(track);
+            const updatedTracks = Libraries.Enumerable.from(resultAtls.Tracks);
 
-            _.each(albumTracks.Tracks, (track) => {
-                track.TlId = updatedTracks.firstOrDefault(e => e.Id == track.Id).TlId;
+            _.each(albumTracks.Tracks, (track): void => {
+                track.TlId = updatedTracks.firstOrDefault((e): boolean => e.Id == track.Id).TlId;
             });
 
             return true;

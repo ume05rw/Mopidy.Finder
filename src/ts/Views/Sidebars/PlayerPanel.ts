@@ -76,14 +76,14 @@ export default class PlayerPanel extends ViewBase {
         await super.Initialize();
 
         this.volumeSlider = Libraries.$(this.$refs.Slider).ionRangeSlider({
-            onFinish: (data) => {
+            onFinish: (data): void => {
                 // スライダー操作完了時のイベント
                 this.player.SetVolume(data.from);
             }
         });
         this.volumeData = this.volumeSlider.data('ionRangeSlider');
 
-        this.player.AddEventListener(PlayerEvents.VolumeChanged, () => {
+        this.player.AddEventListener(PlayerEvents.VolumeChanged, (): void => {
             this.volumeData.update({
                 from: this.player.Volume
             });

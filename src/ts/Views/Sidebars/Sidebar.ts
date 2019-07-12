@@ -1,7 +1,5 @@
-import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
-import Libraries from '../../Libraries';
-import * as _ from 'lodash';
+import ViewBase from '../Bases/ViewBase';
 import PlayerPanel from './PlayerPanel';
 
 export interface IContentChanged {
@@ -72,21 +70,23 @@ export const SidebarEvents = {
 export default class Sidebar extends ViewBase {
 
     private OnClickFinder(): void {
-        this.$emit(SidebarEvents.ContentChanged, {
+        const args: IContentChanged = {
             Name: 'Finder'
-        } as IContentChanged)
+        };
+        this.$emit(SidebarEvents.ContentChanged, args)
     }
 
     private OnClickPlaylists(): void {
-        this.$emit(SidebarEvents.ContentChanged, {
+        const args: IContentChanged = {
             Name: 'Playlists'
-        } as IContentChanged)
+        };
+        this.$emit(SidebarEvents.ContentChanged, args)
     }
 
     private OnClickSettings(): void {
-        this.$emit(SidebarEvents.ContentChanged, {
+        const args: IContentChanged = {
             Name: 'Settings'
-        } as IContentChanged)
+        };
+        this.$emit(SidebarEvents.ContentChanged, args)
     }
-   
 }

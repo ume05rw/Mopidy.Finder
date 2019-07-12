@@ -1,10 +1,10 @@
-import ViewBase from './Bases/ViewBase';
 import Component from 'vue-class-component';
-import HeaderBar from './HeaderBars/HeaderBar';
-import { default as Sidebar, SidebarEvents, IContentChanged } from './Sidebars/Sidebar';
+import ViewBase from './Bases/ViewBase';
 import Finder from './Finders/Finder';
+import HeaderBar from './HeaderBars/HeaderBar';
 import Playlists from './Playlists/Playlists';
-import Settings from './Settings/Settings'
+import Settings from './Settings/Settings';
+import { default as Sidebar, IContentChanged } from './Sidebars/Sidebar';
 
 @Component({
     template: `<div class="wrapper" style="height: 100%; min-height: 100%;">

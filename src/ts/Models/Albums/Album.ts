@@ -19,13 +19,13 @@ export default class Album implements IAlbum {
         if (!entity)
             return null;
 
-        var result = new Album();
-        result.Id = entity.Id;
-        result.Name = entity.Name;
-        result.LowerName = entity.LowerName;
-        result.Uri = entity.Uri;
-        result.Year = entity.Year;
-        result.ImageUri = entity.ImageUri;
+        const result = new Album();
+        result.Id = entity.Id || null;
+        result.Name = entity.Name || null;
+        result.LowerName = entity.LowerName || null;
+        result.Uri = entity.Uri || null;
+        result.Year = entity.Year || null;
+        result.ImageUri = entity.ImageUri || null;
         result.ArtistAlbums = ArtistAlbum.CreateArray(entity.ArtistAlbums);
         result.GenreAlbums = GenreAlbum.CreateArray(entity.GenreAlbums);
 
@@ -36,13 +36,13 @@ export default class Album implements IAlbum {
         if (!entity)
             return null;
 
-        var result = new Album();
+        const result = new Album();
         result.Id = null;
-        result.Name = entity.name;
+        result.Name = entity.name || null;
         result.LowerName = (entity.name)
             ? entity.name.toLowerCase()
             : null;
-        result.Uri = entity.uri;
+        result.Uri = entity.uri || null;
         result.Year = (entity.date && 4 <= entity.date.length)
             ? (4 < entity.date.length)
                 ? parseInt(entity.date.substr(0, 4), 10)
@@ -58,7 +58,7 @@ export default class Album implements IAlbum {
     }
 
     public static CreateArray(entities: IAlbum[]): Album[] {
-        var result: Album[] = [];
+        const result: Album[] = [];
 
         if (!entities)
             return result;
@@ -73,7 +73,7 @@ export default class Album implements IAlbum {
     }
 
     public static CreateArrayFromMopidy(entities: MopidyAlbum[]): Album[] {
-        var result: Album[] = [];
+        const result: Album[] = [];
 
         if (!entities)
             return result;
@@ -87,14 +87,14 @@ export default class Album implements IAlbum {
         return result;
     }
 
-    public Id: number;
-    public Name: string;
-    public LowerName: string;
-    public Uri: string;
-    public Year: number;
-    public ImageUri: string;
-    public ArtistAlbums: ArtistAlbum[];
-    public GenreAlbums: GenreAlbum[];
+    public Id: number = null;
+    public Name: string = null;
+    public LowerName: string = null;
+    public Uri: string = null;
+    public Year: number = null;
+    public ImageUri: string = null;
+    public ArtistAlbums: ArtistAlbum[] = [];
+    public GenreAlbums: GenreAlbum[] = [];
 
     public GetImageFullUri(): string {
         return `${location.protocol}//${location.host}${this.ImageUri}`;

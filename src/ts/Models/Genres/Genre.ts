@@ -18,10 +18,10 @@ export default class Genre implements IGenre {
 
         const result = new Genre();
         if (entity) {
-            result.Id = entity.Id;
-            result.Name = entity.Name;
-            result.LowerName = entity.LowerName;
-            result.Uri = entity.Uri;
+            result.Id = entity.Id || null;
+            result.Name = entity.Name || null;
+            result.LowerName = entity.LowerName || null;
+            result.Uri = entity.Uri || null;
             result.GenreArtists = GenreArtist.CreateArray(entity.GenreArtists);
             result.GenreAlbums = GenreAlbum.CreateArray(entity.GenreAlbums);
         }
@@ -44,10 +44,10 @@ export default class Genre implements IGenre {
         return result;
     }
 
-    public Id: number;
-    public Name: string;
-    public LowerName: string;
-    public Uri: string;
-    public GenreArtists: GenreArtist[];
-    public GenreAlbums: GenreAlbum[];
+    public Id: number = null;
+    public Name: string = null;
+    public LowerName: string = null;
+    public Uri: string = null;
+    public GenreArtists: GenreArtist[] = [];
+    public GenreAlbums: GenreAlbum[] = [];
 }

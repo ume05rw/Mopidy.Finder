@@ -55,11 +55,12 @@ export default abstract class EventableBase implements IEventable {
         if (handler) {
             // handlerが指定されているとき
             let key = -1;
-            const eRef = _.find(this.eventHandlers, (er, idx) => {
+            const eRef = _.find(this.eventHandlers, (er, idx): boolean => {
                 key = idx;
                 // ※注意※
                 // 関数は継承関係のプロトタイプ参照都合で同一オブジェクトになりやすい。
                 // Mittでも同じ実装だった...。
+
                 return (er.Name === name
                     && er.Handler === handler);
             });
@@ -72,11 +73,11 @@ export default abstract class EventableBase implements IEventable {
         } else {
             // handlerが指定されないとき
             const eRefs: EventReference[] = [];
-            _.each(this.eventHandlers, (er) => {
+            _.each(this.eventHandlers, (er): void => {
                 if (er.Name === name)
                     eRefs.push(er);
             });
-            _.each(eRefs, (eRef) => {
+            _.each(eRefs, (eRef): void => {
                 const idx = this.eventHandlers.indexOf(eRef);
                 this.eventHandlers.splice(idx, 1);
                 eRef.Handler = null;
@@ -86,7 +87,7 @@ export default abstract class EventableBase implements IEventable {
     }
 
     public DispatchEvent(name: string, params: any = null): void {
-        _.each(this.eventHandlers, (er: EventReference) => {
+        _.each(this.eventHandlers, (er: EventReference): void => {
             if (er.Name === name) {
                 try {
                     // デフォルトでthisバインド、をやめる。
@@ -96,14 +97,14 @@ export default abstract class EventableBase implements IEventable {
                         ? er.Handler.bind(er.BindTarget)(params)
                         : er.Handler(params);
                 } catch (e) {
-                    console.error(e);
+                    console.error(e); // eslint-disable-line
                 }
             }
         });
     }
 
     public Dispose(): void {
-        _.each(this.eventHandlers, (eRef, index) => {
+        _.each(this.eventHandlers, (eRef, index): void => {
             eRef.Handler = null;
             eRef.Name = null;
             delete this.eventHandlers[index];

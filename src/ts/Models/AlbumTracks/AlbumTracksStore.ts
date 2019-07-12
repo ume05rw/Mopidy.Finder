@@ -15,11 +15,10 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
             Page: page
         });
 
-        if (!response.Succeeded) {
-            console.error(response.Errors);
+        if (!response.Succeeded)
             throw new Error('Unexpected Error on ApiQuery');
-        }
-        var result = response.Result as IPagenatedResult<AlbumTracks>;
+        
+        const result = response.Result as IPagenatedResult<AlbumTracks>;
         result.ResultList = AlbumTracks.CreateArray(result.ResultList);
 
         return result;
@@ -28,11 +27,10 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
     public async PlayAlbumByTrack(track: Track): Promise<AlbumTracks> {
         const response = await this.QueryPost('Player/PlayAlbumByTrack', track);
 
-        if (!response.Succeeded) {
-            console.error(response.Errors);
+        if (!response.Succeeded)
             throw new Error('Unexpected Error on ApiQuery');
-        }
-        var result = AlbumTracks.Create(response.Result as IAlbumTracks);
+
+        const result = AlbumTracks.Create(response.Result as IAlbumTracks);
 
         return result;
     }
@@ -40,10 +38,8 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
     public async PlayAlbumByTlId(tlId: number): Promise<boolean> {
         const response = await this.QueryPost('Player/PlayAlbumByTlId', tlId);
 
-        if (!response.Succeeded) {
-            console.error(response.Errors);
+        if (!response.Succeeded)
             throw new Error('Unexpected Error on ApiQuery');
-        }
 
         return response.Result as boolean;
     }
@@ -51,10 +47,8 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
     public async ClearList(): Promise<boolean> {
         const response = await this.QueryPost('Player/ClearList');
 
-        if (!response.Succeeded) {
-            console.error(response.Errors);
+        if (!response.Succeeded)
             throw new Error('Unexpected Error on ApiQuery');
-        }
 
         return response.Result as boolean;
     }
