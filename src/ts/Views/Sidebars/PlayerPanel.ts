@@ -134,12 +134,14 @@ export default class PlayerPanel extends ViewBase {
         this.volumeData.update({
             from: 0
         });
+        this.player.SetVolume(0);
     }
 
     private OnClickVolumeMax(): void {
         this.volumeData.update({
             from: 100
         });
+        this.player.SetVolume(100);
     }
 
     private OnClickPrevious(): void {

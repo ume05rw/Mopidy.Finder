@@ -10,6 +10,7 @@ import * as jQuery from 'jquery';
 import 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/bootstrap/js/bootstrap';
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
+import 'jquery-slimscroll';
 
 import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
 import * as Enumerable from 'linq';

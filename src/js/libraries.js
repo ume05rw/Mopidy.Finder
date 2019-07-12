@@ -19,6 +19,7 @@ import InfiniteLoading from 'vue-infinite-loading';
 import * as Mopidy from 'mopidy';
 
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
+import 'jquery-slimscroll';
 
 window.__globals = {
     'jquery': jQuery,

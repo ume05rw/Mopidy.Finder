@@ -50,6 +50,7 @@
     <None Remove="tests\Models\Entities\Track.test.ts" />
     <None Remove="types\adminlte\index.d.ts" />
     <None Remove="types\ion-range-slider\index.d.ts" />
+    <None Remove="types\jquery-slimscroll\index.d.ts" />
     <None Remove="types\mopidy\index.d.ts" />
     <None Remove="types\responsive-toolkit\index.d.ts" />
   </ItemGroup>
@@ -125,6 +126,7 @@
     <TypeScriptCompile Include="tests\Models\Entities\Track.test.ts" />
     <TypeScriptCompile Include="types\adminlte\index.d.ts" />
     <TypeScriptCompile Include="types\ion-range-slider\index.d.ts" />
+    <TypeScriptCompile Include="types\jquery-slimscroll\index.d.ts" />
     <TypeScriptCompile Include="types\mopidy\index.d.ts" />
     <TypeScriptCompile Include="types\responsive-toolkit\index.d.ts" />
   </ItemGroup>

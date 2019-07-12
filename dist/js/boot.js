@@ -125,6 +125,13 @@ define('admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider', ["exports"], func
     exports.default = {};
 });
 
+// ダミー: jquery-slimscroll
+define('jquery-slimscroll', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
+});
+
 // ダミー: vue-slider-component/theme/antd.css
 define('vue-slider-component/theme/antd.css', ["exports"], function (exports) {
     "use strict";
