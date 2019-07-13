@@ -4,7 +4,7 @@ import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Artist from '../../../Models/Artists/Artist';
 import { default as ArtistStore, IPagenateQueryArgs } from '../../../Models/Artists/ArtistStore';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
-import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
+import Filterbox from '../../Shared/Filterbox';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
 import SelectionList from '../../Shared/SelectionList';
@@ -15,19 +15,10 @@ import SelectionList from '../../Shared/SelectionList';
         <div class="card-header with-border bg-info">
             <h3 class="card-title">Artists</h3>
             <div class="card-tools form-row">
-                <input class="form-control form-control-navbar form-control-sm text-search animated bounceOut"
-                    style="z-index: 0;"
-                    type="search"
-                    placeholder="Artist Name"
-                    aria-label="Artist Name"
-                    ref="TextSearch"
-                    @input="OnInputSearchText"/>
-                <button
-                    class="btn btn-tool d-inline"
-                    style="z-index: 1;"
-                    ref="ButtonCollaplse"
-                    @click="OnClickSearch" >
-                    <i class="fa fa-search" />
+                <filter-textbox
+                    v-bind:placeHolder="'Artist?'"
+                    ref="Filterbox"
+                    @TextUpdated="Refresh()"/>
                 </button>
                 <button type="button"
                     class="btn btn-tool"
@@ -60,6 +51,7 @@ import SelectionList from '../../Shared/SelectionList';
     </div>
 </div>`,
     components: {
+        'filter-textbox': Filterbox,
         'selection-item': SelectionItem,
         'infinite-loading': InfiniteLoading
     }
@@ -69,19 +61,14 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     protected store: ArtistStore = new ArtistStore();
     protected entities: Artist[] = [];
     private genreIds: number[] = [];
-    private searchTextFilter: DelayedOnceExecuter;
 
-    private get TextSearch(): HTMLInputElement {
-        return this.$refs.TextSearch as HTMLInputElement;
+    private get Filterbox(): Filterbox {
+        return this.$refs.Filterbox as Filterbox;
     }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
-
-        this.searchTextFilter = Delay.DelayedOnce((): void => {
-            this.Refresh();
-        }, 800);
 
         return true;
     }
@@ -107,25 +94,11 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     protected async GetPagenatedList(): Promise<IPagenatedResult<Artist>> {
         const args: IPagenateQueryArgs = {
             GenreIds: this.genreIds,
-            FilterText: this.TextSearch.value,
+            FilterText: this.Filterbox.GetText(),
             Page: this.Page
         };
 
         return await this.store.GetList(args);
-    }
-
-    private OnClickSearch(): void {
-        if (this.TextSearch.classList.contains('bounceOut')) {
-            this.TextSearch.classList.remove('bounceOut');
-            this.TextSearch.classList.add('bounceIn');
-        } else {
-            this.TextSearch.classList.remove('bounceIn');
-            this.TextSearch.classList.add('bounceOut');
-        }
-    }
-
-    private OnInputSearchText(): void {
-        this.searchTextFilter.Exec();
     }
 
     private HasGenre(genreId: number): boolean {

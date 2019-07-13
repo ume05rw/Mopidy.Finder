@@ -5,7 +5,7 @@ import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Playlist from '../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../Models/Playlists/PlaylistStore';
 import Track from '../../../Models/Tracks/Track';
-import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
+import Filterbox from '../../Shared/Filterbox';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionList from '../../Shared/SelectionList';
 import SelectionTrack from '../Selections/SelectionTrack';
@@ -16,20 +16,10 @@ import SelectionTrack from '../Selections/SelectionTrack';
         <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Tracks</h3>
             <div class="card-tools form-row">
-                <input class="form-control form-control-navbar form-control-sm text-search animated bounceOut"
-                    style="z-index: 0;"
-                    type="search"
-                    placeholder="Track Name"
-                    aria-label="Track Name"
-                    ref="TextSearch"
-                    @input="OnInputSearchText"/>
-                <button
-                    class="btn btn-tool d-inline"
-                    style="z-index: 1;"
-                    ref="ButtonCollaplse"
-                    @click="OnClickSearch" >
-                    <i class="fa fa-search" />
-                </button>
+                <filter-textbox
+                    v-bind:placeHolder="'Track?'"
+                    ref="Filterbox"
+                    @TextUpdated="Refresh()"/>
             </div>
         </div>
         <div class="card-body list-scrollable">
@@ -48,6 +38,7 @@ import SelectionTrack from '../Selections/SelectionTrack';
     </div>
 </div>`,
     components: {
+        'filter-textbox': Filterbox,
         'selection-track': SelectionTrack,
         'infinite-loading': InfiniteLoading
     }
@@ -59,19 +50,14 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Track[] = [];
     private playlist: Playlist = null;
-    private searchTextFilter: DelayedOnceExecuter;
 
-    private get TextSearch(): HTMLInputElement {
-        return this.$refs.TextSearch as HTMLInputElement;
+    private get Filterbox(): Filterbox {
+        return this.$refs.Filterbox as Filterbox;
     }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = false;
         await super.Initialize();
-
-        this.searchTextFilter = Delay.DelayedOnce((): void => {
-            this.Refresh();
-        }, 800);
 
         return true;
     }
@@ -126,7 +112,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         }
 
         let entities = Libraries.Enumerable.from(this.playlist.Tracks);
-        const filterText = (this.TextSearch.value || '').toLowerCase();
+        const filterText = this.Filterbox.GetText().toLowerCase();
         if (0 < filterText.length)
             entities = entities
                 .where((e): boolean => 0 <= e.LowerName.indexOf(filterText));
@@ -145,19 +131,5 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         };
 
         return result;
-    }
-
-    private OnClickSearch(): void {
-        if (this.TextSearch.classList.contains('bounceOut')) {
-            this.TextSearch.classList.remove('bounceOut');
-            this.TextSearch.classList.add('bounceIn');
-        } else {
-            this.TextSearch.classList.remove('bounceIn');
-            this.TextSearch.classList.add('bounceOut');
-        }
-    }
-
-    private OnInputSearchText(): void {
-        this.searchTextFilter.Exec();
     }
 }

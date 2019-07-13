@@ -1070,6 +1070,132 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
     }());
     exports.default = Delay;
 });
+define("Views/Shared/Filterbox", ["require", "exports", "Utils/Delay", "vue-class-component", "Views/Bases/ViewBase", "vue-property-decorator"], function (require, exports, Delay_1, vue_class_component_1, ViewBase_1, vue_property_decorator_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.FilterboxEvents = {
+        TextUpdated: 'TextUpdated',
+        AnimationEnd: 'animationend'
+    };
+    var Filterbox = /** @class */ (function (_super) {
+        __extends(Filterbox, _super);
+        function Filterbox() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Filterbox_1 = Filterbox;
+        Object.defineProperty(Filterbox.prototype, "ButtonShow", {
+            get: function () {
+                return this.$refs.ButtonShow;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Filterbox.prototype, "InputText", {
+            get: function () {
+                return this.$refs.InputText;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Filterbox.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            this.InputText.addEventListener(exports.FilterboxEvents.AnimationEnd, function () {
+                                _this.PostAnimated(_this.InputText);
+                                if (_this.InputText.classList.contains(Filterbox_1.Classes.DisplayInline))
+                                    _this.InputText.focus();
+                                if (_this.InputText.classList.contains(Filterbox_1.Classes.DisplayNone))
+                                    _this.ShowElement(_this.ButtonShow);
+                            });
+                            this.ButtonShow.addEventListener(exports.FilterboxEvents.AnimationEnd, function () {
+                                _this.PostAnimated(_this.ButtonShow);
+                                if (_this.ButtonShow.classList.contains(Filterbox_1.Classes.DisplayNone))
+                                    _this.ShowElement(_this.InputText);
+                            });
+                            this.lazyUpdater = Delay_1.default.DelayedOnce(function () {
+                                _this.$emit('TextUpdated');
+                            }, 800);
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Filterbox.prototype.PostAnimated = function (elem) {
+            elem.classList.remove(Filterbox_1.Classes.Animated);
+            elem.classList.remove(Filterbox_1.Classes.Speed);
+            if (elem.classList.contains(Filterbox_1.Classes.In)) {
+                // 表示化
+                elem.classList.remove(Filterbox_1.Classes.In);
+            }
+            else if (elem.classList.contains(Filterbox_1.Classes.Out)) {
+                // 非表示化
+                elem.classList.remove(Filterbox_1.Classes.Out);
+                elem.classList.remove(Filterbox_1.Classes.DisplayInline);
+                elem.classList.add(Filterbox_1.Classes.DisplayNone);
+            }
+        };
+        Filterbox.prototype.OnClickShow = function () {
+            this.Show();
+        };
+        Filterbox.prototype.OnClickClear = function () {
+            this.InputText.value = '';
+            this.Hide();
+        };
+        Filterbox.prototype.OnInput = function () {
+            this.lazyUpdater.Exec();
+        };
+        Filterbox.prototype.OnBlur = function () {
+            if (!this.InputText.value || this.InputText.value.length <= 0)
+                this.Hide();
+        };
+        Filterbox.prototype.ShowElement = function (elem) {
+            elem.classList.remove(Filterbox_1.Classes.DisplayNone);
+            elem.classList.add(Filterbox_1.Classes.DisplayInline);
+            elem.classList.add(Filterbox_1.Classes.In);
+            elem.classList.add(Filterbox_1.Classes.Animated);
+            elem.classList.add(Filterbox_1.Classes.Speed);
+        };
+        Filterbox.prototype.HideElement = function (elem) {
+            elem.classList.add(Filterbox_1.Classes.Out);
+            elem.classList.add(Filterbox_1.Classes.Animated);
+            elem.classList.add(Filterbox_1.Classes.Speed);
+        };
+        Filterbox.prototype.Show = function () {
+            this.HideElement(this.ButtonShow);
+        };
+        Filterbox.prototype.Hide = function () {
+            this.HideElement(this.InputText);
+        };
+        Filterbox.prototype.GetText = function () {
+            return this.InputText.value;
+        };
+        var Filterbox_1;
+        Filterbox.Classes = {
+            DisplayInline: 'd-inline',
+            DisplayNone: 'd-none',
+            Animated: 'animated',
+            In: 'fadeInUp',
+            Out: 'fadeOutDown',
+            Speed: 'faster'
+        };
+        __decorate([
+            vue_property_decorator_1.Prop(),
+            __metadata("design:type", String)
+        ], Filterbox.prototype, "placeHolder", void 0);
+        Filterbox = Filterbox_1 = __decorate([
+            vue_class_component_1.default({
+                template: "<div class=\"form-inline\">\n    <input class=\"form-control form-control-navbar form-control-sm text-filter d-none\"\n        type=\"search\"\n        v-bind:placeholder=\"placeHolder\"\n        v-bind:aria-label=\"placeHolder\"\n        ref=\"InputText\"\n        @input=\"OnInput\"\n        @blur=\"OnBlur\"/>\n    <button\n        class=\"btn btn-tool d-inline\"\n        ref=\"ButtonShow\"\n        @click=\"OnClickShow\" >\n        <i class=\"fa fa-search\" />\n    </button>\n</div>"
+            })
+        ], Filterbox);
+        return Filterbox;
+    }(ViewBase_1.default));
+    exports.default = Filterbox;
+});
 define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1081,7 +1207,7 @@ define("Views/Events/AdminLteEvents", ["require", "exports"], function (require,
         Removed: 'removed.lte.widget'
     };
 });
-define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Shared/SelectionEvents", "Utils/Exception"], function (require, exports, AdminLte, _, Libraries_2, ViewBase_1, AdminLteEvents_1, SelectionEvents_1, Exception_2) {
+define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Shared/SelectionEvents", "Utils/Exception"], function (require, exports, AdminLte, _, Libraries_2, ViewBase_2, AdminLteEvents_1, SelectionEvents_1, Exception_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionList = /** @class */ (function (_super) {
@@ -1220,10 +1346,10 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
             }
         };
         return SelectionList;
-    }(ViewBase_1.default));
+    }(ViewBase_2.default));
     exports.default = SelectionList;
 });
-define("Views/Finders/Selections/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries"], function (require, exports, vue_class_component_1, vue_property_decorator_1, ViewBase_2, AlbumTracks_2, Libraries_3) {
+define("Views/Finders/Selections/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries"], function (require, exports, vue_class_component_2, vue_property_decorator_2, ViewBase_3, AlbumTracks_2, Libraries_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumEvents = {
@@ -1258,19 +1384,19 @@ define("Views/Finders/Selections/SelectionAlbumTracks", ["require", "exports", "
             this.$emit(exports.SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
         };
         __decorate([
-            vue_property_decorator_1.Prop(),
+            vue_property_decorator_2.Prop(),
             __metadata("design:type", AlbumTracks_2.default)
         ], SelectionAlbumTracks.prototype, "entity", void 0);
         SelectionAlbumTracks = __decorate([
-            vue_class_component_1.default({
+            vue_class_component_2.default({
                 template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                        class=\"btn btn-tool\"\n                        @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\"\n                            v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\">{{ track.Name }}</td>\n                            <td class=\"tracklength\">{{ track.GetTimeString() }}</td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
-    }(ViewBase_2.default));
+    }(ViewBase_3.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Delay", "Utils/Exception", "Views/Shared/SelectionList", "Views/Finders/Selections/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_2, vue_infinite_loading_1, Libraries_4, AlbumTracksStore_1, Delay_1, Exception_3, SelectionList_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Selections/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_3, vue_infinite_loading_1, Libraries_4, AlbumTracksStore_1, Exception_3, Filterbox_2, SelectionList_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumList = /** @class */ (function (_super) {
@@ -1284,16 +1410,15 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
             _this.artistIds = [];
             return _this;
         }
-        Object.defineProperty(AlbumList.prototype, "TextSearch", {
+        Object.defineProperty(AlbumList.prototype, "Filterbox", {
             get: function () {
-                return this.$refs.TextSearch;
+                return this.$refs.Filterbox;
             },
             enumerable: true,
             configurable: true
         });
         AlbumList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1301,9 +1426,6 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.searchTextFilter = Delay_1.default.DelayedOnce(function () {
-                                _this.Refresh();
-                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -1331,7 +1453,7 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
                             args = {
                                 GenreIds: this.genreIds,
                                 ArtistIds: this.artistIds,
-                                FilterText: this.TextSearch.value,
+                                FilterText: this.Filterbox.GetText(),
                                 Page: this.Page
                             };
                             return [4 /*yield*/, this.store.GetList(args)];
@@ -1339,19 +1461,6 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
                     }
                 });
             });
-        };
-        AlbumList.prototype.OnInputSearchText = function () {
-            this.searchTextFilter.Exec();
-        };
-        AlbumList.prototype.OnClickSearch = function () {
-            if (this.TextSearch.classList.contains('bounceOut')) {
-                this.TextSearch.classList.remove('bounceOut');
-                this.TextSearch.classList.add('bounceIn');
-            }
-            else {
-                this.TextSearch.classList.remove('bounceIn');
-                this.TextSearch.classList.add('bounceOut');
-            }
         };
         AlbumList.prototype.OnAlbumTracksSelected = function (args) {
             return __awaiter(this, void 0, void 0, function () {
@@ -1450,9 +1559,10 @@ define("Views/Finders/Lists/AlbumList", ["require", "exports", "lodash", "vue-cl
             }
         };
         AlbumList = __decorate([
-            vue_class_component_2.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"Album Name\"\n                    aria-label=\"Album Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+            vue_class_component_3.default({
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
+                    'filter-textbox': Filterbox_2.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
                     'infinite-loading': vue_infinite_loading_1.default
                 }
@@ -1491,7 +1601,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
     }(StoreBase_2.default));
     exports.default = ArtistStore;
 });
-define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_3, vue_property_decorator_2, ViewBase_3) {
+define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_4, vue_property_decorator_3, ViewBase_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionItemEvents = {
@@ -1544,19 +1654,19 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
         var SelectionItem_1;
         SelectionItem.SelectedColor = 'bg-gray';
         __decorate([
-            vue_property_decorator_2.Prop(),
+            vue_property_decorator_3.Prop(),
             __metadata("design:type", Object)
         ], SelectionItem.prototype, "entity", void 0);
         SelectionItem = SelectionItem_1 = __decorate([
-            vue_class_component_3.default({
+            vue_class_component_4.default({
                 template: "<li class=\"nav-item\"\n                   ref=\"Li\" >\n    <a href=\"javascript:void(0)\" class=\"d-inline-block w-100 text-nowrap text-truncate\"\n       @click=\"OnClick\" >\n        {{ entity.Name }}\n    </a>\n</li>"
             })
         ], SelectionItem);
         return SelectionItem;
-    }(ViewBase_3.default));
+    }(ViewBase_4.default));
     exports.default = SelectionItem;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Utils/Delay", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, vue_class_component_4, vue_infinite_loading_2, ArtistStore_1, Delay_2, SelectionItem_2, SelectionList_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Shared/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, vue_class_component_5, vue_infinite_loading_2, ArtistStore_1, Filterbox_3, SelectionItem_2, SelectionList_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistList = /** @class */ (function (_super) {
@@ -1568,16 +1678,15 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             _this.genreIds = [];
             return _this;
         }
-        Object.defineProperty(ArtistList.prototype, "TextSearch", {
+        Object.defineProperty(ArtistList.prototype, "Filterbox", {
             get: function () {
-                return this.$refs.TextSearch;
+                return this.$refs.Filterbox;
             },
             enumerable: true,
             configurable: true
         });
         ArtistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1585,9 +1694,6 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.searchTextFilter = Delay_2.default.DelayedOnce(function () {
-                                _this.Refresh();
-                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -1623,7 +1729,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                         case 0:
                             args = {
                                 GenreIds: this.genreIds,
-                                FilterText: this.TextSearch.value,
+                                FilterText: this.Filterbox.GetText(),
                                 Page: this.Page
                             };
                             return [4 /*yield*/, this.store.GetList(args)];
@@ -1631,19 +1737,6 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                     }
                 });
             });
-        };
-        ArtistList.prototype.OnClickSearch = function () {
-            if (this.TextSearch.classList.contains('bounceOut')) {
-                this.TextSearch.classList.remove('bounceOut');
-                this.TextSearch.classList.add('bounceIn');
-            }
-            else {
-                this.TextSearch.classList.remove('bounceIn');
-                this.TextSearch.classList.add('bounceOut');
-            }
-        };
-        ArtistList.prototype.OnInputSearchText = function () {
-            this.searchTextFilter.Exec();
         };
         ArtistList.prototype.HasGenre = function (genreId) {
             return (0 <= _.indexOf(this.genreIds, genreId));
@@ -1667,9 +1760,10 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             }
         };
         ArtistList = __decorate([
-            vue_class_component_4.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"Artist Name\"\n                    aria-label=\"Artist Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    style=\"z-index: 1;\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+            vue_class_component_5.default({
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    style=\"z-index: 1;\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
+                    'filter-textbox': Filterbox_3.default,
                     'selection-item': SelectionItem_2.default,
                     'infinite-loading': vue_infinite_loading_2.default
                 }
@@ -1749,7 +1843,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Utils/Delay", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_5, vue_infinite_loading_3, GenreStore_1, Delay_3, SelectionItem_3, SelectionList_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Views/Shared/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_6, vue_infinite_loading_3, GenreStore_1, Filterbox_4, SelectionItem_3, SelectionList_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -1760,16 +1854,15 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             _this.entities = [];
             return _this;
         }
-        Object.defineProperty(GenreList.prototype, "TextSearch", {
+        Object.defineProperty(GenreList.prototype, "Filterbox", {
             get: function () {
-                return this.$refs.TextSearch;
+                return this.$refs.Filterbox;
             },
             enumerable: true,
             configurable: true
         });
         GenreList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1777,9 +1870,6 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.searchTextFilter = Delay_3.default.DelayedOnce(function () {
-                                _this.Refresh();
-                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -1814,7 +1904,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                     switch (_a.label) {
                         case 0:
                             args = {
-                                FilterText: this.TextSearch.value,
+                                FilterText: this.Filterbox.GetText(),
                                 Page: this.Page
                             };
                             return [4 /*yield*/, this.store.GetList(args)];
@@ -1823,23 +1913,11 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                 });
             });
         };
-        GenreList.prototype.OnClickSearch = function () {
-            if (this.TextSearch.classList.contains('bounceOut')) {
-                this.TextSearch.classList.remove('bounceOut');
-                this.TextSearch.classList.add('bounceIn');
-            }
-            else {
-                this.TextSearch.classList.remove('bounceIn');
-                this.TextSearch.classList.add('bounceOut');
-            }
-        };
-        GenreList.prototype.OnInputSearchText = function () {
-            this.searchTextFilter.Exec();
-        };
         GenreList = __decorate([
-            vue_class_component_5.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"Genre Name\"\n                    aria-label=\"Genre Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    style=\"z-index: 1;\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+            vue_class_component_6.default({
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    style=\"z-index: 1;\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
+                    'filter-textbox': Filterbox_4.default,
                     'selection-item': SelectionItem_3.default,
                     'infinite-loading': vue_infinite_loading_3.default
                 }
@@ -1849,7 +1927,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionList_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Lists/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_6, ViewBase_4, AlbumList_1, ArtistList_1, GenreList_1) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Lists/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_7, ViewBase_5, AlbumList_1, ArtistList_1, GenreList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -1905,7 +1983,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
             this.AlbumList.RemoveFilterAllArtists();
         };
         Finder = __decorate([
-            vue_class_component_6.default({
+            vue_class_component_7.default({
                 template: "<section class=\"content h-100 tab-pane fade show active\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"finder-tab\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\" />\n    </div>\n</section>",
                 components: {
                     'genre-list': GenreList_1.default,
@@ -1915,10 +1993,10 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
             })
         ], Finder);
         return Finder;
-    }(ViewBase_4.default));
+    }(ViewBase_5.default));
     exports.default = Finder;
 });
-define("Views/HeaderBars/HeaderBar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component"], function (require, exports, ViewBase_5, vue_class_component_7) {
+define("Views/HeaderBars/HeaderBar", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component"], function (require, exports, ViewBase_6, vue_class_component_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var HeaderBar = /** @class */ (function (_super) {
@@ -1932,12 +2010,12 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "Views/Bases/ViewBas
             this.title = title;
         };
         HeaderBar = __decorate([
-            vue_class_component_7.default({
+            vue_class_component_8.default({
                 template: "<nav class=\"main-header navbar navbar-expand border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\" data-widget=\"pushmenu\" href=\"#\">\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n        <li class=\"nav-item\">\n            <h3>{{ title }}</h3>\n        </li>\n    </ul>\n</nav>"
             })
         ], HeaderBar);
         return HeaderBar;
-    }(ViewBase_5.default));
+    }(ViewBase_6.default));
     exports.default = HeaderBar;
 });
 define("Models/Mopidies/IRef", ["require", "exports"], function (require, exports) {
@@ -2230,7 +2308,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
     }(JsonRpcQueryableBase_1.default));
     exports.default = PlaylistStore;
 });
-define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "Libraries", "vue-class-component", "vue-infinite-loading", "Models/Playlists/PlaylistStore", "Utils/Delay", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, Libraries_6, vue_class_component_8, vue_infinite_loading_4, PlaylistStore_1, Delay_4, SelectionItem_4, SelectionList_4) {
+define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "Libraries", "vue-class-component", "vue-infinite-loading", "Models/Playlists/PlaylistStore", "Views/Shared/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, Libraries_6, vue_class_component_9, vue_infinite_loading_4, PlaylistStore_1, Filterbox_5, SelectionItem_4, SelectionList_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlaylistList = /** @class */ (function (_super) {
@@ -2243,6 +2321,13 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
             return _this;
         }
         PlaylistList_1 = PlaylistList;
+        Object.defineProperty(PlaylistList.prototype, "Filterbox", {
+            get: function () {
+                return this.$refs.Filterbox;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(PlaylistList.prototype, "Items", {
             get: function () {
                 return this.$refs.Items;
@@ -2250,16 +2335,8 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(PlaylistList.prototype, "TextSearch", {
-            get: function () {
-                return this.$refs.TextSearch;
-            },
-            enumerable: true,
-            configurable: true
-        });
         PlaylistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -2267,9 +2344,6 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.searchTextFilter = Delay_4.default.DelayedOnce(function () {
-                                _this.Refresh();
-                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -2313,7 +2387,7 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
                             _b.label = 2;
                         case 2:
                             entities = Libraries_6.default.Enumerable.from(this.allEntities);
-                            filterText = (this.TextSearch.value || '').toLowerCase();
+                            filterText = this.Filterbox.GetText().toLowerCase();
                             if (0 < filterText.length)
                                 entities = entities
                                     .where(function (e) { return 0 <= e.Name.toLowerCase().indexOf(filterText); });
@@ -2333,25 +2407,13 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
                 });
             });
         };
-        PlaylistList.prototype.OnClickSearch = function () {
-            if (this.TextSearch.classList.contains('bounceOut')) {
-                this.TextSearch.classList.remove('bounceOut');
-                this.TextSearch.classList.add('bounceIn');
-            }
-            else {
-                this.TextSearch.classList.remove('bounceIn');
-                this.TextSearch.classList.add('bounceOut');
-            }
-        };
-        PlaylistList.prototype.OnInputSearchText = function () {
-            this.searchTextFilter.Exec();
-        };
         var PlaylistList_1;
         PlaylistList.PageLength = 30;
         PlaylistList = PlaylistList_1 = __decorate([
-            vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"List Name\"\n                    aria-label=\"List Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+            vue_class_component_9.default({
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
+                    'filter-textbox': Filterbox_5.default,
                     'selection-item': SelectionItem_4.default,
                     'infinite-loading': vue_infinite_loading_4.default
                 }
@@ -2361,7 +2423,7 @@ define("Views/Playlists/Lists/PlaylistList", ["require", "exports", "lodash", "L
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionEvents"], function (require, exports, vue_class_component_9, vue_property_decorator_3, Track_2, ViewBase_6, SelectionEvents_2) {
+define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionEvents"], function (require, exports, vue_class_component_10, vue_property_decorator_4, Track_2, ViewBase_7, SelectionEvents_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionTrack = /** @class */ (function (_super) {
@@ -2377,19 +2439,19 @@ define("Views/Playlists/Selections/SelectionTrack", ["require", "exports", "vue-
             this.$emit(SelectionEvents_2.default.SelectionChanged, args);
         };
         __decorate([
-            vue_property_decorator_3.Prop(),
+            vue_property_decorator_4.Prop(),
             __metadata("design:type", Track_2.default)
         ], SelectionTrack.prototype, "entity", void 0);
         SelectionTrack = __decorate([
-            vue_class_component_9.default({
+            vue_class_component_10.default({
                 template: "<li class=\"item w-100\"\n                    ref=\"Li\" >\n    <a href=\"javascript:void(0)\" class=\"w-100\"\n        @click=\"OnClick\">\n        <div class=\"product-img\">\n            <img v-bind:src=\"((entity.Album) ? entity.Album.GetImageFullUri() : '')\" alt=\"ALbum Image\">\n        </div>\n        <div class=\"product-info\">\n            <span class=\"product-title\">\n                {{ entity.Name }}\n                <span class=\"pull-right\">{{ entity.GetTimeString() }}</span>\n            </span>\n            <span class=\"product-description\">\n                {{ entity.GetAlbumName() }} {{ entity.GetFormattedYearString() }} {{ ' : ' + entity.GetFormattedArtistName() }}\n            </span>\n        </div>\n    </a>\n</li>"
             })
         ], SelectionTrack);
         return SelectionTrack;
-    }(ViewBase_6.default));
+    }(ViewBase_7.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Models/Tracks/Track", "Utils/Delay", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack"], function (require, exports, vue_class_component_10, vue_infinite_loading_5, Libraries_7, PlaylistStore_2, Track_3, Delay_5, SelectionList_5, SelectionTrack_1) {
+define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Models/Tracks/Track", "Views/Shared/Filterbox", "Views/Shared/SelectionList", "Views/Playlists/Selections/SelectionTrack"], function (require, exports, vue_class_component_11, vue_infinite_loading_5, Libraries_7, PlaylistStore_2, Track_3, Filterbox_6, SelectionList_5, SelectionTrack_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackList = /** @class */ (function (_super) {
@@ -2402,16 +2464,15 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
             return _this;
         }
         TrackList_1 = TrackList;
-        Object.defineProperty(TrackList.prototype, "TextSearch", {
+        Object.defineProperty(TrackList.prototype, "Filterbox", {
             get: function () {
-                return this.$refs.TextSearch;
+                return this.$refs.Filterbox;
             },
             enumerable: true,
             configurable: true
         });
         TrackList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -2419,9 +2480,6 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.searchTextFilter = Delay_5.default.DelayedOnce(function () {
-                                _this.Refresh();
-                            }, 800);
                             return [2 /*return*/, true];
                     }
                 });
@@ -2485,7 +2543,7 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
                             _a.label = 2;
                         case 2:
                             entities = Libraries_7.default.Enumerable.from(this.playlist.Tracks);
-                            filterText = (this.TextSearch.value || '').toLowerCase();
+                            filterText = this.Filterbox.GetText().toLowerCase();
                             if (0 < filterText.length)
                                 entities = entities
                                     .where(function (e) { return 0 <= e.LowerName.indexOf(filterText); });
@@ -2505,25 +2563,13 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
                 });
             });
         };
-        TrackList.prototype.OnClickSearch = function () {
-            if (this.TextSearch.classList.contains('bounceOut')) {
-                this.TextSearch.classList.remove('bounceOut');
-                this.TextSearch.classList.add('bounceIn');
-            }
-            else {
-                this.TextSearch.classList.remove('bounceIn');
-                this.TextSearch.classList.add('bounceOut');
-            }
-        };
-        TrackList.prototype.OnInputSearchText = function () {
-            this.searchTextFilter.Exec();
-        };
         var TrackList_1;
         TrackList.PageLength = 20;
         TrackList = TrackList_1 = __decorate([
-            vue_class_component_10.default({
-                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n            <div class=\"card-tools form-row\">\n                <input class=\"form-control form-control-navbar form-control-sm text-search animated bounceOut\"\n                    style=\"z-index: 0;\"\n                    type=\"search\"\n                    placeholder=\"Track Name\"\n                    aria-label=\"Track Name\"\n                    ref=\"TextSearch\"\n                    @input=\"OnInputSearchText\"/>\n                <button\n                    class=\"btn btn-tool d-inline\"\n                    style=\"z-index: 1;\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickSearch\" >\n                    <i class=\"fa fa-search\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+            vue_class_component_11.default({
+                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
+                    'filter-textbox': Filterbox_6.default,
                     'selection-track': SelectionTrack_1.default,
                     'infinite-loading': vue_infinite_loading_5.default
                 }
@@ -2533,7 +2579,7 @@ define("Views/Playlists/Lists/TrackList", ["require", "exports", "vue-class-comp
     }(SelectionList_5.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/PlaylistList", "Views/Playlists/Lists/TrackList"], function (require, exports, vue_class_component_11, ViewBase_7, PlaylistList_2, TrackList_2) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/PlaylistList", "Views/Playlists/Lists/TrackList"], function (require, exports, vue_class_component_12, ViewBase_8, PlaylistList_2, TrackList_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Playlists = /** @class */ (function (_super) {
@@ -2564,7 +2610,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             }
         };
         Playlists = __decorate([
-            vue_class_component_11.default({
+            vue_class_component_12.default({
                 template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-playlists\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\" />\n        <track-list\n            ref=\"TrackList\" />\n    </div>\n</section>",
                 components: {
                     'playlist-list': PlaylistList_2.default,
@@ -2573,10 +2619,10 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             })
         ], Playlists);
         return Playlists;
-    }(ViewBase_7.default));
+    }(ViewBase_8.default));
     exports.default = Playlists;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_12, ViewBase_8) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_13, ViewBase_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Settings = /** @class */ (function (_super) {
@@ -2585,13 +2631,13 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             return _super !== null && _super.apply(this, arguments) || this;
         }
         Settings = __decorate([
-            vue_class_component_12.default({
+            vue_class_component_13.default({
                 template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n</section>",
                 components: {}
             })
         ], Settings);
         return Settings;
-    }(ViewBase_8.default));
+    }(ViewBase_9.default));
     exports.default = Settings;
 });
 define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase"], function (require, exports, JsonRpcQueryableBase_2) {
@@ -3079,7 +3125,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_3.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_13, Libraries_8, Monitor_2, Player_1, ViewBase_9) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_14, Libraries_8, Monitor_2, Player_1, ViewBase_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlayerPanel = /** @class */ (function (_super) {
@@ -3187,15 +3233,15 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
         var PlayerPanel_1;
         PlayerPanel.ClassDisabled = 'disabled';
         PlayerPanel = PlayerPanel_1 = __decorate([
-            vue_class_component_13.default({
+            vue_class_component_14.default({
                 template: "<div class=\"card siderbar-control pb-10\">\n    <div class=\"card-body\">\n        <img v-bind:src=\"monitor.ImageFullUri\" class=\"albumart\" />\n        <h6 class=\"card-title\">{{ monitor.TrackName }}</h6>\n        <span>{{ monitor.ArtistName }}{{ (monitor.Year) ? '(' + monitor.Year + ')' : '' }}</span>\n        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickPrevious\">\n                <i class=\"fa fa-fast-backward\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickPlayPause\">\n                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickNext\">\n                <i class=\"fa fa-fast-forward\" />\n            </button>\n        </div>\n\n        <div class=\"btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-secondary disabled\"\n                ref=\"ButtonShuffle\"\n                @click=\"OnClickShuffle\">\n                <i class=\"fa fa fa-random\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary disabled\"\n                ref=\"ButtonRepeat\"\n                @click=\"OnClickRepeat\" >\n                <i class=\"fa fa-retweet\" />\n            </button>\n        </div>\n\n        <div class=\"row volume-box w-100 mt-2\">\n            <div class=\"col-1 volume-button volume-min\">\n                <a @click=\"OnClickVolumeMin\">\n                    <i class=\"fa fa-volume-off\" />\n                </a>\n            </div>\n            <div class=\"col-10\">\n                <input type=\"text\"\n                    data-type=\"single\"\n                    data-min=\"0\"\n                    data-max=\"100\"\n                    data-from=\"100\"\n                    data-grid=\"true\"\n                    data-hide-min-max=\"true\"\n                    ref=\"Slider\" />\n            </div>\n            <div class=\"col-1 volume-button volume-max\">\n                <a @click=\"OnClickVolumeMax\">\n                    <i class=\"fa fa-volume-up\" />\n                </a>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], PlayerPanel);
         return PlayerPanel;
-    }(ViewBase_9.default));
+    }(ViewBase_10.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel", "Libraries"], function (require, exports, vue_class_component_14, ViewBase_10, PlayerPanel_2, Libraries_9) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel", "Libraries"], function (require, exports, vue_class_component_15, ViewBase_11, PlayerPanel_2, Libraries_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -3247,7 +3293,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
             this.$emit(exports.SidebarEvents.ContentChanged, args);
         };
         Sidebar = __decorate([
-            vue_class_component_14.default({
+            vue_class_component_15.default({
                 template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SidebarSection\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\"\n                        @click=\"OnClickFinder\" >\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\"\n                        @click=\"OnClickPlaylists\" >\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\"\n                        @click=\"OnClickSettings\" >\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <player-panel ref=\"PlayerPanel\" />\n            </div>\n        </div>\n    </section>\n</aside>",
                 components: {
                     'player-panel': PlayerPanel_2.default
@@ -3255,10 +3301,10 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
             })
         ], Sidebar);
         return Sidebar;
-    }(ViewBase_10.default));
+    }(ViewBase_11.default));
     exports.default = Sidebar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_15, ViewBase_11, Finder_1, HeaderBar_1, Playlists_1, Settings_1, Sidebar_1) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_16, ViewBase_12, Finder_1, HeaderBar_1, Playlists_1, Settings_1, Sidebar_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -3277,7 +3323,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
             this.HeaderBar.SetTitle(args.Name);
         };
         RootView = __decorate([
-            vue_class_component_15.default({
+            vue_class_component_16.default({
                 template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar\n        @ContentChanged=\"OnContentChanged\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder ref=\"Finder\" />\n        <playlists ref=\"Playlists\" />\n        <settings ref=\"Settings\" />\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
@@ -3289,7 +3335,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
             })
         ], RootView);
         return RootView;
-    }(ViewBase_11.default));
+    }(ViewBase_12.default));
     exports.default = RootView;
 });
 define("Controllers/RootContoller", ["require", "exports", "Views/RootView"], function (require, exports, RootView_1) {

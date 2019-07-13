@@ -32,8 +32,8 @@
     padding-left: 5px;
     padding-right: 5px;
 }
-.card-tools .text-search {
-    max-width: 120px;
+.card-tools .text-filter {
+    width: 120px;
 }
 
 /**

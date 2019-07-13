@@ -3,7 +3,7 @@ import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Genre from '../../../Models/Genres/Genre';
 import { default as GenreStore, IPagenateQueryArgs } from '../../../Models/Genres/GenreStore';
-import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
+import Filterbox from '../../Shared/Filterbox';
 import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
 import SelectionItem from '../../Shared/SelectionItem';
 import SelectionList from '../../Shared/SelectionList';
@@ -14,20 +14,10 @@ import SelectionList from '../../Shared/SelectionList';
         <div class="card-header with-border bg-green">
             <h3 class="card-title">Genres</h3>
             <div class="card-tools form-row">
-                <input class="form-control form-control-navbar form-control-sm text-search animated bounceOut"
-                    style="z-index: 0;"
-                    type="search"
-                    placeholder="Genre Name"
-                    aria-label="Genre Name"
-                    ref="TextSearch"
-                    @input="OnInputSearchText"/>
-                <button
-                    class="btn btn-tool d-inline"
-                    style="z-index: 1;"
-                    ref="ButtonCollaplse"
-                    @click="OnClickSearch" >
-                    <i class="fa fa-search" />
-                </button>
+                <filter-textbox
+                    v-bind:placeHolder="'Genre?'"
+                    ref="Filterbox"
+                    @TextUpdated="Refresh()"/>
                 <button type="button"
                     class="btn btn-tool"
                     style="z-index: 1;"
@@ -59,6 +49,7 @@ import SelectionList from '../../Shared/SelectionList';
     </div>
 </div>`,
     components: {
+        'filter-textbox': Filterbox,
         'selection-item': SelectionItem,
         'infinite-loading': InfiniteLoading
     }
@@ -67,19 +58,14 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
 
     protected store: GenreStore = new GenreStore();
     protected entities: Genre[] = [];
-    private searchTextFilter: DelayedOnceExecuter;
 
-    private get TextSearch(): HTMLInputElement {
-        return this.$refs.TextSearch as HTMLInputElement;
+    private get Filterbox(): Filterbox {
+        return this.$refs.Filterbox as Filterbox;
     }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
-
-        this.searchTextFilter = Delay.DelayedOnce((): void => {
-            this.Refresh();
-        }, 800);
 
         return true;
     }
@@ -104,24 +90,10 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
     }
     protected async GetPagenatedList(): Promise<IPagenatedResult<Genre>> {
         const args: IPagenateQueryArgs = {
-            FilterText: this.TextSearch.value,
+            FilterText: this.Filterbox.GetText(),
             Page: this.Page
         };
 
         return await this.store.GetList(args);
-    }
-
-    private OnClickSearch(): void {
-        if (this.TextSearch.classList.contains('bounceOut')) {
-            this.TextSearch.classList.remove('bounceOut');
-            this.TextSearch.classList.add('bounceIn');
-        } else {
-            this.TextSearch.classList.remove('bounceIn');
-            this.TextSearch.classList.add('bounceOut');
-        }
-    }
-
-    private OnInputSearchText(): void {
-        this.searchTextFilter.Exec();
     }
 }

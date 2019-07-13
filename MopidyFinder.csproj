@@ -42,6 +42,7 @@
     <None Remove="src\ts\Views\Playlists\Selections\SelectionTrack.ts" />
     <None Remove="src\ts\Views\RootView.ts" />
     <None Remove="src\ts\Views\Settings\Settings.ts" />
+    <None Remove="src\ts\Views\Shared\Filterbox.ts" />
     <None Remove="src\ts\Views\Shared\SelectionEvents.ts" />
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
     <None Remove="src\ts\Views\Shared\SelectionList.ts" />
@@ -119,6 +120,7 @@
     <TypeScriptCompile Include="src\ts\Views\Playlists\Selections\SelectionTrack.ts" />
     <TypeScriptCompile Include="src\ts\Views\RootView.ts" />
     <TypeScriptCompile Include="src\ts\Views\Settings\Settings.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Shared\Filterbox.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionEvents.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionItem.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionList.ts" />

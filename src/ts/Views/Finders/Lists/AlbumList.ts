@@ -5,8 +5,8 @@ import Libraries from '../../../Libraries';
 import AlbumTracks from '../../../Models/AlbumTracks/AlbumTracks';
 import AlbumTracksStore, { IPagenateQueryArgs } from '../../../Models/AlbumTracks/AlbumTracksStore';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
-import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 import Exception from '../../../Utils/Exception';
+import Filterbox from '../../Shared/Filterbox';
 import SelectionList from '../../Shared/SelectionList';
 import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from '../Selections/SelectionAlbumTracks';
 
@@ -16,20 +16,10 @@ import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from '../Se
         <div class="card-header with-border bg-secondary">
             <h3 class="card-title">Albums</h3>
             <div class="card-tools form-row">
-                <input class="form-control form-control-navbar form-control-sm text-search animated bounceOut"
-                    style="z-index: 0;"
-                    type="search"
-                    placeholder="Album Name"
-                    aria-label="Album Name"
-                    ref="TextSearch"
-                    @input="OnInputSearchText"/>
-                <button
-                    class="btn btn-tool d-inline"
-                    style="z-index: 1;"
-                    ref="ButtonCollaplse"
-                    @click="OnClickSearch" >
-                    <i class="fa fa-search" />
-                </button>
+                <filter-textbox
+                    v-bind:placeHolder="'Album?'"
+                    ref="Filterbox"
+                    @TextUpdated="Refresh()"/>
             </div>
         </div>
         <div class="card-body list-scrollable">
@@ -48,6 +38,7 @@ import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from '../Se
     </div>
 </div>`,
     components: {
+        'filter-textbox': Filterbox,
         'selection-album-tracks': SelectionAlbumTracks,
         'infinite-loading': InfiniteLoading
     }
@@ -60,19 +51,14 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     private isEntitiesRefreshed: boolean = false;
     private genreIds: number[] = [];
     private artistIds: number[] = [];
-    private searchTextFilter: DelayedOnceExecuter;
 
-    private get TextSearch(): HTMLInputElement {
-        return this.$refs.TextSearch as HTMLInputElement;
+    private get Filterbox(): Filterbox {
+        return this.$refs.Filterbox as Filterbox;
     }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = false;
         await super.Initialize();
-
-        this.searchTextFilter = Delay.DelayedOnce((): void => {
-            this.Refresh();
-        }, 800);
 
         return true;
     }
@@ -91,26 +77,11 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         const args: IPagenateQueryArgs = {
             GenreIds: this.genreIds,
             ArtistIds: this.artistIds,
-            FilterText: this.TextSearch.value,
+            FilterText: this.Filterbox.GetText(),
             Page: this.Page
         };
 
         return await this.store.GetList(args);
-    }
-
-
-    private OnInputSearchText(): void {
-        this.searchTextFilter.Exec();
-    }
-
-    private OnClickSearch(): void {
-        if (this.TextSearch.classList.contains('bounceOut')) {
-            this.TextSearch.classList.remove('bounceOut');
-            this.TextSearch.classList.add('bounceIn');
-        } else {
-            this.TextSearch.classList.remove('bounceIn');
-            this.TextSearch.classList.add('bounceOut');
-        }
     }
 
     private async OnAlbumTracksSelected(args: IAlbumTracksSelectedArgs): Promise<boolean> {
