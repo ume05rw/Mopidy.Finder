@@ -726,7 +726,9 @@ define("Models/Albums/Album", ["require", "exports", "Models/Relations/ArtistAlb
             return result;
         };
         Album.prototype.GetImageFullUri = function () {
-            return location.protocol + "//" + location.host + this.ImageUri;
+            return (!this.ImageUri || this.ImageUri == '')
+                ? location.protocol + "//" + location.host + "/img/nullImage.jpg"
+                : location.protocol + "//" + location.host + this.ImageUri;
         };
         return Album;
     }());
@@ -2423,7 +2425,9 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
         });
         Object.defineProperty(Monitor.prototype, "ImageFullUri", {
             get: function () {
-                return location.protocol + "//" + location.host + this._imageUri;
+                return (!this._imageUri || this._imageUri == '')
+                    ? location.protocol + "//" + location.host + "/img/nullImage.jpg"
+                    : location.protocol + "//" + location.host + this._imageUri;
             },
             enumerable: true,
             configurable: true
@@ -3020,7 +3024,7 @@ define("Models/Mopidies/IPlaylist", ["require", "exports"], function (require, e
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Models/Bases/JsonRpcQueryableBase", "Models/Playlists/Playlist"], function (require, exports, Libraries_7, JsonRpcQueryableBase_3, Playlist_1) {
+define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Models/Bases/JsonRpcQueryableBase", "Models/Playlists/Playlist", "Models/Tracks/Track"], function (require, exports, Libraries_7, JsonRpcQueryableBase_3, Playlist_1, Track_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlaylistStore = /** @class */ (function (_super) {
@@ -3048,7 +3052,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
         };
         PlaylistStore.prototype.GetTracksByPlaylist = function (playlist) {
             return __awaiter(this, void 0, void 0, function () {
-                var response, mpPlaylist, trackUris, response2, pairList, tracks, i, track, completedTrack;
+                var response, mpPlaylist, trackUris, response2, pairList, mpTracks, i, track, completedTrack, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
@@ -3057,6 +3061,8 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                         case 1:
                             response = _a.sent();
                             mpPlaylist = response.result;
+                            if (!mpPlaylist.tracks)
+                                return [2 /*return*/, []];
                             trackUris = Libraries_7.default.Enumerable.from(mpPlaylist.tracks)
                                 .select(function (e) { return e.uri; })
                                 .toArray();
@@ -3066,16 +3072,17 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                         case 2:
                             response2 = _a.sent();
                             pairList = response2.result;
-                            tracks = [];
+                            mpTracks = [];
                             for (i = 0; i < mpPlaylist.tracks.length; i++) {
                                 track = mpPlaylist.tracks[i];
                                 if (!pairList[track.uri])
                                     continue;
                                 completedTrack = pairList[track.uri][0];
                                 if (completedTrack)
-                                    tracks.push(completedTrack);
+                                    mpTracks.push(completedTrack);
                             }
-                            return [2 /*return*/, tracks];
+                            result = Track_2.default.CreateArrayFromMopidy(mpTracks);
+                            return [2 /*return*/, result];
                     }
                 });
             });
@@ -3300,7 +3307,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
     }(ViewBase_10.default));
     exports.default = AddModal;
 });
-define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_9, PlaylistStore_1, Filterbox_4, SelectionItem_4, SelectionList_4, SlideupButton_2, AddModal_1) {
+define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_9, PlaylistStore_1, Filterbox_4, SelectionItem_4, SelectionList_4, AddModal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistListEvents = {
@@ -3319,20 +3326,6 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         Object.defineProperty(PlaylistList.prototype, "Filterbox", {
             get: function () {
                 return this.$refs.Filterbox;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PlaylistList.prototype, "ButtonAdd", {
-            get: function () {
-                return this.$refs.ButtonAdd;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(PlaylistList.prototype, "ButtonDelete", {
-            get: function () {
-                return this.$refs.ButtonDelete;
             },
             enumerable: true,
             configurable: true
@@ -3382,22 +3375,11 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
             _super.prototype.OnClickCollapse.call(this);
         };
         PlaylistList.prototype.OnSelectionChanged = function (args) {
-            var _this = this;
             _.each(this.Items, function (si) {
                 if (si.GetEntity() !== args.Entity && si.GetSelected()) {
                     si.SetSelected(false);
                 }
             });
-            if (args.Selected && this.ButtonAdd.GetIsVisible()) {
-                this.ButtonAdd.Hide().then(function () {
-                    _this.ButtonDelete.Show();
-                });
-            }
-            else if (!args.Selected && this.ButtonDelete.GetIsVisible()) {
-                this.ButtonDelete.Hide().then(function () {
-                    _this.ButtonAdd.Show();
-                });
-            }
             _super.prototype.OnSelectionChanged.call(this, args);
         };
         PlaylistList.prototype.GetPagenatedList = function () {
@@ -3434,12 +3416,6 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                 });
             });
         };
-        PlaylistList.prototype.SetListOperation = function (listSelected) {
-            if (listSelected) {
-            }
-            else {
-            }
-        };
         PlaylistList.prototype.OnClickAdd = function () {
             this.AddModal.Show();
         };
@@ -3461,15 +3437,6 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                 });
             });
         };
-        PlaylistList.prototype.OnClickDelete = function () {
-        };
-        PlaylistList.prototype.OnDeleteOrdered = function (playlist) {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    return [2 /*return*/, true];
-                });
-            });
-        };
         var PlaylistList_1;
         PlaylistList.PageLength = 30;
         PlaylistList.Classes = {
@@ -3481,10 +3448,9 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         };
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_14.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <slideup-buton\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-plus-circle\"\n                    ref=\"ButtonAdd\"\n                    @Clicked=\"OnClickAdd\" />\n                <slideup-buton\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-minus-circle\"\n                    ref=\"ButtonDelete\"\n                    @Clicked=\"OnClickDelete\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_4.default,
-                    'slideup-buton': SlideupButton_2.default,
                     'selection-item': SelectionItem_4.default,
                     'infinite-loading': vue_infinite_loading_4.default,
                     'add-modal': AddModal_1.default
@@ -3495,7 +3461,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_15, vue_property_decorator_6, Track_2, ViewBase_11, SelectionList_5) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_15, vue_property_decorator_6, Track_3, ViewBase_11, SelectionList_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionTrack = /** @class */ (function (_super) {
@@ -3512,7 +3478,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "vu
         };
         __decorate([
             vue_property_decorator_6.Prop(),
-            __metadata("design:type", Track_2.default)
+            __metadata("design:type", Track_3.default)
         ], SelectionTrack.prototype, "entity", void 0);
         SelectionTrack = __decorate([
             vue_class_component_15.default({
@@ -3523,7 +3489,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "vu
     }(ViewBase_11.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Models/Tracks/Track", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Playlists/Lists/Tracks/SelectionTrack"], function (require, exports, vue_class_component_16, vue_infinite_loading_5, Libraries_10, PlaylistStore_2, Track_3, Filterbox_5, SelectionList_6, SelectionTrack_1) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Shared/SlideupButton"], function (require, exports, vue_class_component_16, vue_infinite_loading_5, Libraries_10, PlaylistStore_2, Filterbox_5, SelectionList_6, SelectionTrack_1, SlideupButton_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackList = /** @class */ (function (_super) {
@@ -3539,6 +3505,27 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "vue-cla
         Object.defineProperty(TrackList.prototype, "Filterbox", {
             get: function () {
                 return this.$refs.Filterbox;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TrackList.prototype, "EditButton", {
+            get: function () {
+                return this.$refs.EditButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TrackList.prototype, "DeleteButton", {
+            get: function () {
+                return this.$refs.DeleteButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TrackList.prototype, "EndEditButton", {
+            get: function () {
+                return this.$refs.EndEditButton;
             },
             enumerable: true,
             configurable: true
@@ -3572,6 +3559,22 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "vue-cla
                 });
             });
         };
+        TrackList.prototype.OnClickEdit = function () {
+            var _this = this;
+            this.EditButton.Hide().then(function () {
+                _this.DeleteButton.Show();
+                _this.EndEditButton.Show();
+            });
+        };
+        TrackList.prototype.OnClickDelete = function () {
+        };
+        TrackList.prototype.OnClickEndEdit = function () {
+            var _this = this;
+            this.DeleteButton.Hide();
+            this.EndEditButton.Hide().then(function () {
+                _this.EditButton.Show();
+            });
+        };
         /**
          * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
          * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -3594,9 +3597,9 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "vue-cla
         };
         TrackList.prototype.GetPagenatedList = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var result_1, mpTracks, entities, filterText, totalLength, pagenated, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
+                var result_1, _a, entities, filterText, totalLength, pagenated, result;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
                         case 0:
                             if (!this.playlist) {
                                 result_1 = {
@@ -3608,11 +3611,11 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "vue-cla
                                 return [2 /*return*/, result_1];
                             }
                             if (!(!this.playlist.Tracks || this.playlist.Tracks.length <= 0)) return [3 /*break*/, 2];
+                            _a = this.playlist;
                             return [4 /*yield*/, this.store.GetTracksByPlaylist(this.playlist)];
                         case 1:
-                            mpTracks = _a.sent();
-                            this.playlist.Tracks = Track_3.default.CreateArrayFromMopidy(mpTracks);
-                            _a.label = 2;
+                            _a.Tracks = _b.sent();
+                            _b.label = 2;
                         case 2:
                             entities = Libraries_10.default.Enumerable.from(this.playlist.Tracks);
                             filterText = this.Filterbox.GetText().toLowerCase();
@@ -3639,9 +3642,10 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "vue-cla
         TrackList.PageLength = 20;
         TrackList = TrackList_1 = __decorate([
             vue_class_component_16.default({
-                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-9\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Tracks</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil-square\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    ref=\"DeleteButton\"\n                    @Clicked=\"OnClickDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"products-list product-list-in-box\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
+                    'slideup-button': SlideupButton_2.default,
                     'selection-track': SelectionTrack_1.default,
                     'infinite-loading': vue_infinite_loading_5.default
                 }

@@ -36,13 +36,16 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         return result;
     }
 
-    public async GetTracksByPlaylist(playlist: Playlist): Promise<ITrack[]> {
+    public async GetTracksByPlaylist(playlist: Playlist): Promise<Track[]> {
         const response
             = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
                 uri: playlist.Uri
             });
 
         const mpPlaylist = response.result as IPlaylist;
+        if (!mpPlaylist.tracks)
+            return [];
+
         const trackUris = Libraries.Enumerable.from(mpPlaylist.tracks)
             .select((e): string => e.uri)
             .toArray();
@@ -55,7 +58,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         const pairList = response2.result as { [uri: string]: ITrack[] };
 
         // プレイリストの順序通りにトラックを並べて取得する。
-        const tracks: ITrack[] = [];
+        const mpTracks: ITrack[] = [];
         for (let i = 0; i < mpPlaylist.tracks.length; i++) {
             const track = mpPlaylist.tracks[i];
 
@@ -64,10 +67,12 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
 
             const completedTrack = pairList[track.uri][0];
             if (completedTrack)
-                tracks.push(completedTrack);
+                mpTracks.push(completedTrack);
         }
 
-        return tracks;
+        const result = Track.CreateArrayFromMopidy(mpTracks);
+
+        return result;
     }
 
     public async GetImageUri(uri: string): Promise<string> {

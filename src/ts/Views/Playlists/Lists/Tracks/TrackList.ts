@@ -8,6 +8,7 @@ import Track from '../../../../Models/Tracks/Track';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionList, ISelectionChangedArgs } from '../../../Shared/SelectionList';
 import SelectionTrack from './SelectionTrack';
+import SlideupButton from '../../../Shared/SlideupButton';
 
 @Component({
     template: `<div class="col-md-9">
@@ -18,7 +19,22 @@ import SelectionTrack from './SelectionTrack';
                 <filter-textbox
                     v-bind:placeHolder="'Track?'"
                     ref="Filterbox"
-                    @TextUpdated="Refresh()"/>
+                    @TextUpdated="Refresh()" />
+                <slideup-button
+                    v-bind:hideOnInit="false"
+                    iconClass="fa fa-pencil-square"
+                    ref="EditButton"
+                    @Clicked="OnClickEdit" />
+                <slideup-button
+                    v-bind:hideOnInit="true"
+                    iconClass="fa fa-trash"
+                    ref="DeleteButton"
+                    @Clicked="OnClickDelete" />
+                <slideup-button
+                    v-bind:hideOnInit="true"
+                    iconClass="fa fa-check"
+                    ref="EndEditButton"
+                    @Clicked="OnClickEndEdit" />
             </div>
         </div>
         <div class="card-body list-scrollable">
@@ -38,6 +54,7 @@ import SelectionTrack from './SelectionTrack';
 </div>`,
     components: {
         'filter-textbox': Filterbox,
+        'slideup-button': SlideupButton,
         'selection-track': SelectionTrack,
         'infinite-loading': InfiniteLoading
     }
@@ -52,6 +69,16 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
+    }
+
+    private get EditButton(): SlideupButton {
+        return this.$refs.EditButton as SlideupButton;
+    }
+    private get DeleteButton(): SlideupButton {
+        return this.$refs.DeleteButton as SlideupButton;
+    }
+    private get EndEditButton(): SlideupButton {
+        return this.$refs.EndEditButton as SlideupButton;
     }
 
     public async Initialize(): Promise<boolean> {
@@ -75,6 +102,24 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
+    private OnClickEdit(): void {
+        this.EditButton.Hide().then((): void => {
+            this.DeleteButton.Show();
+            this.EndEditButton.Show();
+        });
+    }
+
+    private OnClickDelete(): void {
+
+    }
+
+    private OnClickEndEdit(): void {
+        this.DeleteButton.Hide();
+        this.EndEditButton.Hide().then((): void => {
+            this.EditButton.Show();
+        });
+    }
+
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
      * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -92,7 +137,6 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             ? this.store.PlayByTlId(args.Entity.TlId)
             : this.store.PlayPlaylist(this.playlist, args.Entity);
     }
-
     protected async GetPagenatedList(): Promise<IPagenatedResult<Track>> {
         if (!this.playlist) {
             const result: IPagenatedResult<Track> = {
@@ -105,10 +149,8 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             return result;
         }
 
-        if (!this.playlist.Tracks || this.playlist.Tracks.length <= 0) {
-            const mpTracks = await this.store.GetTracksByPlaylist(this.playlist);
-            this.playlist.Tracks = Track.CreateArrayFromMopidy(mpTracks);
-        }
+        if (!this.playlist.Tracks || this.playlist.Tracks.length <= 0)
+            this.playlist.Tracks = await this.store.GetTracksByPlaylist(this.playlist);
 
         let entities = Libraries.Enumerable.from(this.playlist.Tracks);
         const filterText = this.Filterbox.GetText().toLowerCase();

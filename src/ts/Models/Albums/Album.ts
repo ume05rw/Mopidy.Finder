@@ -97,6 +97,8 @@ export default class Album implements IAlbum {
     public GenreAlbums: GenreAlbum[] = [];
 
     public GetImageFullUri(): string {
-        return `${location.protocol}//${location.host}${this.ImageUri}`;
+        return (!this.ImageUri || this.ImageUri == '')
+            ? `${location.protocol}//${location.host}/img/nullImage.jpg`
+            : `${location.protocol}//${location.host}${this.ImageUri}`;
     }
 }
