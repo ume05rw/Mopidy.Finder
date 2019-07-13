@@ -1,9 +1,9 @@
 import Component from 'vue-class-component';
 import Playlist from '../../Models/Playlists/Playlist';
 import ViewBase from '../Bases/ViewBase';
-import { ISelectionChangedArgs } from '../Shared/SelectionEvents';
-import PlaylistList from './Lists/PlaylistList';
-import TrackList from './Lists/TrackList';
+import { ISelectionChangedArgs } from '../Shared/SelectionList';
+import PlaylistList from './Lists/Playlists/PlaylistList';
+import TrackList from './Lists/Tracks/TrackList';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"

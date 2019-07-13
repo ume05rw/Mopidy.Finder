@@ -3,10 +3,9 @@ import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Genre from '../../../Models/Genres/Genre';
 import { default as GenreStore, IPagenateQueryArgs } from '../../../Models/Genres/GenreStore';
-import Filterbox from '../../Shared/Filterbox';
-import { ISelectionChangedArgs } from '../../Shared/SelectionEvents';
+import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import SelectionItem from '../../Shared/SelectionItem';
-import SelectionList from '../../Shared/SelectionList';
+import { default as SelectionList, ISelectionChangedArgs } from '../../Shared/SelectionList';
 
 @Component({
     template: `<div class="col-md-3">
@@ -20,13 +19,11 @@ import SelectionList from '../../Shared/SelectionList';
                     @TextUpdated="Refresh()"/>
                 <button type="button"
                     class="btn btn-tool"
-                    style="z-index: 1;"
                     @click="OnClickRefresh" >
                     <i class="fa fa-repeat" />
                 </button>
                 <button
                     class="btn btn-tool d-inline d-md-none collapse"
-                    style="z-index: 1;"
                     ref="ButtonCollaplse"
                     @click="OnClickCollapse" >
                     <i class="fa fa-minus" />

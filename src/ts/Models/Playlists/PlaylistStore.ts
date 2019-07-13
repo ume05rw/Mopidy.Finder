@@ -12,6 +12,9 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
     private static readonly Methods = {
         PlaylistAsList: 'core.playlists.as_list',
         PlaylistLookup: 'core.playlists.lookup',
+        PlaylistCreate: 'core.playlists.create',
+        PlaylistSave: 'core.playlists.save',
+        PlaylistDelete: 'core.playlists.delete',
         LibraryLookup: 'core.library.lookup',
         LibraryGetImages: 'core.library.get_images',
         TracklistClearList: 'core.tracklist.clear',
@@ -120,9 +123,24 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
     }
 
     public async PlayByTlId(tlId: number): Promise<boolean> {
-
         await this.JsonRpcNotice(PlaylistStore.Methods.PlaybackPlay, {
             tlid: tlId
+        });
+
+        return true;
+    }
+
+    public async AddPlaylist(name: string): Promise<boolean> {
+        await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistCreate, {
+            name: name
+        });
+
+        return true;
+    }
+
+    public async DeletePlaylist(playlist: Playlist): Promise<boolean> {
+        await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistDelete, {
+            uri: playlist.Uri
         });
 
         return true;

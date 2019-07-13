@@ -33,6 +33,6 @@ export default class RootView extends ViewBase {
     }
 
     private OnContentChanged(args: IContentChanged): void {
-        this.HeaderBar.SetTitle(args.Name);
+        this.HeaderBar.SetHeader(args);
     }
 }

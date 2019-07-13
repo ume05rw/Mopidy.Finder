@@ -3,8 +3,14 @@ import ViewBase from '../Bases/ViewBase';
 import PlayerPanel from './PlayerPanel';
 import Libraries from '../../Libraries';
 
+export enum Pages {
+    Finder = 'Finder',
+    Playlists = 'Playlists',
+    Settings = 'Settings'
+}
+
 export interface IContentChanged {
-    Name: string;
+    Page: Pages;
 }
 
 export const SidebarEvents = {
@@ -88,21 +94,21 @@ export default class Sidebar extends ViewBase {
 
     private OnClickFinder(): void {
         const args: IContentChanged = {
-            Name: 'Finder'
+            Page: Pages.Finder
         };
         this.$emit(SidebarEvents.ContentChanged, args)
     }
 
     private OnClickPlaylists(): void {
         const args: IContentChanged = {
-            Name: 'Playlists'
+            Page: Pages.Playlists
         };
         this.$emit(SidebarEvents.ContentChanged, args)
     }
 
     private OnClickSettings(): void {
         const args: IContentChanged = {
-            Name: 'Settings'
+            Page: Pages.Settings
         };
         this.$emit(SidebarEvents.ContentChanged, args)
     }

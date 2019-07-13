@@ -5,8 +5,23 @@ import Libraries from '../../Libraries';
 import { IPagenatedResult } from '../../Models/Bases/StoreBase';
 import ViewBase from '../Bases/ViewBase';
 import { WidgetEvents } from '../Events/AdminLteEvents';
-import { default as SelectionEvents, IListUpdatedArgs, ISelectionChangedArgs } from './SelectionEvents';
 import Exception from '../../Utils/Exception';
+
+export interface ISelectionChangedArgs<TEntity> {
+    Entity: TEntity;
+    Selected: boolean;
+}
+
+export interface IListUpdatedArgs<TEntity> {
+    Entities: TEntity[];
+}
+
+export const SelectionEvents = {
+    ListUpdated: 'ListUpdated',
+    SelectionChanged: 'SelectionChanged',
+    Refreshed: 'Refreshed',
+}
+
 
 export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
 
