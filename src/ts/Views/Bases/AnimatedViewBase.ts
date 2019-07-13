@@ -9,8 +9,9 @@ export default abstract class AnimatedViewBase extends ViewBase {
     protected abstract AnimationClassIn: string;
     protected abstract AnimationClassOut: string;
     protected AnimationClassSpeed: string = 'faster';
+    protected AnimationClassHide: string = 'd-none';
     private readonly AnimationClassAnimated: string = 'animated';
-    private readonly AnimationClassHide: string = 'd-none';
+    
 
     private _resolver: (value: boolean) => void = null;
 
@@ -22,7 +23,16 @@ export default abstract class AnimatedViewBase extends ViewBase {
         await super.Initialize();
 
         this.Element.addEventListener(AnimatedViewEvents.AnimationEnd, () => {
-            this.PostAnimated();
+            const classes = this.Element.classList;
+
+            if (classes.contains(this.AnimationClassIn)) {
+                // 表示化
+                this.ClearAllClasses();
+            } else if (classes.contains(this.AnimationClassOut)) {
+                // 非表示化
+                this.ClearAllClasses();
+                classes.add(this.AnimationClassHide);
+            }
 
             if (this._resolver) {
                 this._resolver(true);
@@ -34,23 +44,32 @@ export default abstract class AnimatedViewBase extends ViewBase {
         return true;
     }
 
-    private PostAnimated(): void {
+    protected ClearAllClasses(): void {
         const classes = this.Element.classList;
+
+        if (classes.contains(this.AnimationClassHide))
+            classes.remove(this.AnimationClassHide);
 
         if (classes.contains(this.AnimationClassAnimated))
             classes.remove(this.AnimationClassAnimated);
 
-        if (classes.contains(this.AnimationClassSpeed))
-            classes.remove(this.AnimationClassSpeed);
-
-        if (classes.contains(this.AnimationClassIn)) {
-            // 表示化
-            classes.remove(this.AnimationClassIn);
-        } else if (classes.contains(this.AnimationClassOut)) {
-            // 非表示化
+        if (classes.contains(this.AnimationClassOut))
             classes.remove(this.AnimationClassOut);
-            classes.add(this.AnimationClassHide);
+
+        if (classes.contains(this.AnimationClassIn))
+            classes.remove(this.AnimationClassIn);
+
+        if (
+            this.AnimationClassSpeed
+            && 0 < this.AnimationClassSpeed.length
+            && classes.contains(this.AnimationClassSpeed)
+        ) {
+            classes.remove(this.AnimationClassSpeed);
         }
+    }
+
+    public ShowNow(): void {
+        this.ClearAllClasses();
     }
 
     public Show(): Promise<boolean> {
@@ -64,17 +83,9 @@ export default abstract class AnimatedViewBase extends ViewBase {
 
             const classes = this.Element.classList;
 
-            if (classes.contains(this.AnimationClassHide))
-                classes.remove(this.AnimationClassHide);
-
-            if (classes.contains(this.AnimationClassOut))
-                classes.remove(this.AnimationClassOut);
-
-            if (!classes.contains(this.AnimationClassAnimated))
-                classes.add(this.AnimationClassAnimated);
-
-            if (!classes.contains(this.AnimationClassIn))
-                classes.add(this.AnimationClassIn);
+            this.ClearAllClasses();
+            classes.add(this.AnimationClassAnimated);
+            classes.add(this.AnimationClassIn);
 
             if (
                 this.AnimationClassSpeed
@@ -84,6 +95,11 @@ export default abstract class AnimatedViewBase extends ViewBase {
                 classes.add(this.AnimationClassSpeed);
             }
         });
+    }
+
+    public HideNow(): void {
+        this.ClearAllClasses();
+        this.Element.classList.add(this.AnimationClassHide);
     }
 
     public Hide(): Promise<boolean> {
@@ -97,17 +113,9 @@ export default abstract class AnimatedViewBase extends ViewBase {
 
             const classes = this.Element.classList;
 
-            if (classes.contains(this.AnimationClassHide))
-                classes.remove(this.AnimationClassHide);
-
-            if (classes.contains(this.AnimationClassIn))
-                classes.remove(this.AnimationClassIn);
-
-            if (!classes.contains(this.AnimationClassAnimated))
-                classes.add(this.AnimationClassAnimated);
-
-            if (!classes.contains(this.AnimationClassOut))
-                classes.add(this.AnimationClassOut);
+            this.ClearAllClasses();
+            classes.add(this.AnimationClassAnimated);
+            classes.add(this.AnimationClassOut);
 
             if (
                 this.AnimationClassSpeed
@@ -117,5 +125,9 @@ export default abstract class AnimatedViewBase extends ViewBase {
                 classes.add(this.AnimationClassSpeed);
             }
         });
+    }
+
+    public GetIsVisible(): boolean {
+        return !this.Element.classList.contains(this.AnimationClassHide);
     }
 }

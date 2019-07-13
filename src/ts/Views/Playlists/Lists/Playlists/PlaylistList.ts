@@ -8,7 +8,9 @@ import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import SelectionItem from '../../../Shared/SelectionItem';
 import { default as SelectionList, ISelectionChangedArgs } from '../../../Shared/SelectionList';
+import SlideupButton from '../../../Shared/SlideupButton';
 import AddModal from './AddModal';
+
 
 export const PlaylistListEvents = {
     AnimationEnd: 'animationend'
@@ -30,18 +32,16 @@ export const PlaylistListEvents = {
                     @click="OnClickCollapse" >
                     <i class="fa fa-minus" />
                 </button>
-                <button type="button"
-                    class="btn btn-tool"
+                <slideup-buton
+                    v-bind:hideOnInit="false"
+                    iconClass="fa fa-plus-circle"
                     ref="ButtonAdd"
-                    @click="OnClickNew">
-                    <i class="fa fa-plus-circle" />
-                </button>
-                <button type="button"
-                    class="btn btn-tool d-none"
+                    @Clicked="OnClickAdd" />
+                <slideup-buton
+                    v-bind:hideOnInit="true"
+                    iconClass="fa fa-minus-circle"
                     ref="ButtonDelete"
-                    @click="OnClickDelete">
-                    <i class="fa fa-minus-circle" />
-                </button>
+                    @Clicked="OnClickDelete" />
             </div>
         </div>
         <div class="card-body list-scrollable">
@@ -64,6 +64,7 @@ export const PlaylistListEvents = {
 </div>`,
     components: {
         'filter-textbox': Filterbox,
+        'slideup-buton': SlideupButton,
         'selection-item': SelectionItem,
         'infinite-loading': InfiniteLoading,
         'add-modal': AddModal
@@ -89,12 +90,12 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         return this.$refs.Filterbox as Filterbox;
     }
 
-    private get ButtonAdd(): HTMLButtonElement {
-        return this.$refs.ButtonAdd as HTMLButtonElement;
+    private get ButtonAdd(): SlideupButton {
+        return this.$refs.ButtonAdd as SlideupButton;
     }
 
-    private get ButtonDelete(): HTMLButtonElement {
-        return this.$refs.ButtonDelete as HTMLButtonElement;
+    private get ButtonDelete(): SlideupButton {
+        return this.$refs.ButtonDelete as SlideupButton;
     }
 
     private get Items(): SelectionItem<Playlist>[] {
@@ -108,8 +109,6 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
-
-
 
         return true;
     }
@@ -132,6 +131,16 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
                 si.SetSelected(false);
             }
         });
+
+        if (args.Selected && this.ButtonAdd.GetIsVisible()) {
+            this.ButtonAdd.Hide().then((): void => {
+                this.ButtonDelete.Show();
+            });
+        } else if (!args.Selected && this.ButtonDelete.GetIsVisible()) {
+            this.ButtonDelete.Hide().then((): void => {
+                this.ButtonAdd.Show();
+            });
+        }
 
         super.OnSelectionChanged(args);
     }
@@ -169,7 +178,7 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         }
     }
 
-    private OnClickNew(): void {
+    private OnClickAdd(): void {
         this.AddModal.Show();
     }
 

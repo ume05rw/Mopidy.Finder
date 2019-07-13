@@ -1229,8 +1229,8 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
         function AnimatedViewBase() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.AnimationClassSpeed = 'faster';
-            _this.AnimationClassAnimated = 'animated';
             _this.AnimationClassHide = 'd-none';
+            _this.AnimationClassAnimated = 'animated';
             _this._resolver = null;
             return _this;
         }
@@ -1250,7 +1250,16 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
                         case 1:
                             _a.sent();
                             this.Element.addEventListener(exports.AnimatedViewEvents.AnimationEnd, function () {
-                                _this.PostAnimated();
+                                var classes = _this.Element.classList;
+                                if (classes.contains(_this.AnimationClassIn)) {
+                                    // 表示化
+                                    _this.ClearAllClasses();
+                                }
+                                else if (classes.contains(_this.AnimationClassOut)) {
+                                    // 非表示化
+                                    _this.ClearAllClasses();
+                                    classes.add(_this.AnimationClassHide);
+                                }
                                 if (_this._resolver) {
                                     _this._resolver(true);
                                     _this._resolver = null;
@@ -1262,21 +1271,24 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
                 });
             });
         };
-        AnimatedViewBase.prototype.PostAnimated = function () {
+        AnimatedViewBase.prototype.ClearAllClasses = function () {
             var classes = this.Element.classList;
+            if (classes.contains(this.AnimationClassHide))
+                classes.remove(this.AnimationClassHide);
             if (classes.contains(this.AnimationClassAnimated))
                 classes.remove(this.AnimationClassAnimated);
-            if (classes.contains(this.AnimationClassSpeed))
-                classes.remove(this.AnimationClassSpeed);
-            if (classes.contains(this.AnimationClassIn)) {
-                // 表示化
-                classes.remove(this.AnimationClassIn);
-            }
-            else if (classes.contains(this.AnimationClassOut)) {
-                // 非表示化
+            if (classes.contains(this.AnimationClassOut))
                 classes.remove(this.AnimationClassOut);
-                classes.add(this.AnimationClassHide);
+            if (classes.contains(this.AnimationClassIn))
+                classes.remove(this.AnimationClassIn);
+            if (this.AnimationClassSpeed
+                && 0 < this.AnimationClassSpeed.length
+                && classes.contains(this.AnimationClassSpeed)) {
+                classes.remove(this.AnimationClassSpeed);
             }
+        };
+        AnimatedViewBase.prototype.ShowNow = function () {
+            this.ClearAllClasses();
         };
         AnimatedViewBase.prototype.Show = function () {
             var _this = this;
@@ -1287,20 +1299,19 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
             return new Promise(function (resolve) {
                 _this._resolver = resolve;
                 var classes = _this.Element.classList;
-                if (classes.contains(_this.AnimationClassHide))
-                    classes.remove(_this.AnimationClassHide);
-                if (classes.contains(_this.AnimationClassOut))
-                    classes.remove(_this.AnimationClassOut);
-                if (!classes.contains(_this.AnimationClassAnimated))
-                    classes.add(_this.AnimationClassAnimated);
-                if (!classes.contains(_this.AnimationClassIn))
-                    classes.add(_this.AnimationClassIn);
+                _this.ClearAllClasses();
+                classes.add(_this.AnimationClassAnimated);
+                classes.add(_this.AnimationClassIn);
                 if (_this.AnimationClassSpeed
                     && 0 < _this.AnimationClassSpeed.length
                     && !classes.contains(_this.AnimationClassSpeed)) {
                     classes.add(_this.AnimationClassSpeed);
                 }
             });
+        };
+        AnimatedViewBase.prototype.HideNow = function () {
+            this.ClearAllClasses();
+            this.Element.classList.add(this.AnimationClassHide);
         };
         AnimatedViewBase.prototype.Hide = function () {
             var _this = this;
@@ -1311,14 +1322,9 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
             return new Promise(function (resolve) {
                 _this._resolver = resolve;
                 var classes = _this.Element.classList;
-                if (classes.contains(_this.AnimationClassHide))
-                    classes.remove(_this.AnimationClassHide);
-                if (classes.contains(_this.AnimationClassIn))
-                    classes.remove(_this.AnimationClassIn);
-                if (!classes.contains(_this.AnimationClassAnimated))
-                    classes.add(_this.AnimationClassAnimated);
-                if (!classes.contains(_this.AnimationClassOut))
-                    classes.add(_this.AnimationClassOut);
+                _this.ClearAllClasses();
+                classes.add(_this.AnimationClassAnimated);
+                classes.add(_this.AnimationClassOut);
                 if (_this.AnimationClassSpeed
                     && 0 < _this.AnimationClassSpeed.length
                     && !classes.contains(_this.AnimationClassSpeed)) {
@@ -1326,37 +1332,62 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
                 }
             });
         };
+        AnimatedViewBase.prototype.GetIsVisible = function () {
+            return !this.Element.classList.contains(this.AnimationClassHide);
+        };
         return AnimatedViewBase;
     }(ViewBase_2.default));
     exports.default = AnimatedViewBase;
 });
-define("Views/Shared/Filterboxes/SearchButton", ["require", "exports", "vue-class-component", "Views/Bases/AnimatedViewBase"], function (require, exports, vue_class_component_1, AnimatedViewBase_1) {
+define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/AnimatedViewBase"], function (require, exports, vue_class_component_1, vue_property_decorator_1, AnimatedViewBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SearchButtonEvents = {
+    exports.SlideupButtonEvents = {
         Clicked: 'Clicked'
     };
-    var SearchButton = /** @class */ (function (_super) {
-        __extends(SearchButton, _super);
-        function SearchButton() {
+    var SlideupButtom = /** @class */ (function (_super) {
+        __extends(SlideupButtom, _super);
+        function SlideupButtom() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.AnimationClassIn = 'fadeInUp';
             _this.AnimationClassOut = 'fadeOutDown';
             return _this;
         }
-        SearchButton.prototype.OnClick = function () {
-            this.$emit(exports.SearchButtonEvents.Clicked);
+        SlideupButtom.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            if (this.hideOnInit === true)
+                                this.HideNow();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
-        SearchButton = __decorate([
+        SlideupButtom.prototype.OnClick = function () {
+            this.$emit(exports.SlideupButtonEvents.Clicked);
+        };
+        __decorate([
+            vue_property_decorator_1.Prop(),
+            __metadata("design:type", Boolean)
+        ], SlideupButtom.prototype, "hideOnInit", void 0);
+        __decorate([
+            vue_property_decorator_1.Prop(),
+            __metadata("design:type", String)
+        ], SlideupButtom.prototype, "iconClass", void 0);
+        SlideupButtom = __decorate([
             vue_class_component_1.default({
-                template: "<button\n    class=\"btn btn-tool\"\n    @click=\"OnClick\">\n        <i class=\"fa fa-search\" />\n</button>"
+                template: "<button\n    class=\"btn btn-tool\"\n    @click=\"OnClick\">\n        <i v-bind:class=\"iconClass\" />\n</button>"
             })
-        ], SearchButton);
-        return SearchButton;
+        ], SlideupButtom);
+        return SlideupButtom;
     }(AnimatedViewBase_1.default));
-    exports.default = SearchButton;
+    exports.default = SlideupButtom;
 });
-define("Views/Shared/Filterboxes/SearchInput", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/AnimatedViewBase"], function (require, exports, vue_class_component_2, vue_property_decorator_1, AnimatedViewBase_2) {
+define("Views/Shared/Filterboxes/SearchInput", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/AnimatedViewBase"], function (require, exports, vue_class_component_2, vue_property_decorator_2, AnimatedViewBase_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SearchInputEvents = {
@@ -1387,7 +1418,7 @@ define("Views/Shared/Filterboxes/SearchInput", ["require", "exports", "vue-class
             return this.$el.value;
         };
         __decorate([
-            vue_property_decorator_1.Prop(),
+            vue_property_decorator_2.Prop(),
             __metadata("design:type", String)
         ], SearchInput.prototype, "placeHolder", void 0);
         SearchInput = __decorate([
@@ -1399,7 +1430,7 @@ define("Views/Shared/Filterboxes/SearchInput", ["require", "exports", "vue-class
     }(AnimatedViewBase_2.default));
     exports.default = SearchInput;
 });
-define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-component", "vue-property-decorator", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/Filterboxes/SearchButton", "Views/Shared/Filterboxes/SearchInput"], function (require, exports, vue_class_component_3, vue_property_decorator_2, Delay_1, ViewBase_3, SearchButton_1, SearchInput_1) {
+define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-component", "vue-property-decorator", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SlideupButton", "Views/Shared/Filterboxes/SearchInput"], function (require, exports, vue_class_component_3, vue_property_decorator_3, Delay_1, ViewBase_3, SlideupButton_1, SearchInput_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FilterboxEvents = {
@@ -1441,7 +1472,7 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
                 });
             });
         };
-        Filterbox.prototype.OnClickShow = function () {
+        Filterbox.prototype.OnClick = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     return [2 /*return*/, this.Show()];
@@ -1491,15 +1522,15 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
             return this.SearchInput.GetValue();
         };
         __decorate([
-            vue_property_decorator_2.Prop(),
+            vue_property_decorator_3.Prop(),
             __metadata("design:type", String)
         ], Filterbox.prototype, "placeHolder", void 0);
         Filterbox = __decorate([
             vue_class_component_3.default({
-                template: "<div class=\"form-inline\">\n    <search-input\n        v-bind:placeholder=\"placeHolder\"\n        v-bind:aria-label=\"placeHolder\"\n        ref=\"SearchInput\"\n        @Input=\"OnInput\"\n        @Blur=\"OnBlur\"/>\n    <search-button\n        ref=\"SearchButton\"\n        @Clicked=\"OnClickShow\" />\n</div>",
+                template: "<div class=\"form-inline\">\n    <search-input\n        v-bind:placeholder=\"placeHolder\"\n        v-bind:aria-label=\"placeHolder\"\n        ref=\"SearchInput\"\n        @Input=\"OnInput\"\n        @Blur=\"OnBlur\"/>\n    <slideup-button\n        v-bind:hideOnInit=\"false\"\n        iconClass=\"fa fa-search\"\n        ref=\"SearchButton\"\n        @Clicked=\"OnClick\" />\n</div>",
                 components: {
                     'search-input': SearchInput_1.default,
-                    'search-button': SearchButton_1.default
+                    'slideup-button': SlideupButton_1.default
                 }
             })
         ], Filterbox);
@@ -1507,7 +1538,7 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
     }(ViewBase_3.default));
     exports.default = Filterbox;
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries"], function (require, exports, vue_class_component_4, vue_property_decorator_3, ViewBase_4, AlbumTracks_2, Libraries_3) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries"], function (require, exports, vue_class_component_4, vue_property_decorator_4, ViewBase_4, AlbumTracks_2, Libraries_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumEvents = {
@@ -1542,7 +1573,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             this.$emit(exports.SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
         };
         __decorate([
-            vue_property_decorator_3.Prop(),
+            vue_property_decorator_4.Prop(),
             __metadata("design:type", AlbumTracks_2.default)
         ], SelectionAlbumTracks.prototype, "entity", void 0);
         SelectionAlbumTracks = __decorate([
@@ -1759,7 +1790,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
     }(StoreBase_2.default));
     exports.default = ArtistStore;
 });
-define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_6, vue_property_decorator_4, ViewBase_5) {
+define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_6, vue_property_decorator_5, ViewBase_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionItemEvents = {
@@ -1812,7 +1843,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
         var SelectionItem_1;
         SelectionItem.SelectedColor = 'bg-gray';
         __decorate([
-            vue_property_decorator_4.Prop(),
+            vue_property_decorator_5.Prop(),
             __metadata("design:type", Object)
         ], SelectionItem.prototype, "entity", void 0);
         SelectionItem = SelectionItem_1 = __decorate([
@@ -3269,7 +3300,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
     }(ViewBase_10.default));
     exports.default = AddModal;
 });
-define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_9, PlaylistStore_1, Filterbox_4, SelectionItem_4, SelectionList_4, AddModal_1) {
+define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_9, PlaylistStore_1, Filterbox_4, SelectionItem_4, SelectionList_4, SlideupButton_2, AddModal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistListEvents = {
@@ -3351,11 +3382,22 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
             _super.prototype.OnClickCollapse.call(this);
         };
         PlaylistList.prototype.OnSelectionChanged = function (args) {
+            var _this = this;
             _.each(this.Items, function (si) {
                 if (si.GetEntity() !== args.Entity && si.GetSelected()) {
                     si.SetSelected(false);
                 }
             });
+            if (args.Selected && this.ButtonAdd.GetIsVisible()) {
+                this.ButtonAdd.Hide().then(function () {
+                    _this.ButtonDelete.Show();
+                });
+            }
+            else if (!args.Selected && this.ButtonDelete.GetIsVisible()) {
+                this.ButtonDelete.Hide().then(function () {
+                    _this.ButtonAdd.Show();
+                });
+            }
             _super.prototype.OnSelectionChanged.call(this, args);
         };
         PlaylistList.prototype.GetPagenatedList = function () {
@@ -3398,7 +3440,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
             else {
             }
         };
-        PlaylistList.prototype.OnClickNew = function () {
+        PlaylistList.prototype.OnClickAdd = function () {
             this.AddModal.Show();
         };
         PlaylistList.prototype.OnAddOrdered = function () {
@@ -3439,9 +3481,10 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         };
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_14.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickNew\">\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool d-none\"\n                    ref=\"ButtonDelete\"\n                    @click=\"OnClickDelete\">\n                    <i class=\"fa fa-minus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <slideup-buton\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-plus-circle\"\n                    ref=\"ButtonAdd\"\n                    @Clicked=\"OnClickAdd\" />\n                <slideup-buton\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-minus-circle\"\n                    ref=\"ButtonDelete\"\n                    @Clicked=\"OnClickDelete\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_4.default,
+                    'slideup-buton': SlideupButton_2.default,
                     'selection-item': SelectionItem_4.default,
                     'infinite-loading': vue_infinite_loading_4.default,
                     'add-modal': AddModal_1.default
@@ -3452,7 +3495,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_15, vue_property_decorator_5, Track_2, ViewBase_11, SelectionList_5) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_15, vue_property_decorator_6, Track_2, ViewBase_11, SelectionList_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SelectionTrack = /** @class */ (function (_super) {
@@ -3468,7 +3511,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "vu
             this.$emit(SelectionList_5.SelectionEvents.SelectionChanged, args);
         };
         __decorate([
-            vue_property_decorator_5.Prop(),
+            vue_property_decorator_6.Prop(),
             __metadata("design:type", Track_2.default)
         ], SelectionTrack.prototype, "entity", void 0);
         SelectionTrack = __decorate([
@@ -3752,57 +3795,5 @@ define("Main", ["require", "exports", "Libraries", "Controllers/RootContoller"],
         return Main;
     }());
     var main = (new Main()).Init(); // eslint-disable-line
-});
-define("Views/Playlists/Lists/Playlists/AddButton", ["require", "exports", "vue-class-component", "Views/Bases/AnimatedViewBase"], function (require, exports, vue_class_component_20, AnimatedViewBase_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.AddButtonEvents = {
-        Clicked: 'Clicked'
-    };
-    var AddButton = /** @class */ (function (_super) {
-        __extends(AddButton, _super);
-        function AddButton() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.AnimationClassIn = 'fadeInUp';
-            _this.AnimationClassOut = 'fadeOutDown';
-            return _this;
-        }
-        AddButton.prototype.OnClick = function () {
-            this.$emit(exports.AddButtonEvents.Clicked);
-        };
-        AddButton = __decorate([
-            vue_class_component_20.default({
-                template: "<button\n    class=\"btn btn-tool\"\n    @click=\"OnClick\">\n        <i class=\"fa fa-search\" />\n</button>"
-            })
-        ], AddButton);
-        return AddButton;
-    }(AnimatedViewBase_3.default));
-    exports.default = AddButton;
-});
-define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component", "Views/Bases/AnimatedViewBase"], function (require, exports, vue_class_component_21, AnimatedViewBase_4) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SlideupButtonEvents = {
-        Clicked: 'Clicked'
-    };
-    var ButtomSearch = /** @class */ (function (_super) {
-        __extends(ButtomSearch, _super);
-        function ButtomSearch() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.AnimationClassIn = 'fadeInUp';
-            _this.AnimationClassOut = 'fadeOutDown';
-            return _this;
-        }
-        ButtomSearch.prototype.OnClick = function () {
-            this.$emit(exports.SlideupButtonEvents.Clicked);
-        };
-        ButtomSearch = __decorate([
-            vue_class_component_21.default({
-                template: "<button\n    class=\"btn btn-tool\"\n    @click=\"OnClick\">\n        <i class=\"fa fa-search\" />\n</button>"
-            })
-        ], ButtomSearch);
-        return ButtomSearch;
-    }(AnimatedViewBase_4.default));
-    exports.default = ButtomSearch;
 });
 //# sourceMappingURL=tsout.js.map

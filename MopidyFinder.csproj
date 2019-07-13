@@ -38,14 +38,12 @@
     <None Remove="src\ts\Views\Finders\Lists\SelectionAlbumTracks.ts" />
     <None Remove="src\ts\Views\Finders\TrackList.ts" />
     <None Remove="src\ts\Views\HeaderBars\HeaderBar.ts" />
-    <None Remove="src\ts\Views\Playlists\Lists\Playlists\AddButton.ts" />
     <None Remove="src\ts\Views\Playlists\Lists\PlaylistList.ts" />
     <None Remove="src\ts\Views\Playlists\Lists\TrackList.ts" />
     <None Remove="src\ts\Views\Playlists\Playlists.ts" />
     <None Remove="src\ts\Views\RootView.ts" />
     <None Remove="src\ts\Views\Settings\Settings.ts" />
     <None Remove="src\ts\Views\Shared\Filterbox.ts" />
-    <None Remove="src\ts\Views\Shared\Filterboxes\SearchButton.ts" />
     <None Remove="src\ts\Views\Shared\Filterboxes\SearchInput.ts" />
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
     <None Remove="src\ts\Views\Shared\SelectionList.ts" />
@@ -120,8 +118,6 @@
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\Albums\SelectionAlbumTracks.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\Albums\AlbumList.ts" />
     <TypeScriptCompile Include="src\ts\Views\HeaderBars\HeaderBar.ts" />
-    <TypeScriptCompile Include="src\ts\Views\Playlists\Lists\Playlists\AddButton.ts" />
-    <TypeScriptCompile Include="src\ts\Views\Shared\Filterboxes\SearchButton.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Filterboxes\SearchInput.ts" />
     <TypeScriptCompile Include="src\ts\Views\Playlists\Lists\Playlists\PlaylistList.ts" />
     <TypeScriptCompile Include="src\ts\Views\Playlists\Lists\Tracks\TrackList.ts" />

@@ -2,7 +2,7 @@ import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 import ViewBase from '../../Bases/ViewBase';
-import SearchButton from './SearchButton';
+import SlideupButton from '../SlideupButton';
 import SearchInput from './SearchInput';
 
 export const FilterboxEvents = {
@@ -18,13 +18,15 @@ export const FilterboxEvents = {
         ref="SearchInput"
         @Input="OnInput"
         @Blur="OnBlur"/>
-    <search-button
+    <slideup-button
+        v-bind:hideOnInit="false"
+        iconClass="fa fa-search"
         ref="SearchButton"
-        @Clicked="OnClickShow" />
+        @Clicked="OnClick" />
 </div>`,
     components: {
         'search-input': SearchInput,
-        'search-button': SearchButton
+        'slideup-button': SlideupButton
     }
 })
 export default class Filterbox extends ViewBase {
@@ -38,8 +40,8 @@ export default class Filterbox extends ViewBase {
         return this.$refs.SearchInput as SearchInput;
     }
 
-    private get SearchButton(): SearchButton {
-        return this.$refs.SearchButton as SearchButton;
+    private get SearchButton(): SlideupButton {
+        return this.$refs.SearchButton as SlideupButton;
     }
 
 
@@ -53,7 +55,7 @@ export default class Filterbox extends ViewBase {
         return true;
     }
 
-    private async OnClickShow(): Promise<boolean> {
+    private async OnClick(): Promise<boolean> {
         return this.Show();
     }
 
