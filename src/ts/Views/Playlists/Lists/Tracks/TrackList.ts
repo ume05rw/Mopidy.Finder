@@ -152,6 +152,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
     private OnClickEndEdit(): void {
         // TODO: 保存処理
+        // this.playlist.Tracks も更新されるようにする。
 
         this.titleInputAnimate
             .RemoveDisplayNone()
@@ -171,6 +172,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             this.listMode = ListMode.Playable;
             this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
             this.EditButton.Show();
+            this.SetPlaylist(this.playlist);
         });
     }
 

@@ -3902,6 +3902,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         };
         TrackList.prototype.OnClickEndEdit = function () {
             // TODO: 保存処理
+            // this.playlist.Tracks も更新されるようにする。
             var _this = this;
             this.titleInputAnimate
                 .RemoveDisplayNone()
@@ -3920,6 +3921,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 _this.listMode = ListMode.Playable;
                 _this.listClasses = TrackList_1.ListBaseClasses + _this.listMode.toString();
                 _this.EditButton.Show();
+                _this.SetPlaylist(_this.playlist);
             });
         };
         TrackList.prototype.OnSelectionChanged = function (args) {
