@@ -1,15 +1,16 @@
 import Libraries from './Libraries';
-import RootContoller from './Controllers/RootContoller';
+import RootView from './Views/RootView';
 
 class Main {
 
-    private _rootController: RootContoller;
+    private _view: RootView;
 
     public async Init(): Promise<Main> {
         Libraries.Initialize();
 
-        this._rootController = new RootContoller();
-        await this._rootController.Init();
+        this._view = new RootView();
+        this._view.$mount('#root');
+        await this._view.Initialize();
 
         return this;
     }

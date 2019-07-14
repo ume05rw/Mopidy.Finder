@@ -14,15 +14,15 @@ export interface ISelectionChangedArgs<TEntity> {
 @Component({
     template: `<li class="nav-item"
                    ref="Li" >
-    <a href="javascript:void(0)" class="d-inline-block w-100 text-nowrap text-truncate"
+    <span class="d-block w-100 text-nowrap text-truncate"
        @click="OnClick" >
-        {{ entity.Name }}
-    </a>
+        {{ (entity.Name == ' ') ? '[blank]' : entity.Name }}
+    </span>
 </li>`
 })
 export default class SelectionItem<TEntity> extends ViewBase {
 
-    private static readonly SelectedColor: string = 'bg-gray';
+    private static readonly SelectedColor: string = 'selected';
 
     @Prop()
     private entity!: TEntity;

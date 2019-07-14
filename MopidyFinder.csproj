@@ -16,6 +16,7 @@
     <None Remove="src\ts\Models\Mopidies\Monitor.ts" />
     <None Remove="src\ts\Models\Playlists\Playlist.ts" />
     <None Remove="src\ts\Models\Playlists\PlaylistStore.ts" />
+    <None Remove="src\ts\Utils\Animate.ts" />
     <None Remove="src\ts\Utils\Delay.ts" />
     <None Remove="src\ts\Utils\Exception.ts" />
     <None Remove="src\ts\Views\Bases\AnimatedViewBase.ts" />
@@ -79,7 +80,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <TypeScriptCompile Include="src\ts\Controllers\RootContoller.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\IAlbum.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\IArtist.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\IPlaylist.ts" />
@@ -90,6 +90,7 @@
     <TypeScriptCompile Include="src\ts\Models\Mopidies\Player.ts" />
     <TypeScriptCompile Include="src\ts\Models\Playlists\Playlist.ts" />
     <TypeScriptCompile Include="src\ts\Models\Playlists\PlaylistStore.ts" />
+    <TypeScriptCompile Include="src\ts\Utils\Animate.ts" />
     <TypeScriptCompile Include="src\ts\Utils\Delay.ts" />
     <TypeScriptCompile Include="src\ts\Utils\Exception.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\AnimatedViewBase.ts" />

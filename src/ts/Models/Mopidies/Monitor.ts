@@ -118,7 +118,6 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
             : `${location.protocol}//${location.host}${this._imageUri}`;
     }
 
-
     public StartPolling(): void {
         if (this._timer !== null)
             this.StopPolling();

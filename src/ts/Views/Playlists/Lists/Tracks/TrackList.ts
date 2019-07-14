@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../../../Libraries';
@@ -6,15 +7,26 @@ import Playlist from '../../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Track from '../../../../Models/Tracks/Track';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
-import { default as SelectionList, ISelectionChangedArgs } from '../../../Shared/SelectionList';
-import SelectionTrack from './SelectionTrack';
+import { default as SelectionList } from '../../../Shared/SelectionList';
 import SlideupButton from '../../../Shared/SlideupButton';
+import { default as SelectionTrack, ITrackDeleteOrderedArgs, ITrackSelectionChangedArgs } from './SelectionTrack';
+import { default as Animate, Animation, Speed } from '../../../../Utils/Animate';
+
+enum ListMode {
+    Playable = 'playable',
+    Editable = 'editable'
+}
 
 @Component({
-    template: `<div class="col-md-9">
+    template: `<div class="col-md-9 playlist-track">
     <div class="card">
         <div class="card-header with-border bg-secondary">
-            <h3 class="card-title">Tracks</h3>
+            <h3 class="card-title"
+                ref="TitleH3">
+                Tracks
+            </h3>
+            <input class="form-control form-control-sm d-none title-input"
+                ref="TitleInput" />
             <div class="card-tools form-row">
                 <filter-textbox
                     v-bind:placeHolder="'Track?'"
@@ -22,14 +34,9 @@ import SlideupButton from '../../../Shared/SlideupButton';
                     @TextUpdated="Refresh()" />
                 <slideup-button
                     v-bind:hideOnInit="false"
-                    iconClass="fa fa-pencil-square"
+                    iconClass="fa fa-pencil"
                     ref="EditButton"
                     @Clicked="OnClickEdit" />
-                <slideup-button
-                    v-bind:hideOnInit="true"
-                    iconClass="fa fa-trash"
-                    ref="DeleteButton"
-                    @Clicked="OnClickDelete" />
                 <slideup-button
                     v-bind:hideOnInit="true"
                     iconClass="fa fa-check"
@@ -38,12 +45,14 @@ import SlideupButton from '../../../Shared/SlideupButton';
             </div>
         </div>
         <div class="card-body list-scrollable">
-            <ul class="products-list product-list-in-box">
+            <ul v-bind:class="listClasses"
+                ref="TrackListUl">
                 <template v-for="entity in entities">
                 <selection-track
                     ref="Items"
                     v-bind:entity="entity"
-                    @SelectionChanged="OnSelectionChanged" />
+                    @SelectionChanged="OnSelectionChanged"
+                    @DeleteOrdered="OnDeleteOrdered" />
                 </template>
                 <infinite-loading
                     @infinite="OnInfinite"
@@ -62,11 +71,23 @@ import SlideupButton from '../../../Shared/SlideupButton';
 export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
     private static readonly PageLength: number = 20;
+    private static readonly ListBaseClasses = 'products-list product-list-in-box track-list ';
 
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Track[] = [];
     private playlist: Playlist = null;
+    private removedEntities: Track[] = [];
+    private listMode: ListMode = ListMode.Playable;
+    private listClasses: string = TrackList.ListBaseClasses + this.listMode.toString();
+    private titleH3Animate: Animate;
+    private titleInputAnimate: Animate;
 
+    private get TitleH3(): HTMLHeadingElement {
+        return this.$refs.TitleH3 as HTMLHeadingElement;
+    }
+    private get TitleInput(): HTMLInputElement {
+        return this.$refs.TitleInput as HTMLInputElement;
+    }
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
     }
@@ -74,16 +95,22 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     private get EditButton(): SlideupButton {
         return this.$refs.EditButton as SlideupButton;
     }
-    private get DeleteButton(): SlideupButton {
-        return this.$refs.DeleteButton as SlideupButton;
-    }
     private get EndEditButton(): SlideupButton {
         return this.$refs.EndEditButton as SlideupButton;
+    }
+    private get TrackListUl(): HTMLUListElement {
+        return this.$refs.TrackListUl as HTMLUListElement;
+    }
+    private get Items(): SelectionTrack[] {
+        return this.$refs.Items as SelectionTrack[];
     }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = false;
         await super.Initialize();
+
+        this.titleH3Animate = new Animate(this.TitleH3);
+        this.titleInputAnimate = new Animate(this.TitleInput);
 
         return true;
     }
@@ -93,6 +120,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             ? playlist
             : null;
         this.entities = [];
+        this.removedEntities = [];
 
         for (let i = 0; i < this.playlist.Tracks.length; i++)
             this.playlist.Tracks[i].TlId = null;
@@ -103,21 +131,79 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     }
 
     private OnClickEdit(): void {
+        this.titleH3Animate
+            .RemoveDisplayNone()
+            .Execute(Animation.FadeOutDown, Speed.Faster)
+            .then((): void => {
+                this.titleH3Animate.SetDisplayNone();
+                this.TitleInput.value = this.playlist.Name;
+                this.titleInputAnimate
+                    .RemoveDisplayNone()
+                    .Execute(Animation.FadeInUp, Speed.Faster);
+            });
         this.EditButton.Hide().then((): void => {
-            this.DeleteButton.Show();
-            this.EndEditButton.Show();
+            this.listMode = ListMode.Editable;
+            this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
+            this.EndEditButton.Show().then((): void => {
+                this.$forceUpdate();
+            });
         });
-    }
-
-    private OnClickDelete(): void {
-
     }
 
     private OnClickEndEdit(): void {
-        this.DeleteButton.Hide();
+        // TODO: 保存処理
+
+        this.titleInputAnimate
+            .RemoveDisplayNone()
+            .Execute(Animation.FadeOutDown, Speed.Faster)
+            .then((): void => {
+                this.titleInputAnimate.SetDisplayNone();
+                this.TitleInput.value = '';
+                this.titleH3Animate
+                    .RemoveDisplayNone()
+                    .Execute(Animation.FadeInUp, Speed.Faster);
+            })
         this.EndEditButton.Hide().then((): void => {
+            _.each(this.Items, (item) => {
+                item.Deselect();
+            });
+
+            this.listMode = ListMode.Playable;
+            this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
             this.EditButton.Show();
         });
+    }
+
+    protected OnSelectionChanged(args: ITrackSelectionChangedArgs): void {
+
+        if (this.listMode === ListMode.Playable) {
+            // 再生モード時
+            const isAllTracksRegistered = Libraries.Enumerable.from(this.playlist.Tracks)
+                .all((e): boolean => e.TlId !== null);
+
+            (isAllTracksRegistered)
+                ? this.store.PlayByTlId(args.Entity.TlId)
+                : this.store.PlayPlaylist(this.playlist, args.Entity);
+        } else if (this.listMode === ListMode.Editable) {
+            // 編集モード時
+
+            (args.View.GetIsSelected())
+                ? args.View.Deselect()
+                : args.View.Select();
+        }
+    }
+
+    private async OnDeleteOrdered(args: ITrackDeleteOrderedArgs): Promise<boolean> {
+        if (this.listMode === ListMode.Playable)
+            return;
+
+        await args.View.Deltete();
+
+        args.View.$el.parentElement.removeChild(args.View.$el);
+        _.pull(this.entities, args.Entity);
+        this.removedEntities.push(args.Entity);
+
+        return;
     }
 
     /**
@@ -128,14 +214,6 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
      */
     protected async OnInfinite($state: StateChanger): Promise<boolean> {
         return super.OnInfinite($state);
-    }
-    protected OnSelectionChanged(args: ISelectionChangedArgs<Track>): void {
-        const isAllTracksRegistered = Libraries.Enumerable.from(this.playlist.Tracks)
-            .all((e): boolean => e.TlId !== null);
-
-        (isAllTracksRegistered)
-            ? this.store.PlayByTlId(args.Entity.TlId)
-            : this.store.PlayPlaylist(this.playlist, args.Entity);
     }
     protected async GetPagenatedList(): Promise<IPagenatedResult<Track>> {
         if (!this.playlist) {
