@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MopidyFinder.Models.JsonRpcs
@@ -65,11 +66,6 @@ namespace MopidyFinder.Models.JsonRpcs
                 result = new JsonRpcResultSucceeded((int)values.Id, values.Result);
 
             return result;
-        }
-
-        public static JsonRpcResult CreateErrorResult(int id, string message)
-        {
-            return new JsonRpcResultError(id, message);
         }
     }
 }

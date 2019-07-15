@@ -11,6 +11,7 @@ import { default as SelectionList } from '../../../Shared/SelectionList';
 import SlideupButton from '../../../Shared/SlideupButton';
 import { default as SelectionTrack, ITrackDeleteOrderedArgs, ITrackSelectionChangedArgs } from './SelectionTrack';
 import { default as Animate, Animation, Speed } from '../../../../Utils/Animate';
+import Sortable from 'sortablejs/modular/sortable.complete.esm';
 
 enum ListMode {
     Playable = 'playable',
@@ -39,12 +40,17 @@ enum ListMode {
                     @Clicked="OnClickEdit" />
                 <slideup-button
                     v-bind:hideOnInit="true"
+                    iconClass="fa fa-trash"
+                    ref="DeleteListButton"
+                    @Clicked="OnClickDeleteList" />
+                <slideup-button
+                    v-bind:hideOnInit="true"
                     iconClass="fa fa-check"
                     ref="EndEditButton"
                     @Clicked="OnClickEndEdit" />
             </div>
         </div>
-        <div class="card-body list-scrollable">
+        <div class="card-body list-scrollable track-list">
             <ul v-bind:class="listClasses"
                 ref="TrackListUl">
                 <template v-for="entity in entities">
@@ -52,10 +58,11 @@ enum ListMode {
                     ref="Items"
                     v-bind:entity="entity"
                     @SelectionChanged="OnSelectionChanged"
-                    @DeleteOrdered="OnDeleteOrdered" />
+                    @DeleteOrdered="OnDeleteRowOrdered" />
                 </template>
                 <infinite-loading
                     @infinite="OnInfinite"
+                    force-use-infinite-wrapper=".list-scrollable.track-list"
                     ref="InfiniteLoading" />
             </ul>
         </div>
@@ -81,6 +88,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     private listClasses: string = TrackList.ListBaseClasses + this.listMode.toString();
     private titleH3Animate: Animate;
     private titleInputAnimate: Animate;
+    private sortable: Sortable = null;
 
     private get TitleH3(): HTMLHeadingElement {
         return this.$refs.TitleH3 as HTMLHeadingElement;
@@ -94,6 +102,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
     private get EditButton(): SlideupButton {
         return this.$refs.EditButton as SlideupButton;
+    }
+    private get DeleteListButton(): SlideupButton {
+        return this.$refs.DeleteListButton as SlideupButton;
     }
     private get EndEditButton(): SlideupButton {
         return this.$refs.EndEditButton as SlideupButton;
@@ -144,6 +155,13 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.EditButton.Hide().then((): void => {
             this.listMode = ListMode.Editable;
             this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
+            this.sortable = Sortable.create(this.TrackListUl, {
+                animation: 500,
+                multiDrag: true,
+                selectedClass: 'selected'
+            });
+
+            this.DeleteListButton.Show();
             this.EndEditButton.Show().then((): void => {
                 this.$forceUpdate();
             });
@@ -163,7 +181,8 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
                 this.titleH3Animate
                     .RemoveDisplayNone()
                     .Execute(Animation.FadeInUp, Speed.Faster);
-            })
+            });
+        this.DeleteListButton.Hide();
         this.EndEditButton.Hide().then((): void => {
             _.each(this.Items, (item) => {
                 item.Deselect();
@@ -171,6 +190,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
             this.listMode = ListMode.Playable;
             this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
+            this.sortable.destroy();
+            this.sortable = null;
+
             this.EditButton.Show();
             this.SetPlaylist(this.playlist);
         });
@@ -195,7 +217,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         }
     }
 
-    private async OnDeleteOrdered(args: ITrackDeleteOrderedArgs): Promise<boolean> {
+    private async OnDeleteRowOrdered(args: ITrackDeleteOrderedArgs): Promise<boolean> {
         if (this.listMode === ListMode.Playable)
             return;
 
@@ -206,6 +228,10 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.removedEntities.push(args.Entity);
 
         return;
+    }
+
+    private OnClickDeleteList(): void {
+
     }
 
     /**

@@ -150,7 +150,7 @@ define("EventableBase", ["require", "exports", "lodash"], function (require, exp
     }());
     exports.default = EventableBase;
 });
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "../css/site.css", "admin-lte/dist/js/adminlte", "admin-lte/plugins/bootstrap/js/bootstrap", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap", "admin-lte/dist/js/adminlte", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     /**
@@ -1989,7 +1989,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList = __decorate([
             vue_class_component_5.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable album-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.album-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_1.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
@@ -2190,7 +2190,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable artist-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.artist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_2.default,
                     'selection-item': SelectionItem_2.default,
@@ -2344,7 +2344,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         };
         GenreList = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable genre-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.genre-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_3.default,
                     'selection-item': SelectionItem_3.default,
@@ -2529,7 +2529,7 @@ define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, ex
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase"], function (require, exports, JsonRpcQueryableBase_1) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Utils/Exception"], function (require, exports, JsonRpcQueryableBase_1, Exception_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -2561,6 +2561,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
             _this._imageUri = null;
             _this._volume = 0;
             _this._isShuffle = false;
+            _this._nowOnPollingProsess = false;
             _this._backupValues = {
                 TlId: null,
                 PlayerState: PlayerState.Paused,
@@ -2675,7 +2676,8 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
             if (this._timer !== null)
                 this.StopPolling();
             this._timer = setInterval(function () {
-                _this.Polling();
+                if (!_this._nowOnPollingProsess)
+                    _this.Polling();
             }, Monitor.PollingMsec);
         };
         Monitor.prototype.StopPolling = function () {
@@ -2689,25 +2691,29 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
         };
         Monitor.prototype.Polling = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var resState, resTrack, tlTrack, track, _a, resTs, resVol, resRandom, resRepeat;
+                var resState, resTrack, tlTrack, track, _a, resTs, resVol, resRandom, resRepeat, ex_1;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
+                            this._nowOnPollingProsess = true;
+                            _b.label = 1;
+                        case 1:
+                            _b.trys.push([1, 15, , 16]);
                             this.SetBackupValues();
                             return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetState)];
-                        case 1:
+                        case 2:
                             resState = _b.sent();
                             if (resState.result) {
                                 this._playerState = resState.result;
                                 this._isPlaying = (this._playerState === PlayerState.Playing);
                             }
                             return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetCurrentTlTrack)];
-                        case 2:
+                        case 3:
                             resTrack = _b.sent();
-                            if (!resTrack.result) return [3 /*break*/, 6];
+                            if (!resTrack.result) return [3 /*break*/, 7];
                             tlTrack = resTrack.result;
                             track = tlTrack.track;
-                            if (!(this._tlId !== tlTrack.tlid)) return [3 /*break*/, 5];
+                            if (!(this._tlId !== tlTrack.tlid)) return [3 /*break*/, 6];
                             // 一旦初期化
                             this._tlId = tlTrack.tlid;
                             this._trackName = track.name;
@@ -2732,19 +2738,19 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                             this._trackLength = (track.length)
                                 ? track.length
                                 : 0;
-                            if (!track.album) return [3 /*break*/, 5];
-                            if (!(track.album.images && 0 < track.album.images.length)) return [3 /*break*/, 3];
+                            if (!track.album) return [3 /*break*/, 6];
+                            if (!(track.album.images && 0 < track.album.images.length)) return [3 /*break*/, 4];
                             this._imageUri = track.album.images[0];
-                            return [3 /*break*/, 5];
-                        case 3:
-                            if (!track.album.uri) return [3 /*break*/, 5];
+                            return [3 /*break*/, 6];
+                        case 4:
+                            if (!track.album.uri) return [3 /*break*/, 6];
                             _a = this;
                             return [4 /*yield*/, this.GetAlbumImageUri(track.album.uri)];
-                        case 4:
+                        case 5:
                             _a._imageUri = _b.sent();
-                            _b.label = 5;
-                        case 5: return [3 /*break*/, 7];
-                        case 6:
+                            _b.label = 6;
+                        case 6: return [3 /*break*/, 8];
+                        case 7:
                             this._tlId = null;
                             this._trackName = '--';
                             this._trackLength = 0;
@@ -2752,38 +2758,45 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                             this._artistName = '--';
                             this._year = null;
                             this._imageUri = null;
-                            _b.label = 7;
-                        case 7:
-                            if (!this._isPlaying) return [3 /*break*/, 9];
-                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetTimePosition)];
+                            _b.label = 8;
                         case 8:
+                            if (!this._isPlaying) return [3 /*break*/, 10];
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetTimePosition)];
+                        case 9:
                             resTs = _b.sent();
                             this._trackProgress = (resTs.result)
                                 ? parseInt(resTs.result, 10)
                                 : 0;
-                            return [3 /*break*/, 10];
-                        case 9:
+                            return [3 /*break*/, 11];
+                        case 10:
                             this._trackProgress = 0;
-                            _b.label = 10;
-                        case 10: return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetVolume)];
-                        case 11:
+                            _b.label = 11;
+                        case 11: return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetVolume)];
+                        case 12:
                             resVol = _b.sent();
                             this._volume = (resVol.result)
                                 ? resVol.result
                                 : 0;
                             return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetRandom)];
-                        case 12:
+                        case 13:
                             resRandom = _b.sent();
                             this._isShuffle = (resRandom.result)
                                 ? resRandom.result
                                 : false;
                             return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetRepeat)];
-                        case 13:
+                        case 14:
                             resRepeat = _b.sent();
                             this._isRepeat = (resRepeat.result)
                                 ? resRepeat.result
                                 : false;
                             this.DetectChanges();
+                            return [3 /*break*/, 16];
+                        case 15:
+                            ex_1 = _b.sent();
+                            Exception_5.default.Dump('Polling Error', ex_1);
+                            return [3 /*break*/, 16];
+                        case 16:
+                            this._nowOnPollingProsess = false;
                             return [2 /*return*/, true];
                     }
                 });
@@ -3076,7 +3089,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                                 else if (!_this.monitor.IsRepeat && enabled)
                                     _this.ButtonRepeat.classList.add(PlayerPanel_1.ClassDisabled);
                             });
-                            this.monitor.StartPolling();
+                            //this.monitor.StartPolling();
                             return [2 /*return*/, true];
                     }
                 });
@@ -3278,6 +3291,8 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                         case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistAsList)];
                         case 1:
                             response = _a.sent();
+                            console.log('PlaylistStore.GetPlaylists:');
+                            console.log(response);
                             refs = response.result;
                             ordered = Libraries_7.default.Enumerable.from(refs)
                                 .orderBy(function (e) { return e.name; })
@@ -3686,7 +3701,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         };
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_14.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable playlist-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.playlist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_4.default,
                     'selection-item': SelectionItem_4.default,
@@ -3785,7 +3800,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
     }(ViewBase_11.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Utils/Animate"], function (require, exports, _, vue_class_component_16, vue_infinite_loading_5, Libraries_10, PlaylistStore_2, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, Animate_4) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Utils/Animate", "sortablejs/modular/sortable.complete.esm"], function (require, exports, _, vue_class_component_16, vue_infinite_loading_5, Libraries_10, PlaylistStore_2, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, Animate_4, sortable_complete_esm_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ListMode;
@@ -3803,6 +3818,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             _this.removedEntities = [];
             _this.listMode = ListMode.Playable;
             _this.listClasses = TrackList_1.ListBaseClasses + _this.listMode.toString();
+            _this.sortable = null;
             return _this;
         }
         TrackList_1 = TrackList;
@@ -3830,6 +3846,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         Object.defineProperty(TrackList.prototype, "EditButton", {
             get: function () {
                 return this.$refs.EditButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TrackList.prototype, "DeleteListButton", {
+            get: function () {
+                return this.$refs.DeleteListButton;
             },
             enumerable: true,
             configurable: true
@@ -3902,6 +3925,12 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             this.EditButton.Hide().then(function () {
                 _this.listMode = ListMode.Editable;
                 _this.listClasses = TrackList_1.ListBaseClasses + _this.listMode.toString();
+                _this.sortable = sortable_complete_esm_1.default.create(_this.TrackListUl, {
+                    animation: 500,
+                    multiDrag: true,
+                    selectedClass: 'selected'
+                });
+                _this.DeleteListButton.Show();
                 _this.EndEditButton.Show().then(function () {
                     _this.$forceUpdate();
                 });
@@ -3921,12 +3950,15 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     .RemoveDisplayNone()
                     .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
             });
+            this.DeleteListButton.Hide();
             this.EndEditButton.Hide().then(function () {
                 _.each(_this.Items, function (item) {
                     item.Deselect();
                 });
                 _this.listMode = ListMode.Playable;
                 _this.listClasses = TrackList_1.ListBaseClasses + _this.listMode.toString();
+                _this.sortable.destroy();
+                _this.sortable = null;
                 _this.EditButton.Show();
                 _this.SetPlaylist(_this.playlist);
             });
@@ -3947,7 +3979,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     : args.View.Select();
             }
         };
-        TrackList.prototype.OnDeleteOrdered = function (args) {
+        TrackList.prototype.OnDeleteRowOrdered = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -3964,6 +3996,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     }
                 });
             });
+        };
+        TrackList.prototype.OnClickDeleteList = function () {
         };
         /**
          * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
@@ -4026,7 +4060,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.ListBaseClasses = 'products-list product-list-in-box track-list ';
         TrackList = TrackList_1 = __decorate([
             vue_class_component_16.default({
-                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\" />\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\" />\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    ref=\"DeleteListButton\"\n                    @Clicked=\"OnClickDeleteList\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable track-list\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.track-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
                     'slideup-button': SlideupButton_2.default,

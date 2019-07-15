@@ -1,3 +1,13 @@
+/*html,
+body,
+div#root {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    overflow: hidden !important;
+}*/
+
 .list-scrollable {
     /* 57, 64, 49 **/
     height: calc(100vh - 140px);

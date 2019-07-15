@@ -22,9 +22,25 @@ namespace MopidyFinder.Controllers
 
         public async Task<IActionResult> Index()
         {
-            await Initializer.Exec();
+            //await Initializer.Exec();
 
+#if DEBUG
             return this.File(HomeController.IndexDevBytes, "text/html");
+#else
+            // TS/WebpackコンパイルはMSBuild側ではやってない。
+            // 別途 npm run build:prod を実行すること。
+            return this.File(HomeController.IndexBytes, "text/html");
+#endif
+        }
+
+        public IActionResult Debug()
+        {
+            return this.File(HomeController.IndexDevBytes, "text/html");
+        }
+
+        public IActionResult Release()
+        {
+            return this.File(HomeController.IndexBytes, "text/html");
         }
     }
 }

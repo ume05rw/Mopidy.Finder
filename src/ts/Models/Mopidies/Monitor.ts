@@ -1,5 +1,6 @@
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import ITlTrack from '../Mopidies/ITlTrack';
+import Exception from '../../Utils/Exception';
 
 export const MonitorEvents = {
     TrackChanged: 'TrackChanged',
@@ -58,6 +59,7 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
     private _isShuffle: boolean = false;
     private _isRepeat: boolean;
     private _timer: number;
+    private _nowOnPollingProsess: boolean = false;
 
     private _backupValues: IStatus = {
         TlId: null,
@@ -123,7 +125,8 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
             this.StopPolling();
             
         this._timer = setInterval((): void => {
-            this.Polling();
+            if (!this._nowOnPollingProsess)
+                this.Polling();
         }, Monitor.PollingMsec);
     }
 
@@ -139,90 +142,98 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
 
     private async Polling(): Promise<boolean> {
 
-        this.SetBackupValues();
+        this._nowOnPollingProsess = true;
 
-        const resState = await this.JsonRpcRequest(Monitor.Methods.GetState);
-        if (resState.result) {
-            this._playerState = resState.result as PlayerState;
-            this._isPlaying = (this._playerState === PlayerState.Playing);
-        }
+        try {
+            this.SetBackupValues();
 
-        const resTrack = await this.JsonRpcRequest(Monitor.Methods.GetCurrentTlTrack);
-        if (resTrack.result) {
-            const tlTrack = resTrack.result as ITlTrack;
-            const track = tlTrack.track;
-            if (this._tlId !== tlTrack.tlid) {
+            const resState = await this.JsonRpcRequest(Monitor.Methods.GetState);
+            if (resState.result) {
+                this._playerState = resState.result as PlayerState;
+                this._isPlaying = (this._playerState === PlayerState.Playing);
+            }
 
-                // 一旦初期化
-                this._tlId = tlTrack.tlid;
-                this._trackName = track.name;
+            const resTrack = await this.JsonRpcRequest(Monitor.Methods.GetCurrentTlTrack);
+            if (resTrack.result) {
+                const tlTrack = resTrack.result as ITlTrack;
+                const track = tlTrack.track;
+                if (this._tlId !== tlTrack.tlid) {
+
+                    // 一旦初期化
+                    this._tlId = tlTrack.tlid;
+                    this._trackName = track.name;
+                    this._trackLength = 0;
+                    this._trackProgress = 0;
+                    this._artistName = '--';
+                    this._year = null;
+                    this._imageUri = null;
+
+                    if (track.artists && 0 < track.artists.length) {
+                        this._artistName = (track.artists.length === 1)
+                            ? track.artists[0].name
+                            : track.artists[0].name + ' and more...';
+                    } else {
+                        this._artistName = '';
+                    }
+
+                    if (track.date && 4 <= track.date.length) {
+                        this._year = (4 < track.date.length)
+                            ? parseInt(track.date.substring(0, 4), 10)
+                            : parseInt(track.date, 10);
+                    }
+
+                    this._trackLength = (track.length)
+                        ? track.length
+                        : 0;
+
+                    if (track.album) {
+                        if (track.album.images && 0 < track.album.images.length) {
+                            this._imageUri = track.album.images[0];
+                        } else if (track.album.uri) {
+                            this._imageUri = await this.GetAlbumImageUri(track.album.uri);
+                        }
+                    }
+                }
+            } else {
+                this._tlId = null;
+                this._trackName = '--';
                 this._trackLength = 0;
                 this._trackProgress = 0;
                 this._artistName = '--';
                 this._year = null;
                 this._imageUri = null;
-
-                if (track.artists && 0 < track.artists.length) {
-                    this._artistName = (track.artists.length === 1)
-                        ? track.artists[0].name
-                        : track.artists[0].name + ' and more...';
-                } else {
-                    this._artistName = '';
-                }
-
-                if (track.date && 4 <= track.date.length) {
-                    this._year = (4 < track.date.length)
-                        ? parseInt(track.date.substring(0, 4), 10)
-                        : parseInt(track.date, 10);
-                }
-
-                this._trackLength = (track.length)
-                    ? track.length
-                    : 0;
-
-                if (track.album) {
-                    if (track.album.images && 0 < track.album.images.length) {
-                        this._imageUri = track.album.images[0];
-                    } else if (track.album.uri) {
-                        this._imageUri = await this.GetAlbumImageUri(track.album.uri);
-                    }
-                }
             }
-        } else {
-            this._tlId = null;
-            this._trackName = '--';
-            this._trackLength = 0;
-            this._trackProgress = 0;
-            this._artistName = '--';
-            this._year = null;
-            this._imageUri = null;
-        }
 
-        if (this._isPlaying) {
-            const resTs = await this.JsonRpcRequest(Monitor.Methods.GetTimePosition);
-            this._trackProgress = (resTs.result)
-                ? parseInt(resTs.result, 10)
+            if (this._isPlaying) {
+                const resTs = await this.JsonRpcRequest(Monitor.Methods.GetTimePosition);
+                this._trackProgress = (resTs.result)
+                    ? parseInt(resTs.result, 10)
+                    : 0;
+            } else {
+                this._trackProgress = 0;
+            }
+
+            const resVol = await this.JsonRpcRequest(Monitor.Methods.GetVolume);
+            this._volume = (resVol.result)
+                ? resVol.result as number
                 : 0;
-        } else {
-            this._trackProgress = 0;
+
+            const resRandom = await this.JsonRpcRequest(Monitor.Methods.GetRandom);
+            this._isShuffle = (resRandom.result)
+                ? resRandom.result as boolean
+                : false;
+
+            const resRepeat = await this.JsonRpcRequest(Monitor.Methods.GetRepeat);
+            this._isRepeat = (resRepeat.result)
+                ? resRepeat.result as boolean
+                : false;
+
+            this.DetectChanges();
+        } catch (ex) {
+            Exception.Dump('Polling Error', ex);
         }
 
-        const resVol = await this.JsonRpcRequest(Monitor.Methods.GetVolume);
-        this._volume = (resVol.result)
-            ? resVol.result as number
-            : 0;
-
-        const resRandom = await this.JsonRpcRequest(Monitor.Methods.GetRandom);
-        this._isShuffle = (resRandom.result)
-            ? resRandom.result as boolean
-            : false;
-
-        const resRepeat = await this.JsonRpcRequest(Monitor.Methods.GetRepeat);
-        this._isRepeat = (resRepeat.result)
-            ? resRepeat.result as boolean
-            : false;
-
-        this.DetectChanges();
+        this._nowOnPollingProsess = false;
 
         return true;
     }

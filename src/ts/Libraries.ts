@@ -1,18 +1,36 @@
+/**
+ * --------------------------------------------------
+ * CSS
+ * --------------------------------------------------
+ */
 import 'animate.css/animate.css';
 import 'font-awesome/css/font-awesome.css';
 import 'admin-lte/dist/css/adminlte.css';
 import 'admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css';
 import '../css/site.css';
 
+/**
+ * --------------------------------------------------
+ * JQuery本体とJQuery依存ライブラリ
+ * --------------------------------------------------
+ */
 import * as jQuery from 'jquery';
-
-// 先にJQueryを読ませておく。
-import 'admin-lte/dist/js/adminlte';
+import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
 import 'admin-lte/plugins/bootstrap/js/bootstrap';
+import 'admin-lte/dist/js/adminlte';
+//import * as Bootstrap from 'admin-lte/plugins/bootstrap/js/bootstrap';
+//import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 import 'jquery-slimscroll';
 
-import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
+/**
+ * --------------------------------------------------
+ * 独立したライブラリ
+ * --------------------------------------------------
+ * ※defaultエクスポート変換しているもののみ、ここで
+ * ※実体取得ロジックを挟む。
+ * --------------------------------------------------
+ */
 import * as Enumerable from 'linq';
 import * as Mopidy from 'mopidy';
 
@@ -68,3 +86,4 @@ export default class Libraries {
         });
     }
 }
+

@@ -57,7 +57,8 @@
             "responsive-toolkit": [ "types/responsive-toolkit" ],
             "admin-lte/dist/js/adminlte": [ "types/adminlte" ],
             "mopidy": [ "types/mopidy" ],
-            "jquery-slimscroll": [ "types/jquery-slimscroll" ]
+            "jquery-slimscroll": [ "types/jquery-slimscroll" ],
+            "sortablejs/modular/sortable.complete.esm": [ "types/sortable" ]
         },
 
         // TSの型定義ファイル参照パス

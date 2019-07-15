@@ -38,7 +38,7 @@ export const PlaylistListEvents = {
                 </button>
             </div>
         </div>
-        <div class="card-body list-scrollable">
+        <div class="card-body list-scrollable playlist-list">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
                 <selection-item
@@ -48,6 +48,7 @@ export const PlaylistListEvents = {
                 </template>
                 <infinite-loading
                     @infinite="OnInfinite"
+                    force-use-infinite-wrapper=".list-scrollable.playlist-list"
                     ref="InfiniteLoading" />
             </ul>
         </div>

@@ -148,6 +148,10 @@
     </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="types\sortable\" />
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptJSXEmit>None</TypeScriptJSXEmit>

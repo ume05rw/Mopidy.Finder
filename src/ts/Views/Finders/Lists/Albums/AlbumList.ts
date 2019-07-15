@@ -22,7 +22,7 @@ import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './Sel
                     @TextUpdated="Refresh()"/>
             </div>
         </div>
-        <div class="card-body list-scrollable">
+        <div class="card-body list-scrollable album-list">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
                     <selection-album-tracks
@@ -32,6 +32,7 @@ import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './Sel
                 </template>
                 <infinite-loading
                     @infinite="OnInfinite"
+                    force-use-infinite-wrapper=".list-scrollable.album-list"
                     ref="InfiniteLoading" />
             </ul>
         </div>
