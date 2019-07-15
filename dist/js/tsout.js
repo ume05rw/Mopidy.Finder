@@ -1220,20 +1220,289 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
     }());
     exports.default = Delay;
 });
-define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_2) {
+define("Utils/Animate", ["require", "exports", "lodash"], function (require, exports, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.AnimatedViewEvents = {
-        AnimationEnd: 'animationend'
+    var Speed;
+    (function (Speed) {
+        Speed["Slower"] = "slower";
+        Speed["Slow"] = "slow";
+        Speed["Normal"] = "";
+        Speed["Fast"] = "fast";
+        Speed["Faster"] = "faster";
+    })(Speed = exports.Speed || (exports.Speed = {}));
+    ;
+    var Animation;
+    (function (Animation) {
+        Animation["Bounce"] = "bounce";
+        Animation["BounceIn"] = "bounceIn";
+        Animation["BounceInDown"] = "bounceInDown";
+        Animation["BounceInLeft"] = "bounceInLeft";
+        Animation["BounceInRight"] = "bounceInRight";
+        Animation["BounceInUp"] = "bounceInUp";
+        Animation["BounceOut"] = "bounceOut";
+        Animation["BounceOutDown"] = "bounceOutDown";
+        Animation["BounceOutLeft"] = "bounceOutLeft";
+        Animation["BounceOutRight"] = "bounceOutRight";
+        Animation["BounceOutUp"] = "bounceOutUp";
+        Animation["FadeIn"] = "fadeIn";
+        Animation["FadeInDown"] = "fadeInDown";
+        Animation["FadeInDownBig"] = "fadeInDownBig";
+        Animation["FadeInLeft"] = "fadeInLeft";
+        Animation["FadeInLeftBig"] = "fadeInLeftBig";
+        Animation["FadeInRight"] = "fadeInRight";
+        Animation["FadeInRightBig"] = "fadeInRightBig";
+        Animation["FadeInUp"] = "fadeInUp";
+        Animation["FadeInUpBig"] = "fadeInUpBig";
+        Animation["FadeOut"] = "fadeOut";
+        Animation["FadeOutDown"] = "fadeOutDown";
+        Animation["FadeOutDownBig"] = "fadeOutDownBig";
+        Animation["FadeOutLeft"] = "fadeOutLeft";
+        Animation["FadeOutLeftBig"] = "fadeOutLeftBig";
+        Animation["FadeOutRight"] = "fadeOutRight";
+        Animation["FadeOutRightBig"] = "fadeOutRightBig";
+        Animation["FadeOutUp"] = "fadeOutUp";
+        Animation["FadeOutUpBig"] = "fadeOutUpBig";
+        Animation["Flash"] = "flash";
+        Animation["FlipInX"] = "flipInX";
+        Animation["FlipInY"] = "flipInY";
+        Animation["FlipOutX"] = "flipOutX";
+        Animation["FlipOutY"] = "flipOutY";
+        Animation["HeadShake"] = "headShake";
+        Animation["HeartBeat"] = "heartBeat";
+        Animation["Hinge"] = "hinge";
+        Animation["JackInTheBox"] = "jackInTheBox";
+        Animation["Jello"] = "jello";
+        Animation["LightSpeedIn"] = "lightSpeedIn";
+        Animation["LightSpeedOut"] = "lightSpeedOut";
+        Animation["Pulse"] = "pulse";
+        Animation["RollIn"] = "rollIn";
+        Animation["RollOut"] = "rollOut";
+        Animation["RotateIn"] = "rotateIn";
+        Animation["RotateInDownLeft"] = "rotateInDownLeft";
+        Animation["RotateInDownRight"] = "rotateInDownRight";
+        Animation["RotateInUpLeft"] = "rotateInUpLeft";
+        Animation["RotateInUpRight"] = "rotateInUpRight";
+        Animation["RotateOut"] = "rotateOut";
+        Animation["RotateOutDownLeft"] = "rotateOutDownLeft";
+        Animation["RotateOutDownRight"] = "rotateOutDownRight";
+        Animation["RotateOutUpLeft"] = "rotateOutUpLeft";
+        Animation["RotateOutUpRight"] = "rotateOutUpRight";
+        Animation["RubberBand"] = "rubberBand";
+        Animation["Shake"] = "shake";
+        Animation["SlideInDown"] = "slideInDown";
+        Animation["SlideInLeft"] = "slideInLeft";
+        Animation["SlideInRight"] = "slideInRight";
+        Animation["SlideInUp"] = "slideInUp";
+        Animation["SlideOutDown"] = "slideOutDown";
+        Animation["SlideOutLeft"] = "slideOutLeft";
+        Animation["SlideOutRight"] = "slideOutRight";
+        Animation["SlideOutUp"] = "slideOutUp";
+        Animation["Swing"] = "swing";
+        Animation["Tada"] = "tada";
+        Animation["Wobble"] = "wobble";
+        Animation["ZoomIn"] = "zoomIn";
+        Animation["ZoomInDown"] = "zoomInDown";
+        Animation["ZoomInLeft"] = "zoomInLeft";
+        Animation["ZoomInRight"] = "zoomInRight";
+        Animation["ZoomInUp"] = "zoomInUp";
+        Animation["ZoomOut"] = "zoomOut";
+        Animation["ZoomOutDown"] = "zoomOutDown";
+        Animation["ZoomOutLeft"] = "zoomOutLeft";
+        Animation["ZoomOutRight"] = "zoomOutRight";
+        Animation["ZoomOutUp"] = "zoomOutUp";
+    })(Animation = exports.Animation || (exports.Animation = {}));
+    var ToHideAnimations = {
+        'bounceOut': true,
+        'bounceOutDown': true,
+        'bounceOutLeft': true,
+        'bounceOutRight': true,
+        'bounceOutUp': true,
+        'fadeOut': true,
+        'fadeOutDown': true,
+        'fadeOutDownBig': true,
+        'fadeOutLeft': true,
+        'fadeOutLeftBig': true,
+        'fadeOutRight': true,
+        'fadeOutRightBig': true,
+        'fadeOutUp': true,
+        'fadeOutUpBig': true,
+        'flipOutX': true,
+        'flipOutY': true,
+        'hinge': true,
+        'lightSpeedOut': true,
+        'rollOut': true,
+        'rotateOut': true,
+        'rotateOutDownLeft': true,
+        'rotateOutDownRight': true,
+        'rotateOutUpLeft': true,
+        'rotateOutUpRight': true,
+        'slideOutDown': true,
+        'slideOutLeft': true,
+        'slideOutRight': true,
+        'slideOutUp': true,
+        'zoomOut': true,
+        'zoomOutDown': true,
+        'zoomOutLeft': true,
+        'zoomOutRight': true,
+        'zoomOutUp': true,
     };
+    var Animate = /** @class */ (function () {
+        function Animate(elem) {
+            this._resolver = null;
+            this._elem = null;
+            this._classes = null;
+            this._elem = elem;
+            this._classes = this._elem.classList;
+            this.OnAnimationEnd.bind(this);
+        }
+        Animate.ClearAnimation = function (elem) {
+            var classes = elem.classList;
+            if (!classes.contains(Animate.ClassAnimated))
+                classes.remove(Animate.ClassAnimated);
+            _.each(_.toPairs(Speed), function (vals) {
+                var className = vals[1];
+                if (className === '')
+                    return;
+                if (classes.contains(className))
+                    classes.remove(className);
+            });
+            _.each(_.toPairs(Animation), function (vals) {
+                var className = vals[1];
+                if (classes.contains(className))
+                    classes.remove(className);
+            });
+        };
+        Animate.Exec = function (elem, animation, speed) {
+            if (speed === void 0) { speed = Speed.Normal; }
+            return __awaiter(this, void 0, void 0, function () {
+                var anim;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            anim = new Animate(elem);
+                            return [4 /*yield*/, anim.Execute(animation, speed)];
+                        case 1:
+                            _a.sent();
+                            anim.Dispose();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Animate.GetClassString = function (animation, speed) {
+            if (speed === void 0) { speed = Speed.Normal; }
+            var result = " " + Animate.ClassAnimated + " " + animation.toString() + " "
+                + ((speed === Speed.Normal)
+                    ? ''
+                    : speed.toString() + " ");
+            return result;
+        };
+        Animate.IsHideAnimation = function (animation) {
+            return (ToHideAnimations[animation.toString()]);
+        };
+        Animate.prototype.Execute = function (animation, speed) {
+            var _this = this;
+            if (speed === void 0) { speed = Speed.Normal; }
+            return new Promise(function (resolve) {
+                _this._resolver = resolve;
+                _this._elem.addEventListener(Animate.AnimationEndEvent, _this.OnAnimationEnd);
+                // 同じ内容のアニメーションが設定済みのとき、一度クリアしたあとで遅延実行する。
+                var needsDefer = (_this._classes.contains(Animate.ClassAnimated)
+                    && _this._classes.contains(animation.toString()));
+                Animate.ClearAnimation(_this._elem);
+                (needsDefer)
+                    ? _.defer(function () {
+                        _this.InnerExecute(animation, speed);
+                    })
+                    : _this.InnerExecute(animation, speed);
+            });
+        };
+        Animate.prototype.InnerExecute = function (animation, speed) {
+            var _this = this;
+            if (speed === void 0) { speed = Speed.Normal; }
+            this._classes.add(Animate.ClassAnimated);
+            this._classes.add(animation.toString());
+            if (speed !== Speed.Normal)
+                this._classes.add(speed.toString());
+            // animationendイベントタイムアウト: 100ms加算。
+            var endTime = -1;
+            switch (speed) {
+                case Speed.Slower:
+                    endTime = 3100;
+                    break;
+                case Speed.Slow:
+                    endTime = 2100;
+                    break;
+                case Speed.Normal:
+                    endTime = 1100;
+                    break;
+                case Speed.Fast:
+                    endTime = 900;
+                    break;
+                case Speed.Faster:
+                    endTime = 600;
+                    break;
+            }
+            setTimeout(function () {
+                if (_this._resolver) {
+                    _this._resolver(false);
+                    _this._resolver = null;
+                }
+            }, endTime);
+        };
+        Animate.prototype.Clear = function () {
+            Animate.ClearAnimation(this._elem);
+            return this;
+        };
+        Animate.prototype.SetDisplayNone = function () {
+            if (!this._classes.contains('d-none'))
+                this._classes.add('d-none');
+            return this;
+        };
+        Animate.prototype.RemoveDisplayNone = function () {
+            if (this._classes.contains('d-none'))
+                this._classes.remove('d-none');
+            return this;
+        };
+        Animate.prototype.OnAnimationEnd = function () {
+            if (this._resolver) {
+                this._resolver(true);
+                this._resolver = null;
+            }
+            return this;
+        };
+        Animate.prototype.Dispose = function () {
+            Animate.ClearAnimation(this._elem);
+            try {
+                this._elem.removeEventListener(Animate.AnimationEndEvent, this.OnAnimationEnd);
+            }
+            catch (e) {
+                // 握りつぶす。
+            }
+            if (this._resolver)
+                this._resolver(false);
+            this._resolver = null;
+            this._elem = null;
+            this._classes = null;
+        };
+        Animate.ClassAnimated = 'animated';
+        Animate.AnimationEndEvent = 'animationend';
+        return Animate;
+    }());
+    exports.default = Animate;
+});
+define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewBase", "Utils/Exception", "Utils/Animate", "Utils/Animate"], function (require, exports, ViewBase_2, Exception_3, Animate_1, Animate_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Animation = Animate_2.Animation;
+    exports.Speed = Animate_2.Speed;
     var AnimatedViewBase = /** @class */ (function (_super) {
         __extends(AnimatedViewBase, _super);
         function AnimatedViewBase() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.AnimationClassSpeed = 'faster';
-            _this.AnimationClassHide = 'd-none';
-            _this.AnimationClassAnimated = 'animated';
-            _this._resolver = null;
+            _this.Speed = Animate_1.Speed.Faster;
+            _this.ClassHide = 'd-none';
             return _this;
         }
         Object.defineProperty(AnimatedViewBase.prototype, "Element", {
@@ -1245,97 +1514,66 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
         });
         AnimatedViewBase.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.Element.addEventListener(exports.AnimatedViewEvents.AnimationEnd, function () {
-                                var classes = _this.Element.classList;
-                                if (classes.contains(_this.AnimationClassIn)) {
-                                    // 表示化
-                                    _this.ClearAllClasses();
-                                }
-                                else if (classes.contains(_this.AnimationClassOut)) {
-                                    // 非表示化
-                                    _this.ClearAllClasses();
-                                    classes.add(_this.AnimationClassHide);
-                                }
-                                if (_this._resolver) {
-                                    _this._resolver(true);
-                                    _this._resolver = null;
-                                }
-                                //this.$emit(AnimatedViewEvents.AnimationEnd);
-                            });
+                            if (!this.AnimationIn || Animate_1.default.IsHideAnimation(this.AnimationIn))
+                                Exception_3.default.Throw('Invalid In-Animation', this.AnimationIn);
+                            if (!this.AnimationOut || !Animate_1.default.IsHideAnimation(this.AnimationOut))
+                                Exception_3.default.Throw('Invalid Out-Animation', this.AnimationOut);
+                            this.animate = new Animate_1.default(this.$el);
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
         AnimatedViewBase.prototype.ClearAllClasses = function () {
-            var classes = this.Element.classList;
-            if (classes.contains(this.AnimationClassHide))
-                classes.remove(this.AnimationClassHide);
-            if (classes.contains(this.AnimationClassAnimated))
-                classes.remove(this.AnimationClassAnimated);
-            if (classes.contains(this.AnimationClassOut))
-                classes.remove(this.AnimationClassOut);
-            if (classes.contains(this.AnimationClassIn))
-                classes.remove(this.AnimationClassIn);
-            if (this.AnimationClassSpeed
-                && 0 < this.AnimationClassSpeed.length
-                && classes.contains(this.AnimationClassSpeed)) {
-                classes.remove(this.AnimationClassSpeed);
-            }
+            Animate_1.default.ClearAnimation(this.Element);
         };
         AnimatedViewBase.prototype.ShowNow = function () {
             this.ClearAllClasses();
+            if (this.$el.classList.contains(this.ClassHide))
+                this.$el.classList.remove(this.ClassHide);
         };
         AnimatedViewBase.prototype.Show = function () {
-            var _this = this;
-            if (this._resolver) {
-                this._resolver(false);
-                this._resolver = null;
-            }
-            return new Promise(function (resolve) {
-                _this._resolver = resolve;
-                var classes = _this.Element.classList;
-                _this.ClearAllClasses();
-                classes.add(_this.AnimationClassAnimated);
-                classes.add(_this.AnimationClassIn);
-                if (_this.AnimationClassSpeed
-                    && 0 < _this.AnimationClassSpeed.length
-                    && !classes.contains(_this.AnimationClassSpeed)) {
-                    classes.add(_this.AnimationClassSpeed);
-                }
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.$el.classList.contains(this.ClassHide))
+                                this.$el.classList.remove(this.ClassHide);
+                            return [4 /*yield*/, this.animate.Execute(this.AnimationIn, this.Speed)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
             });
         };
         AnimatedViewBase.prototype.HideNow = function () {
             this.ClearAllClasses();
-            this.Element.classList.add(this.AnimationClassHide);
+            this.$el.classList.add(this.ClassHide);
         };
         AnimatedViewBase.prototype.Hide = function () {
-            var _this = this;
-            if (this._resolver) {
-                this._resolver(false);
-                this._resolver = null;
-            }
-            return new Promise(function (resolve) {
-                _this._resolver = resolve;
-                var classes = _this.Element.classList;
-                _this.ClearAllClasses();
-                classes.add(_this.AnimationClassAnimated);
-                classes.add(_this.AnimationClassOut);
-                if (_this.AnimationClassSpeed
-                    && 0 < _this.AnimationClassSpeed.length
-                    && !classes.contains(_this.AnimationClassSpeed)) {
-                    classes.add(_this.AnimationClassSpeed);
-                }
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.$el.classList.contains(this.ClassHide))
+                                this.$el.classList.remove(this.ClassHide);
+                            return [4 /*yield*/, this.animate.Execute(this.AnimationOut, this.Speed)];
+                        case 1:
+                            _a.sent();
+                            this.$el.classList.add(this.ClassHide);
+                            return [2 /*return*/, true];
+                    }
+                });
             });
         };
         AnimatedViewBase.prototype.GetIsVisible = function () {
-            return !this.Element.classList.contains(this.AnimationClassHide);
+            return !this.Element.classList.contains(this.ClassHide);
         };
         return AnimatedViewBase;
     }(ViewBase_2.default));
@@ -1351,8 +1589,8 @@ define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component
         __extends(SlideupButtom, _super);
         function SlideupButtom() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.AnimationClassIn = 'fadeInUp';
-            _this.AnimationClassOut = 'fadeOutDown';
+            _this.AnimationIn = AnimatedViewBase_1.Animation.FadeInUp;
+            _this.AnimationOut = AnimatedViewBase_1.Animation.FadeOutDown;
             return _this;
         }
         SlideupButtom.prototype.Initialize = function () {
@@ -1400,8 +1638,8 @@ define("Views/Shared/Filterboxes/SearchInput", ["require", "exports", "vue-class
         __extends(SearchInput, _super);
         function SearchInput() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.AnimationClassIn = 'fadeInUp';
-            _this.AnimationClassOut = 'fadeOutDown';
+            _this.AnimationIn = AnimatedViewBase_2.Animation.FadeInUp;
+            _this.AnimationOut = AnimatedViewBase_2.Animation.FadeOutDown;
             return _this;
         }
         SearchInput.prototype.OnInput = function () {
@@ -1587,7 +1825,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     }(ViewBase_4.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_5, vue_infinite_loading_1, Libraries_4, AlbumTracksStore_1, Exception_3, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_5, vue_infinite_loading_1, Libraries_4, AlbumTracksStore_1, Exception_4, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumList = /** @class */ (function (_super) {
@@ -1673,10 +1911,10 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 2:
                             albumTracks = args.Entity;
                             if (!albumTracks)
-                                Exception_3.default.Throw('AlbumTracks Not Found', args);
+                                Exception_4.default.Throw('AlbumTracks Not Found', args);
                             track = args.Track;
                             if (!track)
-                                Exception_3.default.Throw('Track Not Found', args);
+                                Exception_4.default.Throw('Track Not Found', args);
                             isAllTracksRegistered = Libraries_4.default.Enumerable.from(albumTracks.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
@@ -3461,238 +3699,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Utils/Animate", ["require", "exports", "lodash"], function (require, exports, _) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Speed;
-    (function (Speed) {
-        Speed["Slower"] = "slower";
-        Speed["Slow"] = "slow";
-        Speed["Normal"] = "";
-        Speed["Fast"] = "fast";
-        Speed["Faster"] = "faster";
-    })(Speed = exports.Speed || (exports.Speed = {}));
-    ;
-    var Animation;
-    (function (Animation) {
-        Animation["Bounce"] = "bounce";
-        Animation["BounceIn"] = "bounceIn";
-        Animation["BounceInDown"] = "bounceInDown";
-        Animation["BounceInLeft"] = "bounceInLeft";
-        Animation["BounceInRight"] = "bounceInRight";
-        Animation["BounceInUp"] = "bounceInUp";
-        Animation["BounceOut"] = "bounceOut";
-        Animation["BounceOutDown"] = "bounceOutDown";
-        Animation["BounceOutLeft"] = "bounceOutLeft";
-        Animation["BounceOutRight"] = "bounceOutRight";
-        Animation["BounceOutUp"] = "bounceOutUp";
-        Animation["FadeIn"] = "fadeIn";
-        Animation["FadeInDown"] = "fadeInDown";
-        Animation["FadeInDownBig"] = "fadeInDownBig";
-        Animation["FadeInLeft"] = "fadeInLeft";
-        Animation["FadeInLeftBig"] = "fadeInLeftBig";
-        Animation["FadeInRight"] = "fadeInRight";
-        Animation["FadeInRightBig"] = "fadeInRightBig";
-        Animation["FadeInUp"] = "fadeInUp";
-        Animation["FadeInUpBig"] = "fadeInUpBig";
-        Animation["FadeOut"] = "fadeOut";
-        Animation["FadeOutDown"] = "fadeOutDown";
-        Animation["FadeOutDownBig"] = "fadeOutDownBig";
-        Animation["FadeOutLeft"] = "fadeOutLeft";
-        Animation["FadeOutLeftBig"] = "fadeOutLeftBig";
-        Animation["FadeOutRight"] = "fadeOutRight";
-        Animation["FadeOutRightBig"] = "fadeOutRightBig";
-        Animation["FadeOutUp"] = "fadeOutUp";
-        Animation["FadeOutUpBig"] = "fadeOutUpBig";
-        Animation["Flash"] = "flash";
-        Animation["FlipInX"] = "flipInX";
-        Animation["FlipInY"] = "flipInY";
-        Animation["FlipOutX"] = "flipOutX";
-        Animation["FlipOutY"] = "flipOutY";
-        Animation["HeadShake"] = "headShake";
-        Animation["HeartBeat"] = "heartBeat";
-        Animation["Hinge"] = "hinge";
-        Animation["JackInTheBox"] = "jackInTheBox";
-        Animation["Jello"] = "jello";
-        Animation["LightSpeedIn"] = "lightSpeedIn";
-        Animation["LightSpeedOut"] = "lightSpeedOut";
-        Animation["Pulse"] = "pulse";
-        Animation["RollIn"] = "rollIn";
-        Animation["RollOut"] = "rollOut";
-        Animation["RotateIn"] = "rotateIn";
-        Animation["RotateInDownLeft"] = "rotateInDownLeft";
-        Animation["RotateInDownRight"] = "rotateInDownRight";
-        Animation["RotateInUpLeft"] = "rotateInUpLeft";
-        Animation["RotateInUpRight"] = "rotateInUpRight";
-        Animation["RotateOut"] = "rotateOut";
-        Animation["RotateOutDownLeft"] = "rotateOutDownLeft";
-        Animation["RotateOutDownRight"] = "rotateOutDownRight";
-        Animation["RotateOutUpLeft"] = "rotateOutUpLeft";
-        Animation["RotateOutUpRight"] = "rotateOutUpRight";
-        Animation["RubberBand"] = "rubberBand";
-        Animation["Shake"] = "shake";
-        Animation["SlideInDown"] = "slideInDown";
-        Animation["SlideInLeft"] = "slideInLeft";
-        Animation["SlideInRight"] = "slideInRight";
-        Animation["SlideInUp"] = "slideInUp";
-        Animation["SlideOutDown"] = "slideOutDown";
-        Animation["SlideOutLeft"] = "slideOutLeft";
-        Animation["SlideOutRight"] = "slideOutRight";
-        Animation["SlideOutUp"] = "slideOutUp";
-        Animation["Swing"] = "swing";
-        Animation["Tada"] = "tada";
-        Animation["Wobble"] = "wobble";
-        Animation["ZoomIn"] = "zoomIn";
-        Animation["ZoomInDown"] = "zoomInDown";
-        Animation["ZoomInLeft"] = "zoomInLeft";
-        Animation["ZoomInRight"] = "zoomInRight";
-        Animation["ZoomInUp"] = "zoomInUp";
-        Animation["ZoomOut"] = "zoomOut";
-        Animation["ZoomOutDown"] = "zoomOutDown";
-        Animation["ZoomOutLeft"] = "zoomOutLeft";
-        Animation["ZoomOutRight"] = "zoomOutRight";
-        Animation["ZoomOutUp"] = "zoomOutUp";
-    })(Animation = exports.Animation || (exports.Animation = {}));
-    var Animate = /** @class */ (function () {
-        function Animate(elem) {
-            this._resolver = null;
-            this._elem = null;
-            this._classes = null;
-            this._elem = elem;
-            this._classes = this._elem.classList;
-            this.OnAnimationEnd.bind(this);
-        }
-        Animate.ClearAnimation = function (elem) {
-            var classes = elem.classList;
-            if (!classes.contains(Animate.ClassAnimated))
-                classes.remove(Animate.ClassAnimated);
-            _.each(_.toPairs(Speed), function (vals) {
-                var className = vals[1];
-                if (className === '')
-                    return;
-                if (classes.contains(className))
-                    classes.remove(className);
-            });
-            _.each(_.toPairs(Animation), function (vals) {
-                var className = vals[1];
-                if (classes.contains(className))
-                    classes.remove(className);
-            });
-        };
-        Animate.Exec = function (elem, animation, speed) {
-            if (speed === void 0) { speed = Speed.Normal; }
-            return (new Animate(elem)).Execute(animation, speed, true);
-        };
-        Animate.GetClassString = function (animation, speed) {
-            if (speed === void 0) { speed = Speed.Normal; }
-            var result = " " + Animate.ClassAnimated + " " + animation.toString() + " "
-                + ((speed === Speed.Normal)
-                    ? ''
-                    : speed.toString() + " ");
-            return result;
-        };
-        Animate.prototype.Execute = function (animation, speed, afterDispose) {
-            var _this = this;
-            if (speed === void 0) { speed = Speed.Normal; }
-            if (afterDispose === void 0) { afterDispose = false; }
-            return new Promise(function (resolve) {
-                _this._resolver = resolve;
-                _this._elem.addEventListener(Animate.AnimationEndEvent, _this.OnAnimationEnd);
-                // 同じ内容のアニメーションが設定済みのとき、一度クリアしたあとで遅延実行する。
-                var needsDefer = (_this._classes.contains(Animate.ClassAnimated)
-                    && _this._classes.contains(animation.toString()));
-                Animate.ClearAnimation(_this._elem);
-                (needsDefer)
-                    ? _.defer(function () {
-                        _this.InnerExecute(animation, speed, afterDispose);
-                    })
-                    : _this.InnerExecute(animation, speed, afterDispose);
-            });
-        };
-        Animate.prototype.InnerExecute = function (animation, speed, afterDispose) {
-            var _this = this;
-            if (speed === void 0) { speed = Speed.Normal; }
-            if (afterDispose === void 0) { afterDispose = false; }
-            this._classes.add(Animate.ClassAnimated);
-            this._classes.add(animation.toString());
-            if (speed !== Speed.Normal)
-                this._classes.add(speed.toString());
-            // animationendイベントタイムアウト: 500ms加算。
-            var endTime = 3500;
-            switch (speed) {
-                case Speed.Slower:
-                    endTime = 3500;
-                    break;
-                case Speed.Slow:
-                    endTime = 2500;
-                    break;
-                case Speed.Normal:
-                    endTime = 1500;
-                    break;
-                case Speed.Fast:
-                    endTime = 1300;
-                    break;
-                case Speed.Faster:
-                    endTime = 1000;
-                    break;
-            }
-            setTimeout(function () {
-                if (_this._resolver) {
-                    _this._resolver(false);
-                    _this._resolver = null;
-                }
-                if (afterDispose)
-                    _this.Dispose();
-            }, endTime);
-        };
-        Animate.prototype.Clear = function () {
-            Animate.ClearAnimation(this._elem);
-            return this;
-        };
-        Animate.prototype.SetDisplayNone = function () {
-            if (!this._classes.contains('d-none'))
-                this._classes.add('d-none');
-            return this;
-        };
-        Animate.prototype.RemoveDisplayNone = function () {
-            if (this._classes.contains('d-none'))
-                this._classes.remove('d-none');
-            return this;
-        };
-        Animate.prototype.OnAnimationEnd = function () {
-            try {
-                this._elem.removeEventListener(Animate.AnimationEndEvent, this.OnAnimationEnd);
-            }
-            catch (e) {
-                // 握りつぶす。
-            }
-            if (this._resolver) {
-                this._resolver(true);
-                this._resolver = null;
-            }
-            return this;
-        };
-        Animate.prototype.Dispose = function () {
-            Animate.ClearAnimation(this._elem);
-            try {
-                this._elem.removeEventListener(Animate.AnimationEndEvent, this.OnAnimationEnd);
-            }
-            catch (e) {
-                // 握りつぶす。
-            }
-            if (this._resolver)
-                this._resolver(false);
-            this._resolver = null;
-            this._elem = null;
-            this._classes = null;
-        };
-        Animate.ClassAnimated = 'animated';
-        Animate.AnimationEndEvent = 'animationend';
-        return Animate;
-    }());
-    exports.default = Animate;
-});
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList", "Utils/Animate", "Utils/Delay"], function (require, exports, _, vue_class_component_15, vue_property_decorator_6, Track_3, ViewBase_11, SelectionList_5, Animate_1, Delay_2) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList", "Utils/Animate", "Utils/Delay"], function (require, exports, _, vue_class_component_15, vue_property_decorator_6, Track_3, ViewBase_11, SelectionList_5, Animate_3, Delay_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionList_5.SelectionEvents), {
@@ -3705,7 +3712,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             _this.selected = false;
             _this.liClasses = SelectionTrack_1.LiClasses;
             _this.isDeleting = false;
-            _this.deletingClasses = Animate_1.default.GetClassString(Animate_1.Animation.FadeOutRight, Animate_1.Speed.Faster);
+            _this.deletingClasses = Animate_3.default.GetClassString(Animate_3.Animation.FadeOutRight, Animate_3.Speed.Faster);
             return _this;
         }
         SelectionTrack_1 = SelectionTrack;
@@ -3771,14 +3778,14 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
         ], SelectionTrack.prototype, "entity", void 0);
         SelectionTrack = SelectionTrack_1 = __decorate([
             vue_class_component_15.default({
-                template: "<li v-bind:class=\"liClasses\"\n    ref=\"Li\"\n    @click=\"OnClickRow\">\n    <div class=\"product-img ml-2\">\n        <img v-bind:src=\"((entity.Album) ? entity.Album.GetImageFullUri() : '')\" alt=\"ALbum Image\">\n    </div>\n    <div class=\"product-info\">\n        <span class=\"product-title pl-2\">\n            {{ entity.Name }}\n            <div class=\"btn-group pull-right mr-2 editmode-buttons\">\n                <button\n                    class=\"btn btn-sm btn-outline-dark\"\n                    @click=\"OnClickDelete\"\n                    ref=\"ButtonCollaplse\" >\n                    <i class=\"fa fa-trash\" />\n                </button>\n            </div>\n            <span class=\"pull-right length mr-2\">{{ entity.GetTimeString() }}</span>\n        </span>\n        <span class=\"product-description pl-2\">\n            {{ entity.GetAlbumName() }} {{ entity.GetFormattedYearString() }} {{ ' : ' + entity.GetFormattedArtistName() }}\n        </span>\n    </div>\n</li>"
+                template: "<li v-bind:class=\"liClasses\"\n    ref=\"Li\"\n    @click=\"OnClickRow\">\n    <div class=\"product-img ml-2\">\n        <img v-bind:src=\"((entity.Album) ? entity.Album.GetImageFullUri() : '')\" alt=\"ALbum Image\">\n    </div>\n    <div class=\"product-info\">\n        <span class=\"product-title pl-2\">\n            {{ entity.Name }}\n            <div class=\"btn-group pull-right mr-2 editmode-buttons\">\n                <button\n                    class=\"btn btn-sm btn-outline-dark\"\n                    @click=\"OnClickDelete\"\n                    ref=\"ButtonCollaplse\" >\n                    <i class=\"fa fa-minus-circle\" />\n                </button>\n            </div>\n            <span class=\"pull-right length mr-2\">{{ entity.GetTimeString() }}</span>\n        </span>\n        <span class=\"product-description pl-2\">\n            {{ entity.GetAlbumName() }} {{ entity.GetFormattedYearString() }} {{ ' : ' + entity.GetFormattedArtistName() }}\n        </span>\n    </div>\n</li>"
             })
         ], SelectionTrack);
         return SelectionTrack;
     }(ViewBase_11.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Utils/Animate"], function (require, exports, _, vue_class_component_16, vue_infinite_loading_5, Libraries_10, PlaylistStore_2, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, Animate_2) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Utils/Animate"], function (require, exports, _, vue_class_component_16, vue_infinite_loading_5, Libraries_10, PlaylistStore_2, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, Animate_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ListMode;
@@ -3857,8 +3864,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.titleH3Animate = new Animate_2.default(this.TitleH3);
-                            this.titleInputAnimate = new Animate_2.default(this.TitleInput);
+                            this.titleH3Animate = new Animate_4.default(this.TitleH3);
+                            this.titleInputAnimate = new Animate_4.default(this.TitleInput);
                             return [2 /*return*/, true];
                     }
                 });
@@ -3884,13 +3891,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             var _this = this;
             this.titleH3Animate
                 .RemoveDisplayNone()
-                .Execute(Animate_2.Animation.FadeOutDown, Animate_2.Speed.Faster)
+                .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
                 .then(function () {
                 _this.titleH3Animate.SetDisplayNone();
                 _this.TitleInput.value = _this.playlist.Name;
                 _this.titleInputAnimate
                     .RemoveDisplayNone()
-                    .Execute(Animate_2.Animation.FadeInUp, Animate_2.Speed.Faster);
+                    .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
             });
             this.EditButton.Hide().then(function () {
                 _this.listMode = ListMode.Editable;
@@ -3906,13 +3913,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             var _this = this;
             this.titleInputAnimate
                 .RemoveDisplayNone()
-                .Execute(Animate_2.Animation.FadeOutDown, Animate_2.Speed.Faster)
+                .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
                 .then(function () {
                 _this.titleInputAnimate.SetDisplayNone();
                 _this.TitleInput.value = '';
                 _this.titleH3Animate
                     .RemoveDisplayNone()
-                    .Execute(Animate_2.Animation.FadeInUp, Animate_2.Speed.Faster);
+                    .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
             });
             this.EndEditButton.Hide().then(function () {
                 _.each(_this.Items, function (item) {

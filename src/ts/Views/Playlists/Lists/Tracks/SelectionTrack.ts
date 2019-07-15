@@ -37,7 +37,7 @@ export interface ITrackSelectionChangedArgs extends ISelectionChangedArgs<Track>
                     class="btn btn-sm btn-outline-dark"
                     @click="OnClickDelete"
                     ref="ButtonCollaplse" >
-                    <i class="fa fa-trash" />
+                    <i class="fa fa-minus-circle" />
                 </button>
             </div>
             <span class="pull-right length mr-2">{{ entity.GetTimeString() }}</span>

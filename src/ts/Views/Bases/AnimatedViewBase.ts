@@ -1,19 +1,16 @@
 import ViewBase from './ViewBase';
+import Exception from '../../Utils/Exception';
+import { default as Animate, Animation, Speed } from '../../Utils/Animate';
 
-export const AnimatedViewEvents = {
-    AnimationEnd: 'animationend'
-};
+export { Animation, Speed } from '../../Utils/Animate';
 
 export default abstract class AnimatedViewBase extends ViewBase {
 
-    protected abstract AnimationClassIn: string;
-    protected abstract AnimationClassOut: string;
-    protected AnimationClassSpeed: string = 'faster';
-    protected AnimationClassHide: string = 'd-none';
-    private readonly AnimationClassAnimated: string = 'animated';
-    
-
-    private _resolver: (value: boolean) => void = null;
+    protected abstract AnimationIn: Animation;
+    protected abstract AnimationOut: Animation;
+    protected Speed: Speed = Speed.Faster;
+    protected ClassHide: string = 'd-none';
+    private animate: Animate;
 
     protected get Element(): HTMLElement {
         return this.$el as HTMLElement;
@@ -22,112 +19,54 @@ export default abstract class AnimatedViewBase extends ViewBase {
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        this.Element.addEventListener(AnimatedViewEvents.AnimationEnd, () => {
-            const classes = this.Element.classList;
+        if (!this.AnimationIn || Animate.IsHideAnimation(this.AnimationIn))
+            Exception.Throw('Invalid In-Animation', this.AnimationIn);
 
-            if (classes.contains(this.AnimationClassIn)) {
-                // 表示化
-                this.ClearAllClasses();
-            } else if (classes.contains(this.AnimationClassOut)) {
-                // 非表示化
-                this.ClearAllClasses();
-                classes.add(this.AnimationClassHide);
-            }
+        if (!this.AnimationOut || !Animate.IsHideAnimation(this.AnimationOut))
+            Exception.Throw('Invalid Out-Animation', this.AnimationOut);
 
-            if (this._resolver) {
-                this._resolver(true);
-                this._resolver = null;
-            }
-            //this.$emit(AnimatedViewEvents.AnimationEnd);
-        });
+        this.animate = new Animate(this.$el as HTMLElement);
 
         return true;
     }
 
     protected ClearAllClasses(): void {
-        const classes = this.Element.classList;
-
-        if (classes.contains(this.AnimationClassHide))
-            classes.remove(this.AnimationClassHide);
-
-        if (classes.contains(this.AnimationClassAnimated))
-            classes.remove(this.AnimationClassAnimated);
-
-        if (classes.contains(this.AnimationClassOut))
-            classes.remove(this.AnimationClassOut);
-
-        if (classes.contains(this.AnimationClassIn))
-            classes.remove(this.AnimationClassIn);
-
-        if (
-            this.AnimationClassSpeed
-            && 0 < this.AnimationClassSpeed.length
-            && classes.contains(this.AnimationClassSpeed)
-        ) {
-            classes.remove(this.AnimationClassSpeed);
-        }
+        Animate.ClearAnimation(this.Element);
     }
 
     public ShowNow(): void {
         this.ClearAllClasses();
+
+        if (this.$el.classList.contains(this.ClassHide))
+            this.$el.classList.remove(this.ClassHide);
     }
 
-    public Show(): Promise<boolean> {
-        if (this._resolver) {
-            this._resolver(false);
-            this._resolver = null;
-        }
+    public async Show(): Promise<boolean> {
+        if (this.$el.classList.contains(this.ClassHide))
+            this.$el.classList.remove(this.ClassHide);
 
-        return new Promise((resolve: (value: boolean) => void): void => {
-            this._resolver = resolve;
+        await this.animate.Execute(this.AnimationIn, this.Speed);
 
-            const classes = this.Element.classList;
-
-            this.ClearAllClasses();
-            classes.add(this.AnimationClassAnimated);
-            classes.add(this.AnimationClassIn);
-
-            if (
-                this.AnimationClassSpeed
-                && 0 < this.AnimationClassSpeed.length
-                && !classes.contains(this.AnimationClassSpeed)
-            ) {
-                classes.add(this.AnimationClassSpeed);
-            }
-        });
+        return true;
     }
 
     public HideNow(): void {
         this.ClearAllClasses();
-        this.Element.classList.add(this.AnimationClassHide);
+        this.$el.classList.add(this.ClassHide);
     }
 
-    public Hide(): Promise<boolean> {
-        if (this._resolver) {
-            this._resolver(false);
-            this._resolver = null;
-        }
+    public async Hide(): Promise<boolean> {
+        if (this.$el.classList.contains(this.ClassHide))
+            this.$el.classList.remove(this.ClassHide);
 
-        return new Promise((resolve: (value: boolean) => void): void => {
-            this._resolver = resolve;
+        await this.animate.Execute(this.AnimationOut, this.Speed);
 
-            const classes = this.Element.classList;
+        this.$el.classList.add(this.ClassHide);
 
-            this.ClearAllClasses();
-            classes.add(this.AnimationClassAnimated);
-            classes.add(this.AnimationClassOut);
-
-            if (
-                this.AnimationClassSpeed
-                && 0 < this.AnimationClassSpeed.length
-                && !classes.contains(this.AnimationClassSpeed)
-            ) {
-                classes.add(this.AnimationClassSpeed);
-            }
-        });
+        return true;
     }
 
     public GetIsVisible(): boolean {
-        return !this.Element.classList.contains(this.AnimationClassHide);
+        return !this.Element.classList.contains(this.ClassHide);
     }
 }

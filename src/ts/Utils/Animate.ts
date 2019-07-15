@@ -88,6 +88,42 @@ export enum Animation {
     ZoomOutUp = 'zoomOutUp'
 }
 
+const ToHideAnimations: { [name: string]: boolean} = {
+    'bounceOut': true,
+    'bounceOutDown': true,
+    'bounceOutLeft': true,
+    'bounceOutRight': true,
+    'bounceOutUp': true,
+    'fadeOut': true,
+    'fadeOutDown': true,
+    'fadeOutDownBig': true,
+    'fadeOutLeft': true,
+    'fadeOutLeftBig': true,
+    'fadeOutRight': true,
+    'fadeOutRightBig': true,
+    'fadeOutUp': true,
+    'fadeOutUpBig': true,
+    'flipOutX': true,
+    'flipOutY': true,
+    'hinge': true,
+    'lightSpeedOut': true,
+    'rollOut': true,
+    'rotateOut': true,
+    'rotateOutDownLeft': true,
+    'rotateOutDownRight': true,
+    'rotateOutUpLeft': true,
+    'rotateOutUpRight': true,
+    'slideOutDown': true,
+    'slideOutLeft': true,
+    'slideOutRight': true,
+    'slideOutUp': true,
+    'zoomOut': true,
+    'zoomOutDown': true,
+    'zoomOutLeft': true,
+    'zoomOutRight': true,
+    'zoomOutUp': true,
+};
+
 export default class Animate {
 
     public static readonly ClassAnimated = 'animated';
@@ -114,8 +150,12 @@ export default class Animate {
         })
     }
 
-    public static Exec(elem: HTMLElement, animation: Animation, speed: Speed = Speed.Normal): Promise<boolean> {
-        return (new Animate(elem)).Execute(animation, speed, true);
+    public static async Exec(elem: HTMLElement, animation: Animation, speed: Speed = Speed.Normal): Promise<boolean> {
+        const anim = new Animate(elem);
+        await anim.Execute(animation, speed);
+        anim.Dispose();
+
+        return true;
     }
 
     public static GetClassString(animation: Animation, speed: Speed = Speed.Normal): string {
@@ -125,6 +165,10 @@ export default class Animate {
                 : `${speed.toString()} `);
 
         return result;
+    }
+
+    public static IsHideAnimation(animation: Animation): boolean {
+        return (ToHideAnimations[animation.toString()]);
     }
 
     private _resolver: (value: boolean) => void = null;
@@ -138,7 +182,7 @@ export default class Animate {
         this.OnAnimationEnd.bind(this);
     }
 
-    public Execute(animation: Animation, speed: Speed = Speed.Normal, afterDispose: boolean = false): Promise<boolean> {
+    public Execute(animation: Animation, speed: Speed = Speed.Normal): Promise<boolean> {
         return new Promise((resolve: (value: boolean) => void): void => {
             this._resolver = resolve;
             this._elem.addEventListener(Animate.AnimationEndEvent, this.OnAnimationEnd);
@@ -153,27 +197,27 @@ export default class Animate {
 
             (needsDefer)
                 ? _.defer((): void => {
-                    this.InnerExecute(animation, speed, afterDispose)
+                    this.InnerExecute(animation, speed)
                 })
-                : this.InnerExecute(animation, speed, afterDispose);
+                : this.InnerExecute(animation, speed);
         });
     }
 
-    private InnerExecute(animation: Animation, speed: Speed = Speed.Normal, afterDispose: boolean = false) {
+    private InnerExecute(animation: Animation, speed: Speed = Speed.Normal) {
 
         this._classes.add(Animate.ClassAnimated);
         this._classes.add(animation.toString());
         if (speed !== Speed.Normal)
             this._classes.add(speed.toString());
 
-        // animationendイベントタイムアウト: 500ms加算。
-        let endTime = 3500;
+        // animationendイベントタイムアウト: 100ms加算。
+        let endTime = -1;
         switch (speed) {
-            case Speed.Slower: endTime = 3500; break;
-            case Speed.Slow: endTime = 2500; break;
-            case Speed.Normal: endTime = 1500; break;
-            case Speed.Fast: endTime = 1300; break;
-            case Speed.Faster: endTime = 1000; break;
+            case Speed.Slower: endTime = 3100; break;
+            case Speed.Slow: endTime = 2100; break;
+            case Speed.Normal: endTime = 1100; break;
+            case Speed.Fast: endTime = 900; break;
+            case Speed.Faster: endTime = 600; break;
         }
 
         setTimeout((): void => {
@@ -181,9 +225,6 @@ export default class Animate {
                 this._resolver(false);
                 this._resolver = null;
             }
-            if (afterDispose)
-                this.Dispose();
-
         }, endTime);
     }
 
@@ -208,12 +249,6 @@ export default class Animate {
     }
 
     private OnAnimationEnd(): Animate {
-        try {
-            this._elem.removeEventListener(Animate.AnimationEndEvent, this.OnAnimationEnd);
-        } catch (e) {
-            // 握りつぶす。
-        }
-        
         if (this._resolver) {
             this._resolver(true);
             this._resolver = null;

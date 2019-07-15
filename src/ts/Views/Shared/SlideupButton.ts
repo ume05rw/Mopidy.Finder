@@ -1,6 +1,6 @@
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import AnimatedViewBase from '../Bases/AnimatedViewBase';
+import { default as AnimatedViewBase, Animation } from '../Bases/AnimatedViewBase';
 
 export const SlideupButtonEvents = {
     Clicked: 'Clicked'
@@ -14,8 +14,8 @@ export const SlideupButtonEvents = {
 </button>`
 })
 export default class SlideupButtom extends AnimatedViewBase {
-    protected AnimationClassIn: string = 'fadeInUp';
-    protected AnimationClassOut: string = 'fadeOutDown';
+    protected AnimationIn: Animation = Animation.FadeInUp
+    protected AnimationOut: Animation = Animation.FadeOutDown;
 
     @Prop()
     protected hideOnInit: boolean;
