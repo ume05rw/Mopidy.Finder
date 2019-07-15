@@ -3089,7 +3089,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                                 else if (!_this.monitor.IsRepeat && enabled)
                                     _this.ButtonRepeat.classList.add(PlayerPanel_1.ClassDisabled);
                             });
-                            //this.monitor.StartPolling();
+                            this.monitor.StartPolling();
                             return [2 /*return*/, true];
                     }
                 });
