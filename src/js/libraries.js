@@ -16,7 +16,7 @@ import '../css/site.css';
  */
 import jQuery from 'jquery';
 import ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
-import * as Bootstrap from 'admin-lte/plugins/bootstrap/js/bootstrap';
+import * as Bootstrap from 'admin-lte/plugins/bootstrap/js/bootstrap.bundle';
 import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 import 'jquery-slimscroll';
@@ -51,7 +51,7 @@ import InfiniteLoading from 'vue-infinite-loading';
  */
 window.__globals = {
     'jquery': jQuery,
-    'admin-lte/plugins/bootstrap/js/bootstrap': Bootstrap,
+    'admin-lte/plugins/bootstrap/js/bootstrap.bundle': Bootstrap,
     'responsive-toolkit/dist/bootstrap-toolkit': ResponsiveBootstrapToolkit,
     'admin-lte/dist/js/adminlte': AdminLte,
 

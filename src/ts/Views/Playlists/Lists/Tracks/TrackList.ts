@@ -39,21 +39,25 @@ enum ListMode {
                 <slideup-button
                     v-bind:hideOnInit="false"
                     iconClass="fa fa-pencil"
+                    tooltip="Edit"
                     ref="EditButton"
                     @Clicked="OnClickEdit" />
                 <slideup-button
                     v-bind:hideOnInit="true"
                     iconClass="fa fa-trash"
+                    tooltip="Delete"
                     ref="DeleteListButton"
                     @Clicked="OnClickDeleteList" />
                 <slideup-button
                     v-bind:hideOnInit="true"
                     iconClass="fa fa-undo"
+                    tooltip="Rollback"
                     ref="UndoButton"
                     @Clicked="OnClickUndoButton" />
                 <slideup-button
                     v-bind:hideOnInit="true"
                     iconClass="fa fa-check"
+                    tooltip="Update"
                     ref="EndEditButton"
                     @Clicked="OnClickEndEdit" />
             </div>

@@ -5,6 +5,7 @@ import AlbumTracks from '../../../../Models/AlbumTracks/AlbumTracks';
 import Libraries from '../../../../Libraries';
 import { ISelectionChangedArgs } from '../../../Shared/SelectionList';
 import Track from '../../../../Models/Tracks/Track';
+import * as _ from 'lodash';
 
 export interface IAlbumTracksSelectedArgs extends ISelectionChangedArgs<AlbumTracks> {
     Track: Track;
@@ -23,8 +24,9 @@ export const SelectionAlbumEvents = {
             </h3>
             <div class="card-tools">
                 <button type="button"
-                        class="btn btn-tool"
-                        @click="OnClickAlbumPlay" >
+                    class="btn btn-tool"
+                    ref="AlbumPlayButton"
+                    @click="OnClickAlbumPlay" >
                     <i class="fa fa-play" />
                 </button>
             </div>
@@ -55,6 +57,19 @@ export default class SelectionAlbumTracks extends ViewBase {
 
     @Prop()
     private entity: AlbumTracks;
+
+    public constructor() {
+        super();
+
+        // InfiniteLoadingで動的に追加されるため、
+        // Initializeメソッドが実行されない。
+        _.delay(() => {
+            Libraries.$(this.$refs.AlbumPlayButton as HTMLElement).tooltip({
+                placement: 'top',
+                title: 'Play Album'
+            });
+        }, 500);
+    }
 
     private OnClickAlbumPlay(): void {
         const tracks = Libraries.Enumerable.from(this.entity.Tracks);

@@ -21,6 +21,7 @@ export const FilterboxEvents = {
     <slideup-button
         v-bind:hideOnInit="false"
         iconClass="fa fa-search"
+        tooltip="Filter"
         ref="SearchButton"
         @Clicked="OnClick" />
 </div>`,

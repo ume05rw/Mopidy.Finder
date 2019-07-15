@@ -7,6 +7,7 @@ import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import SelectionItem from '../../Shared/SelectionItem';
 import { default as SelectionList, ISelectionChangedArgs } from '../../Shared/SelectionList';
+import Libraries from '../../../Libraries';
 
 @Component({
     template: `<div class="col-md-3">
@@ -21,6 +22,7 @@ import { default as SelectionList, ISelectionChangedArgs } from '../../Shared/Se
                 </button>
                 <button type="button"
                     class="btn btn-tool"
+                    ref="RefreshButton"
                     @click="OnClickRefresh" >
                     <i class="fa fa-repeat" />
                 </button>
@@ -67,6 +69,15 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
+
+        Libraries.$(this.$refs.RefreshButton as HTMLElement).tooltip({
+            placement: 'top',
+            title: 'Refresh'
+        });
+        Libraries.$(this.$refs.ButtonCollaplse as HTMLElement).tooltip({
+            placement: 'top',
+            title: 'Shrink/Expand'
+        });
 
         return true;
     }

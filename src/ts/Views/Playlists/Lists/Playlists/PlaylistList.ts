@@ -96,6 +96,15 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         this.isAutoCollapse = true;
         await super.Initialize();
 
+        Libraries.$(this.$refs.ButtonAdd as HTMLElement).tooltip({
+            placement: 'top',
+            title: 'Add Playlist'
+        });
+        Libraries.$(this.$refs.ButtonCollaplse as HTMLElement).tooltip({
+            placement: 'top',
+            title: 'Shrink/Expand'
+        });
+
         return true;
     }
 

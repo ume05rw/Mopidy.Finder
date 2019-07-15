@@ -6,6 +6,7 @@ import ViewBase from '../../../Bases/ViewBase';
 import { ISelectionChangedArgs, SelectionEvents } from '../../../Shared/SelectionList';
 import { default as Animate, Animation, Speed }from '../../../../Utils/Animate';
 import Delay from '../../../../Utils/Delay';
+import Libraries from '../../../../Libraries';
 
 export const TrackSelectionEvents = _.extend(_.clone(SelectionEvents), {
     DeleteOrdered: 'DeleteOrdered'
@@ -37,8 +38,8 @@ export interface ITrackSelectionChangedArgs extends ISelectionChangedArgs<Track>
                 <button
                     class="btn btn-sm btn-outline-dark"
                     @click="OnClickDelete"
-                    ref="ButtonCollaplse" >
-                    <i class="fa fa-minus-circle" />
+                    ref="DeleteButton" >
+                    <i class="fa fa-trash" />
                 </button>
             </div>
             <span class="pull-right length mr-2">{{ entity.GetTimeString() }}</span>
@@ -64,15 +65,26 @@ export default class SelectionTrack extends ViewBase {
     private liClasses: string = SelectionTrack.LiClasses;
     private isDeleting: boolean = false;
     private deletingClasses = Animate.GetClassString(Animation.FadeOutRight, Speed.Faster);
+
+    public constructor() {
+        super();
+
+        _.delay(() => {
+            Libraries.$(this.$refs.DeleteButton as HTMLElement).tooltip({
+                placement: 'top',
+                title: 'Delete'
+            });
+        }, 500);
+    }
+
     private SetLiClasses(): void {
         this.liClasses = SelectionTrack.LiClasses
-            + (this.selected ? 'selected ' : '');
+            + ((this.selected)
+                ? 'selected '
+                : '');
 
-        if (this.isDeleting === true) {
-            console.log('DELETING!');
-            console.log(this.entity.Name);
+        if (this.isDeleting === true)
             this.liClasses += this.deletingClasses;
-        }
 
         this.$forceUpdate();
     }

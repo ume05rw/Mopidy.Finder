@@ -1,6 +1,7 @@
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import { default as AnimatedViewBase, Animation } from '../Bases/AnimatedViewBase';
+import Libraries from '../../Libraries';
 
 export const SlideupButtonEvents = {
     Clicked: 'Clicked'
@@ -23,11 +24,21 @@ export default class SlideupButtom extends AnimatedViewBase {
     @Prop()
     protected iconClass: string;
 
+    @Prop()
+    protected tooltip: string;
+
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
         if (this.hideOnInit === true)
             this.HideNow();
+
+        if (this.tooltip && 0 < this.tooltip.length) {
+            Libraries.$(this.$el as HTMLElement).tooltip({
+                placement: 'top',
+                title: this.tooltip
+            });
+        }
 
         return true;
     }

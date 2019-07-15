@@ -3,10 +3,10 @@
 // http://ionden.com/a/plugins/ion.rangeSlider/api.html
 
 interface JQuery {
-    ionRangeSlider(options?: IonRangeSliderOpsion): JQuery;
+    ionRangeSlider(options?: IIonRangeSliderOpsion): JQuery;
 }
 
-interface IonRangeSliderOpsion {
+interface IIonRangeSliderOpsion {
     skin?: string;
     type?: string;
     min?: number;

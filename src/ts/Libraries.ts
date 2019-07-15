@@ -16,10 +16,8 @@ import '../css/site.css';
  */
 import * as jQuery from 'jquery';
 import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
-import 'admin-lte/plugins/bootstrap/js/bootstrap';
+import 'admin-lte/plugins/bootstrap/js/bootstrap.bundle';
 import 'admin-lte/dist/js/adminlte';
-//import * as Bootstrap from 'admin-lte/plugins/bootstrap/js/bootstrap';
-//import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 import 'jquery-slimscroll';
 

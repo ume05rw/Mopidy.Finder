@@ -58,10 +58,10 @@ define('responsive-toolkit/dist/bootstrap-toolkit', ["exports"], function (expor
     exports.default = window.__globals['responsive-toolkit/dist/bootstrap-toolkit'];
 });
 // admin-lte/plugins/bootstrap/js/bootstrap
-define('admin-lte/plugins/bootstrap/js/bootstrap', ["exports"], function (exports) {
+define('admin-lte/plugins/bootstrap/js/bootstrap.bundle', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var instance = window.__globals['admin-lte/plugins/bootstrap/js/bootstrap'];
+    var instance = window.__globals['admin-lte/plugins/bootstrap/js/bootstrap.bundle'];
     for (var key in instance) {
         var val = instance[key];
         exports[key] = val;
