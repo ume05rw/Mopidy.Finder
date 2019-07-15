@@ -3427,6 +3427,33 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                 });
             });
         };
+        PlaylistStore.prototype.UpdatePlayllist = function (playlist) {
+            return __awaiter(this, void 0, void 0, function () {
+                var tracks, i, track, response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            tracks = [];
+                            for (i = 0; i < playlist.Tracks.length; i++) {
+                                track = playlist.Tracks[i];
+                                tracks.push({
+                                    uri: track.Uri
+                                });
+                            }
+                            return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistSave, {
+                                    playlist: {
+                                        name: playlist.Name,
+                                        uri: playlist.Uri,
+                                        tracks: tracks
+                                    }
+                                })];
+                        case 1:
+                            response = _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
         PlaylistStore.prototype.DeletePlaylist = function (playlist) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
@@ -3553,7 +3580,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
         };
         AddModal = __decorate([
             vue_class_component_13.default({
-                template: "<div class=\"modal fade\"\n    style=\"display: none;\"\n    aria-hidden=\"true\"\n    ref=\"DivModalAdd\">\n    <div class=\"modal-dialog\">\n        <div class=\"modal-content bg-info\">\n            <div class=\"modal-header\">\n                <h4 class=\"modal-title\">New Playlist</h4>\n                <button type=\"button\"\n                    class=\"close\"\n                    data-dismiss=\"modal\"\n                    aria-label=\"Close\">\n                    <span aria-hidden=\"true\">\u00D7</span>\n                </button>\n            </div>\n            <div class=\"modal-body needs-validation\"\n                novalidate\n                ref=\"DivValidatable\" >\n                <div class=\"form-group\">\n                    <label for=\"new-playlist-name\">Playlist Name</label>\n                    <div class=\"input-group\">\n                        <input type=\"text\"\n                            id=\"new-playlist-name\"\n                            class=\"form-control\"\n                            required\n                            placeholder=\"Name\"\n                            autocomplete=\"off\"\n                            ref=\"TextName\"/>\n                        <div class=\"invalid-feedback text-white\"\n                            ref=\"LabelInvalid\"><strong>{{ errorMessage }}</strong></div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"modal-footer justify-content-end\">\n                <button type=\"button\"\n                    class=\"btn btn-outline-light float-right\"\n                    @click=\"OnClickAdd\">Add</button>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"modal fade\"\n    style=\"display: none;\"\n    aria-hidden=\"true\">\n    <div class=\"modal-dialog\">\n        <div class=\"modal-content bg-info\">\n            <div class=\"modal-header\">\n                <h4 class=\"modal-title\">New Playlist</h4>\n                <button type=\"button\"\n                    class=\"close\"\n                    data-dismiss=\"modal\"\n                    aria-label=\"Close\">\n                    <span aria-hidden=\"true\">\u00D7</span>\n                </button>\n            </div>\n            <div class=\"modal-body needs-validation\"\n                novalidate\n                ref=\"DivValidatable\" >\n                <div class=\"form-group\">\n                    <label for=\"new-playlist-name\">Playlist Name</label>\n                    <div class=\"input-group\">\n                        <input type=\"text\"\n                            id=\"new-playlist-name\"\n                            class=\"form-control\"\n                            required\n                            placeholder=\"Name\"\n                            autocomplete=\"off\"\n                            ref=\"TextName\"/>\n                        <div class=\"invalid-feedback text-white\"\n                            ref=\"LabelInvalid\"><strong>{{ errorMessage }}</strong></div>\n                    </div>\n                </div>\n            </div>\n            <div class=\"modal-footer justify-content-end\">\n                <button type=\"button\"\n                    class=\"btn btn-outline-light float-right\"\n                    @click=\"OnClickAdd\">Add</button>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], AddModal);
         return AddModal;
@@ -3741,8 +3768,11 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
         SelectionTrack.prototype.SetLiClasses = function () {
             this.liClasses = SelectionTrack_1.LiClasses
                 + (this.selected ? 'selected ' : '');
-            if (this.isDeleting)
+            if (this.isDeleting === true) {
+                console.log('DELETING!');
+                console.log(this.entity.Name);
                 this.liClasses += this.deletingClasses;
+            }
             this.$forceUpdate();
         };
         SelectionTrack.prototype.OnClickRow = function (ev) {
@@ -3755,18 +3785,22 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             };
             this.$emit(exports.TrackSelectionEvents.SelectionChanged, args);
         };
-        SelectionTrack.prototype.OnClickDelete = function () {
+        SelectionTrack.prototype.OnClickDelete = function (ev) {
+            console.log('SelectionTrack.OnClickDelete');
             var args = {
                 Entity: this.entity,
                 View: this
             };
             this.$emit(exports.TrackSelectionEvents.DeleteOrdered, args);
+            ev.preventDefault();
+            ev.stopPropagation();
         };
-        SelectionTrack.prototype.Delete = function () {
+        SelectionTrack.prototype.DeleteTrack = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            console.log('SelectionTrack.DeleteTrack');
                             this.isDeleting = true;
                             this.SetLiClasses();
                             return [4 /*yield*/, Delay_2.default.Wait(600)];
@@ -3781,16 +3815,24 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             return this.selected;
         };
         SelectionTrack.prototype.Select = function () {
+            console.log('SelectionTrack.Select');
             if (!this.selected) {
                 this.selected = true;
                 this.SetLiClasses();
             }
         };
         SelectionTrack.prototype.Deselect = function () {
+            console.log('SelectionTrack.Deselect');
             if (this.selected) {
                 this.selected = false;
                 this.SetLiClasses();
             }
+        };
+        SelectionTrack.prototype.Reset = function () {
+            console.log('SelectionTrack.Reset');
+            this.isDeleting = false;
+            this.selected = false;
+            this.SetLiClasses();
         };
         var SelectionTrack_1;
         SelectionTrack.LiClasses = 'item w-100 track-row ';
@@ -3807,7 +3849,123 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
     }(ViewBase_11.default));
     exports.default = SelectionTrack;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Utils/Animate", "sortablejs/modular/sortable.complete.esm"], function (require, exports, _, vue_class_component_16, vue_infinite_loading_5, Libraries_10, PlaylistStore_2, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, Animate_4, sortable_complete_esm_1) {
+define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries"], function (require, exports, ViewBase_12, vue_class_component_16, Libraries_10) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ConfirmType;
+    (function (ConfirmType) {
+        ConfirmType["Notice"] = "bg-info";
+        ConfirmType["Warning"] = "bg-warning";
+    })(ConfirmType = exports.ConfirmType || (exports.ConfirmType = {}));
+    var ConfirmDialog = /** @class */ (function (_super) {
+        __extends(ConfirmDialog, _super);
+        function ConfirmDialog() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.modalClasses = ConfirmDialog_1.ModalBaseClass + " " + ConfirmType.Notice.toString();
+            _this.mainMessage = '';
+            _this.detailLines = [];
+            _this.resolver = null;
+            return _this;
+        }
+        ConfirmDialog_1 = ConfirmDialog;
+        ConfirmDialog.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            this.modal = Libraries_10.default.$(this.$el);
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ConfirmDialog.prototype.OnClickOk = function () {
+            this.Resolve(true);
+        };
+        ConfirmDialog.prototype.OnClickCancel = function () {
+            this.Resolve(false);
+        };
+        ConfirmDialog.prototype.Resolve = function (result) {
+            if (this.resolver) {
+                this.resolver(result);
+            }
+            this.resolver = null;
+            this.modal.modal('hide');
+        };
+        ConfirmDialog.prototype.SetConfirmType = function (confirmType) {
+            this.modalClasses = ConfirmDialog_1.ModalBaseClass + " " + confirmType.toString();
+        };
+        ConfirmDialog.prototype.SetBody = function (mainMessage, detailLines) {
+            this.mainMessage = mainMessage;
+            if (detailLines && 0 < detailLines.length)
+                this.detailLines = detailLines;
+            this.$forceUpdate();
+        };
+        ConfirmDialog.prototype.Confirm = function () {
+            var _this = this;
+            return new Promise(function (resolve) {
+                _this.modal.modal('show');
+                _this.resolver = resolve;
+            });
+        };
+        var ConfirmDialog_1;
+        ConfirmDialog.ModalBaseClass = 'modal-content';
+        ConfirmDialog = ConfirmDialog_1 = __decorate([
+            vue_class_component_16.default({
+                template: "<div class=\"modal fade\"\n    data-backdrop=\"static\"\n    data-keyboard=\"false\"\n    data-focus=\"true\"\n    style=\"display: none;\"\n    aria-hidden=\"true\">\n    <div class=\"modal-dialog\">\n        <div v-bind:class=\"modalClasses\">\n            <div class=\"modal-header\">\n                <h4 class=\"modal-title\">{{ mainMessage }}</h4>\n            </div>\n            <div class=\"modal-body\">\n                <p>\n                <template v-for=\"line in detailLines\">\n                    <span>{{ line }}</span><br/>\n                </template>\n                </p>\n            </div>\n            <div class=\"modal-footer ustify-content-between\">\n                <button type=\"button\"\n                    class=\"btn btn-outline-light\"\n                    @click=\"OnClickCancel\">Cancel</button>\n                <button type=\"button\"\n                    class=\"btn btn-outline-light\"\n                    @click=\"OnClickOk\">OK</button>\n            </div>\n        </div>\n    </div>\n</div>"
+            })
+        ], ConfirmDialog);
+        return ConfirmDialog;
+    }(ViewBase_12.default));
+    exports.default = ConfirmDialog;
+});
+define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "Views/Shared/Dialogs/ConfirmDialog"], function (require, exports, ConfirmDialog_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var UpdateDialog = /** @class */ (function (_super) {
+        __extends(UpdateDialog, _super);
+        function UpdateDialog() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        UpdateDialog.prototype.SetUpdateMessage = function (isOrderChanged, removedTracks, newName) {
+            if (newName === void 0) { newName = null; }
+            var message = 'Update Playlist?';
+            var confirmType = (removedTracks && 0 < removedTracks.length)
+                ? ConfirmDialog_2.ConfirmType.Warning
+                : ConfirmDialog_2.ConfirmType.Notice;
+            var details = [];
+            if (newName && 0 < newName.length)
+                details.push("Rename to [ " + newName + " ]");
+            if (removedTracks && 0 < removedTracks.length) {
+                var unit = (removedTracks.length === 1)
+                    ? 'Track'
+                    : 'Tracks';
+                details.push("Delete " + removedTracks.length + " " + unit + ".");
+            }
+            if (isOrderChanged === true)
+                details.push('Change Track Order.');
+            details.push('');
+            details.push('Are you sure?');
+            this.SetConfirmType(confirmType);
+            this.SetBody(message, details);
+        };
+        UpdateDialog.prototype.SetRollbackMessage = function () {
+            this.SetConfirmType(ConfirmDialog_2.ConfirmType.Notice);
+            var message = 'Rollback Playlist?';
+            var details = [
+                'Discard all changes.',
+                '',
+                'Are you sure?'
+            ];
+            this.SetBody(message, details);
+        };
+        return UpdateDialog;
+    }(ConfirmDialog_2.default));
+    exports.default = UpdateDialog;
+});
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Utils/Animate", "sortablejs/modular/sortable.complete.esm", "Utils/Delay", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, vue_class_component_17, vue_infinite_loading_5, Libraries_11, PlaylistStore_2, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, Animate_4, sortable_complete_esm_1, Delay_3, UpdateDialog_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ListMode;
@@ -3864,6 +4022,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(TrackList.prototype, "UndoButton", {
+            get: function () {
+                return this.$refs.UndoButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(TrackList.prototype, "EndEditButton", {
             get: function () {
                 return this.$refs.EndEditButton;
@@ -3881,6 +4046,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         Object.defineProperty(TrackList.prototype, "Items", {
             get: function () {
                 return this.$refs.Items;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(TrackList.prototype, "UpdateDialog", {
+            get: function () {
+                return this.$refs.UpdateDialog;
             },
             enumerable: true,
             configurable: true
@@ -3917,93 +4089,91 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 });
             });
         };
-        TrackList.prototype.OnClickEdit = function () {
-            var _this = this;
-            this.titleH3Animate
-                .RemoveDisplayNone()
-                .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
-                .then(function () {
-                _this.titleH3Animate.SetDisplayNone();
-                _this.TitleInput.value = _this.playlist.Name;
-                _this.titleInputAnimate
-                    .RemoveDisplayNone()
-                    .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
-            });
-            this.EditButton.Hide().then(function () {
-                _this.listMode = ListMode.Editable;
-                _this.listClasses = TrackList_1.ListBaseClasses + _this.listMode.toString();
-                _this.sortable = sortable_complete_esm_1.default.create(_this.TrackListUl, {
-                    animation: 500,
-                    multiDrag: true,
-                    selectedClass: 'selected',
-                    dataIdAttr: 'data-uri',
-                    onEnd: function (ev) {
-                        _this.OnOrderChanged(ev);
+        TrackList.prototype.SetSortable = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.DisposeSortable();
+                            return [4 /*yield*/, Delay_3.default.Wait(10)];
+                        case 1:
+                            _a.sent();
+                            this.sortable = sortable_complete_esm_1.default.create(this.TrackListUl, {
+                                animation: 500,
+                                multiDrag: true,
+                                selectedClass: 'selected',
+                                dataIdAttr: 'data-uri',
+                                onEnd: function (ev) {
+                                    _this.OnOrderChanged(ev);
+                                }
+                            });
+                            return [2 /*return*/, true];
                     }
                 });
-                _this.DeleteListButton.Show();
-                _this.EndEditButton.Show().then(function () {
-                    _this.$forceUpdate();
-                });
             });
         };
-        TrackList.prototype.OnClickEndEdit = function () {
-            var _this = this;
-            this.sortable.destroy();
-            this.sortable = null;
-            this.ClearSelection();
-            var beforeTracks = this.playlist.Tracks;
-            var afterTracks = this.GetEditedTracks();
-            var removedTracks = this.removedEntities;
-            var orderChanged = false;
-            for (var i = 0; i < afterTracks.length; i++) {
-                if (afterTracks[i] !== beforeTracks[i]) {
-                    orderChanged = true;
-                    break;
+        TrackList.prototype.DisposeSortable = function () {
+            if (this.sortable !== null) {
+                try {
+                    this.sortable.destroy();
+                }
+                catch (ex) {
                 }
             }
-            console.log('order changed: ' + orderChanged);
-            console.log('removed:');
-            console.log(removedTracks);
-            // TODO: 保存処理
-            // this.playlist.Tracks も更新されるようにする。
-            this.playlist.Name = this.TitleInput.value;
-            this.playlist.Tracks = afterTracks;
-            this.Refresh();
-            this.titleInputAnimate
-                .RemoveDisplayNone()
-                .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
-                .then(function () {
-                _this.titleInputAnimate.SetDisplayNone();
-                _this.TitleInput.value = '';
-                _this.titleH3Animate
-                    .RemoveDisplayNone()
-                    .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
-            });
-            this.DeleteListButton.Hide();
-            this.EndEditButton.Hide().then(function () {
-                _this.listMode = ListMode.Playable;
-                _this.listClasses = TrackList_1.ListBaseClasses + _this.listMode.toString();
-                _this.EditButton.Show();
-            });
+            this.sortable = null;
         };
-        TrackList.prototype.ClearSelection = function () {
-            _.each(this.Items, function (item) {
-                item.Deselect();
-                // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
-                sortable_complete_esm_1.default.utils.deselect(item.$el);
-            });
+        TrackList.prototype.OnClickEdit = function () {
+            this.GoIntoEditor();
         };
-        TrackList.prototype.OnOrderChanged = function (args) {
-            var _this = this;
-            _.delay(function () {
-                _this.ClearSelection();
-            }, 500);
+        TrackList.prototype.OnClickEndEdit = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var updatedTracks, isOrderChanged, removedTracks, newName, isUpdate;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.ClearSelection();
+                            this.DisposeSortable();
+                            updatedTracks = this.GetEditedTracks();
+                            isOrderChanged = this.GetIsOrderChanged(updatedTracks);
+                            removedTracks = this.removedEntities;
+                            newName = (this.playlist.Name !== this.TitleInput.value)
+                                ? this.TitleInput.value
+                                : null;
+                            if (this.playlist.Name !== this.TitleInput.value
+                                && (!this.TitleInput.value
+                                    || this.TitleInput.value.length <= 0)) {
+                                // TODO: AlertToastを出す。'Name required.'
+                                this.TitleInput.focus();
+                                return [2 /*return*/, false];
+                            }
+                            isUpdate = false;
+                            if (!(isOrderChanged
+                                || 0 < removedTracks.length
+                                || (newName && 1 <= newName.length))) return [3 /*break*/, 2];
+                            // 何か変更があるとき
+                            this.UpdateDialog.SetUpdateMessage(isOrderChanged, removedTracks, newName);
+                            return [4 /*yield*/, this.UpdateDialog.Confirm()];
+                        case 1:
+                            isUpdate = _a.sent();
+                            _a.label = 2;
+                        case 2:
+                            if (!(isUpdate === true)) return [3 /*break*/, 4];
+                            return [4 /*yield*/, this.Update(updatedTracks)];
+                        case 3:
+                            _a.sent();
+                            _a.label = 4;
+                        case 4:
+                            this.GoBackToPlayer();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         TrackList.prototype.GetEditedTracks = function () {
             // entitiesをUL要素内の見た目の順序に取得する。
             var result = [];
-            var enEntities = Libraries_10.default.Enumerable.from(this.entities);
+            var enEntities = Libraries_11.default.Enumerable.from(this.entities);
             var children = this.TrackListUl.querySelectorAll('li');
             var _loop_1 = function (i) {
                 var uri = children[i].getAttribute('data-uri');
@@ -4014,9 +4184,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             for (var i = 0; i < children.length; i++) {
                 _loop_1(i);
             }
-            var beforeTracks = this.playlist.Tracks;
-            for (var i = 0; i < beforeTracks.length; i++) {
-                var track = beforeTracks[i];
+            for (var i = 0; i < this.playlist.Tracks.length; i++) {
+                var track = this.playlist.Tracks[i];
                 // 表示圏外だったエンティティを追加する。
                 if (result.indexOf(track) <= -1
                     && this.removedEntities.indexOf(track) <= 1) {
@@ -4025,10 +4194,126 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             }
             return result;
         };
+        TrackList.prototype.GetIsOrderChanged = function (updatedTracks) {
+            var beforeTracks = this.playlist.Tracks;
+            var result = false;
+            for (var i = 0; i < updatedTracks.length; i++) {
+                if (updatedTracks[i] !== beforeTracks[i]) {
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+        };
+        TrackList.prototype.Update = function (newTracks) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    // TODO: 保存処理
+                    // this.playlist.Tracks も更新されるようにする。
+                    this.playlist.Name = this.TitleInput.value;
+                    this.playlist.Tracks = newTracks;
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        TrackList.prototype.GoIntoEditor = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            // タイトル・編集開始ボタン非表示化
+                            this.titleH3Animate
+                                .RemoveDisplayNone()
+                                .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
+                                .then(function () {
+                                _this.titleH3Animate.SetDisplayNone();
+                            });
+                            return [4 /*yield*/, this.EditButton.Hide()];
+                        case 1:
+                            _a.sent();
+                            // 内部的モード切替
+                            this.TitleInput.value = this.playlist.Name;
+                            this.listMode = ListMode.Editable;
+                            this.listClasses = TrackList_1.ListBaseClasses + this.listMode.toString();
+                            // 編集操作ボタン類の表示化
+                            this.titleInputAnimate
+                                .RemoveDisplayNone()
+                                .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
+                            this.DeleteListButton.Show();
+                            return [4 /*yield*/, this.EndEditButton.Show()];
+                        case 2:
+                            _a.sent();
+                            // 編集操作ボタン類表示化後
+                            this.$forceUpdate();
+                            this.$nextTick(function () {
+                                _this.SetSortable();
+                            });
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.GoBackToPlayer = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            // 編集操作ボタン類非表示化
+                            this.titleInputAnimate
+                                .RemoveDisplayNone()
+                                .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
+                                .then(function () {
+                                _this.titleInputAnimate.SetDisplayNone();
+                            });
+                            this.DeleteListButton.Hide();
+                            return [4 /*yield*/, this.EndEditButton.Hide()];
+                        case 1:
+                            _a.sent();
+                            // 内部的モード切替
+                            this.TitleInput.value = '';
+                            this.listMode = ListMode.Playable;
+                            this.listClasses = TrackList_1.ListBaseClasses + this.listMode.toString();
+                            // タイトル・編集開始ボタン表示化
+                            if (this.UndoButton.GetIsVisible())
+                                this.UndoButton.Hide();
+                            this.titleH3Animate
+                                .RemoveDisplayNone()
+                                .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
+                            return [4 /*yield*/, this.EditButton.Show()];
+                        case 2:
+                            _a.sent();
+                            // リスト再描画
+                            this.Refresh();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.ShowUndoIfHidden = function () {
+            if (!this.UndoButton.GetIsVisible())
+                this.UndoButton.Show();
+        };
+        TrackList.prototype.ClearSelection = function () {
+            var _this = this;
+            _.each(this.Items, function (item) {
+                item.Reset();
+                // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
+                if (_this.sortable) {
+                    try {
+                        sortable_complete_esm_1.default.utils.deselect(item.$el);
+                    }
+                    catch (ex) {
+                        // 握りつぶす。
+                    }
+                }
+            });
+        };
         TrackList.prototype.OnSelectionChanged = function (args) {
             if (this.listMode === ListMode.Playable) {
                 // 再生モード時
-                var isAllTracksRegistered = Libraries_10.default.Enumerable.from(this.playlist.Tracks)
+                var isAllTracksRegistered = Libraries_11.default.Enumerable.from(this.playlist.Tracks)
                     .all(function (e) { return e.TlId !== null; });
                 (isAllTracksRegistered)
                     ? this.store.PlayByTlId(args.Entity.TlId)
@@ -4041,6 +4326,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     : args.View.Select();
             }
         };
+        TrackList.prototype.OnOrderChanged = function (args) {
+            var _this = this;
+            _.delay(function () {
+                _this.ClearSelection();
+                _this.ShowUndoIfHidden();
+            }, 500);
+        };
         TrackList.prototype.OnClickDeleteList = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var promises, hasRemovedTrack;
@@ -4048,6 +4340,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            console.log('TrackList.OnClickDeleteList');
                             if (this.listMode === ListMode.Playable)
                                 return [2 /*return*/];
                             promises = [];
@@ -4059,14 +4352,37 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                                     hasRemovedTrack = true;
                                 }
                             });
-                            if (!hasRemovedTrack) return [3 /*break*/, 2];
+                            if (!hasRemovedTrack) return [3 /*break*/, 3];
                             // どれかトラックが削除されたとき
                             return [4 /*yield*/, Promise.all(promises)];
                         case 1:
                             // どれかトラックが削除されたとき
                             _a.sent();
-                            return [3 /*break*/, 2];
-                        case 2: return [2 /*return*/, true];
+                            return [4 /*yield*/, this.SetSortable()];
+                        case 2:
+                            _a.sent();
+                            return [3 /*break*/, 3];
+                        case 3: return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.OnClickUndoButton = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var isRollback;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.UpdateDialog.SetRollbackMessage();
+                            return [4 /*yield*/, this.UpdateDialog.Confirm()];
+                        case 1:
+                            isRollback = _a.sent();
+                            if (!isRollback) return [3 /*break*/, 3];
+                            return [4 /*yield*/, this.GoBackToPlayer()];
+                        case 2:
+                            _a.sent();
+                            _a.label = 3;
+                        case 3: return [2 /*return*/, true];
                     }
                 });
             });
@@ -4076,11 +4392,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            console.log('TrackList.OnDeleteRowOrdered');
                             if (this.listMode === ListMode.Playable)
                                 return [2 /*return*/];
                             return [4 /*yield*/, this.DeleteTrack(args.View)];
                         case 1:
                             _a.sent();
+                            this.SetSortable();
                             return [2 /*return*/, true];
                     }
                 });
@@ -4091,14 +4409,18 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            console.log('TrackList.DeleteTrack');
                             if (this.listMode === ListMode.Playable)
                                 return [2 /*return*/];
-                            return [4 /*yield*/, row.Delete()];
+                            return [4 /*yield*/, row.DeleteTrack()];
                         case 1:
                             _a.sent();
                             row.$el.parentElement.removeChild(row.$el);
+                            _.pull(this.$children, row);
                             _.pull(this.entities, row.Entity);
                             this.removedEntities.push(row.Entity);
+                            row.$destroy();
+                            this.ShowUndoIfHidden();
                             return [2 /*return*/, true];
                     }
                 });
@@ -4139,7 +4461,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             _a.Tracks = _b.sent();
                             _b.label = 2;
                         case 2:
-                            entities = Libraries_10.default.Enumerable.from(this.playlist.Tracks);
+                            entities = Libraries_11.default.Enumerable.from(this.playlist.Tracks);
                             filterText = this.Filterbox.GetText().toLowerCase();
                             if (0 < filterText.length)
                                 entities = entities
@@ -4164,13 +4486,14 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.PageLength = 20;
         TrackList.ListBaseClasses = 'products-list product-list-in-box track-list ';
         TrackList = TrackList_1 = __decorate([
-            vue_class_component_16.default({
-                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\" />\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    ref=\"DeleteListButton\"\n                    @Clicked=\"OnClickDeleteList\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable track-list\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.track-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+            vue_class_component_17.default({
+                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\" />\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    ref=\"DeleteListButton\"\n                    @Clicked=\"OnClickDeleteList\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable track-list\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.track-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
                     'slideup-button': SlideupButton_2.default,
                     'selection-track': SelectionTrack_2.default,
-                    'infinite-loading': vue_infinite_loading_5.default
+                    'infinite-loading': vue_infinite_loading_5.default,
+                    'update-dialog': UpdateDialog_1.default
                 }
             })
         ], TrackList);
@@ -4178,7 +4501,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionList_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList"], function (require, exports, vue_class_component_17, ViewBase_12, PlaylistList_2, TrackList_2) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList"], function (require, exports, vue_class_component_18, ViewBase_13, PlaylistList_2, TrackList_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Playlists = /** @class */ (function (_super) {
@@ -4209,7 +4532,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             }
         };
         Playlists = __decorate([
-            vue_class_component_17.default({
+            vue_class_component_18.default({
                 template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-playlists\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\" />\n        <track-list\n            ref=\"TrackList\" />\n    </div>\n</section>",
                 components: {
                     'playlist-list': PlaylistList_2.default,
@@ -4218,10 +4541,10 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             })
         ], Playlists);
         return Playlists;
-    }(ViewBase_12.default));
+    }(ViewBase_13.default));
     exports.default = Playlists;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_18, ViewBase_13) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_19, ViewBase_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Settings = /** @class */ (function (_super) {
@@ -4230,16 +4553,16 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             return _super !== null && _super.apply(this, arguments) || this;
         }
         Settings = __decorate([
-            vue_class_component_18.default({
+            vue_class_component_19.default({
                 template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n</section>",
                 components: {}
             })
         ], Settings);
         return Settings;
-    }(ViewBase_13.default));
+    }(ViewBase_14.default));
     exports.default = Settings;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_19, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_1, Sidebar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_20, ViewBase_15, Finder_1, HeaderBar_1, Playlists_1, Settings_1, Sidebar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -4258,7 +4581,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
             this.HeaderBar.SetHeader(args);
         };
         RootView = __decorate([
-            vue_class_component_19.default({
+            vue_class_component_20.default({
                 template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar\n        @ContentChanged=\"OnContentChanged\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder ref=\"Finder\" />\n        <playlists ref=\"Playlists\" />\n        <settings ref=\"Settings\" />\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
@@ -4270,10 +4593,10 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
             })
         ], RootView);
         return RootView;
-    }(ViewBase_14.default));
+    }(ViewBase_15.default));
     exports.default = RootView;
 });
-define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_11, RootView_1) {
+define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_12, RootView_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -4284,7 +4607,7 @@ define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Libraries_11.default.Initialize();
+                            Libraries_12.default.Initialize();
                             this._view = new RootView_1.default();
                             this._view.$mount('#root');
                             return [4 /*yield*/, this._view.Initialize()];

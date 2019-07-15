@@ -12,6 +12,9 @@ import SlideupButton from '../../../Shared/SlideupButton';
 import { default as SelectionTrack, ITrackDeleteOrderedArgs, ITrackSelectionChangedArgs } from './SelectionTrack';
 import { default as Animate, Animation, Speed } from '../../../../Utils/Animate';
 import Sortable from 'sortablejs/modular/sortable.complete.esm';
+import { default as ConfirmDialog, ConfirmType } from '../../../Shared/Dialogs/ConfirmDialog';
+import Delay from '../../../../Utils/Delay';
+import UpdateDialog from './UpdateDialog';
 
 enum ListMode {
     Playable = 'playable',
@@ -45,6 +48,11 @@ enum ListMode {
                     @Clicked="OnClickDeleteList" />
                 <slideup-button
                     v-bind:hideOnInit="true"
+                    iconClass="fa fa-undo"
+                    ref="UndoButton"
+                    @Clicked="OnClickUndoButton" />
+                <slideup-button
+                    v-bind:hideOnInit="true"
                     iconClass="fa fa-check"
                     ref="EndEditButton"
                     @Clicked="OnClickEndEdit" />
@@ -67,12 +75,15 @@ enum ListMode {
             </ul>
         </div>
     </div>
+    <update-dialog
+        ref="UpdateDialog" />
 </div>`,
     components: {
         'filter-textbox': Filterbox,
         'slideup-button': SlideupButton,
         'selection-track': SelectionTrack,
-        'infinite-loading': InfiniteLoading
+        'infinite-loading': InfiniteLoading,
+        'update-dialog': UpdateDialog
     }
 })
 export default class TrackList extends SelectionList<Track, PlaylistStore> {
@@ -106,6 +117,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     private get DeleteListButton(): SlideupButton {
         return this.$refs.DeleteListButton as SlideupButton;
     }
+    private get UndoButton(): SlideupButton {
+        return this.$refs.UndoButton as SlideupButton;
+    }
     private get EndEditButton(): SlideupButton {
         return this.$refs.EndEditButton as SlideupButton;
     }
@@ -114,6 +128,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     }
     private get Items(): SelectionTrack[] {
         return this.$refs.Items as SelectionTrack[];
+    }
+    private get UpdateDialog(): UpdateDialog {
+        return this.$refs.UpdateDialog as UpdateDialog;
     }
 
     public async Initialize(): Promise<boolean> {
@@ -141,94 +158,79 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-    private OnClickEdit(): void {
-        this.titleH3Animate
-            .RemoveDisplayNone()
-            .Execute(Animation.FadeOutDown, Speed.Faster)
-            .then((): void => {
-                this.titleH3Animate.SetDisplayNone();
-                this.TitleInput.value = this.playlist.Name;
-                this.titleInputAnimate
-                    .RemoveDisplayNone()
-                    .Execute(Animation.FadeInUp, Speed.Faster);
-            });
-        this.EditButton.Hide().then((): void => {
-            this.listMode = ListMode.Editable;
-            this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
-            this.sortable = Sortable.create(this.TrackListUl, {
-                animation: 500,
-                multiDrag: true,
-                selectedClass: 'selected',
-                dataIdAttr: 'data-uri',
-                onEnd: (ev): void => {
-                    this.OnOrderChanged(ev);
-                }
-            });
+    private async SetSortable(): Promise<boolean> {
+        this.DisposeSortable();
 
-            this.DeleteListButton.Show();
-            this.EndEditButton.Show().then((): void => {
-                this.$forceUpdate();
-            });
+        await Delay.Wait(10);
+
+        this.sortable = Sortable.create(this.TrackListUl, {
+            animation: 500,
+            multiDrag: true,
+            selectedClass: 'selected',
+            dataIdAttr: 'data-uri',
+            onEnd: (ev): void => {
+                this.OnOrderChanged(ev);
+            }
         });
+
+        return true;
     }
 
-    private OnClickEndEdit(): void {
-        this.sortable.destroy();
-        this.sortable = null;
-
-        this.ClearSelection();
-
-        const beforeTracks = this.playlist.Tracks;
-        const afterTracks = this.GetEditedTracks();
-        const removedTracks = this.removedEntities;
-        let orderChanged = false;
-        for (let i = 0; i < afterTracks.length; i++) {
-            if (afterTracks[i] !== beforeTracks[i]) {
-                orderChanged = true;
-                break;
+    private DisposeSortable(): void {
+        if (this.sortable !== null) {
+            try {
+                this.sortable.destroy();
+            } catch (ex) {
             }
         }
-        console.log('order changed: ' + orderChanged);
-        console.log('removed:');
-        console.log(removedTracks);
-        // TODO: 保存処理
-        // this.playlist.Tracks も更新されるようにする。
-
-        this.playlist.Name = this.TitleInput.value;
-        this.playlist.Tracks = afterTracks;
-
-        this.Refresh();
-
-        this.titleInputAnimate
-            .RemoveDisplayNone()
-            .Execute(Animation.FadeOutDown, Speed.Faster)
-            .then((): void => {
-                this.titleInputAnimate.SetDisplayNone();
-                this.TitleInput.value = '';
-                this.titleH3Animate
-                    .RemoveDisplayNone()
-                    .Execute(Animation.FadeInUp, Speed.Faster);
-            });
-        this.DeleteListButton.Hide();
-        this.EndEditButton.Hide().then((): void => {
-            this.listMode = ListMode.Playable;
-            this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
-            this.EditButton.Show();
-        });
+        this.sortable = null;
     }
 
-    private ClearSelection(): void {
-        _.each(this.Items, (item) => {
-            item.Deselect();
-            // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
-            Sortable.utils.deselect(item.$el as HTMLElement);
-        });
+    private OnClickEdit(): void {
+        this.GoIntoEditor();
     }
 
-    private OnOrderChanged(args: Sortable.SortableEvent): void {
-        _.delay((): void => {
-            this.ClearSelection();
-        }, 500);
+    private async OnClickEndEdit(): Promise<boolean> {
+        this.ClearSelection();
+        this.DisposeSortable();
+        
+        const updatedTracks = this.GetEditedTracks();
+        const isOrderChanged = this.GetIsOrderChanged(updatedTracks);
+        const removedTracks = this.removedEntities;
+        const newName = (this.playlist.Name !== this.TitleInput.value)
+            ? this.TitleInput.value
+            : null;
+
+        if (
+            this.playlist.Name !== this.TitleInput.value
+            && (
+                !this.TitleInput.value
+                || this.TitleInput.value.length <= 0
+            )
+        ) {
+            // TODO: AlertToastを出す。'Name required.'
+            this.TitleInput.focus();
+            return false;
+        }
+
+        let isUpdate = false;
+
+        if (
+            isOrderChanged
+            || 0 < removedTracks.length
+            || (newName && 1 <= newName.length)
+        ) {
+            // 何か変更があるとき
+            this.UpdateDialog.SetUpdateMessage(isOrderChanged, removedTracks, newName);
+            isUpdate = await this.UpdateDialog.Confirm();
+        }
+
+        if (isUpdate === true)
+            await this.Update(updatedTracks);
+
+        this.GoBackToPlayer();
+
+        return true;
     }
 
     private GetEditedTracks(): Track[] {
@@ -243,9 +245,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             if (entity && result.indexOf(entity) <= -1)
                 result.push(entity);
         }
-        const beforeTracks = this.playlist.Tracks;
-        for (let i = 0; i < beforeTracks.length; i++) {
-            const track = beforeTracks[i];
+
+        for (let i = 0; i < this.playlist.Tracks.length; i++) {
+            const track = this.playlist.Tracks[i];
 
             // 表示圏外だったエンティティを追加する。
             if (
@@ -257,6 +259,110 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         }
 
         return result;
+    }
+
+    private GetIsOrderChanged(updatedTracks: Track[]): boolean {
+        const beforeTracks = this.playlist.Tracks;
+        let result = false;
+        for (let i = 0; i < updatedTracks.length; i++) {
+            if (updatedTracks[i] !== beforeTracks[i]) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    private async Update(newTracks: Track[]): Promise<boolean> {
+
+        // TODO: 保存処理
+        // this.playlist.Tracks も更新されるようにする。
+
+        this.playlist.Name = this.TitleInput.value;
+        this.playlist.Tracks = newTracks;
+
+        return true;
+    }
+
+    private async GoIntoEditor(): Promise<boolean> {
+        // タイトル・編集開始ボタン非表示化
+        this.titleH3Animate
+            .RemoveDisplayNone()
+            .Execute(Animation.FadeOutDown, Speed.Faster)
+            .then(() => {
+                this.titleH3Animate.SetDisplayNone();
+            });
+        await this.EditButton.Hide();
+
+        // 内部的モード切替
+        this.TitleInput.value = this.playlist.Name;
+        this.listMode = ListMode.Editable;
+        this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
+
+        // 編集操作ボタン類の表示化
+        this.titleInputAnimate
+            .RemoveDisplayNone()
+            .Execute(Animation.FadeInUp, Speed.Faster);
+        this.DeleteListButton.Show();
+        await this.EndEditButton.Show();
+
+        // 編集操作ボタン類表示化後
+        this.$forceUpdate();
+        this.$nextTick(() => {
+            this.SetSortable();
+        });
+
+        return true;
+    }
+
+    private async GoBackToPlayer(): Promise<boolean> {
+        // 編集操作ボタン類非表示化
+        this.titleInputAnimate
+            .RemoveDisplayNone()
+            .Execute(Animation.FadeOutDown, Speed.Faster)
+            .then((): void => {
+                this.titleInputAnimate.SetDisplayNone();
+            });
+        this.DeleteListButton.Hide();
+        await this.EndEditButton.Hide();
+
+        // 内部的モード切替
+        this.TitleInput.value = '';
+        this.listMode = ListMode.Playable;
+        this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
+
+        // タイトル・編集開始ボタン表示化
+        if (this.UndoButton.GetIsVisible())
+            this.UndoButton.Hide();
+        this.titleH3Animate
+            .RemoveDisplayNone()
+            .Execute(Animation.FadeInUp, Speed.Faster);
+        await this.EditButton.Show();
+
+        // リスト再描画
+        this.Refresh();
+
+        return true;
+    }
+
+    private ShowUndoIfHidden(): void {
+        if (!this.UndoButton.GetIsVisible())
+            this.UndoButton.Show();
+    }
+
+    private ClearSelection(): void {
+        _.each(this.Items, (item) => {
+            item.Reset();
+            // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
+            if (this.sortable) {
+                try {
+                    Sortable.utils.deselect(item.$el as HTMLElement);
+                } catch (ex) {
+                    // 握りつぶす。
+                }
+            }
+        });
     }
 
     protected OnSelectionChanged(args: ITrackSelectionChangedArgs): void {
@@ -276,7 +382,15 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         }
     }
 
+    private OnOrderChanged(args: Sortable.SortableEvent): void {
+        _.delay((): void => {
+            this.ClearSelection();
+            this.ShowUndoIfHidden();
+        }, 500);
+    }
+
     private async OnClickDeleteList(): Promise<boolean> {
+        console.log('TrackList.OnClickDeleteList');
         if (this.listMode === ListMode.Playable)
             return;
 
@@ -295,6 +409,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         if (hasRemovedTrack) {
             // どれかトラックが削除されたとき
             await Promise.all(promises);
+            await this.SetSortable();
         } else {
             // 削除トラックが無い(=どの行も選択されていない)とき
             // TODO: プレイリスト全体を削除するか、ダイアログを出す。
@@ -303,24 +418,42 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
+    private async OnClickUndoButton(): Promise<boolean> {
+        this.UpdateDialog.SetRollbackMessage();
+        const isRollback = await this.UpdateDialog.Confirm();
+
+        if (isRollback)
+            await this.GoBackToPlayer();
+
+        return true;
+    }
+
     private async OnDeleteRowOrdered(args: ITrackDeleteOrderedArgs): Promise<boolean> {
+        console.log('TrackList.OnDeleteRowOrdered');
         if (this.listMode === ListMode.Playable)
             return;
 
         await this.DeleteTrack(args.View);
 
+        this.SetSortable();
+
         return true;
     }
 
     private async DeleteTrack(row: SelectionTrack): Promise<boolean> {
+        console.log('TrackList.DeleteTrack');
         if (this.listMode === ListMode.Playable)
             return;
 
-        await row.Delete();
-
+        await row.DeleteTrack();
+        
         row.$el.parentElement.removeChild(row.$el);
+        _.pull(this.$children, row);
         _.pull(this.entities, row.Entity);
         this.removedEntities.push(row.Entity);
+        row.$destroy();
+
+        this.ShowUndoIfHidden();
 
         return true;
     }

@@ -68,8 +68,11 @@ export default class SelectionTrack extends ViewBase {
         this.liClasses = SelectionTrack.LiClasses
             + (this.selected ? 'selected ' : '');
 
-        if (this.isDeleting)
+        if (this.isDeleting === true) {
+            console.log('DELETING!');
+            console.log(this.entity.Name);
             this.liClasses += this.deletingClasses;
+        }
 
         this.$forceUpdate();
     }
@@ -85,15 +88,19 @@ export default class SelectionTrack extends ViewBase {
         this.$emit(TrackSelectionEvents.SelectionChanged, args);
     }
 
-    private OnClickDelete(): void {
+    private OnClickDelete(ev: MouseEvent): void {
+        console.log('SelectionTrack.OnClickDelete');
         const args: ITrackDeleteOrderedArgs = {
             Entity: this.entity,
             View: this
         };
         this.$emit(TrackSelectionEvents.DeleteOrdered, args);
+        ev.preventDefault();
+        ev.stopPropagation();
     }
 
-    public async Delete(): Promise<boolean> {
+    public async DeleteTrack(): Promise<boolean> {
+        console.log('SelectionTrack.DeleteTrack');
         this.isDeleting = true;
         this.SetLiClasses();
         await Delay.Wait(600);
@@ -106,6 +113,7 @@ export default class SelectionTrack extends ViewBase {
     }
 
     public Select(): void {
+        console.log('SelectionTrack.Select');
         if (!this.selected) {
             this.selected = true;
             this.SetLiClasses();
@@ -113,9 +121,17 @@ export default class SelectionTrack extends ViewBase {
     }
 
     public Deselect(): void {
+        console.log('SelectionTrack.Deselect');
         if (this.selected) {
             this.selected = false;
             this.SetLiClasses();
         }
+    }
+
+    public Reset(): void {
+        console.log('SelectionTrack.Reset');
+        this.isDeleting = false;
+        this.selected = false;
+        this.SetLiClasses();
     }
 }

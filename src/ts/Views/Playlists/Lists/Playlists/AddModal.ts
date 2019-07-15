@@ -10,8 +10,7 @@ export const AddModalEvents = {
 @Component({
     template: `<div class="modal fade"
     style="display: none;"
-    aria-hidden="true"
-    ref="DivModalAdd">
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content bg-info">
             <div class="modal-header">

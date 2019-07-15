@@ -146,6 +146,27 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         return true;
     }
 
+    public async UpdatePlayllist(playlist: Playlist): Promise<boolean> {
+
+        const tracks: { uri: string }[] = [];
+        for (let i = 0; i < playlist.Tracks.length; i++) {
+            const track = playlist.Tracks[i];
+            tracks.push({
+                uri: track.Uri
+            });
+        }
+
+        const response = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistSave, {
+            playlist: {
+                name: playlist.Name,
+                uri: playlist.Uri,
+                tracks: tracks
+            }
+        });
+
+        return true;
+    }
+
     public async DeletePlaylist(playlist: Playlist): Promise<boolean> {
         await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistDelete, {
             uri: playlist.Uri
