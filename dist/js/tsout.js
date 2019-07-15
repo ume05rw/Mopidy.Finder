@@ -3731,6 +3731,13 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             return _this;
         }
         SelectionTrack_1 = SelectionTrack;
+        Object.defineProperty(SelectionTrack.prototype, "Entity", {
+            get: function () {
+                return this.entity;
+            },
+            enumerable: true,
+            configurable: true
+        });
         SelectionTrack.prototype.SetLiClasses = function () {
             this.liClasses = SelectionTrack_1.LiClasses
                 + (this.selected ? 'selected ' : '');
@@ -3755,7 +3762,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             };
             this.$emit(exports.TrackSelectionEvents.DeleteOrdered, args);
         };
-        SelectionTrack.prototype.Deltete = function () {
+        SelectionTrack.prototype.Delete = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -3793,7 +3800,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
         ], SelectionTrack.prototype, "entity", void 0);
         SelectionTrack = SelectionTrack_1 = __decorate([
             vue_class_component_15.default({
-                template: "<li v-bind:class=\"liClasses\"\n    ref=\"Li\"\n    @click=\"OnClickRow\">\n    <div class=\"product-img ml-2\">\n        <img v-bind:src=\"((entity.Album) ? entity.Album.GetImageFullUri() : '')\" alt=\"ALbum Image\">\n    </div>\n    <div class=\"product-info\">\n        <span class=\"product-title pl-2\">\n            {{ entity.Name }}\n            <div class=\"btn-group pull-right mr-2 editmode-buttons\">\n                <button\n                    class=\"btn btn-sm btn-outline-dark\"\n                    @click=\"OnClickDelete\"\n                    ref=\"ButtonCollaplse\" >\n                    <i class=\"fa fa-minus-circle\" />\n                </button>\n            </div>\n            <span class=\"pull-right length mr-2\">{{ entity.GetTimeString() }}</span>\n        </span>\n        <span class=\"product-description pl-2\">\n            {{ entity.GetAlbumName() }} {{ entity.GetFormattedYearString() }} {{ ' : ' + entity.GetFormattedArtistName() }}\n        </span>\n    </div>\n</li>"
+                template: "<li v-bind:class=\"liClasses\"\n    v-bind:data-uri=\"entity.Uri\"\n    ref=\"Li\"\n    @click=\"OnClickRow\">\n    <div class=\"product-img ml-2\">\n        <img v-bind:src=\"((entity.Album) ? entity.Album.GetImageFullUri() : '')\" alt=\"ALbum Image\">\n    </div>\n    <div class=\"product-info\">\n        <span class=\"product-title pl-2\">\n            {{ entity.Name }}\n            <div class=\"btn-group pull-right mr-2 editmode-buttons\">\n                <button\n                    class=\"btn btn-sm btn-outline-dark\"\n                    @click=\"OnClickDelete\"\n                    ref=\"ButtonCollaplse\" >\n                    <i class=\"fa fa-minus-circle\" />\n                </button>\n            </div>\n            <span class=\"pull-right length mr-2\">{{ entity.GetTimeString() }}</span>\n        </span>\n        <span class=\"product-description pl-2\">\n            {{ entity.GetAlbumName() }} {{ entity.GetFormattedYearString() }} {{ ' : ' + entity.GetFormattedArtistName() }}\n        </span>\n    </div>\n</li>"
             })
         ], SelectionTrack);
         return SelectionTrack;
@@ -3928,7 +3935,11 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 _this.sortable = sortable_complete_esm_1.default.create(_this.TrackListUl, {
                     animation: 500,
                     multiDrag: true,
-                    selectedClass: 'selected'
+                    selectedClass: 'selected',
+                    dataIdAttr: 'data-uri',
+                    onEnd: function (ev) {
+                        _this.OnOrderChanged(ev);
+                    }
                 });
                 _this.DeleteListButton.Show();
                 _this.EndEditButton.Show().then(function () {
@@ -3937,9 +3948,28 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             });
         };
         TrackList.prototype.OnClickEndEdit = function () {
+            var _this = this;
+            this.sortable.destroy();
+            this.sortable = null;
+            this.ClearSelection();
+            var beforeTracks = this.playlist.Tracks;
+            var afterTracks = this.GetEditedTracks();
+            var removedTracks = this.removedEntities;
+            var orderChanged = false;
+            for (var i = 0; i < afterTracks.length; i++) {
+                if (afterTracks[i] !== beforeTracks[i]) {
+                    orderChanged = true;
+                    break;
+                }
+            }
+            console.log('order changed: ' + orderChanged);
+            console.log('removed:');
+            console.log(removedTracks);
             // TODO: 保存処理
             // this.playlist.Tracks も更新されるようにする。
-            var _this = this;
+            this.playlist.Name = this.TitleInput.value;
+            this.playlist.Tracks = afterTracks;
+            this.Refresh();
             this.titleInputAnimate
                 .RemoveDisplayNone()
                 .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
@@ -3952,16 +3982,48 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             });
             this.DeleteListButton.Hide();
             this.EndEditButton.Hide().then(function () {
-                _.each(_this.Items, function (item) {
-                    item.Deselect();
-                });
                 _this.listMode = ListMode.Playable;
                 _this.listClasses = TrackList_1.ListBaseClasses + _this.listMode.toString();
-                _this.sortable.destroy();
-                _this.sortable = null;
                 _this.EditButton.Show();
-                _this.SetPlaylist(_this.playlist);
             });
+        };
+        TrackList.prototype.ClearSelection = function () {
+            _.each(this.Items, function (item) {
+                item.Deselect();
+                // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
+                sortable_complete_esm_1.default.utils.deselect(item.$el);
+            });
+        };
+        TrackList.prototype.OnOrderChanged = function (args) {
+            var _this = this;
+            _.delay(function () {
+                _this.ClearSelection();
+            }, 500);
+        };
+        TrackList.prototype.GetEditedTracks = function () {
+            // entitiesをUL要素内の見た目の順序に取得する。
+            var result = [];
+            var enEntities = Libraries_10.default.Enumerable.from(this.entities);
+            var children = this.TrackListUl.querySelectorAll('li');
+            var _loop_1 = function (i) {
+                var uri = children[i].getAttribute('data-uri');
+                var entity = enEntities.firstOrDefault(function (e) { return e.Uri == uri; });
+                if (entity && result.indexOf(entity) <= -1)
+                    result.push(entity);
+            };
+            for (var i = 0; i < children.length; i++) {
+                _loop_1(i);
+            }
+            var beforeTracks = this.playlist.Tracks;
+            for (var i = 0; i < beforeTracks.length; i++) {
+                var track = beforeTracks[i];
+                // 表示圏外だったエンティティを追加する。
+                if (result.indexOf(track) <= -1
+                    && this.removedEntities.indexOf(track) <= 1) {
+                    result.push(track);
+                }
+            }
+            return result;
         };
         TrackList.prototype.OnSelectionChanged = function (args) {
             if (this.listMode === ListMode.Playable) {
@@ -3979,6 +4041,36 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     : args.View.Select();
             }
         };
+        TrackList.prototype.OnClickDeleteList = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var promises, hasRemovedTrack;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.listMode === ListMode.Playable)
+                                return [2 /*return*/];
+                            promises = [];
+                            hasRemovedTrack = false;
+                            _.each(this.$children, function (view) {
+                                if (view instanceof SelectionTrack_2.default
+                                    && view.GetIsSelected()) {
+                                    promises.push(_this.DeleteTrack(view));
+                                    hasRemovedTrack = true;
+                                }
+                            });
+                            if (!hasRemovedTrack) return [3 /*break*/, 2];
+                            // どれかトラックが削除されたとき
+                            return [4 /*yield*/, Promise.all(promises)];
+                        case 1:
+                            // どれかトラックが削除されたとき
+                            _a.sent();
+                            return [3 /*break*/, 2];
+                        case 2: return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
         TrackList.prototype.OnDeleteRowOrdered = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
@@ -3986,18 +4078,31 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 0:
                             if (this.listMode === ListMode.Playable)
                                 return [2 /*return*/];
-                            return [4 /*yield*/, args.View.Deltete()];
+                            return [4 /*yield*/, this.DeleteTrack(args.View)];
                         case 1:
                             _a.sent();
-                            args.View.$el.parentElement.removeChild(args.View.$el);
-                            _.pull(this.entities, args.Entity);
-                            this.removedEntities.push(args.Entity);
-                            return [2 /*return*/];
+                            return [2 /*return*/, true];
                     }
                 });
             });
         };
-        TrackList.prototype.OnClickDeleteList = function () {
+        TrackList.prototype.DeleteTrack = function (row) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.listMode === ListMode.Playable)
+                                return [2 /*return*/];
+                            return [4 /*yield*/, row.Delete()];
+                        case 1:
+                            _a.sent();
+                            row.$el.parentElement.removeChild(row.$el);
+                            _.pull(this.entities, row.Entity);
+                            this.removedEntities.push(row.Entity);
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         /**
          * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に

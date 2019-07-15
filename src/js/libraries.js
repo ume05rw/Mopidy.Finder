@@ -68,5 +68,3 @@ window.__globals = {
     'vue-infinite-loading': InfiniteLoading
 };
 
-console.log('libraries.js');
-console.log(Sortable);

@@ -93,6 +93,24 @@ declare namespace Sortable {
          * list, in which moved element.
          */
         to: HTMLElement;
+
+        // --------------------------------------------------
+        // MultiDragプラグイン用に追記
+        // --------------------------------------------------
+        /**
+         * dragged elements
+         */
+        items: HTMLElement[];
+        newIndicies: Indicies[] | undefined;
+        oldIndicies: Indicies[] | undefined;
+    }
+
+    // --------------------------------------------------
+    // MultiDragプラグイン用に追記
+    // --------------------------------------------------
+    export interface Indicies {
+        index: number;
+        multiDragElement: HTMLElement
     }
 
     export interface MoveEvent extends Event {
@@ -338,6 +356,14 @@ declare namespace Sortable {
          * @param state a class's state.
          */
         toggleClass(element: HTMLElement, name: string, state: boolean): void;
+
+        // --------------------------------------------------
+        // MultiDragプラグイン用に追記
+        // --------------------------------------------------
+        // -->
+        select(element: HTMLElement): void;
+        deselect(element: HTMLElement): void;
+        // <--
     }
 
     interface DOMRect {

@@ -24,6 +24,7 @@ export interface ITrackSelectionChangedArgs extends ISelectionChangedArgs<Track>
 
 @Component({
     template: `<li v-bind:class="liClasses"
+    v-bind:data-uri="entity.Uri"
     ref="Li"
     @click="OnClickRow">
     <div class="product-img ml-2">
@@ -54,6 +55,10 @@ export default class SelectionTrack extends ViewBase {
 
     @Prop()
     private entity: Track;
+
+    public get Entity(): Track {
+        return this.entity;
+    }
 
     private selected: boolean = false;
     private liClasses: string = SelectionTrack.LiClasses;
@@ -88,7 +93,7 @@ export default class SelectionTrack extends ViewBase {
         this.$emit(TrackSelectionEvents.DeleteOrdered, args);
     }
 
-    public async Deltete(): Promise<boolean> {
+    public async Delete(): Promise<boolean> {
         this.isDeleting = true;
         this.SetLiClasses();
         await Delay.Wait(600);

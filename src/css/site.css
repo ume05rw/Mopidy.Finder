@@ -1,4 +1,4 @@
-/*html,
+html,
 body,
 div#root {
     width: 100% !important;
@@ -6,7 +6,7 @@ div#root {
     height: 100% !important;
     max-height: 100% !important;
     overflow: hidden !important;
-}*/
+}
 
 .list-scrollable {
     /* 57, 64, 49 **/
@@ -41,10 +41,7 @@ div#root {
 .plain-list li {
     border-top: 1px solid rgba(0, 0, 0, 0.125);
     border-bottom: none !important;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 4px 8px;
 }
 .plain-list li.selected {
     background-color: #adb5bd;
