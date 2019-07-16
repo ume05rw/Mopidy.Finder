@@ -6,8 +6,8 @@ import { IPagenatedResult } from '../../../../Models/Bases/StoreBase';
 import Playlist from '../../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
-import { default as SelectionItem, ISelectionOrderedArgs, ISelectionChangedArgs } from '../../../Shared/SelectionItem';
-import { default as SelectionList, SelectionEvents } from '../../../Shared/SelectionList';
+import { default as SelectionItem, ISelectionChangedArgs, ISelectionOrderedArgs } from '../../../Shared/SelectionItem';
+import { default as SelectionList } from '../../../Shared/SelectionList';
 import AddModal from './AddModal';
 
 export const PlaylistListEvents = {
@@ -122,15 +122,9 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         super.OnClickCollapse();
     }
     protected async OnSelectionOrdered(args: ISelectionOrderedArgs<Playlist>): Promise<boolean> {
-        console.log('PlaylistList.OnPlaylistsSelectionOrdered:')
-        console.log(args);
         return super.OnSelectionOrdered(args);
     }
-
     protected OnSelectionChanged(args: ISelectionChangedArgs<Playlist>): void {
-        console.log('PlaylistList.OnSelectionChanged:')
-        console.log(args);
-
         _.each(this.Items, (si): void => {
             if (si.GetEntity() !== args.Entity && si.GetSelected()) {
                 si.SetSelected(false);

@@ -1,14 +1,14 @@
 import * as _ from 'lodash';
+import Sortable from 'sortablejs/modular/sortable.complete.esm';
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
+import Libraries from '../../../../Libraries';
 import Track from '../../../../Models/Tracks/Track';
+import { Animation, default as Animate, Speed } from '../../../../Utils/Animate';
+import Delay from '../../../../Utils/Delay';
 import ViewBase from '../../../Bases/ViewBase';
 import { ISelectionChangedArgs } from '../../../Shared/SelectionItem';
 import { SelectionEvents } from '../../../Shared/SelectionList';
-import { default as Animate, Animation, Speed } from '../../../../Utils/Animate';
-import Delay from '../../../../Utils/Delay';
-import Libraries from '../../../../Libraries';
-import Sortable from 'sortablejs/modular/sortable.complete.esm';
 
 export const TrackSelectionEvents = _.extend(_.clone(SelectionEvents), {
     DeleteOrdered: 'DeleteOrdered'

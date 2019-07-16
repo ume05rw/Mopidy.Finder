@@ -150,9 +150,11 @@ define("EventableBase", ["require", "exports", "lodash"], function (require, exp
     }());
     exports.default = EventableBase;
 });
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/dist/js/adminlte", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    // SweetAlert2 は個別読み込みOK.
+    //import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
     /**
      * VS開発時のステップデバッグ環境を維持するため、開発環境ではAMD形式で
      * ライブラリをexportしている。
@@ -1840,7 +1842,6 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
          */
         SelectionList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var button;
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -1848,12 +1849,12 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
                         case 1:
                             _a.sent();
                             if (this.isAutoCollapse) {
-                                button = Libraries_3.default.$(this.ButtonCollaplse);
-                                this.boxWidget = new AdminLte.Widget(button);
-                                button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
+                                this.button = Libraries_3.default.$(this.ButtonCollaplse);
+                                this.boxWidget = new AdminLte.Widget(this.button);
+                                this.button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
                                     _this.isCollapsed = true;
                                 });
-                                button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
+                                this.button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
                                     _this.isCollapsed = false;
                                 });
                                 Libraries_3.default.$(window).resize(this.viewport.changed(function () {
@@ -3841,15 +3842,11 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         PlaylistList.prototype.OnSelectionOrdered = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    console.log('PlaylistList.OnPlaylistsSelectionOrdered:');
-                    console.log(args);
                     return [2 /*return*/, _super.prototype.OnSelectionOrdered.call(this, args)];
                 });
             });
         };
         PlaylistList.prototype.OnSelectionChanged = function (args) {
-            console.log('PlaylistList.OnSelectionChanged:');
-            console.log(args);
             _.each(this.Items, function (si) {
                 if (si.GetEntity() !== args.Entity && si.GetSelected()) {
                     si.SetSelected(false);
@@ -3936,7 +3933,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList", "Utils/Animate", "Utils/Delay", "Libraries", "sortablejs/modular/sortable.complete.esm"], function (require, exports, _, vue_class_component_15, vue_property_decorator_6, Track_3, ViewBase_11, SelectionList_5, Animate_3, Delay_3, Libraries_13, sortable_complete_esm_1) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_15, vue_property_decorator_6, Libraries_13, Track_3, Animate_3, Delay_3, ViewBase_11, SelectionList_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionList_5.SelectionEvents), {

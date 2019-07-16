@@ -7,6 +7,7 @@ import 'animate.css/animate.css';
 import 'font-awesome/css/font-awesome.css';
 import 'admin-lte/dist/css/adminlte.css';
 import 'admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css';
+import 'admin-lte/plugins/sweetalert2/sweetalert2.css';
 import '../css/site.css';
 
 /**
@@ -17,7 +18,8 @@ import '../css/site.css';
 import * as jQuery from 'jquery';
 import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
 import 'admin-lte/plugins/bootstrap/js/bootstrap.bundle';
-import 'admin-lte/dist/js/adminlte';
+//import 'admin-lte/dist/js/adminlte';
+import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 import 'jquery-slimscroll';
 
@@ -31,6 +33,9 @@ import 'jquery-slimscroll';
  */
 import * as Enumerable from 'linq';
 import * as Mopidy from 'mopidy';
+
+// SweetAlert2 は個別読み込みOK.
+//import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
 
 /**
  * VS開発時のステップデバッグ環境を維持するため、開発環境ではAMD形式で

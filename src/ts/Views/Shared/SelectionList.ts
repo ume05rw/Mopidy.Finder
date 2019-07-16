@@ -28,6 +28,7 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
 
     private page: number = 1;
     private viewport = Libraries.ResponsiveBootstrapToolkit;
+    private button: JQuery;
     private boxWidget: AdminLte.Widget;
     private isCollapsed: boolean = false;
 
@@ -53,13 +54,13 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
         await super.Initialize();
 
         if (this.isAutoCollapse) {
-            const button = Libraries.$(this.ButtonCollaplse);
-            this.boxWidget = new AdminLte.Widget(button);
+            this.button = Libraries.$(this.ButtonCollaplse);
+            this.boxWidget = new AdminLte.Widget(this.button);
 
-            button.on(WidgetEvents.Collapsed, (): void => {
+            this.button.on(WidgetEvents.Collapsed, (): void => {
                 this.isCollapsed = true;
             });
-            button.on(WidgetEvents.Expanded, (): void => {
+            this.button.on(WidgetEvents.Expanded, (): void => {
                 this.isCollapsed = false;
             });
 

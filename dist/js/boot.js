@@ -32,6 +32,12 @@ define('admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css', ["exports"],
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {};
 });
+// ダミー: admin-lte/plugins/sweetalert2/sweetalert2.css
+define('admin-lte/plugins/sweetalert2/sweetalert2.css', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
+});
 // ダミー: site.css
 define('../css/site.css', ["exports"], function (exports) {
     "use strict";
@@ -90,12 +96,17 @@ define('jquery-slimscroll', ["exports"], function (exports) {
     exports.default = {};
 });
 
-
 /**
  * --------------------------------------------------
  * 独立したライブラリ
  * --------------------------------------------------
  */
+// admin-lte/plugins/sweetalert2/sweetalert2
+define('admin-lte/plugins/sweetalert2/sweetalert2', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['admin-lte/plugins/sweetalert2/sweetalert2'];
+});
 // lodash
 define('lodash', ["exports"], function (exports) {
     "use strict";
