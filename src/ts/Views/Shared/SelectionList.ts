@@ -6,11 +6,7 @@ import { IPagenatedResult } from '../../Models/Bases/StoreBase';
 import ViewBase from '../Bases/ViewBase';
 import { WidgetEvents } from '../Events/AdminLteEvents';
 import Exception from '../../Utils/Exception';
-
-export interface ISelectionChangedArgs<TEntity> {
-    Entity: TEntity;
-    Selected: boolean;
-}
+import { SelectionItemEvents, ISelectionChangedArgs, ISelectionOrderedArgs } from './SelectionItem';
 
 export interface IListUpdatedArgs<TEntity> {
     Entities: TEntity[];
@@ -18,7 +14,8 @@ export interface IListUpdatedArgs<TEntity> {
 
 export const SelectionEvents = {
     ListUpdated: 'ListUpdated',
-    SelectionChanged: 'SelectionChanged',
+    SelectionOrdered: SelectionItemEvents.SelectionOrdered,
+    SelectionChanged: SelectionItemEvents.SelectionChanged,
     Refreshed: 'Refreshed',
 }
 
@@ -118,6 +115,12 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
     protected OnClickRefresh(): void {
         this.Refresh();
         this.$emit(SelectionEvents.Refreshed);
+    }
+
+    protected async OnSelectionOrdered(args: ISelectionOrderedArgs<TEntity>): Promise<boolean> {
+        this.$emit(SelectionEvents.SelectionOrdered, args);
+
+        return args.Permitted;
     }
 
     protected OnSelectionChanged(args: ISelectionChangedArgs<TEntity>): void {

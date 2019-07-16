@@ -4,7 +4,7 @@ import Libraries from '../../../../Libraries';
 import AlbumTracks from '../../../../Models/AlbumTracks/AlbumTracks';
 import Track from '../../../../Models/Tracks/Track';
 import ViewBase from '../../../Bases/ViewBase';
-import { ISelectionChangedArgs } from '../../../Shared/SelectionList';
+import { ISelectionChangedArgs } from '../../../Shared/SelectionItem';
 
 export interface IAlbumTracksSelectedArgs extends ISelectionChangedArgs<AlbumTracks> {
     Track: Track;

@@ -158,15 +158,27 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
+    public GetIsPlaylistSwichable(): boolean {
+        if (this.listMode === ListMode.Playable)
+            return true;
+
+        return !(this.GetUpdate()).HasUpdate;
+    }
+
     public async SetPlaylist(playlist: Playlist): Promise<boolean> {
+        if (this.listMode !== ListMode.Playable)
+            await this.GoBackToPlayer();
+
         this.playlist = (playlist)
             ? playlist
             : null;
         this.entities = [];
         this.removedEntities = [];
 
-        for (let i = 0; i < this.playlist.Tracks.length; i++)
-            this.playlist.Tracks[i].TlId = null;
+        if (this.playlist && this.playlist.Tracks) {
+            for (let i = 0; i < this.playlist.Tracks.length; i++)
+                this.playlist.Tracks[i].TlId = null;
+        }
 
         this.Refresh();
 

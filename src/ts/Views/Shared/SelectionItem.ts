@@ -3,6 +3,7 @@ import { Prop } from 'vue-property-decorator';
 import ViewBase from '../Bases/ViewBase';
 
 export const SelectionItemEvents = {
+    SelectionOrdered: 'SelectionOrdered',
     SelectionChanged: 'SelectionChanged'
 }
 
@@ -10,6 +11,10 @@ export interface ISelectionChangedArgs<TEntity> {
     Entity: TEntity;
     Selected: boolean;
 }
+export interface ISelectionOrderedArgs<TEntity> extends ISelectionChangedArgs<TEntity> {
+    Permitted: boolean;
+}
+
 
 @Component({
     template: `<li class="nav-item"
@@ -34,14 +39,24 @@ export default class SelectionItem<TEntity> extends ViewBase {
     }
 
     private OnClick(): void {
+        const orderedArgs: ISelectionOrderedArgs<TEntity> = {
+            Entity: this.entity,
+            Selected: !this.selected,
+            Permitted: true
+        };
+        this.$emit(SelectionItemEvents.SelectionOrdered, orderedArgs);
+
+        if (orderedArgs.Permitted !== true)
+            return;
+
         this.selected = !this.selected;
         this.SetClassBySelection();
 
-        const args: ISelectionChangedArgs<TEntity> = {
+        const changedArgs: ISelectionChangedArgs<TEntity> = {
             Entity: this.entity,
             Selected: this.selected
         };
-        this.$emit(SelectionItemEvents.SelectionChanged, args);
+        this.$emit(SelectionItemEvents.SelectionChanged, changedArgs);
     }
 
     private SetClassBySelection(): void {

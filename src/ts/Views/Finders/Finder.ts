@@ -1,6 +1,6 @@
 import Component from 'vue-class-component';
 import ViewBase from '../Bases/ViewBase';
-import { ISelectionChangedArgs } from '../Shared/SelectionList';
+import { ISelectionChangedArgs } from '../Shared/SelectionItem';
 import AlbumList from './Lists/Albums/AlbumList';
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';

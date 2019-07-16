@@ -4,8 +4,8 @@ import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Genre from '../../../Models/Genres/Genre';
 import { default as GenreStore, IPagenateQueryArgs } from '../../../Models/Genres/GenreStore';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
-import SelectionItem from '../../Shared/SelectionItem';
-import { default as SelectionList, ISelectionChangedArgs } from '../../Shared/SelectionList';
+import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
+import SelectionList from '../../Shared/SelectionList';
 import Libraries from '../../../Libraries';
 
 @Component({
