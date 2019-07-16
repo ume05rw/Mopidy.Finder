@@ -156,44 +156,8 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
             const resTrack = await this.JsonRpcRequest(Monitor.Methods.GetCurrentTlTrack);
             if (resTrack.result) {
                 const tlTrack = resTrack.result as ITlTrack;
-                const track = tlTrack.track;
-                if (this._tlId !== tlTrack.tlid) {
-
-                    // 一旦初期化
-                    this._tlId = tlTrack.tlid;
-                    this._trackName = track.name;
-                    this._trackLength = 0;
-                    this._trackProgress = 0;
-                    this._artistName = '--';
-                    this._year = null;
-                    this._imageUri = null;
-
-                    if (track.artists && 0 < track.artists.length) {
-                        this._artistName = (track.artists.length === 1)
-                            ? track.artists[0].name
-                            : track.artists[0].name + ' and more...';
-                    } else {
-                        this._artistName = '';
-                    }
-
-                    if (track.date && 4 <= track.date.length) {
-                        this._year = (4 < track.date.length)
-                            ? parseInt(track.date.substring(0, 4), 10)
-                            : parseInt(track.date, 10);
-                    }
-
-                    this._trackLength = (track.length)
-                        ? track.length
-                        : 0;
-
-                    if (track.album) {
-                        if (track.album.images && 0 < track.album.images.length) {
-                            this._imageUri = track.album.images[0];
-                        } else if (track.album.uri) {
-                            this._imageUri = await this.GetAlbumImageUri(track.album.uri);
-                        }
-                    }
-                }
+                if (this._tlId !== tlTrack.tlid)
+                    await this.SetTrackInfo(tlTrack);
             } else {
                 this._tlId = null;
                 this._trackName = '--';
@@ -234,6 +198,47 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
         }
 
         this._nowOnPollingProsess = false;
+
+        return true;
+    }
+
+    private async SetTrackInfo(tlTrack: ITlTrack): Promise<boolean> {
+        const track = tlTrack.track;
+
+        // 一旦初期化
+        this._tlId = tlTrack.tlid;
+        this._trackName = track.name;
+        this._trackLength = 0;
+        this._trackProgress = 0;
+        this._artistName = '--';
+        this._year = null;
+        this._imageUri = null;
+
+        if (track.artists && 0 < track.artists.length) {
+            this._artistName = (track.artists.length === 1)
+                ? track.artists[0].name
+                : track.artists[0].name + ' and more...';
+        } else {
+            this._artistName = '';
+        }
+
+        if (track.date && 4 <= track.date.length) {
+            this._year = (4 < track.date.length)
+                ? parseInt(track.date.substring(0, 4), 10)
+                : parseInt(track.date, 10);
+        }
+
+        this._trackLength = (track.length)
+            ? track.length
+            : 0;
+
+        if (track.album) {
+            if (track.album.images && 0 < track.album.images.length) {
+                this._imageUri = track.album.images[0];
+            } else if (track.album.uri) {
+                this._imageUri = await this.GetAlbumImageUri(track.album.uri);
+            }
+        }
 
         return true;
     }

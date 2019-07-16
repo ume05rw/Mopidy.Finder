@@ -93,11 +93,13 @@ export default class AddModal extends ViewBase {
 
         if (!this.TextName.value || this.TextName.value === '') {
             this.errorMessage = 'name required.';
+
             return false;
         }
 
         if (40 <= this.TextName.value.length) {
             this.errorMessage = 'name too long.'
+
             return false;
         }
 

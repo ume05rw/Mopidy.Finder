@@ -236,6 +236,9 @@ define("Views/Bases/ViewBase", ["require", "exports", "vue", "lodash"], function
                 });
             });
         };
+        ViewBase.prototype.GetIsInitialized = function () {
+            return this.initialized;
+        };
         return ViewBase;
     }(vue_1.default));
     exports.default = ViewBase;
@@ -1231,7 +1234,6 @@ define("Utils/Animate", ["require", "exports", "lodash"], function (require, exp
         Speed["Fast"] = "fast";
         Speed["Faster"] = "faster";
     })(Speed = exports.Speed || (exports.Speed = {}));
-    ;
     var Animation;
     (function (Animation) {
         Animation["Bounce"] = "bounce";
@@ -1788,7 +1790,7 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
     }(ViewBase_3.default));
     exports.default = Filterbox;
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase", "Models/AlbumTracks/AlbumTracks", "Libraries", "lodash"], function (require, exports, vue_class_component_4, vue_property_decorator_4, ViewBase_4, AlbumTracks_2, Libraries_4, _) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_4, vue_property_decorator_4, Libraries_4, AlbumTracks_2, ViewBase_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumEvents = {
@@ -1797,17 +1799,24 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     var SelectionAlbumTracks = /** @class */ (function (_super) {
         __extends(SelectionAlbumTracks, _super);
         function SelectionAlbumTracks() {
-            var _this = _super.call(this) || this;
-            // InfiniteLoadingで動的に追加されるため、
-            // Initializeメソッドが実行されない。
-            _.delay(function () {
-                Libraries_4.default.$(_this.$refs.AlbumPlayButton).tooltip({
-                    placement: 'top',
-                    title: 'Play Album'
-                });
-            }, 500);
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
+        SelectionAlbumTracks.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            Libraries_4.default.$(this.$refs.AlbumPlayButton).tooltip({
+                                placement: 'top',
+                                title: 'Play Album'
+                            });
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
         SelectionAlbumTracks.prototype.OnClickAlbumPlay = function () {
             var tracks = Libraries_4.default.Enumerable.from(this.entity.Tracks);
             var track = tracks
@@ -1838,14 +1847,13 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         SelectionAlbumTracks = __decorate([
             vue_class_component_4.default({
                 template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\"\n                            v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\">{{ track.Name }}</td>\n                            <td class=\"tracklength\">{{ track.GetTimeString() }}</td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
-            }),
-            __metadata("design:paramtypes", [])
+            })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
     }(ViewBase_4.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_5, vue_infinite_loading_1, Libraries_5, AlbumTracksStore_1, Exception_4, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks", "Utils/Delay"], function (require, exports, _, vue_class_component_5, vue_infinite_loading_1, Libraries_5, AlbumTracksStore_1, Exception_4, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1, Delay_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumList = /** @class */ (function (_super) {
@@ -1866,8 +1874,16 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(AlbumList.prototype, "Items", {
+            get: function () {
+                return this.$refs.Items;
+            },
+            enumerable: true,
+            configurable: true
+        });
         AlbumList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -1875,6 +1891,22 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            this.$on(SelectionList_1.SelectionEvents.ListUpdated, function () { return __awaiter(_this, void 0, void 0, function () {
+                                var i, item;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0: return [4 /*yield*/, Delay_2.default.Wait(500)];
+                                        case 1:
+                                            _a.sent();
+                                            for (i = 0; i < this.Items.length; i++) {
+                                                item = this.Items[i];
+                                                if (!item.GetIsInitialized())
+                                                    item.Initialize();
+                                            }
+                                            return [2 /*return*/, true];
+                                    }
+                                });
+                            }); });
                             return [2 /*return*/, true];
                     }
                 });
@@ -2009,7 +2041,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList = __decorate([
             vue_class_component_5.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable album-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"AlbumTracks\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.album-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable album-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.album-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_1.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
@@ -2727,29 +2759,92 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
         };
         Monitor.prototype.Polling = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var resState, resTrack, tlTrack, track, _a, resTs, resVol, resRandom, resRepeat, ex_1;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var resState, resTrack, tlTrack, resTs, resVol, resRandom, resRepeat, ex_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0:
                             this._nowOnPollingProsess = true;
-                            _b.label = 1;
+                            _a.label = 1;
                         case 1:
-                            _b.trys.push([1, 15, , 16]);
+                            _a.trys.push([1, 14, , 15]);
                             this.SetBackupValues();
                             return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetState)];
                         case 2:
-                            resState = _b.sent();
+                            resState = _a.sent();
                             if (resState.result) {
                                 this._playerState = resState.result;
                                 this._isPlaying = (this._playerState === PlayerState.Playing);
                             }
                             return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetCurrentTlTrack)];
                         case 3:
-                            resTrack = _b.sent();
-                            if (!resTrack.result) return [3 /*break*/, 7];
+                            resTrack = _a.sent();
+                            if (!resTrack.result) return [3 /*break*/, 6];
                             tlTrack = resTrack.result;
+                            if (!(this._tlId !== tlTrack.tlid)) return [3 /*break*/, 5];
+                            return [4 /*yield*/, this.SetTrackInfo(tlTrack)];
+                        case 4:
+                            _a.sent();
+                            _a.label = 5;
+                        case 5: return [3 /*break*/, 7];
+                        case 6:
+                            this._tlId = null;
+                            this._trackName = '--';
+                            this._trackLength = 0;
+                            this._trackProgress = 0;
+                            this._artistName = '--';
+                            this._year = null;
+                            this._imageUri = null;
+                            _a.label = 7;
+                        case 7:
+                            if (!this._isPlaying) return [3 /*break*/, 9];
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetTimePosition)];
+                        case 8:
+                            resTs = _a.sent();
+                            this._trackProgress = (resTs.result)
+                                ? parseInt(resTs.result, 10)
+                                : 0;
+                            return [3 /*break*/, 10];
+                        case 9:
+                            this._trackProgress = 0;
+                            _a.label = 10;
+                        case 10: return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetVolume)];
+                        case 11:
+                            resVol = _a.sent();
+                            this._volume = (resVol.result)
+                                ? resVol.result
+                                : 0;
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetRandom)];
+                        case 12:
+                            resRandom = _a.sent();
+                            this._isShuffle = (resRandom.result)
+                                ? resRandom.result
+                                : false;
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetRepeat)];
+                        case 13:
+                            resRepeat = _a.sent();
+                            this._isRepeat = (resRepeat.result)
+                                ? resRepeat.result
+                                : false;
+                            this.DetectChanges();
+                            return [3 /*break*/, 15];
+                        case 14:
+                            ex_1 = _a.sent();
+                            Exception_5.default.Dump('Polling Error', ex_1);
+                            return [3 /*break*/, 15];
+                        case 15:
+                            this._nowOnPollingProsess = false;
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Monitor.prototype.SetTrackInfo = function (tlTrack) {
+            return __awaiter(this, void 0, void 0, function () {
+                var track, _a;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
                             track = tlTrack.track;
-                            if (!(this._tlId !== tlTrack.tlid)) return [3 /*break*/, 6];
                             // 一旦初期化
                             this._tlId = tlTrack.tlid;
                             this._trackName = track.name;
@@ -2774,66 +2869,18 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                             this._trackLength = (track.length)
                                 ? track.length
                                 : 0;
-                            if (!track.album) return [3 /*break*/, 6];
-                            if (!(track.album.images && 0 < track.album.images.length)) return [3 /*break*/, 4];
+                            if (!track.album) return [3 /*break*/, 3];
+                            if (!(track.album.images && 0 < track.album.images.length)) return [3 /*break*/, 1];
                             this._imageUri = track.album.images[0];
-                            return [3 /*break*/, 6];
-                        case 4:
-                            if (!track.album.uri) return [3 /*break*/, 6];
+                            return [3 /*break*/, 3];
+                        case 1:
+                            if (!track.album.uri) return [3 /*break*/, 3];
                             _a = this;
                             return [4 /*yield*/, this.GetAlbumImageUri(track.album.uri)];
-                        case 5:
+                        case 2:
                             _a._imageUri = _b.sent();
-                            _b.label = 6;
-                        case 6: return [3 /*break*/, 8];
-                        case 7:
-                            this._tlId = null;
-                            this._trackName = '--';
-                            this._trackLength = 0;
-                            this._trackProgress = 0;
-                            this._artistName = '--';
-                            this._year = null;
-                            this._imageUri = null;
-                            _b.label = 8;
-                        case 8:
-                            if (!this._isPlaying) return [3 /*break*/, 10];
-                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetTimePosition)];
-                        case 9:
-                            resTs = _b.sent();
-                            this._trackProgress = (resTs.result)
-                                ? parseInt(resTs.result, 10)
-                                : 0;
-                            return [3 /*break*/, 11];
-                        case 10:
-                            this._trackProgress = 0;
-                            _b.label = 11;
-                        case 11: return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetVolume)];
-                        case 12:
-                            resVol = _b.sent();
-                            this._volume = (resVol.result)
-                                ? resVol.result
-                                : 0;
-                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetRandom)];
-                        case 13:
-                            resRandom = _b.sent();
-                            this._isShuffle = (resRandom.result)
-                                ? resRandom.result
-                                : false;
-                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetRepeat)];
-                        case 14:
-                            resRepeat = _b.sent();
-                            this._isRepeat = (resRepeat.result)
-                                ? resRepeat.result
-                                : false;
-                            this.DetectChanges();
-                            return [3 /*break*/, 16];
-                        case 15:
-                            ex_1 = _b.sent();
-                            Exception_5.default.Dump('Polling Error', ex_1);
-                            return [3 /*break*/, 16];
-                        case 16:
-                            this._nowOnPollingProsess = false;
-                            return [2 /*return*/, true];
+                            _b.label = 3;
+                        case 3: return [2 /*return*/, true];
                     }
                 });
             });
@@ -3327,8 +3374,6 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                         case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistAsList)];
                         case 1:
                             response = _a.sent();
-                            console.log('PlaylistStore.GetPlaylists:');
-                            console.log(response);
                             refs = response.result;
                             ordered = Libraries_10.default.Enumerable.from(refs)
                                 .orderBy(function (e) { return e.name; })
@@ -3485,7 +3530,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                                 })];
                         case 1:
                             response = _a.sent();
-                            return [2 /*return*/, true];
+                            return [2 /*return*/, (response.result !== null)];
                     }
                 });
             });
@@ -3785,7 +3830,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList", "Utils/Animate", "Utils/Delay", "Libraries"], function (require, exports, _, vue_class_component_15, vue_property_decorator_6, Track_3, ViewBase_11, SelectionList_5, Animate_3, Delay_2, Libraries_13) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList", "Utils/Animate", "Utils/Delay", "Libraries"], function (require, exports, _, vue_class_component_15, vue_property_decorator_6, Track_3, ViewBase_11, SelectionList_5, Animate_3, Delay_3, Libraries_13) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionList_5.SelectionEvents), {
@@ -3794,17 +3839,11 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
     var SelectionTrack = /** @class */ (function (_super) {
         __extends(SelectionTrack, _super);
         function SelectionTrack() {
-            var _this = _super.call(this) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.selected = false;
             _this.liClasses = SelectionTrack_1.LiClasses;
             _this.isDeleting = false;
             _this.deletingClasses = Animate_3.default.GetClassString(Animate_3.Animation.FadeOutRight, Animate_3.Speed.Faster);
-            _.delay(function () {
-                Libraries_13.default.$(_this.$refs.DeleteButton).tooltip({
-                    placement: 'top',
-                    title: 'Delete'
-                });
-            }, 500);
             return _this;
         }
         SelectionTrack_1 = SelectionTrack;
@@ -3815,6 +3854,25 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             enumerable: true,
             configurable: true
         });
+        SelectionTrack.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!this.GetIsInitialized()) {
+                                Libraries_13.default.$(this.$refs.DeleteButton).tooltip({
+                                    placement: 'top',
+                                    title: 'Delete'
+                                });
+                            }
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
         SelectionTrack.prototype.SetLiClasses = function () {
             this.liClasses = SelectionTrack_1.LiClasses
                 + ((this.selected)
@@ -3835,7 +3893,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             this.$emit(exports.TrackSelectionEvents.SelectionChanged, args);
         };
         SelectionTrack.prototype.OnClickDelete = function (ev) {
-            console.log('SelectionTrack.OnClickDelete');
+            //console.log('SelectionTrack.OnClickDelete');
             var args = {
                 Entity: this.entity,
                 View: this
@@ -3849,10 +3907,10 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            console.log('SelectionTrack.DeleteTrack');
+                            //console.log('SelectionTrack.DeleteTrack');
                             this.isDeleting = true;
                             this.SetLiClasses();
-                            return [4 /*yield*/, Delay_2.default.Wait(600)];
+                            return [4 /*yield*/, Delay_3.default.Wait(600)];
                         case 1:
                             _a.sent();
                             return [2 /*return*/, true];
@@ -3864,21 +3922,21 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             return this.selected;
         };
         SelectionTrack.prototype.Select = function () {
-            console.log('SelectionTrack.Select');
+            //console.log('SelectionTrack.Select');
             if (!this.selected) {
                 this.selected = true;
                 this.SetLiClasses();
             }
         };
         SelectionTrack.prototype.Deselect = function () {
-            console.log('SelectionTrack.Deselect');
+            //console.log('SelectionTrack.Deselect');
             if (this.selected) {
                 this.selected = false;
                 this.SetLiClasses();
             }
         };
         SelectionTrack.prototype.Reset = function () {
-            console.log('SelectionTrack.Reset');
+            //console.log('SelectionTrack.Reset');
             this.isDeleting = false;
             this.selected = false;
             this.SetLiClasses();
@@ -3892,8 +3950,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
         SelectionTrack = SelectionTrack_1 = __decorate([
             vue_class_component_15.default({
                 template: "<li v-bind:class=\"liClasses\"\n    v-bind:data-uri=\"entity.Uri\"\n    ref=\"Li\"\n    @click=\"OnClickRow\">\n    <div class=\"product-img ml-2\">\n        <img v-bind:src=\"((entity.Album) ? entity.Album.GetImageFullUri() : '')\" alt=\"ALbum Image\">\n    </div>\n    <div class=\"product-info\">\n        <span class=\"product-title pl-2\">\n            {{ entity.Name }}\n            <div class=\"btn-group pull-right mr-2 editmode-buttons\">\n                <button\n                    class=\"btn btn-sm btn-outline-dark\"\n                    @click=\"OnClickDelete\"\n                    ref=\"DeleteButton\" >\n                    <i class=\"fa fa-trash\" />\n                </button>\n            </div>\n            <span class=\"pull-right length mr-2\">{{ entity.GetTimeString() }}</span>\n        </span>\n        <span class=\"product-description pl-2\">\n            {{ entity.GetAlbumName() }} {{ entity.GetFormattedYearString() }} {{ ' : ' + entity.GetFormattedArtistName() }}\n        </span>\n    </div>\n</li>"
-            }),
-            __metadata("design:paramtypes", [])
+            })
         ], SelectionTrack);
         return SelectionTrack;
     }(ViewBase_11.default));
@@ -4015,7 +4072,7 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
     }(ConfirmDialog_2.default));
     exports.default = UpdateDialog;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Utils/Animate", "sortablejs/modular/sortable.complete.esm", "Utils/Delay", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, vue_class_component_17, vue_infinite_loading_5, Libraries_15, PlaylistStore_2, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, Animate_4, sortable_complete_esm_1, Delay_3, UpdateDialog_1) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_17, vue_infinite_loading_5, Libraries_15, PlaylistStore_2, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ListMode;
@@ -4109,6 +4166,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         });
         TrackList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -4116,6 +4174,22 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            this.$on(SelectionList_6.SelectionEvents.ListUpdated, function () { return __awaiter(_this, void 0, void 0, function () {
+                                var i, item;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0: return [4 /*yield*/, Delay_4.default.Wait(500)];
+                                        case 1:
+                                            _a.sent();
+                                            for (i = 0; i < this.Items.length; i++) {
+                                                item = this.Items[i];
+                                                if (!item.GetIsInitialized())
+                                                    item.Initialize();
+                                            }
+                                            return [2 /*return*/, true];
+                                    }
+                                });
+                            }); });
                             this.titleH3Animate = new Animate_4.default(this.TitleH3);
                             this.titleInputAnimate = new Animate_4.default(this.TitleInput);
                             return [2 /*return*/, true];
@@ -4146,7 +4220,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     switch (_a.label) {
                         case 0:
                             this.DisposeSortable();
-                            return [4 /*yield*/, Delay_3.default.Wait(10)];
+                            return [4 /*yield*/, Delay_4.default.Wait(10)];
                         case 1:
                             _a.sent();
                             this.sortable = sortable_complete_esm_1.default.create(this.TrackListUl, {
@@ -4154,8 +4228,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                                 multiDrag: true,
                                 selectedClass: 'selected',
                                 dataIdAttr: 'data-uri',
-                                onEnd: function (ev) {
-                                    _this.OnOrderChanged(ev);
+                                onEnd: function () {
+                                    _this.OnOrderChanged();
                                 }
                             });
                             return [2 /*return*/, true];
@@ -4169,6 +4243,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     this.sortable.destroy();
                 }
                 catch (ex) {
+                    // 握りつぶす。
                 }
             }
             this.sortable = null;
@@ -4376,7 +4451,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     : args.View.Select();
             }
         };
-        TrackList.prototype.OnOrderChanged = function (args) {
+        TrackList.prototype.OnOrderChanged = function () {
             var _this = this;
             _.delay(function () {
                 _this.ClearSelection();
@@ -4390,7 +4465,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            console.log('TrackList.OnClickDeleteList');
+                            //console.log('TrackList.OnClickDeleteList');
                             if (this.listMode === ListMode.Playable)
                                 return [2 /*return*/];
                             promises = [];
@@ -4428,6 +4503,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 1:
                             isRollback = _a.sent();
                             if (!isRollback) return [3 /*break*/, 3];
+                            this.removedEntities = [];
                             return [4 /*yield*/, this.GoBackToPlayer()];
                         case 2:
                             _a.sent();
@@ -4442,7 +4518,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            console.log('TrackList.OnDeleteRowOrdered');
+                            //console.log('TrackList.OnDeleteRowOrdered');
                             if (this.listMode === ListMode.Playable)
                                 return [2 /*return*/];
                             return [4 /*yield*/, this.DeleteTrack(args.View)];
@@ -4459,7 +4535,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            console.log('TrackList.DeleteTrack');
+                            //console.log('TrackList.DeleteTrack');
                             if (this.listMode === ListMode.Playable)
                                 return [2 /*return*/];
                             return [4 /*yield*/, row.DeleteTrack()];

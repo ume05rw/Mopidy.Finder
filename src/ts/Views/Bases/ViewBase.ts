@@ -24,4 +24,8 @@ export default abstract class ViewBase extends Vue {
 
         return true;
     }
+
+    public GetIsInitialized(): boolean {
+        return this.initialized;
+    }
 }

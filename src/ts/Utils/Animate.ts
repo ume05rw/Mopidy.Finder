@@ -6,7 +6,7 @@ export enum Speed {
     Normal = '',
     Fast = 'fast',
     Faster = 'faster'
-};
+}
 
 export enum Animation {
     Bounce = 'bounce',
@@ -203,8 +203,7 @@ export default class Animate {
         });
     }
 
-    private InnerExecute(animation: Animation, speed: Speed = Speed.Normal) {
-
+    private InnerExecute(animation: Animation, speed: Speed = Speed.Normal): void {
         this._classes.add(Animate.ClassAnimated);
         this._classes.add(animation.toString());
         if (speed !== Speed.Normal)

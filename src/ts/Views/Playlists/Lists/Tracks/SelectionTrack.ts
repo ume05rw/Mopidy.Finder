@@ -4,7 +4,7 @@ import { Prop } from 'vue-property-decorator';
 import Track from '../../../../Models/Tracks/Track';
 import ViewBase from '../../../Bases/ViewBase';
 import { ISelectionChangedArgs, SelectionEvents } from '../../../Shared/SelectionList';
-import { default as Animate, Animation, Speed }from '../../../../Utils/Animate';
+import { default as Animate, Animation, Speed } from '../../../../Utils/Animate';
 import Delay from '../../../../Utils/Delay';
 import Libraries from '../../../../Libraries';
 
@@ -66,15 +66,18 @@ export default class SelectionTrack extends ViewBase {
     private isDeleting: boolean = false;
     private deletingClasses = Animate.GetClassString(Animation.FadeOutRight, Speed.Faster);
 
-    public constructor() {
-        super();
+    public async Initialize(): Promise<boolean> {
 
-        _.delay(() => {
+        if (!this.GetIsInitialized()) {
             Libraries.$(this.$refs.DeleteButton as HTMLElement).tooltip({
                 placement: 'top',
                 title: 'Delete'
             });
-        }, 500);
+        }
+
+        await super.Initialize();
+
+        return true;
     }
 
     private SetLiClasses(): void {
@@ -101,7 +104,7 @@ export default class SelectionTrack extends ViewBase {
     }
 
     private OnClickDelete(ev: MouseEvent): void {
-        console.log('SelectionTrack.OnClickDelete');
+        //console.log('SelectionTrack.OnClickDelete');
         const args: ITrackDeleteOrderedArgs = {
             Entity: this.entity,
             View: this
@@ -112,7 +115,7 @@ export default class SelectionTrack extends ViewBase {
     }
 
     public async DeleteTrack(): Promise<boolean> {
-        console.log('SelectionTrack.DeleteTrack');
+        //console.log('SelectionTrack.DeleteTrack');
         this.isDeleting = true;
         this.SetLiClasses();
         await Delay.Wait(600);
@@ -125,7 +128,7 @@ export default class SelectionTrack extends ViewBase {
     }
 
     public Select(): void {
-        console.log('SelectionTrack.Select');
+        //console.log('SelectionTrack.Select');
         if (!this.selected) {
             this.selected = true;
             this.SetLiClasses();
@@ -133,7 +136,7 @@ export default class SelectionTrack extends ViewBase {
     }
 
     public Deselect(): void {
-        console.log('SelectionTrack.Deselect');
+        //console.log('SelectionTrack.Deselect');
         if (this.selected) {
             this.selected = false;
             this.SetLiClasses();
@@ -141,7 +144,7 @@ export default class SelectionTrack extends ViewBase {
     }
 
     public Reset(): void {
-        console.log('SelectionTrack.Reset');
+        //console.log('SelectionTrack.Reset');
         this.isDeleting = false;
         this.selected = false;
         this.SetLiClasses();

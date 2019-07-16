@@ -1,11 +1,10 @@
 import ViewBase from '../../Bases/ViewBase';
 import Component from 'vue-class-component';
-import { Prop } from 'vue-property-decorator';
 import Libraries from '../../../Libraries';
 
 export enum ConfirmType {
-    Notice = "bg-info",
-    Warning = "bg-warning"
+    Notice = 'bg-info',
+    Warning = 'bg-warning'
 }
 
 @Component({
@@ -44,8 +43,7 @@ export default class ConfirmDialog extends ViewBase {
     private static ModalBaseClass: string = 'modal-content';
 
     private modal: JQuery;
-    private modalClasses: string
-        = `${ConfirmDialog.ModalBaseClass} ${ConfirmType.Notice.toString()}`;
+    private modalClasses: string = `${ConfirmDialog.ModalBaseClass} ${ConfirmType.Notice.toString()}`;
 
     private mainMessage: string = '';
     private detailLines: string[] = [];
@@ -67,7 +65,7 @@ export default class ConfirmDialog extends ViewBase {
         this.Resolve(false);
     }
 
-    private Resolve(result: boolean) {
+    private Resolve(result: boolean): void {
         if (this.resolver) {
             this.resolver(result);
         }

@@ -7,8 +7,9 @@ import AlbumTracksStore, { IPagenateQueryArgs } from '../../../../Models/AlbumTr
 import { IPagenatedResult } from '../../../../Models/Bases/StoreBase';
 import Exception from '../../../../Utils/Exception';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
-import SelectionList from '../../../Shared/SelectionList';
+import { default as SelectionList, SelectionEvents } from '../../../Shared/SelectionList';
 import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './SelectionAlbumTracks';
+import Delay from '../../../../Utils/Delay';
 
 @Component({
     template: `<div class="col-md-6">
@@ -26,7 +27,7 @@ import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './Sel
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
                     <selection-album-tracks
-                        ref="AlbumTracks"
+                        ref="Items"
                         v-bind:entity="entity"
                         @AlbumTracksSelected="OnAlbumTracksSelected" />
                 </template>
@@ -56,10 +57,25 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
     }
+    private get Items(): SelectionAlbumTracks[] {
+        return this.$refs.Items as SelectionAlbumTracks[];
+    }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = false;
         await super.Initialize();
+
+        this.$on(SelectionEvents.ListUpdated, async (): Promise<boolean> => {
+            await Delay.Wait(500);
+
+            for (let i = 0; i < this.Items.length; i++) {
+                const item = this.Items[i];
+                if (!item.GetIsInitialized())
+                    item.Initialize();
+            }
+
+            return true;
+        });
 
         return true;
     }

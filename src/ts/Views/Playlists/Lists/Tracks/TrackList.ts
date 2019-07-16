@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import Sortable from 'sortablejs/modular/sortable.complete.esm';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../../../Libraries';
@@ -6,14 +7,12 @@ import { IPagenatedResult } from '../../../../Models/Bases/StoreBase';
 import Playlist from '../../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Track from '../../../../Models/Tracks/Track';
+import { Animation, default as Animate, Speed } from '../../../../Utils/Animate';
+import Delay from '../../../../Utils/Delay';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
-import { default as SelectionList } from '../../../Shared/SelectionList';
+import { default as SelectionList, SelectionEvents } from '../../../Shared/SelectionList';
 import SlideupButton from '../../../Shared/SlideupButton';
 import { default as SelectionTrack, ITrackDeleteOrderedArgs, ITrackSelectionChangedArgs } from './SelectionTrack';
-import { default as Animate, Animation, Speed } from '../../../../Utils/Animate';
-import Sortable from 'sortablejs/modular/sortable.complete.esm';
-import { default as ConfirmDialog, ConfirmType } from '../../../Shared/Dialogs/ConfirmDialog';
-import Delay from '../../../../Utils/Delay';
 import UpdateDialog from './UpdateDialog';
 
 enum ListMode {
@@ -141,6 +140,18 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.isAutoCollapse = false;
         await super.Initialize();
 
+        this.$on(SelectionEvents.ListUpdated, async (): Promise<boolean> => {
+            await Delay.Wait(500);
+
+            for (let i = 0; i < this.Items.length; i++) {
+                const item = this.Items[i];
+                if (!item.GetIsInitialized())
+                    item.Initialize();                
+            }
+
+            return true;
+        });
+
         this.titleH3Animate = new Animate(this.TitleH3);
         this.titleInputAnimate = new Animate(this.TitleInput);
 
@@ -172,8 +183,8 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             multiDrag: true,
             selectedClass: 'selected',
             dataIdAttr: 'data-uri',
-            onEnd: (ev): void => {
-                this.OnOrderChanged(ev);
+            onEnd: (): void => {
+                this.OnOrderChanged();
             }
         });
 
@@ -185,6 +196,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             try {
                 this.sortable.destroy();
             } catch (ex) {
+                // 握りつぶす。
             }
         }
         this.sortable = null;
@@ -214,11 +226,11 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         ) {
             // TODO: AlertToastを出す。'Name required.'
             this.TitleInput.focus();
+
             return false;
         }
 
         let isUpdate = false;
-
         if (
             isOrderChanged
             || 0 < removedTracks.length
@@ -245,7 +257,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         const children = this.TrackListUl.querySelectorAll('li');
         for (let i = 0; i < children.length; i++) {
             const uri = children[i].getAttribute('data-uri');
-            const entity = enEntities.firstOrDefault(e => e.Uri == uri);
+            const entity = enEntities.firstOrDefault((e): boolean => e.Uri == uri);
             if (entity && result.indexOf(entity) <= -1)
                 result.push(entity);
         }
@@ -294,7 +306,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.titleH3Animate
             .RemoveDisplayNone()
             .Execute(Animation.FadeOutDown, Speed.Faster)
-            .then(() => {
+            .then((): void => {
                 this.titleH3Animate.SetDisplayNone();
             });
         await this.EditButton.Hide();
@@ -313,7 +325,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
         // 編集操作ボタン類表示化後
         this.$forceUpdate();
-        this.$nextTick(() => {
+        this.$nextTick((): void => {
             this.SetSortable();
         });
 
@@ -356,7 +368,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     }
 
     private ClearSelection(): void {
-        _.each(this.Items, (item) => {
+        _.each(this.Items, (item): void => {
             item.Reset();
             // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
             if (this.sortable) {
@@ -386,7 +398,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         }
     }
 
-    private OnOrderChanged(args: Sortable.SortableEvent): void {
+    private OnOrderChanged(): void {
         _.delay((): void => {
             this.ClearSelection();
             this.ShowUndoIfHidden();
@@ -394,13 +406,13 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     }
 
     private async OnClickDeleteList(): Promise<boolean> {
-        console.log('TrackList.OnClickDeleteList');
+        //console.log('TrackList.OnClickDeleteList');
         if (this.listMode === ListMode.Playable)
             return;
 
         const promises: Promise<boolean>[] = [];
         let hasRemovedTrack = false;
-        _.each(this.$children, (view) => {
+        _.each(this.$children, (view): void => {
             if (
                 view instanceof SelectionTrack
                 && view.GetIsSelected()
@@ -426,14 +438,16 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.UpdateDialog.SetRollbackMessage();
         const isRollback = await this.UpdateDialog.Confirm();
 
-        if (isRollback)
+        if (isRollback) {
+            this.removedEntities = [];
             await this.GoBackToPlayer();
+        }
 
         return true;
     }
 
     private async OnDeleteRowOrdered(args: ITrackDeleteOrderedArgs): Promise<boolean> {
-        console.log('TrackList.OnDeleteRowOrdered');
+        //console.log('TrackList.OnDeleteRowOrdered');
         if (this.listMode === ListMode.Playable)
             return;
 
@@ -445,7 +459,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     }
 
     private async DeleteTrack(row: SelectionTrack): Promise<boolean> {
-        console.log('TrackList.DeleteTrack');
+        //console.log('TrackList.DeleteTrack');
         if (this.listMode === ListMode.Playable)
             return;
 

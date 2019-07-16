@@ -1,11 +1,10 @@
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import ViewBase from '../../../Bases/ViewBase';
-import AlbumTracks from '../../../../Models/AlbumTracks/AlbumTracks';
 import Libraries from '../../../../Libraries';
-import { ISelectionChangedArgs } from '../../../Shared/SelectionList';
+import AlbumTracks from '../../../../Models/AlbumTracks/AlbumTracks';
 import Track from '../../../../Models/Tracks/Track';
-import * as _ from 'lodash';
+import ViewBase from '../../../Bases/ViewBase';
+import { ISelectionChangedArgs } from '../../../Shared/SelectionList';
 
 export interface IAlbumTracksSelectedArgs extends ISelectionChangedArgs<AlbumTracks> {
     Track: Track;
@@ -58,17 +57,15 @@ export default class SelectionAlbumTracks extends ViewBase {
     @Prop()
     private entity: AlbumTracks;
 
-    public constructor() {
-        super();
+    public async Initialize(): Promise<boolean> {
+        await super.Initialize();
 
-        // InfiniteLoadingで動的に追加されるため、
-        // Initializeメソッドが実行されない。
-        _.delay(() => {
-            Libraries.$(this.$refs.AlbumPlayButton as HTMLElement).tooltip({
-                placement: 'top',
-                title: 'Play Album'
-            });
-        }, 500);
+        Libraries.$(this.$refs.AlbumPlayButton as HTMLElement).tooltip({
+            placement: 'top',
+            title: 'Play Album'
+        });
+
+        return true;
     }
 
     private OnClickAlbumPlay(): void {

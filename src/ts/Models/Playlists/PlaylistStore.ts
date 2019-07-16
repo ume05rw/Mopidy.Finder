@@ -27,9 +27,6 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         const response
             = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistAsList);
 
-        console.log('PlaylistStore.GetPlaylists:');
-        console.log(response);
-
         const refs = response.result as IRef[];
         const ordered = Libraries.Enumerable.from(refs)
             .orderBy((e): string => e.name)
@@ -164,7 +161,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
             }
         });
 
-        return true;
+        return (response.result !== null);
     }
 
     public async DeletePlaylist(playlist: Playlist): Promise<boolean> {
