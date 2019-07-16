@@ -3639,14 +3639,16 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                             for (i = 0; i < playlist.Tracks.length; i++) {
                                 track = playlist.Tracks[i];
                                 tracks.push({
+                                    __model__: 'Track',
                                     uri: track.Uri
                                 });
                             }
                             return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistSave, {
                                     playlist: {
-                                        name: playlist.Name,
+                                        __model__: 'Playlist',
+                                        tracks: tracks,
                                         uri: playlist.Uri,
-                                        tracks: tracks
+                                        name: playlist.Name
                                     }
                                 })];
                         case 1:

@@ -145,19 +145,21 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
 
     public async UpdatePlayllist(playlist: Playlist): Promise<boolean> {
 
-        const tracks: { uri: string }[] = [];
+        const tracks: { __model__: string, uri: string }[] = [];
         for (let i = 0; i < playlist.Tracks.length; i++) {
             const track = playlist.Tracks[i];
             tracks.push({
+                __model__: 'Track',
                 uri: track.Uri
             });
         }
         // 渡し値フォーマットがダメらしい。
         const response = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistSave, {
             playlist: {
-                name: playlist.Name,
+                __model__: 'Playlist',
+                tracks: tracks,
                 uri: playlist.Uri,
-                tracks: tracks
+                name: playlist.Name
             }
         });
 
