@@ -3,11 +3,11 @@ import { IUpdate } from '../../../../Models/Playlists/Playlist';
 
 export default class UpdateDialog extends ConfirmDialog {
 
-    public SetUpdateMessage(listUpdate: IUpdate): void {
+    public ConfirmUpdate(listUpdate: IUpdate): Promise<boolean> {
         const message = 'Update Playlist?';
         const confirmType = (0 < listUpdate.RemovedTracks.length)
             ? ConfirmType.Warning
-            : ConfirmType.Notice;
+            : ConfirmType.Normal;
 
         const details: string[] = [];
 
@@ -25,14 +25,18 @@ export default class UpdateDialog extends ConfirmDialog {
             details.push('Change Track Order.');
 
         details.push('');
+        details.push('This operation cannot be reversed.');
+        details.push('');
         details.push('Are you sure?');
 
         this.SetConfirmType(confirmType);
         this.SetBody(message, details);
+
+        return this.Confirm();
     }
 
-    public SetRollbackMessage(): void {
-        this.SetConfirmType(ConfirmType.Notice);
+    public ConfirmRollback(): Promise<boolean> {
+        this.SetConfirmType(ConfirmType.Normal);
         const message = 'Rollback Playlist?';
         const details: string[] = [
             'Discard all changes.',
@@ -40,5 +44,22 @@ export default class UpdateDialog extends ConfirmDialog {
             'Are you sure?'
         ];
         this.SetBody(message, details);
+
+        return this.Confirm();
+    }
+
+    public ConfirmDeleteAll(): Promise<boolean> {
+        this.SetConfirmType(ConfirmType.Danger);
+        const message = 'Delete Playlist?';
+        const details: string[] = [
+            'Delete all this playlist.',
+            'This operation cannot be reversed.',
+            '',
+            'Are you sure?'
+        ];
+        this.SetBody(message, details);
+
+
+        return this.Confirm();
     }
 }

@@ -204,16 +204,19 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             await this.SetSortable();
         } else {
             // 削除トラックが無い(=どの行も選択されていない)とき
-            // TODO: プレイリスト全体を削除するか、ダイアログを出す。
+            if ((await this.UpdateDialog.ConfirmDeleteAll()) === true) {
+                // TODO: プレイリスト削除処理
+                this.playlist = null;
+                this.removedEntities = [];
+                await this.GoBackToPlayer();
+            }
         }
 
         return true;
     }
 
     private async OnClickUndoButton(): Promise<boolean> {
-        this.UpdateDialog.SetRollbackMessage();
-
-        const isRollback = await this.UpdateDialog.Confirm();
+        const isRollback = await this.UpdateDialog.ConfirmRollback();
         if (isRollback) {
             this.removedEntities = [];
             await this.GoBackToPlayer();
@@ -396,8 +399,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         let isUpdate = false;
         if (update.HasUpdate) {
             // 何か変更があるとき
-            this.UpdateDialog.SetUpdateMessage(update);
-            if ((await this.UpdateDialog.Confirm()) === true) {
+            if ((await this.UpdateDialog.ConfirmUpdate(update)) === true) {
                 // 更新許可OK
                 if ((await this.Update(update)) === true) {
                     this.GoBackToPlayer();

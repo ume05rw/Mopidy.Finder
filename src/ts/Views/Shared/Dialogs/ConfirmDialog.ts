@@ -3,8 +3,9 @@ import Component from 'vue-class-component';
 import Libraries from '../../../Libraries';
 
 export enum ConfirmType {
-    Notice = 'bg-info',
-    Warning = 'bg-warning'
+    Normal = 'bg-info',
+    Warning = 'bg-warning',
+    Danger = 'bg-danger'
 }
 
 @Component({
@@ -43,7 +44,7 @@ export default class ConfirmDialog extends ViewBase {
     private static ModalBaseClass: string = 'modal-content';
 
     private modal: JQuery;
-    private modalClasses: string = `${ConfirmDialog.ModalBaseClass} ${ConfirmType.Notice.toString()}`;
+    private modalClasses: string = `${ConfirmDialog.ModalBaseClass} ${ConfirmType.Normal.toString()}`;
 
     private mainMessage: string = '';
     private detailLines: string[] = [];

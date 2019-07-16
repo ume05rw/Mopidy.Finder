@@ -4052,14 +4052,15 @@ define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "Views/Bases
     Object.defineProperty(exports, "__esModule", { value: true });
     var ConfirmType;
     (function (ConfirmType) {
-        ConfirmType["Notice"] = "bg-info";
+        ConfirmType["Normal"] = "bg-info";
         ConfirmType["Warning"] = "bg-warning";
+        ConfirmType["Danger"] = "bg-danger";
     })(ConfirmType = exports.ConfirmType || (exports.ConfirmType = {}));
     var ConfirmDialog = /** @class */ (function (_super) {
         __extends(ConfirmDialog, _super);
         function ConfirmDialog() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.modalClasses = ConfirmDialog_1.ModalBaseClass + " " + ConfirmType.Notice.toString();
+            _this.modalClasses = ConfirmDialog_1.ModalBaseClass + " " + ConfirmType.Normal.toString();
             _this.mainMessage = '';
             _this.detailLines = [];
             _this.resolver = null;
@@ -4127,11 +4128,11 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
         function UpdateDialog() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        UpdateDialog.prototype.SetUpdateMessage = function (listUpdate) {
+        UpdateDialog.prototype.ConfirmUpdate = function (listUpdate) {
             var message = 'Update Playlist?';
             var confirmType = (0 < listUpdate.RemovedTracks.length)
                 ? ConfirmDialog_2.ConfirmType.Warning
-                : ConfirmDialog_2.ConfirmType.Notice;
+                : ConfirmDialog_2.ConfirmType.Normal;
             var details = [];
             if (listUpdate.IsNameChanged)
                 details.push("Rename to [ " + listUpdate.NewName + " ]");
@@ -4144,12 +4145,15 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
             if (listUpdate.IsOrderChanged !== false)
                 details.push('Change Track Order.');
             details.push('');
+            details.push('This operation cannot be reversed.');
+            details.push('');
             details.push('Are you sure?');
             this.SetConfirmType(confirmType);
             this.SetBody(message, details);
+            return this.Confirm();
         };
-        UpdateDialog.prototype.SetRollbackMessage = function () {
-            this.SetConfirmType(ConfirmDialog_2.ConfirmType.Notice);
+        UpdateDialog.prototype.ConfirmRollback = function () {
+            this.SetConfirmType(ConfirmDialog_2.ConfirmType.Normal);
             var message = 'Rollback Playlist?';
             var details = [
                 'Discard all changes.',
@@ -4157,6 +4161,19 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
                 'Are you sure?'
             ];
             this.SetBody(message, details);
+            return this.Confirm();
+        };
+        UpdateDialog.prototype.ConfirmDeleteAll = function () {
+            this.SetConfirmType(ConfirmDialog_2.ConfirmType.Danger);
+            var message = 'Delete Playlist?';
+            var details = [
+                'Delete all this playlist.',
+                'This operation cannot be reversed.',
+                '',
+                'Are you sure?'
+            ];
+            this.SetBody(message, details);
+            return this.Confirm();
         };
         return UpdateDialog;
     }(ConfirmDialog_2.default));
@@ -4336,8 +4353,18 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             return [4 /*yield*/, this.SetSortable()];
                         case 2:
                             _a.sent();
-                            return [3 /*break*/, 3];
-                        case 3: return [2 /*return*/, true];
+                            return [3 /*break*/, 6];
+                        case 3: return [4 /*yield*/, this.UpdateDialog.ConfirmDeleteAll()];
+                        case 4:
+                            if (!((_a.sent()) === true)) return [3 /*break*/, 6];
+                            // TODO: プレイリスト削除処理
+                            this.playlist = null;
+                            this.removedEntities = [];
+                            return [4 /*yield*/, this.GoBackToPlayer()];
+                        case 5:
+                            _a.sent();
+                            _a.label = 6;
+                        case 6: return [2 /*return*/, true];
                     }
                 });
             });
@@ -4347,9 +4374,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 var isRollback;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            this.UpdateDialog.SetRollbackMessage();
-                            return [4 /*yield*/, this.UpdateDialog.Confirm()];
+                        case 0: return [4 /*yield*/, this.UpdateDialog.ConfirmRollback()];
                         case 1:
                             isRollback = _a.sent();
                             if (!isRollback) return [3 /*break*/, 3];
@@ -4569,9 +4594,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                                 return [2 /*return*/, false];
                             isUpdate = false;
                             if (!update.HasUpdate) return [3 /*break*/, 4];
-                            // 何か変更があるとき
-                            this.UpdateDialog.SetUpdateMessage(update);
-                            return [4 /*yield*/, this.UpdateDialog.Confirm()];
+                            return [4 /*yield*/, this.UpdateDialog.ConfirmUpdate(update)];
                         case 1:
                             if (!((_a.sent()) === true)) return [3 /*break*/, 3];
                             return [4 /*yield*/, this.Update(update)];
