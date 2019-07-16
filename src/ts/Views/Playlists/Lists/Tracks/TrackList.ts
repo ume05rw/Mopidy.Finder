@@ -4,7 +4,7 @@ import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../../../Libraries';
 import { IPagenatedResult } from '../../../../Models/Bases/StoreBase';
-import Playlist from '../../../../Models/Playlists/Playlist';
+import { default as Playlist, IUpdate } from '../../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Track from '../../../../Models/Tracks/Track';
 import { Animation, default as Animate, Speed } from '../../../../Utils/Animate';
@@ -29,7 +29,8 @@ enum ListMode {
                 Tracks
             </h3>
             <input class="form-control form-control-sm d-none title-input"
-                ref="TitleInput" />
+                ref="TitleInput"
+                @input="OnInputTitle"/>
             <div class="card-tools form-row">
                 <filter-textbox
                     v-bind:placeHolder="'Track?'"
@@ -45,8 +46,8 @@ enum ListMode {
                     v-bind:hideOnInit="true"
                     iconClass="fa fa-trash"
                     tooltip="Delete"
-                    ref="DeleteListButton"
-                    @Clicked="OnClickDeleteList" />
+                    ref="HeaderDeleteButton"
+                    @Clicked="OnClickHeaderDelete" />
                 <slideup-button
                     v-bind:hideOnInit="true"
                     iconClass="fa fa-undo"
@@ -113,12 +114,11 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
     }
-
     private get EditButton(): SlideupButton {
         return this.$refs.EditButton as SlideupButton;
     }
-    private get DeleteListButton(): SlideupButton {
-        return this.$refs.DeleteListButton as SlideupButton;
+    private get HeaderDeleteButton(): SlideupButton {
+        return this.$refs.HeaderDeleteButton as SlideupButton;
     }
     private get UndoButton(): SlideupButton {
         return this.$refs.UndoButton as SlideupButton;
@@ -173,9 +173,162 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-    private async SetSortable(): Promise<boolean> {
+/// #region "Events"
+
+    private OnInputTitle(): void {
+        if (this.listMode === ListMode.Playable)
+            return;
+
+        this.ShowUndoIfHidden();
+    }
+
+    private OnClickEdit(): void {
+        this.GoIntoEditor();
+    }
+
+    private async OnClickHeaderDelete(): Promise<boolean> {
+        //console.log('TrackList.OnClickDeleteList');
+        const promises: Promise<boolean>[] = [];
+        let hasRemovedTrack = false;
+        for (let i = 0; i < this.Items.length; i++) {
+            const item = this.Items[i];
+            if (item.GetIsSelected()) {
+                promises.push(this.DeleteTrack(item));
+                hasRemovedTrack = true;
+            }
+        }
+
+        if (hasRemovedTrack) {
+            // どれかトラックが削除されたとき
+            await Promise.all(promises);
+            await this.SetSortable();
+        } else {
+            // 削除トラックが無い(=どの行も選択されていない)とき
+            // TODO: プレイリスト全体を削除するか、ダイアログを出す。
+        }
+
+        return true;
+    }
+
+    private async OnClickUndoButton(): Promise<boolean> {
+        this.UpdateDialog.SetRollbackMessage();
+
+        const isRollback = await this.UpdateDialog.Confirm();
+        if (isRollback) {
+            this.removedEntities = [];
+            await this.GoBackToPlayer();
+        }
+
+        return true;
+    }
+
+    private OnClickEndEdit(): void {
+        this.TryUpdate();
+    }
+
+    protected OnSelectionChanged(args: ITrackSelectionChangedArgs): void {
+        if (this.listMode === ListMode.Playable) {
+            // 再生モード時
+            const isAllTracksRegistered = Libraries.Enumerable.from(this.playlist.Tracks)
+                .all((e): boolean => e.TlId !== null);
+
+            // トラックリスト登録状況で再生方法を変える。
+            (isAllTracksRegistered)
+                ? this.store.PlayByTlId(args.Entity.TlId)
+                : this.store.PlayPlaylist(this.playlist, args.Entity);
+
+        } else if (this.listMode === ListMode.Editable) {
+            // 編集モード時
+            (args.View.GetIsSelected())
+                ? args.View.Deselect()
+                : args.View.Select();
+        }
+    }
+
+    private async OnDeleteRowOrdered(args: ITrackDeleteOrderedArgs): Promise<boolean> {
+        //console.log('TrackList.OnDeleteRowOrdered');
+        await this.DeleteTrack(args.View);
+        this.SetSortable();
+
+        return true;
+    }
+
+    private async OnOrderChanged(): Promise<boolean> {
+        await Delay.Wait(500);
+        this.ClearSelection();
+        this.ShowUndoIfHidden();
+
+        return true;
+    }
+
+/// #endregion
+
+/// #region "Edit"
+
+    private async GoIntoEditor(): Promise<boolean> {
+        // タイトル・編集開始ボタン非表示化
+        await Promise.all([
+            this.Filterbox.Hide(),
+            this.EditButton.Hide(),
+            this.titleH3Animate.Execute(Animation.FadeOutDown, Speed.Faster),
+        ]);
+        
+        // 内部的モード切替
+        this.TitleInput.value = this.playlist.Name;
+        this.listMode = ListMode.Editable;
+        this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
+
+        // 編集操作ボタン類の表示化
+        await Promise.all([
+            this.titleInputAnimate.Execute(Animation.FadeInUp, Speed.Faster),
+            this.HeaderDeleteButton.Show(),
+            this.EndEditButton.Show()
+        ]);
+
+        // 編集操作ボタン類表示化後
+        this.$forceUpdate();
+        this.$nextTick((): void => {
+            this.SetSortable();
+        });
+
+        return true;
+    }
+
+    private async GoBackToPlayer(): Promise<boolean> {
+        this.ClearSelection();
         this.DisposeSortable();
 
+        // 編集操作ボタン類非表示化
+        const promises: Promise<boolean>[] = [
+            this.titleInputAnimate.Execute(Animation.FadeOutDown, Speed.Faster),
+            this.HeaderDeleteButton.Hide(),
+            this.EndEditButton.Hide()
+        ];
+        if (this.UndoButton.GetIsVisible())
+            promises.push(this.UndoButton.Hide());
+
+        await Promise.all(promises);
+
+        // 内部的モード切替
+        this.listMode = ListMode.Playable;
+        this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
+        this.TitleInput.value = '';
+
+        // タイトル・編集開始ボタン表示化
+        await Promise.all([
+            this.titleH3Animate.Execute(Animation.FadeInUp, Speed.Faster),
+            this.EditButton.Show(),
+            this.Filterbox.Show()
+        ]);
+
+        // リスト再描画
+        this.Refresh();
+
+        return true;
+    }
+
+    private async SetSortable(): Promise<boolean> {
+        this.DisposeSortable();
         await Delay.Wait(10);
 
         this.sortable = Sortable.create(this.TrackListUl, {
@@ -202,51 +355,90 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.sortable = null;
     }
 
-    private OnClickEdit(): void {
-        this.GoIntoEditor();
+    private ShowUndoIfHidden(): void {
+        if (!this.UndoButton.GetIsVisible())
+            this.UndoButton.Show();
     }
 
-    private async OnClickEndEdit(): Promise<boolean> {
-        this.ClearSelection();
-        this.DisposeSortable();
-        
-        const updatedTracks = this.GetEditedTracks();
-        const isOrderChanged = this.GetIsOrderChanged(updatedTracks);
-        const removedTracks = this.removedEntities;
-        const newName = (this.playlist.Name !== this.TitleInput.value)
-            ? this.TitleInput.value
-            : null;
+    private ClearSelection(): void {
+        for (let i = 0; i < this.Items.length; i++)
+            this.Items[i].Reset();
+    }
 
-        if (
-            this.playlist.Name !== this.TitleInput.value
-            && (
-                !this.TitleInput.value
-                || this.TitleInput.value.length <= 0
-            )
-        ) {
-            // TODO: AlertToastを出す。'Name required.'
-            this.TitleInput.focus();
+    private async DeleteTrack(row: SelectionTrack): Promise<boolean> {
+        //console.log('TrackList.DeleteTrack');
+        if (this.listMode === ListMode.Playable)
+            return;
 
-            return false;
-        }
+        await row.DeleteTrack();
 
-        let isUpdate = false;
-        if (
-            isOrderChanged
-            || 0 < removedTracks.length
-            || (newName && 1 <= newName.length)
-        ) {
-            // 何か変更があるとき
-            this.UpdateDialog.SetUpdateMessage(isOrderChanged, removedTracks, newName);
-            isUpdate = await this.UpdateDialog.Confirm();
-        }
+        row.$el.parentElement.removeChild(row.$el);
+        _.pull(this.$children, row);
+        _.pull(this.entities, row.Entity);
+        this.removedEntities.push(row.Entity);
+        row.$destroy();
 
-        if (isUpdate === true)
-            await this.Update(updatedTracks);
-
-        this.GoBackToPlayer();
+        this.ShowUndoIfHidden();
 
         return true;
+    }
+
+/// #endregion
+
+/// #region "Register"
+
+    private async TryUpdate(): Promise<boolean> {
+        const update = this.GetUpdate();
+
+        if (!this.Validate(update))
+            return false;
+
+        let isUpdate = false;
+        if (update.HasUpdate) {
+            // 何か変更があるとき
+            this.UpdateDialog.SetUpdateMessage(update);
+            if ((await this.UpdateDialog.Confirm()) === true) {
+                // 更新許可OK
+                if ((await this.Update(update)) === true) {
+                    this.GoBackToPlayer();
+                } else {
+                    // TODO: 失敗Toastを出す。
+                    // そのまま編集モードを維持
+                }
+            } else {
+                // 更新許可NG
+                // そのまま編集モードを維持
+            }
+        } else {
+            // 何も変更が無いとき
+            // 更新登録せず再生モードへ移行
+            this.GoBackToPlayer();
+        }
+
+        return true;
+    }
+
+    private GetUpdate(): IUpdate {
+        const removedTracks = (this.removedEntities && 0 < this.removedEntities.length)
+            ? this.removedEntities
+            : [];
+        const updatedTracks = this.GetEditedTracks();
+        const isOrderChanged = this.GetIsOrderChanged(updatedTracks);
+        const isNameChanged = (this.playlist.Name !== this.TitleInput.value);
+        const hasUpdate = (isOrderChanged !== false)
+            || (0 < removedTracks.length)
+            || (isNameChanged !== false);
+
+        return {
+            HasUpdate: hasUpdate,
+            UpdatedTracks: updatedTracks,
+            RemovedTracks: removedTracks,
+            IsOrderChanged: isOrderChanged,
+            IsNameChanged: isNameChanged,
+            NewName: (this.playlist.Name !== this.TitleInput.value)
+                ? this.TitleInput.value
+                : null
+        } as IUpdate;
     }
 
     private GetEditedTracks(): Track[] {
@@ -290,191 +482,68 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return result;
     }
 
-    private async Update(newTracks: Track[]): Promise<boolean> {
+    private Validate(update: IUpdate): boolean {
+        if (
+            update.IsNameChanged !== false
+            && (
+                !update.NewName
+                || update.NewName.length < Playlist.MinNameLength
+            )
+        ) {
+            // TODO: AlertToastを出す。'Name required.'
+            this.SetTitleValidationBorder(false);
+            this.TitleInput.focus();
 
+            return false;
+        }
+
+        if (
+            update.IsNameChanged !== false
+            && Playlist.MaxNameLength < update.NewName.length
+        ) {
+            // TODO: AlertToastを出す。'Name too long.'
+            this.SetTitleValidationBorder(false);
+            this.TitleInput.focus();
+
+            return false;
+        }
+
+        this.SetTitleValidationBorder(true);
+
+        return true;
+    }
+
+    private SetTitleValidationBorder(isValid: boolean): void {
+        const classes = this.TitleInput.classList;
+        if (
+            isValid === true
+            && classes.contains('is-invalid')
+        ) {
+            classes.remove('is-invalid');
+        }
+
+        if (
+            isValid !== true
+            && !classes.contains('is-invalid')
+        ) {
+            classes.add('is-invalid');
+        }
+    }
+
+    private async Update(update: IUpdate): Promise<boolean> {
         // TODO: 保存処理
         // this.playlist.Tracks も更新されるようにする。
 
-        this.playlist.Name = this.TitleInput.value;
-        this.playlist.Tracks = newTracks;
+        if (update.IsNameChanged)
+            this.playlist.Name = update.NewName;
+
+        if (update.IsOrderChanged || 0 < update.RemovedTracks.length)
+            this.playlist.Tracks = update.UpdatedTracks;
 
         return true;
     }
 
-    private async GoIntoEditor(): Promise<boolean> {
-        // タイトル・編集開始ボタン非表示化
-        this.titleH3Animate
-            .RemoveDisplayNone()
-            .Execute(Animation.FadeOutDown, Speed.Faster)
-            .then((): void => {
-                this.titleH3Animate.SetDisplayNone();
-            });
-        await this.EditButton.Hide();
-
-        // 内部的モード切替
-        this.TitleInput.value = this.playlist.Name;
-        this.listMode = ListMode.Editable;
-        this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
-
-        // 編集操作ボタン類の表示化
-        this.titleInputAnimate
-            .RemoveDisplayNone()
-            .Execute(Animation.FadeInUp, Speed.Faster);
-        this.DeleteListButton.Show();
-        await this.EndEditButton.Show();
-
-        // 編集操作ボタン類表示化後
-        this.$forceUpdate();
-        this.$nextTick((): void => {
-            this.SetSortable();
-        });
-
-        return true;
-    }
-
-    private async GoBackToPlayer(): Promise<boolean> {
-        // 編集操作ボタン類非表示化
-        this.titleInputAnimate
-            .RemoveDisplayNone()
-            .Execute(Animation.FadeOutDown, Speed.Faster)
-            .then((): void => {
-                this.titleInputAnimate.SetDisplayNone();
-            });
-        this.DeleteListButton.Hide();
-        await this.EndEditButton.Hide();
-
-        // 内部的モード切替
-        this.TitleInput.value = '';
-        this.listMode = ListMode.Playable;
-        this.listClasses = TrackList.ListBaseClasses + this.listMode.toString();
-
-        // タイトル・編集開始ボタン表示化
-        if (this.UndoButton.GetIsVisible())
-            this.UndoButton.Hide();
-        this.titleH3Animate
-            .RemoveDisplayNone()
-            .Execute(Animation.FadeInUp, Speed.Faster);
-        await this.EditButton.Show();
-
-        // リスト再描画
-        this.Refresh();
-
-        return true;
-    }
-
-    private ShowUndoIfHidden(): void {
-        if (!this.UndoButton.GetIsVisible())
-            this.UndoButton.Show();
-    }
-
-    private ClearSelection(): void {
-        _.each(this.Items, (item): void => {
-            item.Reset();
-            // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
-            if (this.sortable) {
-                try {
-                    Sortable.utils.deselect(item.$el as HTMLElement);
-                } catch (ex) {
-                    // 握りつぶす。
-                }
-            }
-        });
-    }
-
-    protected OnSelectionChanged(args: ITrackSelectionChangedArgs): void {
-        if (this.listMode === ListMode.Playable) {
-            // 再生モード時
-            const isAllTracksRegistered = Libraries.Enumerable.from(this.playlist.Tracks)
-                .all((e): boolean => e.TlId !== null);
-
-            (isAllTracksRegistered)
-                ? this.store.PlayByTlId(args.Entity.TlId)
-                : this.store.PlayPlaylist(this.playlist, args.Entity);
-        } else if (this.listMode === ListMode.Editable) {
-            // 編集モード時
-            (args.View.GetIsSelected())
-                ? args.View.Deselect()
-                : args.View.Select();
-        }
-    }
-
-    private OnOrderChanged(): void {
-        _.delay((): void => {
-            this.ClearSelection();
-            this.ShowUndoIfHidden();
-        }, 500);
-    }
-
-    private async OnClickDeleteList(): Promise<boolean> {
-        //console.log('TrackList.OnClickDeleteList');
-        if (this.listMode === ListMode.Playable)
-            return;
-
-        const promises: Promise<boolean>[] = [];
-        let hasRemovedTrack = false;
-        _.each(this.$children, (view): void => {
-            if (
-                view instanceof SelectionTrack
-                && view.GetIsSelected()
-            ) {
-                promises.push(this.DeleteTrack(view));
-                hasRemovedTrack = true;
-            }
-        });
-
-        if (hasRemovedTrack) {
-            // どれかトラックが削除されたとき
-            await Promise.all(promises);
-            await this.SetSortable();
-        } else {
-            // 削除トラックが無い(=どの行も選択されていない)とき
-            // TODO: プレイリスト全体を削除するか、ダイアログを出す。
-        }
-
-        return true;
-    }
-
-    private async OnClickUndoButton(): Promise<boolean> {
-        this.UpdateDialog.SetRollbackMessage();
-        const isRollback = await this.UpdateDialog.Confirm();
-
-        if (isRollback) {
-            this.removedEntities = [];
-            await this.GoBackToPlayer();
-        }
-
-        return true;
-    }
-
-    private async OnDeleteRowOrdered(args: ITrackDeleteOrderedArgs): Promise<boolean> {
-        //console.log('TrackList.OnDeleteRowOrdered');
-        if (this.listMode === ListMode.Playable)
-            return;
-
-        await this.DeleteTrack(args.View);
-
-        this.SetSortable();
-
-        return true;
-    }
-
-    private async DeleteTrack(row: SelectionTrack): Promise<boolean> {
-        //console.log('TrackList.DeleteTrack');
-        if (this.listMode === ListMode.Playable)
-            return;
-
-        await row.DeleteTrack();
-        
-        row.$el.parentElement.removeChild(row.$el);
-        _.pull(this.$children, row);
-        _.pull(this.entities, row.Entity);
-        this.removedEntities.push(row.Entity);
-        row.$destroy();
-
-        this.ShowUndoIfHidden();
-
-        return true;
-    }
+/// #endregion
 
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に

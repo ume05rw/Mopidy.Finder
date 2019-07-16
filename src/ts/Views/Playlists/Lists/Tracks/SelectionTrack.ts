@@ -7,6 +7,7 @@ import { ISelectionChangedArgs, SelectionEvents } from '../../../Shared/Selectio
 import { default as Animate, Animation, Speed } from '../../../../Utils/Animate';
 import Delay from '../../../../Utils/Delay';
 import Libraries from '../../../../Libraries';
+import Sortable from 'sortablejs/modular/sortable.complete.esm';
 
 export const TrackSelectionEvents = _.extend(_.clone(SelectionEvents), {
     DeleteOrdered: 'DeleteOrdered'
@@ -141,6 +142,12 @@ export default class SelectionTrack extends ViewBase {
             this.selected = false;
             this.SetLiClasses();
         }
+        try {
+            // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
+            Sortable.utils.deselect(this.$el as HTMLElement);
+        } catch (e) {
+            // 握りつぶす。
+        }
     }
 
     public Reset(): void {
@@ -148,5 +155,11 @@ export default class SelectionTrack extends ViewBase {
         this.isDeleting = false;
         this.selected = false;
         this.SetLiClasses();
+        try {
+            // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
+            Sortable.utils.deselect(this.$el as HTMLElement);
+        } catch (e) {
+            // 握りつぶす。
+        }
     }
 }

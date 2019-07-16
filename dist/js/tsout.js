@@ -1223,7 +1223,7 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
     }());
     exports.default = Delay;
 });
-define("Utils/Animate", ["require", "exports", "lodash"], function (require, exports, _) {
+define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], function (require, exports, _, Exception_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Speed;
@@ -1351,12 +1351,14 @@ define("Utils/Animate", ["require", "exports", "lodash"], function (require, exp
     };
     var Animate = /** @class */ (function () {
         function Animate(elem) {
+            this.HiddenClassName = 'd-none';
+            this._isHidingAnimation = false;
             this._resolver = null;
             this._elem = null;
             this._classes = null;
             this._elem = elem;
             this._classes = this._elem.classList;
-            this.OnAnimationEnd.bind(this);
+            this.OnAnimationEnd = this.OnAnimationEnd.bind(this);
         }
         Animate.ClearAnimation = function (elem) {
             var classes = elem.classList;
@@ -1409,20 +1411,25 @@ define("Utils/Animate", ["require", "exports", "lodash"], function (require, exp
             return new Promise(function (resolve) {
                 _this._resolver = resolve;
                 _this._elem.addEventListener(Animate.AnimationEndEvent, _this.OnAnimationEnd);
-                // 同じ内容のアニメーションが設定済みのとき、一度クリアしたあとで遅延実行する。
+                // 同じ内容のアニメーションが既に設定済みか否か
                 var needsDefer = (_this._classes.contains(Animate.ClassAnimated)
                     && _this._classes.contains(animation.toString()));
                 Animate.ClearAnimation(_this._elem);
                 (needsDefer)
+                    //既にアニメーションセット済みのとき: 一度クリアしたあとで遅延実行
                     ? _.defer(function () {
                         _this.InnerExecute(animation, speed);
                     })
+                    // プレーン状態のとき: 即時アニメーション実行
                     : _this.InnerExecute(animation, speed);
             });
         };
         Animate.prototype.InnerExecute = function (animation, speed) {
             var _this = this;
             if (speed === void 0) { speed = Speed.Normal; }
+            this._isHidingAnimation = Animate.IsHideAnimation(animation);
+            if (!this.GetIsVisible())
+                this.ShowNow();
             this._classes.add(Animate.ClassAnimated);
             this._classes.add(animation.toString());
             if (speed !== Speed.Normal)
@@ -1447,30 +1454,52 @@ define("Utils/Animate", ["require", "exports", "lodash"], function (require, exp
                     break;
             }
             setTimeout(function () {
-                if (_this._resolver) {
-                    _this._resolver(false);
-                    _this._resolver = null;
-                }
+                if (_this._resolver)
+                    _this.Resolve(false);
             }, endTime);
+        };
+        Animate.prototype.OnAnimationEnd = function () {
+            this.Resolve(true);
+            return this;
+        };
+        Animate.prototype.Resolve = function (result) {
+            if (this._isHidingAnimation === true && this.GetIsVisible())
+                this.HideNow();
+            this._isHidingAnimation = false;
+            if (this._resolver) {
+                try {
+                    this._resolver(result);
+                }
+                catch (ex) {
+                    Exception_3.default.Dump('Animated: Unexpected Error on Resolve', ex);
+                }
+            }
+            this._resolver = null;
         };
         Animate.prototype.Clear = function () {
             Animate.ClearAnimation(this._elem);
             return this;
         };
-        Animate.prototype.SetDisplayNone = function () {
-            if (!this._classes.contains('d-none'))
-                this._classes.add('d-none');
+        Animate.prototype.GetIsVisible = function () {
+            if ((this.HiddenClassName)
+                && 0 < this.HiddenClassName.length) {
+                return !this._classes.contains(this.HiddenClassName);
+            }
+            return true;
+        };
+        Animate.prototype.HideNow = function () {
+            if ((this.HiddenClassName)
+                && 0 < this.HiddenClassName.length
+                && !this._classes.contains(this.HiddenClassName)) {
+                this._classes.add(this.HiddenClassName);
+            }
             return this;
         };
-        Animate.prototype.RemoveDisplayNone = function () {
-            if (this._classes.contains('d-none'))
-                this._classes.remove('d-none');
-            return this;
-        };
-        Animate.prototype.OnAnimationEnd = function () {
-            if (this._resolver) {
-                this._resolver(true);
-                this._resolver = null;
+        Animate.prototype.ShowNow = function () {
+            if ((this.HiddenClassName)
+                && 0 < this.HiddenClassName.length
+                && this._classes.contains(this.HiddenClassName)) {
+                this._classes.remove(this.HiddenClassName);
             }
             return this;
         };
@@ -1494,7 +1523,7 @@ define("Utils/Animate", ["require", "exports", "lodash"], function (require, exp
     }());
     exports.default = Animate;
 });
-define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewBase", "Utils/Exception", "Utils/Animate", "Utils/Animate"], function (require, exports, ViewBase_2, Exception_3, Animate_1, Animate_2) {
+define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewBase", "Utils/Exception", "Utils/Animate", "Utils/Animate"], function (require, exports, ViewBase_2, Exception_4, Animate_1, Animate_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Animation = Animate_2.Animation;
@@ -1522,9 +1551,9 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
                         case 1:
                             _a.sent();
                             if (!this.AnimationIn || Animate_1.default.IsHideAnimation(this.AnimationIn))
-                                Exception_3.default.Throw('Invalid In-Animation', this.AnimationIn);
+                                Exception_4.default.Throw('Invalid In-Animation', this.AnimationIn);
                             if (!this.AnimationOut || !Animate_1.default.IsHideAnimation(this.AnimationOut))
-                                Exception_3.default.Throw('Invalid Out-Animation', this.AnimationOut);
+                                Exception_4.default.Throw('Invalid Out-Animation', this.AnimationOut);
                             this.animate = new Animate_1.default(this.$el);
                             return [2 /*return*/, true];
                     }
@@ -1727,7 +1756,7 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
         Filterbox.prototype.OnClick = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    return [2 /*return*/, this.Show()];
+                    return [2 /*return*/, this.SwitchToInput()];
                 });
             });
         };
@@ -1737,9 +1766,9 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
         Filterbox.prototype.OnBlur = function () {
             var value = this.SearchInput.GetValue();
             if (!value || value.length <= 0)
-                this.Hide();
+                this.SwitchToButton();
         };
-        Filterbox.prototype.Show = function () {
+        Filterbox.prototype.SwitchToInput = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -1755,7 +1784,7 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
                 });
             });
         };
-        Filterbox.prototype.Hide = function () {
+        Filterbox.prototype.SwitchToButton = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
@@ -1772,6 +1801,51 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
         };
         Filterbox.prototype.GetText = function () {
             return this.SearchInput.GetValue();
+        };
+        Filterbox.prototype.Clear = function () {
+            this.SearchInput.Clear();
+            this.$emit(exports.FilterboxEvents.TextUpdated);
+        };
+        Filterbox.prototype.GetIsVisible = function () {
+            return (this.SearchButton.GetIsVisible() || this.SearchInput.GetIsVisible());
+        };
+        Filterbox.prototype.Show = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var promises;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            promises = [];
+                            if (this.SearchInput.GetIsVisible())
+                                this.SearchInput.HideNow();
+                            if (!this.SearchButton.GetIsVisible())
+                                promises.push(this.SearchButton.Show());
+                            return [4 /*yield*/, Promise.all(promises)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Filterbox.prototype.Hide = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var promises;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            promises = [];
+                            if (this.SearchButton.GetIsVisible())
+                                promises.push(this.SearchButton.Hide());
+                            if (this.SearchInput.GetIsVisible())
+                                promises.push(this.SearchInput.Hide());
+                            return [4 /*yield*/, Promise.all(promises)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         __decorate([
             vue_property_decorator_3.Prop(),
@@ -1853,7 +1927,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     }(ViewBase_4.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks", "Utils/Delay"], function (require, exports, _, vue_class_component_5, vue_infinite_loading_1, Libraries_5, AlbumTracksStore_1, Exception_4, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1, Delay_2) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks", "Utils/Delay"], function (require, exports, _, vue_class_component_5, vue_infinite_loading_1, Libraries_5, AlbumTracksStore_1, Exception_5, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1, Delay_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumList = /** @class */ (function (_super) {
@@ -1963,10 +2037,10 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 2:
                             albumTracks = args.Entity;
                             if (!albumTracks)
-                                Exception_4.default.Throw('AlbumTracks Not Found', args);
+                                Exception_5.default.Throw('AlbumTracks Not Found', args);
                             track = args.Track;
                             if (!track)
-                                Exception_4.default.Throw('Track Not Found', args);
+                                Exception_5.default.Throw('Track Not Found', args);
                             isAllTracksRegistered = Libraries_5.default.Enumerable.from(albumTracks.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
@@ -2597,7 +2671,7 @@ define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, ex
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Utils/Exception"], function (require, exports, JsonRpcQueryableBase_1, Exception_5) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Utils/Exception"], function (require, exports, JsonRpcQueryableBase_1, Exception_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -2829,7 +2903,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                             return [3 /*break*/, 15];
                         case 14:
                             ex_1 = _a.sent();
-                            Exception_5.default.Dump('Polling Error', ex_1);
+                            Exception_6.default.Dump('Polling Error', ex_1);
                             return [3 /*break*/, 15];
                         case 15:
                             this._nowOnPollingProsess = false;
@@ -3350,6 +3424,8 @@ define("Models/Playlists/Playlist", ["require", "exports"], function (require, e
             }
             return result;
         };
+        Playlist.MinNameLength = 1;
+        Playlist.MaxNameLength = 40;
         return Playlist;
     }());
     exports.default = Playlist;
@@ -3576,7 +3652,7 @@ define("Views/Events/BootstrapEvents", ["require", "exports"], function (require
         Hidden: 'hidden.bs.modal'
     };
 });
-define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_13, Libraries_11, ViewBase_10, BootstrapEvents_1) {
+define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Models/Playlists/Playlist"], function (require, exports, vue_class_component_13, Libraries_11, ViewBase_10, BootstrapEvents_1, Playlist_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AddModalEvents = {
@@ -3636,11 +3712,12 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
             this.$emit(exports.AddModalEvents.AddOrdered);
         };
         AddModal.prototype.Validate = function () {
-            if (!this.TextName.value || this.TextName.value === '') {
+            if (!this.TextName.value
+                || this.TextName.value.length < Playlist_2.default.MinNameLength) {
                 this.errorMessage = 'name required.';
                 return false;
             }
-            if (40 <= this.TextName.value.length) {
+            if (Playlist_2.default.MaxNameLength < this.TextName.value.length) {
                 this.errorMessage = 'name too long.';
                 return false;
             }
@@ -3830,7 +3907,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList", "Utils/Animate", "Utils/Delay", "Libraries"], function (require, exports, _, vue_class_component_15, vue_property_decorator_6, Track_3, ViewBase_11, SelectionList_5, Animate_3, Delay_3, Libraries_13) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "vue-class-component", "vue-property-decorator", "Models/Tracks/Track", "Views/Bases/ViewBase", "Views/Shared/SelectionList", "Utils/Animate", "Utils/Delay", "Libraries", "sortablejs/modular/sortable.complete.esm"], function (require, exports, _, vue_class_component_15, vue_property_decorator_6, Track_3, ViewBase_11, SelectionList_5, Animate_3, Delay_3, Libraries_13, sortable_complete_esm_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionList_5.SelectionEvents), {
@@ -3934,12 +4011,26 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
                 this.selected = false;
                 this.SetLiClasses();
             }
+            try {
+                // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
+                sortable_complete_esm_1.default.utils.deselect(this.$el);
+            }
+            catch (e) {
+                // 握りつぶす。
+            }
         };
         SelectionTrack.prototype.Reset = function () {
             //console.log('SelectionTrack.Reset');
             this.isDeleting = false;
             this.selected = false;
             this.SetLiClasses();
+            try {
+                // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
+                sortable_complete_esm_1.default.utils.deselect(this.$el);
+            }
+            catch (e) {
+                // 握りつぶす。
+            }
         };
         var SelectionTrack_1;
         SelectionTrack.LiClasses = 'item w-100 track-row ';
@@ -4036,22 +4127,21 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
         function UpdateDialog() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        UpdateDialog.prototype.SetUpdateMessage = function (isOrderChanged, removedTracks, newName) {
-            if (newName === void 0) { newName = null; }
+        UpdateDialog.prototype.SetUpdateMessage = function (listUpdate) {
             var message = 'Update Playlist?';
-            var confirmType = (removedTracks && 0 < removedTracks.length)
+            var confirmType = (0 < listUpdate.RemovedTracks.length)
                 ? ConfirmDialog_2.ConfirmType.Warning
                 : ConfirmDialog_2.ConfirmType.Notice;
             var details = [];
-            if (newName && 0 < newName.length)
-                details.push("Rename to [ " + newName + " ]");
-            if (removedTracks && 0 < removedTracks.length) {
-                var unit = (removedTracks.length === 1)
+            if (listUpdate.IsNameChanged)
+                details.push("Rename to [ " + listUpdate.NewName + " ]");
+            if (0 < listUpdate.RemovedTracks.length) {
+                var unit = (listUpdate.RemovedTracks.length === 1)
                     ? 'Track'
                     : 'Tracks';
-                details.push("Delete " + removedTracks.length + " " + unit + ".");
+                details.push("Delete " + listUpdate.RemovedTracks.length + " " + unit + ".");
             }
-            if (isOrderChanged === true)
+            if (listUpdate.IsOrderChanged !== false)
                 details.push('Change Track Order.');
             details.push('');
             details.push('Are you sure?');
@@ -4072,7 +4162,7 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
     }(ConfirmDialog_2.default));
     exports.default = UpdateDialog;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_17, vue_infinite_loading_5, Libraries_15, PlaylistStore_2, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_17, vue_infinite_loading_5, Libraries_15, Playlist_3, PlaylistStore_2, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ListMode;
@@ -4122,9 +4212,9 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(TrackList.prototype, "DeleteListButton", {
+        Object.defineProperty(TrackList.prototype, "HeaderDeleteButton", {
             get: function () {
-                return this.$refs.DeleteListButton;
+                return this.$refs.HeaderDeleteButton;
             },
             enumerable: true,
             configurable: true
@@ -4213,270 +4303,30 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 });
             });
         };
-        TrackList.prototype.SetSortable = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            this.DisposeSortable();
-                            return [4 /*yield*/, Delay_4.default.Wait(10)];
-                        case 1:
-                            _a.sent();
-                            this.sortable = sortable_complete_esm_1.default.create(this.TrackListUl, {
-                                animation: 500,
-                                multiDrag: true,
-                                selectedClass: 'selected',
-                                dataIdAttr: 'data-uri',
-                                onEnd: function () {
-                                    _this.OnOrderChanged();
-                                }
-                            });
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        TrackList.prototype.DisposeSortable = function () {
-            if (this.sortable !== null) {
-                try {
-                    this.sortable.destroy();
-                }
-                catch (ex) {
-                    // 握りつぶす。
-                }
-            }
-            this.sortable = null;
+        /// #region "Events"
+        TrackList.prototype.OnInputTitle = function () {
+            if (this.listMode === ListMode.Playable)
+                return;
+            this.ShowUndoIfHidden();
         };
         TrackList.prototype.OnClickEdit = function () {
             this.GoIntoEditor();
         };
-        TrackList.prototype.OnClickEndEdit = function () {
+        TrackList.prototype.OnClickHeaderDelete = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var updatedTracks, isOrderChanged, removedTracks, newName, isUpdate;
+                var promises, hasRemovedTrack, i, item;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            this.ClearSelection();
-                            this.DisposeSortable();
-                            updatedTracks = this.GetEditedTracks();
-                            isOrderChanged = this.GetIsOrderChanged(updatedTracks);
-                            removedTracks = this.removedEntities;
-                            newName = (this.playlist.Name !== this.TitleInput.value)
-                                ? this.TitleInput.value
-                                : null;
-                            if (this.playlist.Name !== this.TitleInput.value
-                                && (!this.TitleInput.value
-                                    || this.TitleInput.value.length <= 0)) {
-                                // TODO: AlertToastを出す。'Name required.'
-                                this.TitleInput.focus();
-                                return [2 /*return*/, false];
-                            }
-                            isUpdate = false;
-                            if (!(isOrderChanged
-                                || 0 < removedTracks.length
-                                || (newName && 1 <= newName.length))) return [3 /*break*/, 2];
-                            // 何か変更があるとき
-                            this.UpdateDialog.SetUpdateMessage(isOrderChanged, removedTracks, newName);
-                            return [4 /*yield*/, this.UpdateDialog.Confirm()];
-                        case 1:
-                            isUpdate = _a.sent();
-                            _a.label = 2;
-                        case 2:
-                            if (!(isUpdate === true)) return [3 /*break*/, 4];
-                            return [4 /*yield*/, this.Update(updatedTracks)];
-                        case 3:
-                            _a.sent();
-                            _a.label = 4;
-                        case 4:
-                            this.GoBackToPlayer();
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        TrackList.prototype.GetEditedTracks = function () {
-            // entitiesをUL要素内の見た目の順序に取得する。
-            var result = [];
-            var enEntities = Libraries_15.default.Enumerable.from(this.entities);
-            var children = this.TrackListUl.querySelectorAll('li');
-            var _loop_1 = function (i) {
-                var uri = children[i].getAttribute('data-uri');
-                var entity = enEntities.firstOrDefault(function (e) { return e.Uri == uri; });
-                if (entity && result.indexOf(entity) <= -1)
-                    result.push(entity);
-            };
-            for (var i = 0; i < children.length; i++) {
-                _loop_1(i);
-            }
-            for (var i = 0; i < this.playlist.Tracks.length; i++) {
-                var track = this.playlist.Tracks[i];
-                // 表示圏外だったエンティティを追加する。
-                if (result.indexOf(track) <= -1
-                    && this.removedEntities.indexOf(track) <= 1) {
-                    result.push(track);
-                }
-            }
-            return result;
-        };
-        TrackList.prototype.GetIsOrderChanged = function (updatedTracks) {
-            var beforeTracks = this.playlist.Tracks;
-            var result = false;
-            for (var i = 0; i < updatedTracks.length; i++) {
-                if (updatedTracks[i] !== beforeTracks[i]) {
-                    result = true;
-                    break;
-                }
-            }
-            return result;
-        };
-        TrackList.prototype.Update = function (newTracks) {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    // TODO: 保存処理
-                    // this.playlist.Tracks も更新されるようにする。
-                    this.playlist.Name = this.TitleInput.value;
-                    this.playlist.Tracks = newTracks;
-                    return [2 /*return*/, true];
-                });
-            });
-        };
-        TrackList.prototype.GoIntoEditor = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            // タイトル・編集開始ボタン非表示化
-                            this.titleH3Animate
-                                .RemoveDisplayNone()
-                                .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
-                                .then(function () {
-                                _this.titleH3Animate.SetDisplayNone();
-                            });
-                            return [4 /*yield*/, this.EditButton.Hide()];
-                        case 1:
-                            _a.sent();
-                            // 内部的モード切替
-                            this.TitleInput.value = this.playlist.Name;
-                            this.listMode = ListMode.Editable;
-                            this.listClasses = TrackList_1.ListBaseClasses + this.listMode.toString();
-                            // 編集操作ボタン類の表示化
-                            this.titleInputAnimate
-                                .RemoveDisplayNone()
-                                .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
-                            this.DeleteListButton.Show();
-                            return [4 /*yield*/, this.EndEditButton.Show()];
-                        case 2:
-                            _a.sent();
-                            // 編集操作ボタン類表示化後
-                            this.$forceUpdate();
-                            this.$nextTick(function () {
-                                _this.SetSortable();
-                            });
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        TrackList.prototype.GoBackToPlayer = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            // 編集操作ボタン類非表示化
-                            this.titleInputAnimate
-                                .RemoveDisplayNone()
-                                .Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster)
-                                .then(function () {
-                                _this.titleInputAnimate.SetDisplayNone();
-                            });
-                            this.DeleteListButton.Hide();
-                            return [4 /*yield*/, this.EndEditButton.Hide()];
-                        case 1:
-                            _a.sent();
-                            // 内部的モード切替
-                            this.TitleInput.value = '';
-                            this.listMode = ListMode.Playable;
-                            this.listClasses = TrackList_1.ListBaseClasses + this.listMode.toString();
-                            // タイトル・編集開始ボタン表示化
-                            if (this.UndoButton.GetIsVisible())
-                                this.UndoButton.Hide();
-                            this.titleH3Animate
-                                .RemoveDisplayNone()
-                                .Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster);
-                            return [4 /*yield*/, this.EditButton.Show()];
-                        case 2:
-                            _a.sent();
-                            // リスト再描画
-                            this.Refresh();
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        TrackList.prototype.ShowUndoIfHidden = function () {
-            if (!this.UndoButton.GetIsVisible())
-                this.UndoButton.Show();
-        };
-        TrackList.prototype.ClearSelection = function () {
-            var _this = this;
-            _.each(this.Items, function (item) {
-                item.Reset();
-                // マルチセレクト有効時はSortableに選択解除を通知する必要がある。
-                if (_this.sortable) {
-                    try {
-                        sortable_complete_esm_1.default.utils.deselect(item.$el);
-                    }
-                    catch (ex) {
-                        // 握りつぶす。
-                    }
-                }
-            });
-        };
-        TrackList.prototype.OnSelectionChanged = function (args) {
-            if (this.listMode === ListMode.Playable) {
-                // 再生モード時
-                var isAllTracksRegistered = Libraries_15.default.Enumerable.from(this.playlist.Tracks)
-                    .all(function (e) { return e.TlId !== null; });
-                (isAllTracksRegistered)
-                    ? this.store.PlayByTlId(args.Entity.TlId)
-                    : this.store.PlayPlaylist(this.playlist, args.Entity);
-            }
-            else if (this.listMode === ListMode.Editable) {
-                // 編集モード時
-                (args.View.GetIsSelected())
-                    ? args.View.Deselect()
-                    : args.View.Select();
-            }
-        };
-        TrackList.prototype.OnOrderChanged = function () {
-            var _this = this;
-            _.delay(function () {
-                _this.ClearSelection();
-                _this.ShowUndoIfHidden();
-            }, 500);
-        };
-        TrackList.prototype.OnClickDeleteList = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var promises, hasRemovedTrack;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            //console.log('TrackList.OnClickDeleteList');
-                            if (this.listMode === ListMode.Playable)
-                                return [2 /*return*/];
                             promises = [];
                             hasRemovedTrack = false;
-                            _.each(this.$children, function (view) {
-                                if (view instanceof SelectionTrack_2.default
-                                    && view.GetIsSelected()) {
-                                    promises.push(_this.DeleteTrack(view));
+                            for (i = 0; i < this.Items.length; i++) {
+                                item = this.Items[i];
+                                if (item.GetIsSelected()) {
+                                    promises.push(this.DeleteTrack(item));
                                     hasRemovedTrack = true;
                                 }
-                            });
+                            }
                             if (!hasRemovedTrack) return [3 /*break*/, 3];
                             // どれかトラックが削除されたとき
                             return [4 /*yield*/, Promise.all(promises)];
@@ -4513,22 +4363,176 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 });
             });
         };
+        TrackList.prototype.OnClickEndEdit = function () {
+            this.TryUpdate();
+        };
+        TrackList.prototype.OnSelectionChanged = function (args) {
+            if (this.listMode === ListMode.Playable) {
+                // 再生モード時
+                var isAllTracksRegistered = Libraries_15.default.Enumerable.from(this.playlist.Tracks)
+                    .all(function (e) { return e.TlId !== null; });
+                // トラックリスト登録状況で再生方法を変える。
+                (isAllTracksRegistered)
+                    ? this.store.PlayByTlId(args.Entity.TlId)
+                    : this.store.PlayPlaylist(this.playlist, args.Entity);
+            }
+            else if (this.listMode === ListMode.Editable) {
+                // 編集モード時
+                (args.View.GetIsSelected())
+                    ? args.View.Deselect()
+                    : args.View.Select();
+            }
+        };
         TrackList.prototype.OnDeleteRowOrdered = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            //console.log('TrackList.OnDeleteRowOrdered');
-                            if (this.listMode === ListMode.Playable)
-                                return [2 /*return*/];
-                            return [4 /*yield*/, this.DeleteTrack(args.View)];
+                        case 0: 
+                        //console.log('TrackList.OnDeleteRowOrdered');
+                        return [4 /*yield*/, this.DeleteTrack(args.View)];
                         case 1:
+                            //console.log('TrackList.OnDeleteRowOrdered');
                             _a.sent();
                             this.SetSortable();
                             return [2 /*return*/, true];
                     }
                 });
             });
+        };
+        TrackList.prototype.OnOrderChanged = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, Delay_4.default.Wait(500)];
+                        case 1:
+                            _a.sent();
+                            this.ClearSelection();
+                            this.ShowUndoIfHidden();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        /// #endregion
+        /// #region "Edit"
+        TrackList.prototype.GoIntoEditor = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: 
+                        // タイトル・編集開始ボタン非表示化
+                        return [4 /*yield*/, Promise.all([
+                                this.Filterbox.Hide(),
+                                this.EditButton.Hide(),
+                                this.titleH3Animate.Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster),
+                            ])];
+                        case 1:
+                            // タイトル・編集開始ボタン非表示化
+                            _a.sent();
+                            // 内部的モード切替
+                            this.TitleInput.value = this.playlist.Name;
+                            this.listMode = ListMode.Editable;
+                            this.listClasses = TrackList_1.ListBaseClasses + this.listMode.toString();
+                            // 編集操作ボタン類の表示化
+                            return [4 /*yield*/, Promise.all([
+                                    this.titleInputAnimate.Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster),
+                                    this.HeaderDeleteButton.Show(),
+                                    this.EndEditButton.Show()
+                                ])];
+                        case 2:
+                            // 編集操作ボタン類の表示化
+                            _a.sent();
+                            // 編集操作ボタン類表示化後
+                            this.$forceUpdate();
+                            this.$nextTick(function () {
+                                _this.SetSortable();
+                            });
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.GoBackToPlayer = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var promises;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.ClearSelection();
+                            this.DisposeSortable();
+                            promises = [
+                                this.titleInputAnimate.Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster),
+                                this.HeaderDeleteButton.Hide(),
+                                this.EndEditButton.Hide()
+                            ];
+                            if (this.UndoButton.GetIsVisible())
+                                promises.push(this.UndoButton.Hide());
+                            return [4 /*yield*/, Promise.all(promises)];
+                        case 1:
+                            _a.sent();
+                            // 内部的モード切替
+                            this.listMode = ListMode.Playable;
+                            this.listClasses = TrackList_1.ListBaseClasses + this.listMode.toString();
+                            this.TitleInput.value = '';
+                            // タイトル・編集開始ボタン表示化
+                            return [4 /*yield*/, Promise.all([
+                                    this.titleH3Animate.Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster),
+                                    this.EditButton.Show(),
+                                    this.Filterbox.Show()
+                                ])];
+                        case 2:
+                            // タイトル・編集開始ボタン表示化
+                            _a.sent();
+                            // リスト再描画
+                            this.Refresh();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.SetSortable = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.DisposeSortable();
+                            return [4 /*yield*/, Delay_4.default.Wait(10)];
+                        case 1:
+                            _a.sent();
+                            this.sortable = sortable_complete_esm_2.default.create(this.TrackListUl, {
+                                animation: 500,
+                                multiDrag: true,
+                                selectedClass: 'selected',
+                                dataIdAttr: 'data-uri',
+                                onEnd: function () {
+                                    _this.OnOrderChanged();
+                                }
+                            });
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.DisposeSortable = function () {
+            if (this.sortable !== null) {
+                try {
+                    this.sortable.destroy();
+                }
+                catch (ex) {
+                    // 握りつぶす。
+                }
+            }
+            this.sortable = null;
+        };
+        TrackList.prototype.ShowUndoIfHidden = function () {
+            if (!this.UndoButton.GetIsVisible())
+                this.UndoButton.Show();
+        };
+        TrackList.prototype.ClearSelection = function () {
+            for (var i = 0; i < this.Items.length; i++)
+                this.Items[i].Reset();
         };
         TrackList.prototype.DeleteTrack = function (row) {
             return __awaiter(this, void 0, void 0, function () {
@@ -4552,6 +4556,146 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 });
             });
         };
+        /// #endregion
+        /// #region "Register"
+        TrackList.prototype.TryUpdate = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var update, isUpdate;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            update = this.GetUpdate();
+                            if (!this.Validate(update))
+                                return [2 /*return*/, false];
+                            isUpdate = false;
+                            if (!update.HasUpdate) return [3 /*break*/, 4];
+                            // 何か変更があるとき
+                            this.UpdateDialog.SetUpdateMessage(update);
+                            return [4 /*yield*/, this.UpdateDialog.Confirm()];
+                        case 1:
+                            if (!((_a.sent()) === true)) return [3 /*break*/, 3];
+                            return [4 /*yield*/, this.Update(update)];
+                        case 2:
+                            // 更新許可OK
+                            if ((_a.sent()) === true) {
+                                this.GoBackToPlayer();
+                            }
+                            else {
+                                // TODO: 失敗Toastを出す。
+                                // そのまま編集モードを維持
+                            }
+                            return [3 /*break*/, 3];
+                        case 3: return [3 /*break*/, 5];
+                        case 4:
+                            // 何も変更が無いとき
+                            // 更新登録せず再生モードへ移行
+                            this.GoBackToPlayer();
+                            _a.label = 5;
+                        case 5: return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.GetUpdate = function () {
+            var removedTracks = (this.removedEntities && 0 < this.removedEntities.length)
+                ? this.removedEntities
+                : [];
+            var updatedTracks = this.GetEditedTracks();
+            var isOrderChanged = this.GetIsOrderChanged(updatedTracks);
+            var isNameChanged = (this.playlist.Name !== this.TitleInput.value);
+            var hasUpdate = (isOrderChanged !== false)
+                || (0 < removedTracks.length)
+                || (isNameChanged !== false);
+            return {
+                HasUpdate: hasUpdate,
+                UpdatedTracks: updatedTracks,
+                RemovedTracks: removedTracks,
+                IsOrderChanged: isOrderChanged,
+                IsNameChanged: isNameChanged,
+                NewName: (this.playlist.Name !== this.TitleInput.value)
+                    ? this.TitleInput.value
+                    : null
+            };
+        };
+        TrackList.prototype.GetEditedTracks = function () {
+            // entitiesをUL要素内の見た目の順序に取得する。
+            var result = [];
+            var enEntities = Libraries_15.default.Enumerable.from(this.entities);
+            var children = this.TrackListUl.querySelectorAll('li');
+            var _loop_1 = function (i) {
+                var uri = children[i].getAttribute('data-uri');
+                var entity = enEntities.firstOrDefault(function (e) { return e.Uri == uri; });
+                if (entity && result.indexOf(entity) <= -1)
+                    result.push(entity);
+            };
+            for (var i = 0; i < children.length; i++) {
+                _loop_1(i);
+            }
+            for (var i = 0; i < this.playlist.Tracks.length; i++) {
+                var track = this.playlist.Tracks[i];
+                // 表示圏外だったエンティティを追加する。
+                if (result.indexOf(track) <= -1
+                    && this.removedEntities.indexOf(track) <= 1) {
+                    result.push(track);
+                }
+            }
+            return result;
+        };
+        TrackList.prototype.GetIsOrderChanged = function (updatedTracks) {
+            var beforeTracks = this.playlist.Tracks;
+            var result = false;
+            for (var i = 0; i < updatedTracks.length; i++) {
+                if (updatedTracks[i] !== beforeTracks[i]) {
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+        };
+        TrackList.prototype.Validate = function (update) {
+            if (update.IsNameChanged !== false
+                && (!update.NewName
+                    || update.NewName.length < Playlist_3.default.MinNameLength)) {
+                // TODO: AlertToastを出す。'Name required.'
+                this.SetTitleValidationBorder(false);
+                this.TitleInput.focus();
+                return false;
+            }
+            if (update.IsNameChanged !== false
+                && Playlist_3.default.MaxNameLength < update.NewName.length) {
+                // TODO: AlertToastを出す。'Name too long.'
+                this.SetTitleValidationBorder(false);
+                this.TitleInput.focus();
+                return false;
+            }
+            this.SetTitleValidationBorder(true);
+            return true;
+        };
+        TrackList.prototype.SetTitleValidationBorder = function (isValid) {
+            var classes = this.TitleInput.classList;
+            if (isValid === true
+                && classes.contains('is-invalid')) {
+                classes.remove('is-invalid');
+            }
+            if (isValid !== true
+                && !classes.contains('is-invalid')) {
+                classes.add('is-invalid');
+            }
+        };
+        TrackList.prototype.Update = function (update) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    // TODO: 保存処理
+                    // this.playlist.Tracks も更新されるようにする。
+                    if (update.IsNameChanged)
+                        this.playlist.Name = update.NewName;
+                    if (update.IsOrderChanged || 0 < update.RemovedTracks.length)
+                        this.playlist.Tracks = update.UpdatedTracks;
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        /// #endregion
         /**
          * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
          * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -4613,7 +4757,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.ListBaseClasses = 'products-list product-list-in-box track-list ';
         TrackList = TrackList_1 = __decorate([
             vue_class_component_17.default({
-                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\" />\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"DeleteListButton\"\n                    @Clicked=\"OnClickDeleteList\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable track-list\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.track-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
+                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable track-list\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.track-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
                     'slideup-button': SlideupButton_2.default,

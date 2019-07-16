@@ -1,7 +1,19 @@
 import IRef from '../Mopidies/IRef';
 import Track from '../Tracks/Track';
 
+export interface IUpdate {
+    HasUpdate: boolean;
+    UpdatedTracks: Track[];
+    RemovedTracks: Track[];
+    IsOrderChanged: boolean;
+    IsNameChanged: boolean;
+    NewName: string;
+}
+
 export default class Playlist {
+
+    public static readonly MinNameLength: number = 1;
+    public static readonly MaxNameLength: number = 40;
 
     public static CreateByRef(entity: IRef): Playlist {
         if (!entity)

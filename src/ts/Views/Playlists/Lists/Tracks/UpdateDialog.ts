@@ -1,31 +1,27 @@
 import { default as ConfirmDialog, ConfirmType } from '../../../Shared/Dialogs/ConfirmDialog';
-import Track from '../../../../Models/Tracks/Track';
+import { IUpdate } from '../../../../Models/Playlists/Playlist';
 
 export default class UpdateDialog extends ConfirmDialog {
 
-    public SetUpdateMessage(
-        isOrderChanged: boolean,
-        removedTracks: Track[],
-        newName: string = null
-    ): void {
+    public SetUpdateMessage(listUpdate: IUpdate): void {
         const message = 'Update Playlist?';
-        const confirmType = (removedTracks && 0 < removedTracks.length)
+        const confirmType = (0 < listUpdate.RemovedTracks.length)
             ? ConfirmType.Warning
             : ConfirmType.Notice;
 
         const details: string[] = [];
 
-        if (newName && 0 < newName.length)
-            details.push(`Rename to [ ${newName} ]`);
+        if (listUpdate.IsNameChanged)
+            details.push(`Rename to [ ${listUpdate.NewName} ]`);
 
-        if (removedTracks && 0 < removedTracks.length) {
-            const unit = (removedTracks.length === 1)
+        if (0 < listUpdate.RemovedTracks.length) {
+            const unit = (listUpdate.RemovedTracks.length === 1)
                 ? 'Track'
                 : 'Tracks';
-            details.push(`Delete ${removedTracks.length} ${unit}.`);
+            details.push(`Delete ${listUpdate.RemovedTracks.length} ${unit}.`);
         }
 
-        if (isOrderChanged === true)
+        if (listUpdate.IsOrderChanged !== false)
             details.push('Change Track Order.');
 
         details.push('');

@@ -2,6 +2,7 @@ import Component from 'vue-class-component';
 import Libraries from '../../../../Libraries';
 import ViewBase from '../../../Bases/ViewBase';
 import { ModalEvents } from '../../../Events/BootstrapEvents';
+import Playlist from '../../../../Models/Playlists/Playlist';
 
 export const AddModalEvents = {
     AddOrdered: 'AddOrdered'
@@ -91,13 +92,16 @@ export default class AddModal extends ViewBase {
 
     private Validate(): boolean {
 
-        if (!this.TextName.value || this.TextName.value === '') {
+        if (
+            !this.TextName.value
+            || this.TextName.value.length < Playlist.MinNameLength
+        ) {
             this.errorMessage = 'name required.';
 
             return false;
         }
 
-        if (40 <= this.TextName.value.length) {
+        if (Playlist.MaxNameLength < this.TextName.value.length) {
             this.errorMessage = 'name too long.'
 
             return false;

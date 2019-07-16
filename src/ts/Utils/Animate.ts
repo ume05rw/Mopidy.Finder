@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import Exception from './Exception';
 
 export enum Speed {
     Slower = 'slower',
@@ -171,6 +172,9 @@ export default class Animate {
         return (ToHideAnimations[animation.toString()]);
     }
 
+
+    protected HiddenClassName: string = 'd-none';
+    private _isHidingAnimation: boolean = false;
     private _resolver: (value: boolean) => void = null;
     private _elem: HTMLElement = null;
     private _classes: DOMTokenList = null;
@@ -179,7 +183,7 @@ export default class Animate {
         this._elem = elem;
         this._classes = this._elem.classList;
 
-        this.OnAnimationEnd.bind(this);
+        this.OnAnimationEnd = this.OnAnimationEnd.bind(this);
     }
 
     public Execute(animation: Animation, speed: Speed = Speed.Normal): Promise<boolean> {
@@ -187,7 +191,7 @@ export default class Animate {
             this._resolver = resolve;
             this._elem.addEventListener(Animate.AnimationEndEvent, this.OnAnimationEnd);
 
-            // 同じ内容のアニメーションが設定済みのとき、一度クリアしたあとで遅延実行する。
+            // 同じ内容のアニメーションが既に設定済みか否か
             const needsDefer = (
                 this._classes.contains(Animate.ClassAnimated)
                 && this._classes.contains(animation.toString())
@@ -196,14 +200,21 @@ export default class Animate {
             Animate.ClearAnimation(this._elem);
 
             (needsDefer)
+                //既にアニメーションセット済みのとき: 一度クリアしたあとで遅延実行
                 ? _.defer((): void => {
                     this.InnerExecute(animation, speed)
                 })
+                // プレーン状態のとき: 即時アニメーション実行
                 : this.InnerExecute(animation, speed);
         });
     }
 
     private InnerExecute(animation: Animation, speed: Speed = Speed.Normal): void {
+        this._isHidingAnimation = Animate.IsHideAnimation(animation);
+
+        if (!this.GetIsVisible())
+            this.ShowNow();
+
         this._classes.add(Animate.ClassAnimated);
         this._classes.add(animation.toString());
         if (speed !== Speed.Normal)
@@ -220,11 +231,32 @@ export default class Animate {
         }
 
         setTimeout((): void => {
-            if (this._resolver) {
-                this._resolver(false);
-                this._resolver = null;
-            }
+            if (this._resolver)
+                this.Resolve(false);
         }, endTime);
+    }
+
+    private OnAnimationEnd(): Animate {
+        this.Resolve(true);
+
+        return this;
+    }
+
+    private Resolve(result: boolean): void {
+        if (this._isHidingAnimation === true && this.GetIsVisible())
+            this.HideNow();
+
+        this._isHidingAnimation = false;
+
+        if (this._resolver) {
+            try {
+                this._resolver(result);
+            } catch (ex) {
+                Exception.Dump('Animated: Unexpected Error on Resolve', ex);
+            }
+        }
+
+        this._resolver = null;
     }
 
     public Clear(): Animate {
@@ -233,24 +265,36 @@ export default class Animate {
         return this;
     }
 
-    public SetDisplayNone(): Animate {
-        if (!this._classes.contains('d-none'))
-            this._classes.add('d-none');
+    public GetIsVisible(): boolean {
+        if (
+            (this.HiddenClassName)
+            && 0 < this.HiddenClassName.length
+        ) {
+            return !this._classes.contains(this.HiddenClassName);
+        }
+
+        return true;
+    }
+
+    public HideNow(): Animate {
+        if (
+            (this.HiddenClassName)
+            && 0 < this.HiddenClassName.length
+            && !this._classes.contains(this.HiddenClassName)
+        ) {
+            this._classes.add(this.HiddenClassName);
+        }
 
         return this;
     }
 
-    public RemoveDisplayNone(): Animate {
-        if (this._classes.contains('d-none'))
-            this._classes.remove('d-none');
-
-        return this;
-    }
-
-    private OnAnimationEnd(): Animate {
-        if (this._resolver) {
-            this._resolver(true);
-            this._resolver = null;
+    public ShowNow(): Animate {
+        if (
+            (this.HiddenClassName)
+            && 0 < this.HiddenClassName.length
+            && this._classes.contains(this.HiddenClassName)
+        ) {
+            this._classes.remove(this.HiddenClassName);
         }
 
         return this;

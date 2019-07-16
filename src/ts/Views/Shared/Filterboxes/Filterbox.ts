@@ -57,7 +57,7 @@ export default class Filterbox extends ViewBase {
     }
 
     private async OnClick(): Promise<boolean> {
-        return this.Show();
+        return this.SwitchToInput();
     }
 
     private OnInput(): void {
@@ -67,10 +67,10 @@ export default class Filterbox extends ViewBase {
     private OnBlur(): void {
         const value = this.SearchInput.GetValue();
         if (!value || value.length <= 0)
-            this.Hide();
+            this.SwitchToButton();
     }
 
-    public async Show(): Promise<boolean> {
+    private async SwitchToInput(): Promise<boolean> {
         await this.SearchButton.Hide();
         await this.SearchInput.Show();
         this.SearchInput.Focus();
@@ -78,7 +78,7 @@ export default class Filterbox extends ViewBase {
         return true;
     }
 
-    public async Hide(): Promise<boolean> {
+    private async SwitchToButton(): Promise<boolean> {
         await this.SearchInput.Hide();
         await this.SearchButton.Show();
 
@@ -87,5 +87,41 @@ export default class Filterbox extends ViewBase {
 
     public GetText(): string {
         return this.SearchInput.GetValue();
+    }
+
+    public Clear(): void {
+        this.SearchInput.Clear();
+        this.$emit(FilterboxEvents.TextUpdated);
+    }
+
+    public GetIsVisible(): boolean {
+        return (this.SearchButton.GetIsVisible() || this.SearchInput.GetIsVisible());
+    }
+
+    public async Show(): Promise<boolean> {
+        const promises: Promise<boolean>[] = [];
+
+        if (this.SearchInput.GetIsVisible())
+            this.SearchInput.HideNow();
+
+        if (!this.SearchButton.GetIsVisible())
+            promises.push(this.SearchButton.Show());
+
+        await Promise.all(promises);
+
+        return true;
+    }
+
+    public async Hide(): Promise<boolean> {
+        const promises: Promise<boolean>[] = [];
+
+        if (this.SearchButton.GetIsVisible())
+            promises.push(this.SearchButton.Hide());
+        if (this.SearchInput.GetIsVisible())
+            promises.push(this.SearchInput.Hide());
+
+        await Promise.all(promises);
+
+        return true;
     }
 }
