@@ -3290,7 +3290,8 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                                 else if (!_this.monitor.IsRepeat && enabled)
                                     _this.ButtonRepeat.classList.add(PlayerPanel_1.ClassDisabled);
                             });
-                            this.monitor.StartPolling();
+                            // ポーリング一時停止
+                            //this.monitor.StartPolling();
                             return [2 /*return*/, true];
                     }
                 });
@@ -3758,11 +3759,11 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
         AddModal.prototype.Validate = function () {
             if (!this.TextName.value
                 || this.TextName.value.length < Playlist_2.default.MinNameLength) {
-                this.errorMessage = 'name required.';
+                this.errorMessage = 'Name required.';
                 return false;
             }
             if (Playlist_2.default.MaxNameLength < this.TextName.value.length) {
-                this.errorMessage = 'name too long.';
+                this.errorMessage = 'Name too long.';
                 return false;
             }
             return true;
@@ -4420,18 +4421,17 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             return [4 /*yield*/, this.SetSortable()];
                         case 2:
                             _a.sent();
-                            return [3 /*break*/, 6];
-                        case 3: return [4 /*yield*/, this.UpdateDialog.ConfirmDeleteAll()];
+                            return [3 /*break*/, 5];
+                        case 3: 
+                        // 削除トラックが無い(=どの行も選択されていない)とき
+                        // プレイリスト自体を削除する。
+                        return [4 /*yield*/, this.TryDelete()];
                         case 4:
-                            if (!((_a.sent()) === true)) return [3 /*break*/, 6];
-                            // TODO: プレイリスト削除処理
-                            this.playlist = null;
-                            this.removedEntities = [];
-                            return [4 /*yield*/, this.GoBackToPlayer()];
-                        case 5:
+                            // 削除トラックが無い(=どの行も選択されていない)とき
+                            // プレイリスト自体を削除する。
                             _a.sent();
-                            _a.label = 6;
-                        case 6: return [2 /*return*/, true];
+                            _a.label = 5;
+                        case 5: return [2 /*return*/, true];
                     }
                 });
             });
@@ -4668,10 +4668,11 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 2:
                             // 更新許可OK
                             if ((_a.sent()) === true) {
+                                Libraries_15.default.ShowToast.Success('Update Succeeded!');
                                 this.GoBackToPlayer();
                             }
                             else {
-                                // TODO: 失敗Toastを出す。
+                                Libraries_15.default.ShowToast.Error('Update Failed!');
                                 // そのまま編集モードを維持
                             }
                             return [3 /*break*/, 3];
@@ -4746,14 +4747,14 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             if (update.IsNameChanged !== false
                 && (!update.NewName
                     || update.NewName.length < Playlist_3.default.MinNameLength)) {
-                // TODO: AlertToastを出す。'Name required.'
+                Libraries_15.default.ShowToast.Warning('Name required.');
                 this.SetTitleValidationBorder(false);
                 this.TitleInput.focus();
                 return false;
             }
             if (update.IsNameChanged !== false
                 && Playlist_3.default.MaxNameLength < update.NewName.length) {
-                // TODO: AlertToastを出す。'Name too long.'
+                Libraries_15.default.ShowToast.Warning('Name too long.');
                 this.SetTitleValidationBorder(false);
                 this.TitleInput.focus();
                 return false;
@@ -4774,14 +4775,48 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         };
         TrackList.prototype.Update = function (update) {
             return __awaiter(this, void 0, void 0, function () {
+                var result;
                 return __generator(this, function (_a) {
-                    // TODO: 保存処理
-                    // this.playlist.Tracks も更新されるようにする。
-                    if (update.IsNameChanged)
-                        this.playlist.Name = update.NewName;
-                    if (update.IsOrderChanged || 0 < update.RemovedTracks.length)
-                        this.playlist.Tracks = update.UpdatedTracks;
-                    return [2 /*return*/, true];
+                    switch (_a.label) {
+                        case 0:
+                            // TODO: 保存処理
+                            // this.playlist.Tracks も更新されるようにする。
+                            if (update.IsNameChanged)
+                                this.playlist.Name = update.NewName;
+                            if (update.IsOrderChanged || 0 < update.RemovedTracks.length)
+                                this.playlist.Tracks = update.UpdatedTracks;
+                            return [4 /*yield*/, this.store.UpdatePlayllist(this.playlist)];
+                        case 1:
+                            result = _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackList.prototype.TryDelete = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.UpdateDialog.ConfirmDeleteAll()];
+                        case 1:
+                            if (!((_a.sent()) === true)) return [3 /*break*/, 5];
+                            return [4 /*yield*/, this.store.DeletePlaylist(this.playlist)];
+                        case 2:
+                            result = _a.sent();
+                            if (!(result === true)) return [3 /*break*/, 4];
+                            Libraries_15.default.ShowToast.Success('Delete Succeeded!');
+                            this.playlist = null;
+                            this.removedEntities = [];
+                            return [4 /*yield*/, this.GoBackToPlayer()];
+                        case 3:
+                            _a.sent();
+                            return [3 /*break*/, 5];
+                        case 4:
+                            Libraries_15.default.ShowToast.Error('Delete Failed!');
+                            _a.label = 5;
+                        case 5: return [2 /*return*/, true];
+                    }
                 });
             });
         };

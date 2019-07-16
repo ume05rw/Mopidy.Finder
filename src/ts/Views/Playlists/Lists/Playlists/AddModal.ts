@@ -96,13 +96,13 @@ export default class AddModal extends ViewBase {
             !this.TextName.value
             || this.TextName.value.length < Playlist.MinNameLength
         ) {
-            this.errorMessage = 'name required.';
+            this.errorMessage = 'Name required.';
 
             return false;
         }
 
         if (Playlist.MaxNameLength < this.TextName.value.length) {
-            this.errorMessage = 'name too long.'
+            this.errorMessage = 'Name too long.'
 
             return false;
         }

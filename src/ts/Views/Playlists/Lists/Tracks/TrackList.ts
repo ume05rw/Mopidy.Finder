@@ -216,12 +216,8 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             await this.SetSortable();
         } else {
             // 削除トラックが無い(=どの行も選択されていない)とき
-            if ((await this.UpdateDialog.ConfirmDeleteAll()) === true) {
-                // TODO: プレイリスト削除処理
-                this.playlist = null;
-                this.removedEntities = [];
-                await this.GoBackToPlayer();
-            }
+            // プレイリスト自体を削除する。
+            await this.TryDelete();
         }
 
         return true;
@@ -414,9 +410,10 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             if ((await this.UpdateDialog.ConfirmUpdate(update)) === true) {
                 // 更新許可OK
                 if ((await this.Update(update)) === true) {
+                    Libraries.ShowToast.Success('Update Succeeded!');
                     this.GoBackToPlayer();
                 } else {
-                    // TODO: 失敗Toastを出す。
+                    Libraries.ShowToast.Error('Update Failed!');
                     // そのまま編集モードを維持
                 }
             } else {
@@ -504,7 +501,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
                 || update.NewName.length < Playlist.MinNameLength
             )
         ) {
-            // TODO: AlertToastを出す。'Name required.'
+            Libraries.ShowToast.Warning('Name required.');
             this.SetTitleValidationBorder(false);
             this.TitleInput.focus();
 
@@ -515,7 +512,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             update.IsNameChanged !== false
             && Playlist.MaxNameLength < update.NewName.length
         ) {
-            // TODO: AlertToastを出す。'Name too long.'
+            Libraries.ShowToast.Warning('Name too long.');
             this.SetTitleValidationBorder(false);
             this.TitleInput.focus();
 
@@ -553,6 +550,24 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
         if (update.IsOrderChanged || 0 < update.RemovedTracks.length)
             this.playlist.Tracks = update.UpdatedTracks;
+
+        const result = await this.store.UpdatePlayllist(this.playlist);
+
+        return true;
+    }
+
+    private async TryDelete(): Promise<boolean> {
+        if ((await this.UpdateDialog.ConfirmDeleteAll()) === true) {
+            const result = await this.store.DeletePlaylist(this.playlist);
+            if (result === true) {
+                Libraries.ShowToast.Success('Delete Succeeded!');
+                this.playlist = null;
+                this.removedEntities = [];
+                await this.GoBackToPlayer();
+            } else {
+                Libraries.ShowToast.Error('Delete Failed!');
+            }
+        }
 
         return true;
     }
