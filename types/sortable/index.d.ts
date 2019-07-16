@@ -1,4 +1,4 @@
-// プラグインの定義がなさげなので、追加する。
+// プラグインの定義が無いので追加する。
 
 // Type definitions for Sortable.js 1.7
 // Project: https://github.com/RubaXa/Sortable

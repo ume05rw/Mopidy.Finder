@@ -15,11 +15,10 @@ import '../css/site.css';
  * JQuery本体とJQuery依存ライブラリ
  * --------------------------------------------------
  */
-import * as jQuery from 'jquery';
+import jQuery = require('jquery');
 import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
 import 'admin-lte/plugins/bootstrap/js/bootstrap.bundle';
-//import 'admin-lte/dist/js/adminlte';
-import * as AdminLte from 'admin-lte/dist/js/adminlte';
+//import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 import 'jquery-slimscroll';
 
@@ -33,6 +32,7 @@ import 'jquery-slimscroll';
  */
 import * as Enumerable from 'linq';
 import * as Mopidy from 'mopidy';
+import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
 
 // SweetAlert2 は個別読み込みOK.
 //import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
@@ -76,6 +76,34 @@ export default class Libraries {
     public static readonly Mopidy = (((Mopidy as any).default)
         ? (Mopidy as any).default
         : Mopidy) as typeof Mopidy;
+
+    /**
+     * SweetAlert2 - Toast
+     *
+     * type: 'success' | 'error' | 'warning' | 'info' | 'question'
+     * ex) Toast.fire({ type: 'success', title: 'any message here.' });
+     */
+    private static readonly Toast: Swal = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000
+    });
+
+    private static readonly InnerShowToast: (toastType: Swal.SweetAlertType, message: string) => void = (toastType, message) => {
+        Libraries.Toast.fire({
+            type: toastType,
+            title: message
+        });
+    };
+
+    public static readonly ShowToast = {
+        Success: (message): void => Libraries.InnerShowToast('success', message),
+        Info: (message): void => Libraries.InnerShowToast('info', message),
+        Question: (message): void => Libraries.InnerShowToast('question', message),
+        Warning: (message): void => Libraries.InnerShowToast('warning', message),
+        Error: (message): void => Libraries.InnerShowToast('error', message)
+    }
 
     public static Initialize(): void {
         // ResponsiveBootstrapToolkitをbootstrap4に対応させる

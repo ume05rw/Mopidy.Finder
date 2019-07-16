@@ -20,7 +20,6 @@ import ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolki
 import * as Bootstrap from 'admin-lte/plugins/bootstrap/js/bootstrap.bundle';
 import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
-import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
 import 'jquery-slimscroll';
 
 /**
@@ -28,6 +27,7 @@ import 'jquery-slimscroll';
  * 独立したライブラリ
  * --------------------------------------------------
  */
+import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
 import * as _ from 'lodash';
 import Axios from 'axios';
 import * as qs from 'qs';

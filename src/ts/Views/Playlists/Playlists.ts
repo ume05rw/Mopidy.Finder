@@ -4,6 +4,7 @@ import ViewBase from '../Bases/ViewBase';
 import { ISelectionOrderedArgs, ISelectionChangedArgs } from '../Shared/SelectionItem';
 import PlaylistList from './Lists/Playlists/PlaylistList';
 import TrackList from './Lists/Tracks/TrackList';
+import Libraries from '../../Libraries';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
@@ -39,12 +40,10 @@ export default class Playlists extends ViewBase {
 
         // プレイリスト変更可否判定
         const switchable = this.TrackList.GetIsPlaylistSwichable();
-        if (!switchable) {
-            // 保存を促すToastを出す。'Please complete editing.'
-        }
-
         args.Permitted = switchable;
-        
+
+        if (!switchable)
+            Libraries.ShowToast.Warning('Please complete editing.')
 
         return true;
     }

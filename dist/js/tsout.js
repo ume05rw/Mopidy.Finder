@@ -150,7 +150,7 @@ define("EventableBase", ["require", "exports", "lodash"], function (require, exp
     }());
     exports.default = EventableBase;
 });
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "admin-lte/plugins/sweetalert2/sweetalert2", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy, sweetalert2_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // SweetAlert2 は個別読み込みOK.
@@ -203,6 +203,31 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         Libraries.Mopidy = ((Mopidy.default)
             ? Mopidy.default
             : Mopidy);
+        /**
+         * SweetAlert2 - Toast
+         *
+         * type: 'success' | 'error' | 'warning' | 'info' | 'question'
+         * ex) Toast.fire({ type: 'success', title: 'any message here.' });
+         */
+        Libraries.Toast = sweetalert2_1.default.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        Libraries.InnerShowToast = function (toastType, message) {
+            Libraries.Toast.fire({
+                type: toastType,
+                title: message
+            });
+        };
+        Libraries.ShowToast = {
+            Success: function (message) { return Libraries.InnerShowToast('success', message); },
+            Info: function (message) { return Libraries.InnerShowToast('info', message); },
+            Question: function (message) { return Libraries.InnerShowToast('question', message); },
+            Warning: function (message) { return Libraries.InnerShowToast('warning', message); },
+            Error: function (message) { return Libraries.InnerShowToast('error', message); }
+        };
         return Libraries;
     }());
     exports.default = Libraries;
@@ -4836,7 +4861,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionList_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList"], function (require, exports, vue_class_component_18, ViewBase_13, PlaylistList_2, TrackList_2) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Libraries"], function (require, exports, vue_class_component_18, ViewBase_13, PlaylistList_2, TrackList_2, Libraries_16) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Playlists = /** @class */ (function (_super) {
@@ -4865,10 +4890,9 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                     console.log('Playlists.OnPlaylistsSelectionOrdered:');
                     console.log(args);
                     switchable = this.TrackList.GetIsPlaylistSwichable();
-                    if (!switchable) {
-                        // 保存を促すToastを出す。'Please complete editing.'
-                    }
                     args.Permitted = switchable;
+                    if (!switchable)
+                        Libraries_16.default.ShowToast.Warning('Please complete editing.');
                     return [2 /*return*/, true];
                 });
             });
@@ -4946,7 +4970,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
     }(ViewBase_15.default));
     exports.default = RootView;
 });
-define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_16, RootView_1) {
+define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_17, RootView_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -4957,7 +4981,7 @@ define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Libraries_16.default.Initialize();
+                            Libraries_17.default.Initialize();
                             this._view = new RootView_1.default();
                             this._view.$mount('#root');
                             return [4 /*yield*/, this._view.Initialize()];

@@ -59,7 +59,8 @@
             "mopidy": [ "types/mopidy" ],
             "jquery-slimscroll": [ "types/jquery-slimscroll" ],
             "sortablejs/modular/sortable.complete.esm": [ "types/sortable" ],
-            "admin-lte/plugins/bootstrap/js/bootstrap.bundle": [ "node_modules/@types/bootstrap" ]
+            "admin-lte/plugins/bootstrap/js/bootstrap.bundle": [ "node_modules/@types/bootstrap" ],
+            "admin-lte/plugins/sweetalert2/sweetalert2": [ "types/sweetalert2" ]
         },
 
         // TSの型定義ファイル参照パス
