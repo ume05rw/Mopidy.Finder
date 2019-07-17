@@ -145,7 +145,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
 
     public async UpdatePlayllist(playlist: Playlist): Promise<boolean> {
 
-        const tracks: { __model__: string, uri: string }[] = [];
+        const tracks: { __model__: string; uri: string }[] = [];
         for (let i = 0; i < playlist.Tracks.length; i++) {
             const track = playlist.Tracks[i];
             tracks.push({

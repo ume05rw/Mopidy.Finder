@@ -203,6 +203,12 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         Libraries.Mopidy = ((Mopidy.default)
             ? Mopidy.default
             : Mopidy);
+        Libraries.SetTooltip = function (element, message) {
+            Libraries.$(element).tooltip({
+                placement: 'top',
+                title: message
+            });
+        };
         /**
          * SweetAlert2 - Toast
          *
@@ -221,6 +227,12 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
                 title: message
             });
         };
+        /**
+         * SweerAlert2のToast表示メソッド
+         * 型定義を書く補完が使えなくなるので、しないでおく。
+         * ↓多分何かが間違っている...
+         * ShowToast: {[toastType: string]: (message: string) => void }
+         */
         Libraries.ShowToast = {
             Success: function (message) { return Libraries.InnerShowToast('success', message); },
             Info: function (message) { return Libraries.InnerShowToast('info', message); },
@@ -4697,14 +4709,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         /// #region "Register"
         TrackList.prototype.TryUpdate = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var update, isUpdate;
+                var update;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             update = this.GetUpdate();
                             if (!this.Validate(update))
                                 return [2 /*return*/, false];
-                            isUpdate = false;
                             if (!update.HasUpdate) return [3 /*break*/, 4];
                             return [4 /*yield*/, this.UpdateDialog.ConfirmUpdate(update)];
                         case 1:
@@ -4742,7 +4753,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             var hasUpdate = (isOrderChanged !== false)
                 || (0 < removedTracks.length)
                 || (isNameChanged !== false);
-            return {
+            var result = {
                 HasUpdate: hasUpdate,
                 UpdatedTracks: updatedTracks,
                 RemovedTracks: removedTracks,
@@ -4752,6 +4763,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     ? this.TitleInput.value
                     : null
             };
+            return result;
         };
         TrackList.prototype.GetEditedTracks = function () {
             // entitiesをUL要素内の見た目の順序に取得する。
@@ -4833,7 +4845,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             return [4 /*yield*/, this.store.UpdatePlayllist(this.playlist)];
                         case 1:
                             result = _a.sent();
-                            return [2 /*return*/, true];
+                            return [2 /*return*/, result];
                     }
                 });
             });
@@ -4967,8 +4979,6 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             return __awaiter(this, void 0, void 0, function () {
                 var isSaved;
                 return __generator(this, function (_a) {
-                    console.log('Playlists.OnPlaylistsSelectionOrdered:');
-                    console.log(args);
                     isSaved = this.TrackList.GetIsSavedPlaylistChanges();
                     args.Permitted = isSaved;
                     if (!isSaved) {
@@ -4996,7 +5006,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
         };
         Playlists = __decorate([
             vue_class_component_18.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-playlists\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionOrdered=\"OnPlaylistsSelectionOrdered\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\" />\n        <track-list\n            ref=\"TrackList\" />\n    </div>\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n    id=\"tab-playlists\"\n    role=\"tabpanel\"\n    aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionOrdered=\"OnPlaylistsSelectionOrdered\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\" />\n        <track-list\n            ref=\"TrackList\" />\n    </div>\n</section>",
                 components: {
                     'playlist-list': PlaylistList_2.default,
                     'track-list': TrackList_2.default

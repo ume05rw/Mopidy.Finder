@@ -8,9 +8,9 @@ import Libraries from '../../Libraries';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
-                        id="tab-playlists"
-                        role="tabpanel"
-                        aria-labelledby="playlists-tab">
+    id="tab-playlists"
+    role="tabpanel"
+    aria-labelledby="playlists-tab">
     <div class="row">
         <playlist-list
             ref="PlaylistList"
@@ -35,9 +35,6 @@ export default class Playlists extends ContentViewBase {
     }
 
     private async OnPlaylistsSelectionOrdered(args: ISelectionOrderedArgs<Playlist>): Promise<boolean> {
-        console.log('Playlists.OnPlaylistsSelectionOrdered:')
-        console.log(args);
-
         // プレイリスト変更可否判定
         const isSaved = this.TrackList.GetIsSavedPlaylistChanges();
         args.Permitted = isSaved;

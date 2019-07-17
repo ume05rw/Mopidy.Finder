@@ -77,6 +77,14 @@ export default class Libraries {
         ? (Mopidy as any).default
         : Mopidy) as typeof Mopidy;
 
+
+    public static readonly SetTooltip: (element: HTMLElement, message: string) => void = (element: HTMLElement, message: string): void => {
+        Libraries.$(element).tooltip({
+            placement: 'top',
+            title: message
+        });
+    };
+
     /**
      * SweetAlert2 - Toast
      *
@@ -90,19 +98,25 @@ export default class Libraries {
         timer: 3000
     });
 
-    private static readonly InnerShowToast: (toastType: Swal.SweetAlertType, message: string) => void = (toastType, message) => {
+    private static readonly InnerShowToast: (toastType: Swal.SweetAlertType, message: string) => void = (toastType, message): void => {
         Libraries.Toast.fire({
             type: toastType,
             title: message
         });
     };
 
-    public static readonly ShowToast = {
-        Success: (message): void => Libraries.InnerShowToast('success', message),
-        Info: (message): void => Libraries.InnerShowToast('info', message),
-        Question: (message): void => Libraries.InnerShowToast('question', message),
-        Warning: (message): void => Libraries.InnerShowToast('warning', message),
-        Error: (message): void => Libraries.InnerShowToast('error', message)
+    /**
+     * SweerAlert2のToast表示メソッド
+     * 型定義を書く補完が使えなくなるので、しないでおく。
+     * ↓多分何かが間違っている...
+     * ShowToast: {[toastType: string]: (message: string) => void }
+     */
+    public static readonly ShowToast = { // eslint-disable-line
+        Success: (message: string): void => Libraries.InnerShowToast('success', message),
+        Info: (message: string): void => Libraries.InnerShowToast('info', message),
+        Question: (message: string): void => Libraries.InnerShowToast('question', message),
+        Warning: (message: string): void => Libraries.InnerShowToast('warning', message),
+        Error: (message: string): void => Libraries.InnerShowToast('error', message)
     }
 
     public static Initialize(): void {

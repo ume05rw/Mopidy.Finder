@@ -185,7 +185,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-/// #region "Events"
+    /// #region "Events"
 
     private OnInputTitle(): void {
         if (this.listMode === ListMode.Playable)
@@ -272,9 +272,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-/// #endregion
+    /// #endregion
 
-/// #region "Edit"
+    /// #region "Edit"
 
     private async GoIntoEditor(): Promise<boolean> {
         // タイトル・編集開始ボタン非表示化
@@ -394,9 +394,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-/// #endregion
+    /// #endregion
 
-/// #region "Register"
+    /// #region "Register"
 
     private async TryUpdate(): Promise<boolean> {
         const update = this.GetUpdate();
@@ -404,7 +404,6 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         if (!this.Validate(update))
             return false;
 
-        let isUpdate = false;
         if (update.HasUpdate) {
             // 何か変更があるとき
             if ((await this.UpdateDialog.ConfirmUpdate(update)) === true) {
@@ -440,7 +439,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             || (0 < removedTracks.length)
             || (isNameChanged !== false);
 
-        return {
+        const result: IUpdate = {
             HasUpdate: hasUpdate,
             UpdatedTracks: updatedTracks,
             RemovedTracks: removedTracks,
@@ -449,7 +448,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             NewName: (this.playlist.Name !== this.TitleInput.value)
                 ? this.TitleInput.value
                 : null
-        } as IUpdate;
+        };
+
+        return result;
     }
 
     private GetEditedTracks(): Track[] {
@@ -553,7 +554,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
         const result = await this.store.UpdatePlayllist(this.playlist);
 
-        return true;
+        return result;
     }
 
     private async TryDelete(): Promise<boolean> {
@@ -572,7 +573,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-/// #endregion
+    /// #endregion
 
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
