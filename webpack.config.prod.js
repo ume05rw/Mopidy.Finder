@@ -66,6 +66,7 @@ module.exports = {
     resolve: {
         // node_modules をモジュールのルートディレクトリに追加
         modules: [
+            'src/lib',
             'node_modules'
         ],
 
@@ -77,7 +78,9 @@ module.exports = {
         alias: {
             // Admin-LTE側のJQueryを読ませる。
             'jquery': 'admin-lte/node_modules/jquery/dist/jquery.js',
-            'vue$': 'vue/dist/vue.esm.js'
+            'vue$': 'vue/dist/vue.esm.js',
+            // 手を入れたバージョンを読ませる。
+            'jquery-slimscroll': 'jquery-slimscroll/jquery.slimscroll.js'
         }
     },
 

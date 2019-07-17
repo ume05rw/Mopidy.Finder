@@ -2688,7 +2688,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             // 利便性的にどうなのか、悩む。
                             Libraries_8.default.SlimScroll(this.CardInnerBody, {
                                 height: 'calc(100vh - 200px)',
-                                wheelStep: 60
+                                wheelStep: 20
                             });
                             // ※$onの中ではプロパティ定義が参照出来ないらしい。
                             // ※ハンドラメソッドをthisバインドしてもダメだった。

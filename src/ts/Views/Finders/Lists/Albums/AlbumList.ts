@@ -78,7 +78,7 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         // 利便性的にどうなのか、悩む。
         Libraries.SlimScroll(this.CardInnerBody, {
             height: 'calc(100vh - 200px)',
-            wheelStep: 60
+            wheelStep: 20
         });
 
         // ※$onの中ではプロパティ定義が参照出来ないらしい。
