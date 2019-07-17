@@ -8,12 +8,6 @@ div#root {
     overflow: hidden !important;
 }
 
-.list-scrollable {
-    /* 57, 64, 49 **/
-    height: calc(100vh - 140px);
-    overflow-y: scroll;
-}
-
 /**
  * サイドバー等
  */
@@ -42,6 +36,7 @@ div#root {
     border-top: 1px solid rgba(0, 0, 0, 0.125);
     border-bottom: none !important;
     padding: 4px 8px;
+    transition: all 0.3s ease-in-out;
 }
 .plain-list li.selected {
     background-color: #adb5bd;
@@ -57,37 +52,55 @@ div#root {
 .card-tools .text-filter {
     width: 120px;
 }
-.plain-list * {
-    transition: all 0.3s ease-in-out;
+.card-body.list-scrollbox {
+    /* 57, 64, 49 **/
+    height: calc(100vh - 140px);
+    overflow-y: hidden;
+}
+.card-inner-body {
+    width: 100%;
+    height: 100%;
 }
 /**
  * Finder-アルバムリスト
  */
+.nav-item.albumtrack .card {
+    /* border線の分だけ縮める */
+    width: calc(100% - 4px);
+    margin-left: 1px;
+}
 .table.tracks {
     table-layout: fixed;
 }
-.table.tracks * {
+.table.tracks tr {
     transition: all 0.3s ease-in-out;
 }
 .tracks .tracknum {
-    width: 10%;
+    width: 40px;
     text-align: right;
 }
 .tracks .trackname {
-    width: 70%;
+    width: auto;
 }
 .tracks .tracklength {
-    width: 20%;
+    width: 50px;
+}
+.tracks .trackoperation {
+    width: 40px;
 }
 
 .albumtrack .dropdown-menu .dropdown-item {
     color: #212529 !important;
 }
-.albumtrack .dropdown-menu {
+.albumtrack .header-dropdown {
     max-width: 200px;
 }
-.albumtrack .dropdown-menu .inner-dorpdown {
+.albumtrack .header-dropdown .inner-header-dorpdown {
     max-height: 50vh;
+    max-width: 200px;
+}
+.albumtrack .row-dropdown .inner-row-dorpdown {
+    max-height: 40vh;
     max-width: 200px;
 }
 /**

@@ -93,7 +93,11 @@ export default class Libraries {
             Libraries.$(element).tooltip({
                 placement: 'top',
                 title: message,
-                delay: 500
+                trigger: 'hover',
+                delay: {
+                    show: 1000,
+                    hide: 100
+                }
             });
         };
 

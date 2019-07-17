@@ -32,20 +32,22 @@ import Libraries from '../../../Libraries';
                 </button>
             </div>
         </div>
-        <div class="card-body list-scrollable genre-list"
-            ref="CardBody">
-            <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
-                <template v-for="entity in entities">
-                    <selection-item
-                        ref="Items"
-                        v-bind:entity="entity"
-                        @SelectionChanged="OnSelectionChanged" />
-                </template>
-                <infinite-loading
-                    @infinite="OnInfinite"
-                    force-use-infinite-wrapper=".list-scrollable.genre-list"
-                    ref="InfiniteLoading" />
-            </ul>
+        <div class="card-body list-scrollbox">
+            <div class="card-inner-body genre-list"
+                ref="CardInnerBody">
+                <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
+                    <template v-for="entity in entities">
+                        <selection-item
+                            ref="Items"
+                            v-bind:entity="entity"
+                            @SelectionChanged="OnSelectionChanged" />
+                    </template>
+                    <infinite-loading
+                        @infinite="OnInfinite"
+                        force-use-infinite-wrapper=".card-inner-body.genre-list"
+                        ref="InfiniteLoading" />
+                </ul>
+            </div>
         </div>
     </div>
 </div>`,
@@ -63,8 +65,8 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
     }
-    private get CardBody(): HTMLDivElement {
-        return this.$refs.CardBody as HTMLDivElement;
+    private get CardInnerBody(): HTMLDivElement {
+        return this.$refs.CardInnerBody as HTMLDivElement;
     }
 
     public async Initialize(): Promise<boolean> {
@@ -72,9 +74,8 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
-        Libraries.SlimScroll(this.CardBody, {
-            height: 'calc(100vh - 140px)',
-            alwaysVisible: true,
+        Libraries.SlimScroll(this.CardInnerBody, {
+            height: 'calc(100vh - 200px)',
             wheelStep: 60
         });
         Libraries.SetTooltip(this.$refs.RefreshButton as HTMLElement, 'Refresh');

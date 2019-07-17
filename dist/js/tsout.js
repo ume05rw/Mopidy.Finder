@@ -216,7 +216,11 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
             Libraries.$(element).tooltip({
                 placement: 'top',
                 title: message,
-                delay: 500
+                trigger: 'hover',
+                delay: {
+                    show: 1000,
+                    hide: 100
+                }
             });
         };
         /**
@@ -2528,22 +2532,53 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SelectionAlbumTracks.prototype, "DropDownMenuDiv", {
+        Object.defineProperty(SelectionAlbumTracks.prototype, "HeaderPlaylistButton", {
             get: function () {
-                return this.$refs.DropDownMenuDiv;
+                return this.$refs.HeaderPlaylistButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SelectionAlbumTracks.prototype, "HeaderDropDownDiv", {
+            get: function () {
+                return this.$refs.HeaderDropDownDiv;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SelectionAlbumTracks.prototype, "RowPlaylistButtons", {
+            get: function () {
+                return this.$refs.RowPlaylistButtons;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SelectionAlbumTracks.prototype, "RowDropDownDivs", {
+            get: function () {
+                return this.$refs.RowDropDownDivs;
             },
             enumerable: true,
             configurable: true
         });
         SelectionAlbumTracks.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var i, elem, i, elem;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
                             Libraries_7.default.SetTooltip(this.AlbumPlayButton, 'Play Album');
-                            Libraries_7.default.SlimScroll(this.DropDownMenuDiv);
+                            Libraries_7.default.SetTooltip(this.HeaderPlaylistButton, 'To Playlist');
+                            Libraries_7.default.SlimScroll(this.HeaderDropDownDiv);
+                            for (i = 0; i < this.RowPlaylistButtons.length; i++) {
+                                elem = this.RowPlaylistButtons[i];
+                                Libraries_7.default.SetTooltip(elem, 'To Playlist');
+                            }
+                            for (i = 0; i < this.RowDropDownDivs.length; i++) {
+                                elem = this.RowDropDownDivs[i];
+                                Libraries_7.default.SlimScroll(elem);
+                            }
                             return [2 /*return*/, true];
                     }
                 });
@@ -2560,17 +2595,32 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             };
             this.$emit(exports.SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
         };
+        SelectionAlbumTracks.prototype.OnHeaderNewPlaylistClicked = function () {
+        };
+        SelectionAlbumTracks.prototype.OnHeaderPlaylistClicked = function (ev) {
+            var uri = ev.target.getAttribute('data-uri');
+            console.log(uri);
+        };
         SelectionAlbumTracks.prototype.OnClickTrack = function (args) {
-            var tr = args.target.parentElement;
-            var trackId = parseInt(tr.getAttribute('data-trackid'), 10);
+            var tr = args.currentTarget.parentElement;
+            var trackIdString = tr.getAttribute('data-trackid');
+            if (!trackIdString || trackIdString === '')
+                return;
+            var trackId = parseInt(trackIdString, 10);
             var tracks = Libraries_7.default.Enumerable.from(this.entity.Tracks);
-            var track = tracks.first(function (e) { return e.Id === trackId; });
+            var track = tracks.firstOrDefault(function (e) { return e.Id === trackId; });
+            if (!track)
+                return;
             var selectionArgs = {
                 Entity: this.entity,
                 Track: track,
                 Selected: true
             };
             this.$emit(exports.SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
+        };
+        SelectionAlbumTracks.prototype.OnRowPlaylistClicked = function (ev) {
+            var uri = ev.target.getAttribute('data-uri');
+            console.log(uri);
         };
         __decorate([
             vue_property_decorator_5.Prop(),
@@ -2582,7 +2632,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         ], SelectionAlbumTracks.prototype, "playlists", void 0);
         SelectionAlbumTracks = __decorate([
             vue_class_component_5.default({
-                template: "<li class=\"nav-item w-100 albumtrack\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool dropdown-toggle\"\n                    data-toggle=\"dropdown\">\n                    <i class=\"fa fa-bookmark\" />\n                </button>\n                <div class=\"dropdown-menu\">\n                    <div class=\"inner-dorpdown\" ref=\"DropDownMenuDiv\">\n                        <a class=\"dropdown-item\"\n                            href=\"javascript:void(0)\"\n                            @click=\"\">New Playlist</a>\n                        <div class=\"dropdown-divider\"></div>\n                        <template v-for=\"playlist in playlists\">\n                        <a class=\"dropdown-item text-truncate\"\n                            href=\"javascript:void(0)\"\n                            v-bind:data-uri=\"playlist.Uri\"\n                            @click=\"\">{{ playlist.Name }}</a>\n                        </template>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\"\n                            v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\">{{ track.Name }}</td>\n                            <td class=\"tracklength\">{{ track.GetTimeString() }}</td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
+                template: "<li class=\"nav-item albumtrack w-100\"\n                   ref=\"Li\" >\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool dropdown-toggle\"\n                    data-toggle=\"dropdown\"\n                    ref=\"HeaderPlaylistButton\">\n                    <i class=\"fa fa-bookmark\" />\n                </button>\n                <div class=\"dropdown-menu header-dropdown\">\n                    <div class=\"inner-header-dorpdown\" ref=\"HeaderDropDownDiv\">\n                        <a class=\"dropdown-item\"\n                            href=\"javascript:void(0)\"\n                            @click=\"OnHeaderNewPlaylistClicked\">New Playlist</a>\n                        <div class=\"dropdown-divider\"></div>\n                        <template v-for=\"playlist in playlists\">\n                        <a class=\"dropdown-item text-truncate\"\n                            href=\"javascript:void(0)\"\n                            v-bind:data-uri=\"playlist.Uri\"\n                            @click=\"OnHeaderPlaylistClicked\">{{ playlist.Name }}</a>\n                        </template>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\"\n                                @click=\"OnClickTrack\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\"\n                                @click=\"OnClickTrack\">{{ track.Name }}</td>\n                            <td class=\"tracklength\"\n                                @click=\"OnClickTrack\">{{ track.GetTimeString() }}</td>\n                            <td class=\"trackoperation\">\n                                <button type=\"button\"\n                                    class=\"btn btn-tool dropdown-toggle\"\n                                    data-toggle=\"dropdown\"\n                                    ref=\"RowPlaylistButtons\">\n                                    <i class=\"fa fa-bookmark\" />\n                                </button>\n                                <div class=\"dropdown-menu row-dropdown\">\n                                    <div class=\"inner-row-dorpdown\" ref=\"RowDropDownDivs\">\n                                        <template v-for=\"playlist in playlists\">\n                                        <a class=\"dropdown-item text-truncate\"\n                                            href=\"javascript:void(0)\"\n                                            v-bind:data-uri=\"playlist.Uri\"\n                                            @click=\"OnRowPlaylistClicked\">{{ playlist.Name }}</a>\n                                        </template>\n                                    </div>\n                                </div>\n                            </td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
@@ -2618,9 +2668,9 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(AlbumList.prototype, "CardBody", {
+        Object.defineProperty(AlbumList.prototype, "CardInnerBody", {
             get: function () {
-                return this.$refs.CardBody;
+                return this.$refs.CardInnerBody;
             },
             enumerable: true,
             configurable: true
@@ -2636,9 +2686,8 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_8.default.SlimScroll(this.CardBody, {
-                                height: 'calc(100vh - 140px)',
-                                alwaysVisible: true,
+                            Libraries_8.default.SlimScroll(this.CardInnerBody, {
+                                height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
                             // ※$onの中ではプロパティ定義が参照出来ないらしい。
@@ -2820,7 +2869,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList = __decorate([
             vue_class_component_6.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable album-list\"\n            ref=\"CardBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        v-bind:playlists=\"playlists\"\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.album-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body album-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-album-tracks\n                            v-bind:playlists=\"playlists\"\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.album-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_1.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
@@ -2880,9 +2929,9 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ArtistList.prototype, "CardBody", {
+        Object.defineProperty(ArtistList.prototype, "CardInnerBody", {
             get: function () {
-                return this.$refs.CardBody;
+                return this.$refs.CardInnerBody;
             },
             enumerable: true,
             configurable: true
@@ -2897,9 +2946,8 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_9.default.SlimScroll(this.CardBody, {
-                                height: 'calc(100vh - 140px)',
-                                alwaysVisible: true,
+                            Libraries_9.default.SlimScroll(this.CardInnerBody, {
+                                height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
                             Libraries_9.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
@@ -2971,7 +3019,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable artist-list\"\n            ref=\"CardBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.artist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body artist-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.artist-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_2.default,
                     'selection-item': SelectionItem_3.default,
@@ -3071,9 +3119,9 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(GenreList.prototype, "CardBody", {
+        Object.defineProperty(GenreList.prototype, "CardInnerBody", {
             get: function () {
-                return this.$refs.CardBody;
+                return this.$refs.CardInnerBody;
             },
             enumerable: true,
             configurable: true
@@ -3088,9 +3136,8 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_10.default.SlimScroll(this.CardBody, {
-                                height: 'calc(100vh - 140px)',
-                                alwaysVisible: true,
+                            Libraries_10.default.SlimScroll(this.CardInnerBody, {
+                                height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
                             Libraries_10.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
@@ -3140,7 +3187,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         };
         GenreList = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable genre-list\"\n            ref=\"CardBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.genre-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body genre-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.genre-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_3.default,
                     'selection-item': SelectionItem_4.default,
@@ -4119,9 +4166,9 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(PlaylistList.prototype, "CardBody", {
+        Object.defineProperty(PlaylistList.prototype, "CardInnerBody", {
             get: function () {
-                return this.$refs.CardBody;
+                return this.$refs.CardInnerBody;
             },
             enumerable: true,
             configurable: true
@@ -4136,9 +4183,8 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_14.default.SlimScroll(this.CardBody, {
-                                height: 'calc(100vh - 140px)',
-                                alwaysVisible: true,
+                            Libraries_14.default.SlimScroll(this.CardInnerBody, {
+                                height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
                             Libraries_14.default.SetTooltip(this.$refs.ButtonAdd, 'Add Playlist');
@@ -4245,7 +4291,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         };
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_14.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable playlist-list\"\n            ref=\"CardBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionOrdered=\"OnSelectionOrdered\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.playlist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body playlist-list\"\n                ref=\"CardInnerBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionOrdered=\"OnSelectionOrdered\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".card-inner-body.playlist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_4.default,
                     'selection-item': SelectionItem_5.default,
@@ -4603,9 +4649,9 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(TrackList.prototype, "CardBody", {
+        Object.defineProperty(TrackList.prototype, "CardInnerBody", {
             get: function () {
-                return this.$refs.CardBody;
+                return this.$refs.CardInnerBody;
             },
             enumerable: true,
             configurable: true
@@ -4662,9 +4708,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                                 });
                             }); });
                             // 利便性的にどうなのか、悩む。
-                            Libraries_17.default.SlimScroll(this.CardBody, {
-                                height: 'calc(100vh - 140px)',
-                                alwaysVisible: true,
+                            Libraries_17.default.SlimScroll(this.CardInnerBody, {
+                                height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
                             this.titleH3Animate = new Animate_4.default(this.TitleH3);
@@ -5199,7 +5244,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.ListBaseClasses = 'products-list product-list-in-box track-list ';
         TrackList = TrackList_1 = __decorate([
             vue_class_component_17.default({
-                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable track-list\"\n            ref=\"CardBody\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.track-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
+                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body track-list\"\n                ref=\"CardInnerBody\">\n                <ul v-bind:class=\"listClasses\"\n                    ref=\"TrackListUl\">\n                    <template v-for=\"entity in entities\">\n                    <selection-track\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\"\n                        @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.track-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
                     'slideup-button': SlideupButton_2.default,

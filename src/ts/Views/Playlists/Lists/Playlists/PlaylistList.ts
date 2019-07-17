@@ -38,8 +38,9 @@ export const PlaylistListEvents = {
                 </button>
             </div>
         </div>
-        <div class="card-body list-scrollable playlist-list"
-            ref="CardBody">
+        <div class="card-body list-scrollbox">
+            <div class="card-inner-body playlist-list"
+                ref="CardInnerBody">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
                 <selection-item
@@ -50,7 +51,7 @@ export const PlaylistListEvents = {
                 </template>
                 <infinite-loading
                     @infinite="OnInfinite"
-                    force-use-infinite-wrapper=".list-scrollable.playlist-list"
+                    force-use-infinite-wrapper=".card-inner-body.playlist-list"
                     ref="InfiniteLoading" />
             </ul>
         </div>
@@ -91,8 +92,8 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
     private get AddModal(): AddModal {
         return this.$refs.AddModal as AddModal;
     }
-    private get CardBody(): HTMLDivElement {
-        return this.$refs.CardBody as HTMLDivElement;
+    private get CardInnerBody(): HTMLDivElement {
+        return this.$refs.CardInnerBody as HTMLDivElement;
     }
 
     public async Initialize(): Promise<boolean> {
@@ -100,9 +101,8 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
-        Libraries.SlimScroll(this.CardBody, {
-            height: 'calc(100vh - 140px)',
-            alwaysVisible: true,
+        Libraries.SlimScroll(this.CardInnerBody, {
+            height: 'calc(100vh - 200px)',
             wheelStep: 60
         });
         Libraries.SetTooltip(this.$refs.ButtonAdd as HTMLElement, 'Add Playlist');

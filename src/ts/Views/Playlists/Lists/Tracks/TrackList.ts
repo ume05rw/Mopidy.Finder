@@ -62,22 +62,24 @@ enum ListMode {
                     @Clicked="OnClickEndEdit" />
             </div>
         </div>
-        <div class="card-body list-scrollable track-list"
-            ref="CardBody">
-            <ul v-bind:class="listClasses"
-                ref="TrackListUl">
-                <template v-for="entity in entities">
-                <selection-track
-                    ref="Items"
-                    v-bind:entity="entity"
-                    @SelectionChanged="OnSelectionChanged"
-                    @DeleteOrdered="OnDeleteRowOrdered" />
-                </template>
-                <infinite-loading
-                    @infinite="OnInfinite"
-                    force-use-infinite-wrapper=".list-scrollable.track-list"
-                    ref="InfiniteLoading" />
-            </ul>
+        <div class="card-body list-scrollbox">
+            <div class="card-inner-body track-list"
+                ref="CardInnerBody">
+                <ul v-bind:class="listClasses"
+                    ref="TrackListUl">
+                    <template v-for="entity in entities">
+                    <selection-track
+                        ref="Items"
+                        v-bind:entity="entity"
+                        @SelectionChanged="OnSelectionChanged"
+                        @DeleteOrdered="OnDeleteRowOrdered" />
+                    </template>
+                    <infinite-loading
+                        @infinite="OnInfinite"
+                        force-use-infinite-wrapper=".card-inner-body.track-list"
+                        ref="InfiniteLoading" />
+                </ul>
+            </div>
         </div>
     </div>
     <update-dialog
@@ -127,8 +129,8 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     private get EndEditButton(): SlideupButton {
         return this.$refs.EndEditButton as SlideupButton;
     }
-    private get CardBody(): HTMLDivElement {
-        return this.$refs.CardBody as HTMLDivElement;
+    private get CardInnerBody(): HTMLDivElement {
+        return this.$refs.CardInnerBody as HTMLDivElement;
     }
     private get TrackListUl(): HTMLUListElement {
         return this.$refs.TrackListUl as HTMLUListElement;
@@ -161,9 +163,8 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         });
 
         // 利便性的にどうなのか、悩む。
-        Libraries.SlimScroll(this.CardBody, {
-            height: 'calc(100vh - 140px)',
-            alwaysVisible: true,
+        Libraries.SlimScroll(this.CardInnerBody, {
+            height: 'calc(100vh - 200px)',
             wheelStep: 60
         });
         this.titleH3Animate = new Animate(this.TitleH3);

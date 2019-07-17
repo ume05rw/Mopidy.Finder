@@ -25,21 +25,23 @@ import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './Sel
                     @TextUpdated="Refresh()"/>
             </div>
         </div>
-        <div class="card-body list-scrollable album-list"
-            ref="CardBody">
-            <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
-                <template v-for="entity in entities">
-                    <selection-album-tracks
-                        v-bind:playlists="playlists"
-                        ref="Items"
-                        v-bind:entity="entity"
-                        @AlbumTracksSelected="OnAlbumTracksSelected" />
-                </template>
-                <infinite-loading
-                    @infinite="OnInfinite"
-                    force-use-infinite-wrapper=".list-scrollable.album-list"
-                    ref="InfiniteLoading" />
-            </ul>
+        <div class="card-body list-scrollbox">
+            <div class="card-inner-body album-list"
+                ref="CardInnerBody">
+                <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
+                    <template v-for="entity in entities">
+                        <selection-album-tracks
+                            v-bind:playlists="playlists"
+                            ref="Items"
+                            v-bind:entity="entity"
+                            @AlbumTracksSelected="OnAlbumTracksSelected" />
+                    </template>
+                    <infinite-loading
+                        @infinite="OnInfinite"
+                        force-use-infinite-wrapper=".card-inner-body.album-list"
+                        ref="InfiniteLoading" />
+                </ul>
+            </div>
         </div>
     </div>
 </div>`,
@@ -65,8 +67,8 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     private get Items(): SelectionAlbumTracks[] {
         return this.$refs.Items as SelectionAlbumTracks[];
     }
-    private get CardBody(): HTMLDivElement {
-        return this.$refs.CardBody as HTMLDivElement;
+    private get CardInnerBody(): HTMLDivElement {
+        return this.$refs.CardInnerBody as HTMLDivElement;
     }
 
     public async Initialize(): Promise<boolean> {
@@ -74,9 +76,8 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
-        Libraries.SlimScroll(this.CardBody, {
-            height: 'calc(100vh - 140px)',
-            alwaysVisible: true,
+        Libraries.SlimScroll(this.CardInnerBody, {
+            height: 'calc(100vh - 200px)',
             wheelStep: 60
         });
 
