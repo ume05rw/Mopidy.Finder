@@ -33,12 +33,8 @@ export default class SlideupButtom extends AnimatedViewBase {
         if (this.hideOnInit === true)
             this.HideNow();
 
-        if (this.tooltip && 0 < this.tooltip.length) {
-            Libraries.$(this.$el as HTMLElement).tooltip({
-                placement: 'top',
-                title: this.tooltip
-            });
-        }
+        if (this.tooltip && 0 < this.tooltip.length)
+            Libraries.SetTooltip(this.$el as HTMLElement, this.tooltip);
 
         return true;
     }

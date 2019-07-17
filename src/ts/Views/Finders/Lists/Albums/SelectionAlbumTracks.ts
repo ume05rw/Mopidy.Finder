@@ -2,6 +2,7 @@ import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import Libraries from '../../../../Libraries';
 import AlbumTracks from '../../../../Models/AlbumTracks/AlbumTracks';
+import Playlist from '../../../../Models/Playlists/Playlist';
 import Track from '../../../../Models/Tracks/Track';
 import ViewBase from '../../../Bases/ViewBase';
 import { ISelectionChangedArgs } from '../../../Shared/SelectionItem';
@@ -14,7 +15,7 @@ export const SelectionAlbumEvents = {
 };
 
 @Component({
-    template: `<li class="nav-item w-100"
+    template: `<li class="nav-item w-100 albumtrack"
                    ref="Li" >
     <div class="card w-100">
         <div class="card-header with-border bg-secondary">
@@ -28,6 +29,25 @@ export const SelectionAlbumEvents = {
                     @click="OnClickAlbumPlay" >
                     <i class="fa fa-play" />
                 </button>
+                <button type="button"
+                    class="btn btn-tool dropdown-toggle"
+                    data-toggle="dropdown">
+                    <i class="fa fa-bookmark" />
+                </button>
+                <div class="dropdown-menu">
+                    <div class="inner-dorpdown" ref="DropDownMenuDiv">
+                        <a class="dropdown-item"
+                            href="javascript:void(0)"
+                            @click="">New Playlist</a>
+                        <div class="dropdown-divider"></div>
+                        <template v-for="playlist in playlists">
+                        <a class="dropdown-item text-truncate"
+                            href="javascript:void(0)"
+                            v-bind:data-uri="playlist.Uri"
+                            @click="">{{ playlist.Name }}</a>
+                        </template>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="card-body row">
@@ -57,13 +77,21 @@ export default class SelectionAlbumTracks extends ViewBase {
     @Prop()
     private entity: AlbumTracks;
 
+    @Prop()
+    public playlists: Playlist[];
+
+    private get AlbumPlayButton(): HTMLButtonElement {
+        return this.$refs.AlbumPlayButton as HTMLButtonElement;
+    }
+    private get DropDownMenuDiv(): HTMLDivElement {
+        return this.$refs.DropDownMenuDiv as HTMLDivElement;
+    }
+
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        Libraries.$(this.$refs.AlbumPlayButton as HTMLElement).tooltip({
-            placement: 'top',
-            title: 'Play Album'
-        });
+        Libraries.SetTooltip(this.AlbumPlayButton, 'Play Album');
+        Libraries.SlimScroll(this.DropDownMenuDiv);
 
         return true;
     }

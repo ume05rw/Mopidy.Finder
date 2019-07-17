@@ -77,13 +77,25 @@ export default class Libraries {
         ? (Mopidy as any).default
         : Mopidy) as typeof Mopidy;
 
+    /**
+     * SlimScroll (on JQuery)
+     */
+    public static readonly SlimScroll: (element: HTMLElement, opstions?: ISlimScrollOption) => void
+        = (element: HTMLElement, opstions?: ISlimScrollOption): void => {
+            Libraries.$(element).slimScroll(opstions);
+        };
 
-    public static readonly SetTooltip: (element: HTMLElement, message: string) => void = (element: HTMLElement, message: string): void => {
-        Libraries.$(element).tooltip({
-            placement: 'top',
-            title: message
-        });
-    };
+    /**
+     * Popper (on JQuery)
+     */
+    public static readonly SetTooltip: (element: HTMLElement, message: string) => void
+        = (element: HTMLElement, message: string): void => {
+            Libraries.$(element).tooltip({
+                placement: 'top',
+                title: message,
+                delay: 500
+            });
+        };
 
     /**
      * SweetAlert2 - Toast
@@ -98,16 +110,17 @@ export default class Libraries {
         timer: 3000
     });
 
-    private static readonly InnerShowToast: (toastType: Swal.SweetAlertType, message: string) => void = (toastType, message): void => {
-        Libraries.Toast.fire({
-            type: toastType,
-            title: message
-        });
-    };
+    private static readonly InnerShowToast: (toastType: Swal.SweetAlertType, message: string) => void
+        = (toastType, message): void => {
+            Libraries.Toast.fire({
+                type: toastType,
+                title: message
+            });
+        };
 
     /**
      * SweerAlert2のToast表示メソッド
-     * 型定義を書く補完が使えなくなるので、しないでおく。
+     * 型定義を書くと補完が使えなくなるので、しないでおく。
      * ↓多分何かが間違っている...
      * ShowToast: {[toastType: string]: (message: string) => void }
      */

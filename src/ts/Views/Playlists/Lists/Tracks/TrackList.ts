@@ -62,7 +62,8 @@ enum ListMode {
                     @Clicked="OnClickEndEdit" />
             </div>
         </div>
-        <div class="card-body list-scrollable track-list">
+        <div class="card-body list-scrollable track-list"
+            ref="CardBody">
             <ul v-bind:class="listClasses"
                 ref="TrackListUl">
                 <template v-for="entity in entities">
@@ -126,6 +127,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     private get EndEditButton(): SlideupButton {
         return this.$refs.EndEditButton as SlideupButton;
     }
+    private get CardBody(): HTMLDivElement {
+        return this.$refs.CardBody as HTMLDivElement;
+    }
     private get TrackListUl(): HTMLUListElement {
         return this.$refs.TrackListUl as HTMLUListElement;
     }
@@ -140,11 +144,15 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.isAutoCollapse = false;
         await super.Initialize();
 
+        // ※$onの中ではプロパティ定義が参照出来ないらしい。
+        // ※ハンドラメソッドをthisバインドしてもダメだった。
+        // ※やむなく、$refsを直接キャストする。
         this.$on(SelectionEvents.ListUpdated, async (): Promise<boolean> => {
             await Delay.Wait(500);
 
-            for (let i = 0; i < this.Items.length; i++) {
-                const item = this.Items[i];
+            const items = this.$refs.Items as SelectionTrack[];
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
                 if (!item.GetIsInitialized())
                     item.Initialize();                
             }
@@ -152,6 +160,12 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             return true;
         });
 
+        // 利便性的にどうなのか、悩む。
+        Libraries.SlimScroll(this.CardBody, {
+            height: 'calc(100vh - 140px)',
+            alwaysVisible: true,
+            wheelStep: 60
+        });
         this.titleH3Animate = new Animate(this.TitleH3);
         this.titleInputAnimate = new Animate(this.TitleInput);
 

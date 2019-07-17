@@ -38,7 +38,8 @@ export const PlaylistListEvents = {
                 </button>
             </div>
         </div>
-        <div class="card-body list-scrollable playlist-list">
+        <div class="card-body list-scrollable playlist-list"
+            ref="CardBody">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
                 <selection-item
@@ -84,27 +85,28 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
     }
-
     private get Items(): SelectionItem<Playlist>[] {
         return this.$refs.Items as SelectionItem<Playlist>[];
     }
-
     private get AddModal(): AddModal {
         return this.$refs.AddModal as AddModal;
+    }
+    private get CardBody(): HTMLDivElement {
+        return this.$refs.CardBody as HTMLDivElement;
     }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
 
-        Libraries.$(this.$refs.ButtonAdd as HTMLElement).tooltip({
-            placement: 'top',
-            title: 'Add Playlist'
+        // 利便性的にどうなのか、悩む。
+        Libraries.SlimScroll(this.CardBody, {
+            height: 'calc(100vh - 140px)',
+            alwaysVisible: true,
+            wheelStep: 60
         });
-        Libraries.$(this.$refs.ButtonCollaplse as HTMLElement).tooltip({
-            placement: 'top',
-            title: 'Shrink/Expand'
-        });
+        Libraries.SetTooltip(this.$refs.ButtonAdd as HTMLElement, 'Add Playlist');
+        Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');
 
         return true;
     }

@@ -80,6 +80,16 @@ div#root {
     width: 20%;
 }
 
+.albumtrack .dropdown-menu .dropdown-item {
+    color: #212529 !important;
+}
+.albumtrack .dropdown-menu {
+    max-width: 200px;
+}
+.albumtrack .dropdown-menu .inner-dorpdown {
+    max-height: 50vh;
+    max-width: 200px;
+}
 /**
  * プレイリスト-トラックリスト
  */

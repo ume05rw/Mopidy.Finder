@@ -5,11 +5,13 @@ import Libraries from '../../../../Libraries';
 import AlbumTracks from '../../../../Models/AlbumTracks/AlbumTracks';
 import AlbumTracksStore, { IPagenateQueryArgs } from '../../../../Models/AlbumTracks/AlbumTracksStore';
 import { IPagenatedResult } from '../../../../Models/Bases/StoreBase';
+import Playlist from '../../../../Models/Playlists/Playlist';
+import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
+import Delay from '../../../../Utils/Delay';
 import Exception from '../../../../Utils/Exception';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionList, SelectionEvents } from '../../../Shared/SelectionList';
 import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './SelectionAlbumTracks';
-import Delay from '../../../../Utils/Delay';
 
 @Component({
     template: `<div class="col-md-6">
@@ -23,10 +25,12 @@ import Delay from '../../../../Utils/Delay';
                     @TextUpdated="Refresh()"/>
             </div>
         </div>
-        <div class="card-body list-scrollable album-list">
+        <div class="card-body list-scrollable album-list"
+            ref="CardBody">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
                     <selection-album-tracks
+                        v-bind:playlists="playlists"
                         ref="Items"
                         v-bind:entity="entity"
                         @AlbumTracksSelected="OnAlbumTracksSelected" />
@@ -53,6 +57,7 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     private isEntitiesRefreshed: boolean = false;
     private genreIds: number[] = [];
     private artistIds: number[] = [];
+    private playlists: Playlist[] = [];
 
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
@@ -60,22 +65,54 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     private get Items(): SelectionAlbumTracks[] {
         return this.$refs.Items as SelectionAlbumTracks[];
     }
+    private get CardBody(): HTMLDivElement {
+        return this.$refs.CardBody as HTMLDivElement;
+    }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = false;
         await super.Initialize();
 
+        // 利便性的にどうなのか、悩む。
+        Libraries.SlimScroll(this.CardBody, {
+            height: 'calc(100vh - 140px)',
+            alwaysVisible: true,
+            wheelStep: 60
+        });
+
+        // ※$onの中ではプロパティ定義が参照出来ないらしい。
+        // ※ハンドラメソッドをthisバインドしてもダメだった。
+        // ※やむなく、$refsを直接キャストする。
         this.$on(SelectionEvents.ListUpdated, async (): Promise<boolean> => {
             await Delay.Wait(500);
 
-            for (let i = 0; i < this.Items.length; i++) {
-                const item = this.Items[i];
+            const items = this.$refs.Items as SelectionAlbumTracks[];
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
                 if (!item.GetIsInitialized())
                     item.Initialize();
+
+                if (item.playlists !== this.playlists)
+                    item.playlists = this.playlists;
             }
 
             return true;
         });
+
+        await this.InitPlaylistList();
+
+        return true;
+    }
+
+    public async InitPlaylistList(): Promise<boolean> {
+        const store = new PlaylistStore();
+        this.playlists = await store.GetPlaylists();
+
+        if (!this.Items)
+            return true;
+
+        for (let i = 0; i < this.Items.length; i++)
+            this.Items[i].playlists = this.playlists;
 
         return true;
     }

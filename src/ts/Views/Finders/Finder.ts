@@ -45,6 +45,14 @@ export default class Finder extends ContentViewBase {
         return this.$refs.AlbumList as AlbumList;
     }
 
+    protected async OnShown(): Promise<boolean> {
+        super.OnShown();
+
+        await this.AlbumList.InitPlaylistList();
+
+        return true;
+    }
+
     private OnGenreSelectionChanged(args: ISelectionChangedArgs<Genre>): void {
         if (args.Selected) {
             this.ArtistList.AddFilterGenreId(args.Entity.Id);

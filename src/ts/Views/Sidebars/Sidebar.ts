@@ -89,8 +89,8 @@ export default class Sidebar extends ViewBase {
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        Libraries.$('.sidebar').slimScroll({
-            height: '100%'
+        Libraries.SlimScroll(this.SidebarSection, {
+            height: '100vh'
         });
 
         return true;

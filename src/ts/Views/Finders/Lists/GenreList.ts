@@ -32,7 +32,8 @@ import Libraries from '../../../Libraries';
                 </button>
             </div>
         </div>
-        <div class="card-body list-scrollable genre-list">
+        <div class="card-body list-scrollable genre-list"
+            ref="CardBody">
             <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
                 <template v-for="entity in entities">
                     <selection-item
@@ -62,19 +63,22 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
     }
+    private get CardBody(): HTMLDivElement {
+        return this.$refs.CardBody as HTMLDivElement;
+    }
 
     public async Initialize(): Promise<boolean> {
         this.isAutoCollapse = true;
         await super.Initialize();
 
-        Libraries.$(this.$refs.RefreshButton as HTMLElement).tooltip({
-            placement: 'top',
-            title: 'Refresh'
+        // 利便性的にどうなのか、悩む。
+        Libraries.SlimScroll(this.CardBody, {
+            height: 'calc(100vh - 140px)',
+            alwaysVisible: true,
+            wheelStep: 60
         });
-        Libraries.$(this.$refs.ButtonCollaplse as HTMLElement).tooltip({
-            placement: 'top',
-            title: 'Shrink/Expand'
-        });
+        Libraries.SetTooltip(this.$refs.RefreshButton as HTMLElement, 'Refresh');
+        Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');
 
         return true;
     }

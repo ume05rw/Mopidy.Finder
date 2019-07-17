@@ -203,10 +203,20 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         Libraries.Mopidy = ((Mopidy.default)
             ? Mopidy.default
             : Mopidy);
+        /**
+         * SlimScroll (on JQuery)
+         */
+        Libraries.SlimScroll = function (element, opstions) {
+            Libraries.$(element).slimScroll(opstions);
+        };
+        /**
+         * Popper (on JQuery)
+         */
         Libraries.SetTooltip = function (element, message) {
             Libraries.$(element).tooltip({
                 placement: 'top',
-                title: message
+                title: message,
+                delay: 500
             });
         };
         /**
@@ -229,7 +239,7 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         };
         /**
          * SweerAlert2のToast表示メソッド
-         * 型定義を書く補完が使えなくなるので、しないでおく。
+         * 型定義を書くと補完が使えなくなるので、しないでおく。
          * ↓多分何かが間違っている...
          * ShowToast: {[toastType: string]: (message: string) => void }
          */
@@ -282,7 +292,17 @@ define("Views/Bases/ViewBase", ["require", "exports", "vue", "lodash"], function
     }(vue_1.default));
     exports.default = ViewBase;
 });
-define("Views/Bases/ContentViewBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_1) {
+define("Views/Events/BootstrapEvents", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ModalEvents = {
+        Show: 'show.bs.modal',
+        Shown: 'shown.bs.modal',
+        Hide: 'hide.bs.modal',
+        Hidden: 'hidden.bs.modal'
+    };
+});
+define("Views/Bases/ContentViewBase", ["require", "exports", "Views/Bases/ViewBase", "Libraries", "Views/Events/BootstrapEvents"], function (require, exports, ViewBase_1, Libraries_1, BootstrapEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ContentViewBase = /** @class */ (function (_super) {
@@ -290,6 +310,61 @@ define("Views/Bases/ContentViewBase", ["require", "exports", "Views/Bases/ViewBa
         function ContentViewBase() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        ContentViewBase.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var elem;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            elem = Libraries_1.default.$(this.$el);
+                            elem.on(BootstrapEvents_1.ModalEvents.Show, function () {
+                                _this.OnShow();
+                            });
+                            elem.on(BootstrapEvents_1.ModalEvents.Shown, function () {
+                                _this.OnShown();
+                            });
+                            elem.on(BootstrapEvents_1.ModalEvents.Hide, function () {
+                                _this.OnHide();
+                            });
+                            elem.on(BootstrapEvents_1.ModalEvents.Hidden, function () {
+                                _this.OnHidden();
+                            });
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ContentViewBase.prototype.OnShow = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        ContentViewBase.prototype.OnShown = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        ContentViewBase.prototype.OnHide = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        ContentViewBase.prototype.OnHidden = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, true];
+                });
+            });
+        };
         return ContentViewBase;
     }(ViewBase_1.default));
     exports.default = ContentViewBase;
@@ -1009,14 +1084,14 @@ define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "E
     }(EventableBase_1.default));
     exports.default = XhrQueryableBase;
 });
-define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_1, XhrQueryableBase_1) {
+define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_2, XhrQueryableBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var StoreBase = /** @class */ (function (_super) {
         __extends(StoreBase, _super);
         function StoreBase() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.Enumerable = Libraries_1.default.Enumerable;
+            _this.Enumerable = Libraries_2.default.Enumerable;
             return _this;
         }
         return StoreBase;
@@ -1098,7 +1173,405 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
     }(StoreBase_1.default));
     exports.default = AlbumTracksStore;
 });
-define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (require, exports, Exception_2) {
+define("Models/Mopidies/IRef", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Playlists/Playlist", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Playlist = /** @class */ (function () {
+        function Playlist() {
+            this.Name = null;
+            this.Uri = null;
+            this.Tracks = [];
+        }
+        Playlist.CreateFromRef = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Playlist();
+            result.Name = entity.name || null;
+            result.Uri = entity.uri || null;
+            result.Tracks = [];
+            return result;
+        };
+        Playlist.CreateArrayFromRefs = function (entities) {
+            var result = [];
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Playlist.CreateFromRef(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Playlist.MinNameLength = 1;
+        Playlist.MaxNameLength = 40;
+        return Playlist;
+    }());
+    exports.default = Playlist;
+});
+define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var JsonRpcQueryableBase = /** @class */ (function (_super) {
+        __extends(JsonRpcQueryableBase, _super);
+        function JsonRpcQueryableBase() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        JsonRpcQueryableBase.prototype.QueryJsonRpc = function (params) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            params.jsonrpc = '2.0';
+                            return [4 /*yield*/, XhrQueryableBase_2.default.XhrInstance.post(JsonRpcQueryableBase.Url, params)
+                                    .catch(function (e) {
+                                    var resultData = {
+                                        jsonrpc: '2.0',
+                                        error: e
+                                    };
+                                    if (params.id)
+                                        resultData.id = params.id;
+                                    var result = {
+                                        status: 406,
+                                        statusText: 'Network Error',
+                                        config: null,
+                                        headers: null,
+                                        data: resultData
+                                    };
+                                    return result;
+                                })];
+                        case 1:
+                            response = _a.sent();
+                            result = response.data;
+                            if (params.id && !result) {
+                                // id付きにも拘らず、応答が無いとき
+                                console.error("JsonRpcError: method=" + params.method); // eslint-disable-line
+                                console.error('returns null'); // eslint-disable-line
+                            }
+                            if (result && result.error) {
+                                // 応答にerrorが含まれるとき
+                                console.error("JsonRpcError: method=" + params.method); // eslint-disable-line
+                                console.error(result); // eslint-disable-line
+                            }
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        JsonRpcQueryableBase.prototype.JsonRpcRequest = function (method, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var query, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            query = {
+                                jsonrpc: '2.0',
+                                method: method,
+                                id: JsonRpcQueryableBase.IdCounter
+                            };
+                            if (params)
+                                query.params = params;
+                            JsonRpcQueryableBase.IdCounter++;
+                            return [4 /*yield*/, this.QueryJsonRpc(query)];
+                        case 1:
+                            result = _a.sent();
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        JsonRpcQueryableBase.prototype.JsonRpcNotice = function (method, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var query, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            query = {
+                                jsonrpc: '2.0',
+                                method: method
+                            };
+                            if (params)
+                                query.params = params;
+                            return [4 /*yield*/, this.QueryJsonRpc(query)];
+                        case 1:
+                            result = _a.sent();
+                            return [2 /*return*/, (!result || (result && !result.error))];
+                    }
+                });
+            });
+        };
+        JsonRpcQueryableBase.Url = 'JsonRpc';
+        JsonRpcQueryableBase.IdCounter = 1;
+        return JsonRpcQueryableBase;
+    }(XhrQueryableBase_2.default));
+    exports.default = JsonRpcQueryableBase;
+});
+define("Models/Mopidies/IPlaylist", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_3, Exception_2, JsonRpcQueryableBase_1, Track_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var TrackStore = /** @class */ (function (_super) {
+        __extends(TrackStore, _super);
+        function TrackStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        TrackStore.prototype.EnsureTracks = function (tracks) {
+            return __awaiter(this, void 0, void 0, function () {
+                var trackUris, response, pairList, i, track, uri, pairedTrackArray, mpTrack;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            trackUris = Libraries_3.default.Enumerable.from(tracks)
+                                .where(function (e) { return (!e.Name
+                                || !e.Length); })
+                                .select(function (e) { return e.Uri; })
+                                .toArray();
+                            return [4 /*yield*/, this.JsonRpcRequest(TrackStore.Methods.LibraryLookup, {
+                                    uris: trackUris
+                                })];
+                        case 1:
+                            response = _a.sent();
+                            pairList = response.result;
+                            for (i = 0; i < tracks.length; i++) {
+                                track = tracks[i];
+                                uri = track.Uri;
+                                pairedTrackArray = pairList[uri];
+                                if (track.Name && track.Length)
+                                    continue;
+                                if ((!track.Name || !track.Length)
+                                    && (!pairedTrackArray || pairedTrackArray.length <= 0)) {
+                                    Exception_2.default.Dump('TrackStore.EnsureTracks: Track Details Not Found', { track: track, pairedTrackArray: pairedTrackArray });
+                                    continue;
+                                }
+                                mpTrack = pairList[uri][0];
+                                Track_2.default.EnsureTrackByMopidy(track, mpTrack);
+                            }
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        TrackStore.Methods = {
+            LibraryLookup: 'core.library.lookup',
+        };
+        return TrackStore;
+    }(JsonRpcQueryableBase_1.default));
+    exports.default = TrackStore;
+});
+define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_4, JsonRpcQueryableBase_2, Track_3, TrackStore_1, Playlist_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var PlaylistStore = /** @class */ (function (_super) {
+        __extends(PlaylistStore, _super);
+        function PlaylistStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        PlaylistStore.prototype.GetPlaylists = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, refs, ordered, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistAsList)];
+                        case 1:
+                            response = _a.sent();
+                            refs = response.result;
+                            ordered = Libraries_4.default.Enumerable.from(refs)
+                                .orderBy(function (e) { return e.name; })
+                                .toArray();
+                            result = Playlist_1.default.CreateArrayFromRefs(ordered);
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        PlaylistStore.prototype.SetPlaylistTracks = function (playlist) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, mpPlaylist, tracks, trackStore;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
+                                uri: playlist.Uri
+                            })];
+                        case 1:
+                            response = _a.sent();
+                            mpPlaylist = response.result;
+                            tracks = (mpPlaylist.tracks && 0 <= mpPlaylist.tracks.length)
+                                ? Track_3.default.CreateArrayFromMopidy(mpPlaylist.tracks)
+                                : [];
+                            if (tracks.length <= 0) {
+                                playlist.Tracks = [];
+                                return [2 /*return*/, true];
+                            }
+                            trackStore = new TrackStore_1.default();
+                            return [4 /*yield*/, trackStore.EnsureTracks(tracks)];
+                        case 2:
+                            _a.sent();
+                            // 未Ensure状態のtracksをplaylist.TracksにセットするとVueが描画してしまうため、
+                            // Ensure後にセットする。
+                            playlist.Tracks = tracks;
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        PlaylistStore.prototype.GetImageUri = function (uri) {
+            return __awaiter(this, void 0, void 0, function () {
+                var resImages, images;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.LibraryGetImages, {
+                                uris: [uri]
+                            })];
+                        case 1:
+                            resImages = _a.sent();
+                            if (resImages.result) {
+                                images = resImages.result[uri];
+                                if (images && 0 < images.length)
+                                    return [2 /*return*/, images[0]];
+                            }
+                            return [2 /*return*/, null];
+                    }
+                });
+            });
+        };
+        PlaylistStore.prototype.PlayPlaylist = function (playlist, track) {
+            return __awaiter(this, void 0, void 0, function () {
+                var resClear, uris, resAdd, tlTracks, tlDictionary, i, tr;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.TracklistClearList)];
+                        case 1:
+                            resClear = _a.sent();
+                            if (resClear.error)
+                                throw new Error(resClear.error);
+                            uris = Libraries_4.default.Enumerable.from(playlist.Tracks)
+                                .select(function (e) { return e.Uri; })
+                                .toArray();
+                            return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.TracklistAdd, {
+                                    uris: uris
+                                })];
+                        case 2:
+                            resAdd = _a.sent();
+                            if (resAdd.error)
+                                throw new Error(resAdd.error);
+                            tlTracks = resAdd.result;
+                            tlDictionary = Libraries_4.default.Enumerable.from(tlTracks)
+                                .toDictionary(function (e) { return e.track.uri; }, function (e2) { return e2.tlid; });
+                            for (i = 0; i < playlist.Tracks.length; i++) {
+                                tr = playlist.Tracks[i];
+                                tr.TlId = (tlDictionary.contains(tr.Uri))
+                                    ? tlDictionary.get(tr.Uri)
+                                    : null;
+                            }
+                            if (track.TlId === null)
+                                throw new Error("track: " + track.Name + " not assigned TlId");
+                            return [4 /*yield*/, this.PlayByTlId(track.TlId)];
+                        case 3:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        PlaylistStore.prototype.PlayByTlId = function (tlId) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcNotice(PlaylistStore.Methods.PlaybackPlay, {
+                                tlid: tlId
+                            })];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        PlaylistStore.prototype.AddPlaylist = function (name) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistCreate, {
+                                name: name
+                            })];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        PlaylistStore.prototype.UpdatePlayllist = function (playlist) {
+            return __awaiter(this, void 0, void 0, function () {
+                var tracks, i, track, response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            tracks = [];
+                            for (i = 0; i < playlist.Tracks.length; i++) {
+                                track = playlist.Tracks[i];
+                                tracks.push({
+                                    __model__: 'Track',
+                                    uri: track.Uri
+                                });
+                            }
+                            return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistSave, {
+                                    playlist: {
+                                        __model__: 'Playlist',
+                                        tracks: tracks,
+                                        uri: playlist.Uri,
+                                        name: playlist.Name
+                                    }
+                                })];
+                        case 1:
+                            response = _a.sent();
+                            return [2 /*return*/, (response.result !== null)];
+                    }
+                });
+            });
+        };
+        PlaylistStore.prototype.DeletePlaylist = function (playlist) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistDelete, {
+                                uri: playlist.Uri
+                            })];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        PlaylistStore.Methods = {
+            PlaylistAsList: 'core.playlists.as_list',
+            PlaylistLookup: 'core.playlists.lookup',
+            PlaylistCreate: 'core.playlists.create',
+            PlaylistSave: 'core.playlists.save',
+            PlaylistDelete: 'core.playlists.delete',
+            LibraryGetImages: 'core.library.get_images',
+            TracklistClearList: 'core.tracklist.clear',
+            TracklistAdd: 'core.tracklist.add',
+            TracklistGetTlTracks: 'core.tracklist.get_tl_tracks',
+            PlaybackPlay: 'core.playback.play'
+        };
+        return PlaylistStore;
+    }(JsonRpcQueryableBase_2.default));
+    exports.default = PlaylistStore;
+});
+define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (require, exports, Exception_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var DelayedOnceExecuter = /** @class */ (function () {
@@ -1128,13 +1601,13 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
                         if (DelayedOnceExecuter.DelayThreshold < elapsed) {
                             // Delay閾値より長い時間の間、一度も実行されていない。
                             // 無限ループの可能性がある。
-                            Exception_2.default.Dump('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
+                            Exception_3.default.Dump('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
                         }
                     }
                     if (DelayedOnceExecuter.SuppressThreshold < _this._suppressCount) {
                         // Suppress閾値より多くの回数分、実行が抑制されている。
                         // 呼び出し回数が多すぎる可能性がある。
-                        Exception_2.default.Dump('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
+                        Exception_3.default.Dump('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
                     }
                 }, DelayedOnceExecuter.MonitorInterval);
             }
@@ -1193,7 +1666,7 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
                 this._callback(args);
             }
             catch (ex) {
-                Exception_2.default.Dump('Callback FAILED!!', ex);
+                Exception_3.default.Dump('Callback FAILED!!', ex);
             }
             if (this._timer) {
                 clearInterval(this._timer);
@@ -1219,7 +1692,7 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
                         resolve(true);
                     }
                     catch (ex) {
-                        Exception_2.default.Throw('Delay Exception.', ex);
+                        Exception_3.default.Throw('Delay Exception.', ex);
                     }
                 }, msec);
             });
@@ -1234,7 +1707,7 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
     }());
     exports.default = Delay;
 });
-define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], function (require, exports, _, Exception_3) {
+define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], function (require, exports, _, Exception_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Speed;
@@ -1482,7 +1955,7 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], fun
                     this._resolver(result);
                 }
                 catch (ex) {
-                    Exception_3.default.Dump('Animated: Unexpected Error on Resolve', ex);
+                    Exception_4.default.Dump('Animated: Unexpected Error on Resolve', ex);
                 }
             }
             this._resolver = null;
@@ -1534,7 +2007,7 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], fun
     }());
     exports.default = Animate;
 });
-define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewBase", "Utils/Exception", "Utils/Animate", "Utils/Animate"], function (require, exports, ViewBase_3, Exception_4, Animate_1, Animate_2) {
+define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewBase", "Utils/Exception", "Utils/Animate", "Utils/Animate"], function (require, exports, ViewBase_3, Exception_5, Animate_1, Animate_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Animation = Animate_2.Animation;
@@ -1562,9 +2035,9 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
                         case 1:
                             _a.sent();
                             if (!this.AnimationIn || Animate_1.default.IsHideAnimation(this.AnimationIn))
-                                Exception_4.default.Throw('Invalid In-Animation', this.AnimationIn);
+                                Exception_5.default.Throw('Invalid In-Animation', this.AnimationIn);
                             if (!this.AnimationOut || !Animate_1.default.IsHideAnimation(this.AnimationOut))
-                                Exception_4.default.Throw('Invalid Out-Animation', this.AnimationOut);
+                                Exception_5.default.Throw('Invalid Out-Animation', this.AnimationOut);
                             this.animate = new Animate_1.default(this.$el);
                             return [2 /*return*/, true];
                     }
@@ -1621,7 +2094,7 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
     }(ViewBase_3.default));
     exports.default = AnimatedViewBase;
 });
-define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/AnimatedViewBase", "Libraries"], function (require, exports, vue_class_component_2, vue_property_decorator_2, AnimatedViewBase_1, Libraries_2) {
+define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/AnimatedViewBase", "Libraries"], function (require, exports, vue_class_component_2, vue_property_decorator_2, AnimatedViewBase_1, Libraries_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SlideupButtonEvents = {
@@ -1644,12 +2117,8 @@ define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component
                             _a.sent();
                             if (this.hideOnInit === true)
                                 this.HideNow();
-                            if (this.tooltip && 0 < this.tooltip.length) {
-                                Libraries_2.default.$(this.$el).tooltip({
-                                    placement: 'top',
-                                    title: this.tooltip
-                                });
-                            }
+                            if (this.tooltip && 0 < this.tooltip.length)
+                                Libraries_5.default.SetTooltip(this.$el, this.tooltip);
                             return [2 /*return*/, true];
                     }
                 });
@@ -1886,7 +2355,7 @@ define("Views/Events/AdminLteEvents", ["require", "exports"], function (require,
         Removed: 'removed.lte.widget'
     };
 });
-define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Utils/Exception", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, Libraries_3, ViewBase_5, AdminLteEvents_1, Exception_5, SelectionItem_2) {
+define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Utils/Exception", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, Libraries_6, ViewBase_5, AdminLteEvents_1, Exception_6, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionEvents = {
@@ -1901,7 +2370,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.isAutoCollapse = true;
             _this.page = 1;
-            _this.viewport = Libraries_3.default.ResponsiveBootstrapToolkit;
+            _this.viewport = Libraries_6.default.ResponsiveBootstrapToolkit;
             _this.isCollapsed = false;
             return _this;
         }
@@ -1942,7 +2411,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
                         case 1:
                             _a.sent();
                             if (this.isAutoCollapse) {
-                                this.button = Libraries_3.default.$(this.ButtonCollaplse);
+                                this.button = Libraries_6.default.$(this.ButtonCollaplse);
                                 this.boxWidget = new AdminLte.Widget(this.button);
                                 this.button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
                                     _this.isCollapsed = true;
@@ -1950,7 +2419,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
                                 this.button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
                                     _this.isCollapsed = false;
                                 });
-                                Libraries_3.default.$(window).resize(this.viewport.changed(function () {
+                                Libraries_6.default.$(window).resize(this.viewport.changed(function () {
                                     _this.ToggleListByViewport();
                                 }));
                                 _.delay(function () {
@@ -1993,7 +2462,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
                             return [3 /*break*/, 3];
                         case 2:
                             e_1 = _a.sent();
-                            Exception_5.default.Throw(null, e_1);
+                            Exception_6.default.Throw(null, e_1);
                             return [3 /*break*/, 3];
                         case 3: return [2 /*return*/, true];
                     }
@@ -2041,7 +2510,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
     }(ViewBase_5.default));
     exports.default = SelectionList;
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_4, AlbumTracks_2, ViewBase_6) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_7, AlbumTracks_2, ViewBase_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumEvents = {
@@ -2052,6 +2521,20 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         function SelectionAlbumTracks() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(SelectionAlbumTracks.prototype, "AlbumPlayButton", {
+            get: function () {
+                return this.$refs.AlbumPlayButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SelectionAlbumTracks.prototype, "DropDownMenuDiv", {
+            get: function () {
+                return this.$refs.DropDownMenuDiv;
+            },
+            enumerable: true,
+            configurable: true
+        });
         SelectionAlbumTracks.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
@@ -2059,17 +2542,15 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_4.default.$(this.$refs.AlbumPlayButton).tooltip({
-                                placement: 'top',
-                                title: 'Play Album'
-                            });
+                            Libraries_7.default.SetTooltip(this.AlbumPlayButton, 'Play Album');
+                            Libraries_7.default.SlimScroll(this.DropDownMenuDiv);
                             return [2 /*return*/, true];
                     }
                 });
             });
         };
         SelectionAlbumTracks.prototype.OnClickAlbumPlay = function () {
-            var tracks = Libraries_4.default.Enumerable.from(this.entity.Tracks);
+            var tracks = Libraries_7.default.Enumerable.from(this.entity.Tracks);
             var track = tracks
                 .first(function (e) { return e.TrackNo === tracks.min(function (e2) { return e2.TrackNo; }); });
             var selectionArgs = {
@@ -2082,7 +2563,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         SelectionAlbumTracks.prototype.OnClickTrack = function (args) {
             var tr = args.target.parentElement;
             var trackId = parseInt(tr.getAttribute('data-trackid'), 10);
-            var tracks = Libraries_4.default.Enumerable.from(this.entity.Tracks);
+            var tracks = Libraries_7.default.Enumerable.from(this.entity.Tracks);
             var track = tracks.first(function (e) { return e.Id === trackId; });
             var selectionArgs = {
                 Entity: this.entity,
@@ -2095,16 +2576,20 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             vue_property_decorator_5.Prop(),
             __metadata("design:type", AlbumTracks_2.default)
         ], SelectionAlbumTracks.prototype, "entity", void 0);
+        __decorate([
+            vue_property_decorator_5.Prop(),
+            __metadata("design:type", Array)
+        ], SelectionAlbumTracks.prototype, "playlists", void 0);
         SelectionAlbumTracks = __decorate([
             vue_class_component_5.default({
-                template: "<li class=\"nav-item w-100\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\"\n                            v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\">{{ track.Name }}</td>\n                            <td class=\"tracklength\">{{ track.GetTimeString() }}</td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
+                template: "<li class=\"nav-item w-100 albumtrack\"\n                   ref=\"Li\" >\n    <div class=\"card w-100\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnClickAlbumPlay\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool dropdown-toggle\"\n                    data-toggle=\"dropdown\">\n                    <i class=\"fa fa-bookmark\" />\n                </button>\n                <div class=\"dropdown-menu\">\n                    <div class=\"inner-dorpdown\" ref=\"DropDownMenuDiv\">\n                        <a class=\"dropdown-item\"\n                            href=\"javascript:void(0)\"\n                            @click=\"\">New Playlist</a>\n                        <div class=\"dropdown-divider\"></div>\n                        <template v-for=\"playlist in playlists\">\n                        <a class=\"dropdown-item text-truncate\"\n                            href=\"javascript:void(0)\"\n                            v-bind:data-uri=\"playlist.Uri\"\n                            @click=\"\">{{ playlist.Name }}</a>\n                        </template>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr @click=\"OnClickTrack\"\n                            v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\">{{ track.Name }}</td>\n                            <td class=\"tracklength\">{{ track.GetTimeString() }}</td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks", "Utils/Delay"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_5, AlbumTracksStore_1, Exception_6, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1, Delay_2) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_8, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_7, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumList = /** @class */ (function (_super) {
@@ -2116,6 +2601,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
             _this.isEntitiesRefreshed = false;
             _this.genreIds = [];
             _this.artistIds = [];
+            _this.playlists = [];
             return _this;
         }
         Object.defineProperty(AlbumList.prototype, "Filterbox", {
@@ -2132,6 +2618,13 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(AlbumList.prototype, "CardBody", {
+            get: function () {
+                return this.$refs.CardBody;
+            },
+            enumerable: true,
+            configurable: true
+        });
         AlbumList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
@@ -2142,22 +2635,57 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            // 利便性的にどうなのか、悩む。
+                            Libraries_8.default.SlimScroll(this.CardBody, {
+                                height: 'calc(100vh - 140px)',
+                                alwaysVisible: true,
+                                wheelStep: 60
+                            });
+                            // ※$onの中ではプロパティ定義が参照出来ないらしい。
+                            // ※ハンドラメソッドをthisバインドしてもダメだった。
+                            // ※やむなく、$refsを直接キャストする。
                             this.$on(SelectionList_1.SelectionEvents.ListUpdated, function () { return __awaiter(_this, void 0, void 0, function () {
-                                var i, item;
+                                var items, i, item;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
                                         case 0: return [4 /*yield*/, Delay_2.default.Wait(500)];
                                         case 1:
                                             _a.sent();
-                                            for (i = 0; i < this.Items.length; i++) {
-                                                item = this.Items[i];
+                                            items = this.$refs.Items;
+                                            for (i = 0; i < items.length; i++) {
+                                                item = items[i];
                                                 if (!item.GetIsInitialized())
                                                     item.Initialize();
+                                                if (item.playlists !== this.playlists)
+                                                    item.playlists = this.playlists;
                                             }
                                             return [2 /*return*/, true];
                                     }
                                 });
                             }); });
+                            return [4 /*yield*/, this.InitPlaylistList()];
+                        case 2:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        AlbumList.prototype.InitPlaylistList = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var store, _a, i;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            store = new PlaylistStore_1.default();
+                            _a = this;
+                            return [4 /*yield*/, store.GetPlaylists()];
+                        case 1:
+                            _a.playlists = _b.sent();
+                            if (!this.Items)
+                                return [2 /*return*/, true];
+                            for (i = 0; i < this.Items.length; i++)
+                                this.Items[i].playlists = this.playlists;
                             return [2 /*return*/, true];
                     }
                 });
@@ -2214,11 +2742,11 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 2:
                             albumTracks = args.Entity;
                             if (!albumTracks)
-                                Exception_6.default.Throw('AlbumTracks Not Found', args);
+                                Exception_7.default.Throw('AlbumTracks Not Found', args);
                             track = args.Track;
                             if (!track)
-                                Exception_6.default.Throw('Track Not Found', args);
-                            isAllTracksRegistered = Libraries_5.default.Enumerable.from(albumTracks.Tracks)
+                                Exception_7.default.Throw('Track Not Found', args);
+                            isAllTracksRegistered = Libraries_8.default.Enumerable.from(albumTracks.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
                             return [4 /*yield*/, this.store.PlayAlbumByTlId(track.TlId)];
@@ -2228,7 +2756,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 4: return [4 /*yield*/, this.store.PlayAlbumByTrack(track)];
                         case 5:
                             resultAtls = _a.sent();
-                            updatedTracks_1 = Libraries_5.default.Enumerable.from(resultAtls.Tracks);
+                            updatedTracks_1 = Libraries_8.default.Enumerable.from(resultAtls.Tracks);
                             _.each(albumTracks.Tracks, function (track) {
                                 track.TlId = updatedTracks_1.firstOrDefault(function (e) { return e.Id == track.Id; }).TlId;
                             });
@@ -2292,7 +2820,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList = __decorate([
             vue_class_component_6.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable album-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.album-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable album-list\"\n            ref=\"CardBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-album-tracks\n                        v-bind:playlists=\"playlists\"\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.album-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_1.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
@@ -2333,7 +2861,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
     }(StoreBase_2.default));
     exports.default = ArtistStore;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Libraries"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, ArtistStore_1, Filterbox_2, SelectionItem_3, SelectionList_2, Libraries_6) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Models/Artists/ArtistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Libraries"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, ArtistStore_1, Filterbox_2, SelectionItem_3, SelectionList_2, Libraries_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistList = /** @class */ (function (_super) {
@@ -2352,6 +2880,13 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(ArtistList.prototype, "CardBody", {
+            get: function () {
+                return this.$refs.CardBody;
+            },
+            enumerable: true,
+            configurable: true
+        });
         ArtistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
@@ -2361,14 +2896,14 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_6.default.$(this.$refs.RefreshButton).tooltip({
-                                placement: 'top',
-                                title: 'Refresh'
+                            // 利便性的にどうなのか、悩む。
+                            Libraries_9.default.SlimScroll(this.CardBody, {
+                                height: 'calc(100vh - 140px)',
+                                alwaysVisible: true,
+                                wheelStep: 60
                             });
-                            Libraries_6.default.$(this.$refs.ButtonCollaplse).tooltip({
-                                placement: 'top',
-                                title: 'Shrink/Expand'
-                            });
+                            Libraries_9.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
+                            Libraries_9.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                             return [2 /*return*/, true];
                     }
                 });
@@ -2436,7 +2971,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable artist-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.artist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable artist-list\"\n            ref=\"CardBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.artist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_2.default,
                     'selection-item': SelectionItem_3.default,
@@ -2518,7 +3053,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Libraries"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, GenreStore_1, Filterbox_3, SelectionItem_4, SelectionList_3, Libraries_7) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Models/Genres/GenreStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Libraries"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, GenreStore_1, Filterbox_3, SelectionItem_4, SelectionList_3, Libraries_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -2536,6 +3071,13 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(GenreList.prototype, "CardBody", {
+            get: function () {
+                return this.$refs.CardBody;
+            },
+            enumerable: true,
+            configurable: true
+        });
         GenreList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
@@ -2545,14 +3087,14 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_7.default.$(this.$refs.RefreshButton).tooltip({
-                                placement: 'top',
-                                title: 'Refresh'
+                            // 利便性的にどうなのか、悩む。
+                            Libraries_10.default.SlimScroll(this.CardBody, {
+                                height: 'calc(100vh - 140px)',
+                                alwaysVisible: true,
+                                wheelStep: 60
                             });
-                            Libraries_7.default.$(this.$refs.ButtonCollaplse).tooltip({
-                                placement: 'top',
-                                title: 'Shrink/Expand'
-                            });
+                            Libraries_10.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
+                            Libraries_10.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                             return [2 /*return*/, true];
                     }
                 });
@@ -2598,7 +3140,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         };
         GenreList = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable genre-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.genre-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable genre-list\"\n            ref=\"CardBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.genre-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_3.default,
                     'selection-item': SelectionItem_4.default,
@@ -2639,6 +3181,20 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
             enumerable: true,
             configurable: true
         });
+        Finder.prototype.OnShown = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _super.prototype.OnShown.call(this);
+                            return [4 /*yield*/, this.AlbumList.InitPlaylistList()];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
         Finder.prototype.OnGenreSelectionChanged = function (args) {
             if (args.Selected) {
                 this.ArtistList.AddFilterGenreId(args.Entity.Id);
@@ -2682,111 +3238,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
     }(ContentViewBase_1.default));
     exports.default = Finder;
 });
-define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var JsonRpcQueryableBase = /** @class */ (function (_super) {
-        __extends(JsonRpcQueryableBase, _super);
-        function JsonRpcQueryableBase() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        JsonRpcQueryableBase.prototype.QueryJsonRpc = function (params) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            params.jsonrpc = '2.0';
-                            return [4 /*yield*/, XhrQueryableBase_2.default.XhrInstance.post(JsonRpcQueryableBase.Url, params)
-                                    .catch(function (e) {
-                                    var resultData = {
-                                        jsonrpc: '2.0',
-                                        error: e
-                                    };
-                                    if (params.id)
-                                        resultData.id = params.id;
-                                    var result = {
-                                        status: 406,
-                                        statusText: 'Network Error',
-                                        config: null,
-                                        headers: null,
-                                        data: resultData
-                                    };
-                                    return result;
-                                })];
-                        case 1:
-                            response = _a.sent();
-                            result = response.data;
-                            if (params.id && !result) {
-                                // id付きにも拘らず、応答が無いとき
-                                console.error("JsonRpcError: method=" + params.method); // eslint-disable-line
-                                console.error('returns null'); // eslint-disable-line
-                            }
-                            if (result && result.error) {
-                                // 応答にerrorが含まれるとき
-                                console.error("JsonRpcError: method=" + params.method); // eslint-disable-line
-                                console.error(result); // eslint-disable-line
-                            }
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        JsonRpcQueryableBase.prototype.JsonRpcRequest = function (method, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var query, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            query = {
-                                jsonrpc: '2.0',
-                                method: method,
-                                id: JsonRpcQueryableBase.IdCounter
-                            };
-                            if (params)
-                                query.params = params;
-                            JsonRpcQueryableBase.IdCounter++;
-                            return [4 /*yield*/, this.QueryJsonRpc(query)];
-                        case 1:
-                            result = _a.sent();
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        JsonRpcQueryableBase.prototype.JsonRpcNotice = function (method, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var query, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            query = {
-                                jsonrpc: '2.0',
-                                method: method
-                            };
-                            if (params)
-                                query.params = params;
-                            return [4 /*yield*/, this.QueryJsonRpc(query)];
-                        case 1:
-                            result = _a.sent();
-                            return [2 /*return*/, (!result || (result && !result.error))];
-                    }
-                });
-            });
-        };
-        JsonRpcQueryableBase.Url = 'JsonRpc';
-        JsonRpcQueryableBase.IdCounter = 1;
-        return JsonRpcQueryableBase;
-    }(XhrQueryableBase_2.default));
-    exports.default = JsonRpcQueryableBase;
-});
-define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Utils/Exception"], function (require, exports, JsonRpcQueryableBase_1, Exception_7) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Utils/Exception"], function (require, exports, JsonRpcQueryableBase_3, Exception_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -3018,7 +3470,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                             return [3 /*break*/, 15];
                         case 14:
                             ex_1 = _a.sent();
-                            Exception_7.default.Dump('Polling Error', ex_1);
+                            Exception_8.default.Dump('Polling Error', ex_1);
                             return [3 /*break*/, 15];
                         case 15:
                             this._nowOnPollingProsess = false;
@@ -3139,10 +3591,10 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
             GetRepeat: 'core.tracklist.get_repeat'
         };
         return Monitor;
-    }(JsonRpcQueryableBase_1.default));
+    }(JsonRpcQueryableBase_3.default));
     exports.default = Monitor;
 });
-define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Mopidies/Monitor"], function (require, exports, JsonRpcQueryableBase_2, Monitor_1) {
+define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Mopidies/Monitor"], function (require, exports, JsonRpcQueryableBase_4, Monitor_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Player = /** @class */ (function (_super) {
@@ -3298,10 +3750,10 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
             SetRepeat: 'core.tracklist.set_repeat'
         };
         return Player;
-    }(JsonRpcQueryableBase_2.default));
+    }(JsonRpcQueryableBase_4.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_10, Libraries_8, Monitor_2, Player_1, ViewBase_7) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_10, Libraries_11, Monitor_2, Player_1, ViewBase_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlayerPanel = /** @class */ (function (_super) {
@@ -3335,7 +3787,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.volumeSlider = Libraries_8.default.$(this.$refs.Slider).ionRangeSlider({
+                            this.volumeSlider = Libraries_11.default.$(this.$refs.Slider).ionRangeSlider({
                                 onFinish: function (data) {
                                     // スライダー操作完了時のイベント
                                     _this.player.SetVolume(data.from);
@@ -3418,7 +3870,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_7.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel", "Libraries"], function (require, exports, vue_class_component_11, ViewBase_8, PlayerPanel_2, Libraries_9) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel", "Libraries"], function (require, exports, vue_class_component_11, ViewBase_8, PlayerPanel_2, Libraries_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Pages;
@@ -3450,8 +3902,8 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_9.default.$('.sidebar').slimScroll({
-                                height: '100%'
+                            Libraries_12.default.SlimScroll(this.SidebarSection, {
+                                height: '100vh'
                             });
                             return [2 /*return*/, true];
                     }
@@ -3537,311 +3989,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "Views/Bases/ViewBas
     }(ViewBase_9.default));
     exports.default = HeaderBar;
 });
-define("Models/Mopidies/IRef", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Playlists/Playlist", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Playlist = /** @class */ (function () {
-        function Playlist() {
-            this.Name = null;
-            this.Uri = null;
-            this.Tracks = [];
-        }
-        Playlist.CreateFromRef = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Playlist();
-            result.Name = entity.name || null;
-            result.Uri = entity.uri || null;
-            result.Tracks = [];
-            return result;
-        };
-        Playlist.CreateArrayFromRefs = function (entities) {
-            var result = [];
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Playlist.CreateFromRef(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        Playlist.MinNameLength = 1;
-        Playlist.MaxNameLength = 40;
-        return Playlist;
-    }());
-    exports.default = Playlist;
-});
-define("Models/Mopidies/IPlaylist", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_10, Exception_8, JsonRpcQueryableBase_3, Track_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var TrackStore = /** @class */ (function (_super) {
-        __extends(TrackStore, _super);
-        function TrackStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        TrackStore.prototype.EnsureTracks = function (tracks) {
-            return __awaiter(this, void 0, void 0, function () {
-                var trackUris, response, pairList, i, track, uri, pairedTrackArray, mpTrack;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            trackUris = Libraries_10.default.Enumerable.from(tracks)
-                                .where(function (e) { return (!e.Name
-                                || !e.Length); })
-                                .select(function (e) { return e.Uri; })
-                                .toArray();
-                            return [4 /*yield*/, this.JsonRpcRequest(TrackStore.Methods.LibraryLookup, {
-                                    uris: trackUris
-                                })];
-                        case 1:
-                            response = _a.sent();
-                            pairList = response.result;
-                            for (i = 0; i < tracks.length; i++) {
-                                track = tracks[i];
-                                uri = track.Uri;
-                                pairedTrackArray = pairList[uri];
-                                if (track.Name && track.Length)
-                                    continue;
-                                if ((!track.Name || !track.Length)
-                                    && (!pairedTrackArray || pairedTrackArray.length <= 0)) {
-                                    Exception_8.default.Dump('TrackStore.EnsureTracks: Track Details Not Found', { track: track, pairedTrackArray: pairedTrackArray });
-                                    continue;
-                                }
-                                mpTrack = pairList[uri][0];
-                                Track_2.default.EnsureTrackByMopidy(track, mpTrack);
-                            }
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        TrackStore.Methods = {
-            LibraryLookup: 'core.library.lookup',
-        };
-        return TrackStore;
-    }(JsonRpcQueryableBase_3.default));
-    exports.default = TrackStore;
-});
-define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_11, JsonRpcQueryableBase_4, Track_3, TrackStore_1, Playlist_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var PlaylistStore = /** @class */ (function (_super) {
-        __extends(PlaylistStore, _super);
-        function PlaylistStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        PlaylistStore.prototype.GetPlaylists = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, refs, ordered, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistAsList)];
-                        case 1:
-                            response = _a.sent();
-                            refs = response.result;
-                            ordered = Libraries_11.default.Enumerable.from(refs)
-                                .orderBy(function (e) { return e.name; })
-                                .toArray();
-                            result = Playlist_1.default.CreateArrayFromRefs(ordered);
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        PlaylistStore.prototype.SetPlaylistTracks = function (playlist) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, mpPlaylist, tracks, trackStore;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
-                                uri: playlist.Uri
-                            })];
-                        case 1:
-                            response = _a.sent();
-                            mpPlaylist = response.result;
-                            tracks = (mpPlaylist.tracks && 0 <= mpPlaylist.tracks.length)
-                                ? Track_3.default.CreateArrayFromMopidy(mpPlaylist.tracks)
-                                : [];
-                            if (tracks.length <= 0) {
-                                playlist.Tracks = [];
-                                return [2 /*return*/, true];
-                            }
-                            trackStore = new TrackStore_1.default();
-                            return [4 /*yield*/, trackStore.EnsureTracks(tracks)];
-                        case 2:
-                            _a.sent();
-                            // 未Ensure状態のtracksをplaylist.TracksにセットするとVueが描画してしまうため、
-                            // Ensure後にセットする。
-                            playlist.Tracks = tracks;
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        PlaylistStore.prototype.GetImageUri = function (uri) {
-            return __awaiter(this, void 0, void 0, function () {
-                var resImages, images;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.LibraryGetImages, {
-                                uris: [uri]
-                            })];
-                        case 1:
-                            resImages = _a.sent();
-                            if (resImages.result) {
-                                images = resImages.result[uri];
-                                if (images && 0 < images.length)
-                                    return [2 /*return*/, images[0]];
-                            }
-                            return [2 /*return*/, null];
-                    }
-                });
-            });
-        };
-        PlaylistStore.prototype.PlayPlaylist = function (playlist, track) {
-            return __awaiter(this, void 0, void 0, function () {
-                var resClear, uris, resAdd, tlTracks, tlDictionary, i, tr;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.TracklistClearList)];
-                        case 1:
-                            resClear = _a.sent();
-                            if (resClear.error)
-                                throw new Error(resClear.error);
-                            uris = Libraries_11.default.Enumerable.from(playlist.Tracks)
-                                .select(function (e) { return e.Uri; })
-                                .toArray();
-                            return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.TracklistAdd, {
-                                    uris: uris
-                                })];
-                        case 2:
-                            resAdd = _a.sent();
-                            if (resAdd.error)
-                                throw new Error(resAdd.error);
-                            tlTracks = resAdd.result;
-                            tlDictionary = Libraries_11.default.Enumerable.from(tlTracks)
-                                .toDictionary(function (e) { return e.track.uri; }, function (e2) { return e2.tlid; });
-                            for (i = 0; i < playlist.Tracks.length; i++) {
-                                tr = playlist.Tracks[i];
-                                tr.TlId = (tlDictionary.contains(tr.Uri))
-                                    ? tlDictionary.get(tr.Uri)
-                                    : null;
-                            }
-                            if (track.TlId === null)
-                                throw new Error("track: " + track.Name + " not assigned TlId");
-                            return [4 /*yield*/, this.PlayByTlId(track.TlId)];
-                        case 3:
-                            _a.sent();
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        PlaylistStore.prototype.PlayByTlId = function (tlId) {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcNotice(PlaylistStore.Methods.PlaybackPlay, {
-                                tlid: tlId
-                            })];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        PlaylistStore.prototype.AddPlaylist = function (name) {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistCreate, {
-                                name: name
-                            })];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        PlaylistStore.prototype.UpdatePlayllist = function (playlist) {
-            return __awaiter(this, void 0, void 0, function () {
-                var tracks, i, track, response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            tracks = [];
-                            for (i = 0; i < playlist.Tracks.length; i++) {
-                                track = playlist.Tracks[i];
-                                tracks.push({
-                                    __model__: 'Track',
-                                    uri: track.Uri
-                                });
-                            }
-                            return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistSave, {
-                                    playlist: {
-                                        __model__: 'Playlist',
-                                        tracks: tracks,
-                                        uri: playlist.Uri,
-                                        name: playlist.Name
-                                    }
-                                })];
-                        case 1:
-                            response = _a.sent();
-                            return [2 /*return*/, (response.result !== null)];
-                    }
-                });
-            });
-        };
-        PlaylistStore.prototype.DeletePlaylist = function (playlist) {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistDelete, {
-                                uri: playlist.Uri
-                            })];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        PlaylistStore.Methods = {
-            PlaylistAsList: 'core.playlists.as_list',
-            PlaylistLookup: 'core.playlists.lookup',
-            PlaylistCreate: 'core.playlists.create',
-            PlaylistSave: 'core.playlists.save',
-            PlaylistDelete: 'core.playlists.delete',
-            LibraryGetImages: 'core.library.get_images',
-            TracklistClearList: 'core.tracklist.clear',
-            TracklistAdd: 'core.tracklist.add',
-            TracklistGetTlTracks: 'core.tracklist.get_tl_tracks',
-            PlaybackPlay: 'core.playback.play'
-        };
-        return PlaylistStore;
-    }(JsonRpcQueryableBase_4.default));
-    exports.default = PlaylistStore;
-});
-define("Views/Events/BootstrapEvents", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ModalEvents = {
-        Show: 'show.bs.modal',
-        Shown: 'shown.bs.modal',
-        Hide: 'hide.bs.modal',
-        Hidden: 'hidden.bs.modal'
-    };
-});
-define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Models/Playlists/Playlist"], function (require, exports, vue_class_component_13, Libraries_12, ViewBase_10, BootstrapEvents_1, Playlist_2) {
+define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Models/Playlists/Playlist"], function (require, exports, vue_class_component_13, Libraries_13, ViewBase_10, BootstrapEvents_2, Playlist_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AddModalEvents = {
@@ -3883,8 +4031,8 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.modal = Libraries_12.default.$(this.$el);
-                            this.modal.on(BootstrapEvents_1.ModalEvents.Shown, function () {
+                            this.modal = Libraries_13.default.$(this.$el);
+                            this.modal.on(BootstrapEvents_2.ModalEvents.Shown, function () {
                                 _this.TextName.focus();
                             });
                             return [2 /*return*/, true];
@@ -3934,7 +4082,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
     }(ViewBase_10.default));
     exports.default = AddModal;
 });
-define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_13, PlaylistStore_1, Filterbox_4, SelectionItem_5, SelectionList_4, AddModal_1) {
+define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_14, PlaylistStore_2, Filterbox_4, SelectionItem_5, SelectionList_4, AddModal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistListEvents = {
@@ -3944,7 +4092,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         __extends(PlaylistList, _super);
         function PlaylistList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.store = new PlaylistStore_1.default();
+            _this.store = new PlaylistStore_2.default();
             _this.entities = [];
             _this.allEntities = [];
             return _this;
@@ -3971,6 +4119,13 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(PlaylistList.prototype, "CardBody", {
+            get: function () {
+                return this.$refs.CardBody;
+            },
+            enumerable: true,
+            configurable: true
+        });
         PlaylistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
@@ -3980,14 +4135,14 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_13.default.$(this.$refs.ButtonAdd).tooltip({
-                                placement: 'top',
-                                title: 'Add Playlist'
+                            // 利便性的にどうなのか、悩む。
+                            Libraries_14.default.SlimScroll(this.CardBody, {
+                                height: 'calc(100vh - 140px)',
+                                alwaysVisible: true,
+                                wheelStep: 60
                             });
-                            Libraries_13.default.$(this.$refs.ButtonCollaplse).tooltip({
-                                placement: 'top',
-                                title: 'Shrink/Expand'
-                            });
+                            Libraries_14.default.SetTooltip(this.$refs.ButtonAdd, 'Add Playlist');
+                            Libraries_14.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                             return [2 /*return*/, true];
                     }
                 });
@@ -4037,7 +4192,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                             _a.allEntities = _b.sent();
                             _b.label = 2;
                         case 2:
-                            entities = Libraries_13.default.Enumerable.from(this.allEntities);
+                            entities = Libraries_14.default.Enumerable.from(this.allEntities);
                             filterText = this.Filterbox.GetText().toLowerCase();
                             if (0 < filterText.length)
                                 entities = entities
@@ -4090,7 +4245,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         };
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_14.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable playlist-list\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionOrdered=\"OnSelectionOrdered\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.playlist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable playlist-list\"\n            ref=\"CardBody\">\n            <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                <template v-for=\"entity in entities\">\n                <selection-item\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionOrdered=\"OnSelectionOrdered\"\n                    @SelectionChanged=\"OnSelectionChanged\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.playlist-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_4.default,
                     'selection-item': SelectionItem_5.default,
@@ -4103,7 +4258,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_15, vue_property_decorator_6, Libraries_14, Track_4, Animate_3, Delay_3, ViewBase_11, SelectionList_5) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_15, vue_property_decorator_6, Libraries_15, Track_4, Animate_3, Delay_3, ViewBase_11, SelectionList_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionList_5.SelectionEvents), {
@@ -4132,12 +4287,8 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (!this.GetIsInitialized()) {
-                                Libraries_14.default.$(this.$refs.DeleteButton).tooltip({
-                                    placement: 'top',
-                                    title: 'Delete'
-                                });
-                            }
+                            if (!this.GetIsInitialized())
+                                Libraries_15.default.SetTooltip(this.$refs.DeleteButton, 'Delete');
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
@@ -4249,7 +4400,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
     }(ViewBase_11.default));
     exports.default = SelectionTrack;
 });
-define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries"], function (require, exports, ViewBase_12, vue_class_component_16, Libraries_15) {
+define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "Views/Bases/ViewBase", "vue-class-component", "Libraries"], function (require, exports, ViewBase_12, vue_class_component_16, Libraries_16) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ConfirmType;
@@ -4276,7 +4427,7 @@ define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "Views/Bases
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.modal = Libraries_15.default.$(this.$el);
+                            this.modal = Libraries_16.default.$(this.$el);
                             return [2 /*return*/, true];
                     }
                 });
@@ -4381,7 +4532,7 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
     }(ConfirmDialog_2.default));
     exports.default = UpdateDialog;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_17, vue_infinite_loading_5, Libraries_16, Playlist_3, PlaylistStore_2, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_17, vue_infinite_loading_5, Libraries_17, Playlist_3, PlaylistStore_3, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ListMode;
@@ -4393,7 +4544,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         __extends(TrackList, _super);
         function TrackList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.store = new PlaylistStore_2.default();
+            _this.store = new PlaylistStore_3.default();
             _this.entities = [];
             _this.playlist = null;
             _this.removedEntities = [];
@@ -4452,6 +4603,13 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(TrackList.prototype, "CardBody", {
+            get: function () {
+                return this.$refs.CardBody;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(TrackList.prototype, "TrackListUl", {
             get: function () {
                 return this.$refs.TrackListUl;
@@ -4483,15 +4641,19 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            // ※$onの中ではプロパティ定義が参照出来ないらしい。
+                            // ※ハンドラメソッドをthisバインドしてもダメだった。
+                            // ※やむなく、$refsを直接キャストする。
                             this.$on(SelectionList_6.SelectionEvents.ListUpdated, function () { return __awaiter(_this, void 0, void 0, function () {
-                                var i, item;
+                                var items, i, item;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
                                         case 0: return [4 /*yield*/, Delay_4.default.Wait(500)];
                                         case 1:
                                             _a.sent();
-                                            for (i = 0; i < this.Items.length; i++) {
-                                                item = this.Items[i];
+                                            items = this.$refs.Items;
+                                            for (i = 0; i < items.length; i++) {
+                                                item = items[i];
                                                 if (!item.GetIsInitialized())
                                                     item.Initialize();
                                             }
@@ -4499,6 +4661,12 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                                     }
                                 });
                             }); });
+                            // 利便性的にどうなのか、悩む。
+                            Libraries_17.default.SlimScroll(this.CardBody, {
+                                height: 'calc(100vh - 140px)',
+                                alwaysVisible: true,
+                                wheelStep: 60
+                            });
                             this.titleH3Animate = new Animate_4.default(this.TitleH3);
                             this.titleInputAnimate = new Animate_4.default(this.TitleInput);
                             return [2 /*return*/, true];
@@ -4611,7 +4779,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.prototype.OnSelectionChanged = function (args) {
             if (this.listMode === ListMode.Playable) {
                 // 再生モード時
-                var isAllTracksRegistered = Libraries_16.default.Enumerable.from(this.playlist.Tracks)
+                var isAllTracksRegistered = Libraries_17.default.Enumerable.from(this.playlist.Tracks)
                     .all(function (e) { return e.TlId !== null; });
                 // トラックリスト登録状況で再生方法を変える。
                 (isAllTracksRegistered)
@@ -4817,11 +4985,11 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 2:
                             // 更新許可OK
                             if ((_a.sent()) === true) {
-                                Libraries_16.default.ShowToast.Success('Update Succeeded!');
+                                Libraries_17.default.ShowToast.Success('Update Succeeded!');
                                 this.GoBackToPlayer();
                             }
                             else {
-                                Libraries_16.default.ShowToast.Error('Update Failed!');
+                                Libraries_17.default.ShowToast.Error('Update Failed!');
                                 // そのまま編集モードを維持
                             }
                             return [3 /*break*/, 3];
@@ -4861,7 +5029,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.prototype.GetEditedTracks = function () {
             // entitiesをUL要素内の見た目の順序に取得する。
             var result = [];
-            var enEntities = Libraries_16.default.Enumerable.from(this.entities);
+            var enEntities = Libraries_17.default.Enumerable.from(this.entities);
             var children = this.TrackListUl.querySelectorAll('li');
             var _loop_1 = function (i) {
                 var uri = children[i].getAttribute('data-uri');
@@ -4897,14 +5065,14 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             if (update.IsNameChanged !== false
                 && (!update.NewName
                     || update.NewName.length < Playlist_3.default.MinNameLength)) {
-                Libraries_16.default.ShowToast.Warning('Name required.');
+                Libraries_17.default.ShowToast.Warning('Name required.');
                 this.SetTitleValidationBorder(false);
                 this.TitleInput.focus();
                 return false;
             }
             if (update.IsNameChanged !== false
                 && Playlist_3.default.MaxNameLength < update.NewName.length) {
-                Libraries_16.default.ShowToast.Warning('Name too long.');
+                Libraries_17.default.ShowToast.Warning('Name too long.');
                 this.SetTitleValidationBorder(false);
                 this.TitleInput.focus();
                 return false;
@@ -4955,7 +5123,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 2:
                             result = _a.sent();
                             if (!(result === true)) return [3 /*break*/, 4];
-                            Libraries_16.default.ShowToast.Success('Delete Succeeded!');
+                            Libraries_17.default.ShowToast.Success('Delete Succeeded!');
                             this.playlist = null;
                             this.removedEntities = [];
                             return [4 /*yield*/, this.GoBackToPlayer()];
@@ -4963,7 +5131,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             _a.sent();
                             return [3 /*break*/, 5];
                         case 4:
-                            Libraries_16.default.ShowToast.Error('Delete Failed!');
+                            Libraries_17.default.ShowToast.Error('Delete Failed!');
                             _a.label = 5;
                         case 5: return [2 /*return*/, true];
                     }
@@ -5005,7 +5173,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             _a.sent();
                             _a.label = 2;
                         case 2:
-                            entities = Libraries_16.default.Enumerable.from(this.playlist.Tracks);
+                            entities = Libraries_17.default.Enumerable.from(this.playlist.Tracks);
                             filterText = this.Filterbox.GetText().toLowerCase();
                             if (0 < filterText.length)
                                 entities = entities
@@ -5031,7 +5199,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.ListBaseClasses = 'products-list product-list-in-box track-list ';
         TrackList = TrackList_1 = __decorate([
             vue_class_component_17.default({
-                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable track-list\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.track-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
+                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollable track-list\"\n            ref=\"CardBody\">\n            <ul v-bind:class=\"listClasses\"\n                ref=\"TrackListUl\">\n                <template v-for=\"entity in entities\">\n                <selection-track\n                    ref=\"Items\"\n                    v-bind:entity=\"entity\"\n                    @SelectionChanged=\"OnSelectionChanged\"\n                    @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                </template>\n                <infinite-loading\n                    @infinite=\"OnInfinite\"\n                    force-use-infinite-wrapper=\".list-scrollable.track-list\"\n                    ref=\"InfiniteLoading\" />\n            </ul>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
                     'slideup-button': SlideupButton_2.default,
@@ -5045,7 +5213,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionList_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Libraries"], function (require, exports, vue_class_component_18, ContentViewBase_2, PlaylistList_2, TrackList_2, Libraries_17) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Libraries"], function (require, exports, vue_class_component_18, ContentViewBase_2, PlaylistList_2, TrackList_2, Libraries_18) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Playlists = /** @class */ (function (_super) {
@@ -5074,7 +5242,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                     isSaved = this.TrackList.GetIsSavedPlaylistChanges();
                     args.Permitted = isSaved;
                     if (!isSaved) {
-                        Libraries_17.default.ShowToast.Warning('Please complete editing.');
+                        Libraries_18.default.ShowToast.Warning('Please complete editing.');
                     }
                     return [2 /*return*/, true];
                 });
@@ -5092,7 +5260,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             // プレイリスト画面からの移動可否判定
             var isSaved = this.TrackList.GetIsSavedPlaylistChanges();
             if (!isSaved) {
-                Libraries_17.default.ShowToast.Warning('Please complete editing.');
+                Libraries_18.default.ShowToast.Warning('Please complete editing.');
             }
             return isSaved;
         };
@@ -5204,7 +5372,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
     }(ViewBase_13.default));
     exports.default = RootView;
 });
-define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_18, RootView_1) {
+define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_19, RootView_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -5215,7 +5383,7 @@ define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Libraries_18.default.Initialize();
+                            Libraries_19.default.Initialize();
                             this._view = new RootView_1.default();
                             this._view.$mount('#root');
                             return [4 /*yield*/, this._view.Initialize()];

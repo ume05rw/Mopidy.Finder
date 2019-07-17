@@ -68,12 +68,8 @@ export default class SelectionTrack extends ViewBase {
 
     public async Initialize(): Promise<boolean> {
 
-        if (!this.GetIsInitialized()) {
-            Libraries.$(this.$refs.DeleteButton as HTMLElement).tooltip({
-                placement: 'top',
-                title: 'Delete'
-            });
-        }
+        if (!this.GetIsInitialized())
+            Libraries.SetTooltip(this.$refs.DeleteButton as HTMLElement, 'Delete');
 
         await super.Initialize();
 
