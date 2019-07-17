@@ -41,19 +41,20 @@ export const PlaylistListEvents = {
         <div class="card-body list-scrollbox">
             <div class="card-inner-body playlist-list"
                 ref="CardInnerBody">
-            <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
-                <template v-for="entity in entities">
-                <selection-item
-                    ref="Items"
-                    v-bind:entity="entity"
-                    @SelectionOrdered="OnSelectionOrdered"
-                    @SelectionChanged="OnSelectionChanged" />
-                </template>
-                <infinite-loading
-                    @infinite="OnInfinite"
-                    force-use-infinite-wrapper=".card-inner-body.playlist-list"
-                    ref="InfiniteLoading" />
-            </ul>
+                <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
+                    <template v-for="entity in entities">
+                    <selection-item
+                        ref="Items"
+                        v-bind:entity="entity"
+                        @SelectionOrdered="OnSelectionOrdered"
+                        @SelectionChanged="OnSelectionChanged" />
+                    </template>
+                    <infinite-loading
+                        @infinite="OnInfinite"
+                        force-use-infinite-wrapper=".card-inner-body.playlist-list"
+                        ref="InfiniteLoading" />
+                </ul>
+            </div>
         </div>
     </div>
     <add-modal

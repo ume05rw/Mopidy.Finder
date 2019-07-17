@@ -32,6 +32,7 @@ export const SelectionAlbumEvents = {
                 <button type="button"
                     class="btn btn-tool dropdown-toggle"
                     data-toggle="dropdown"
+                    data-offset="-110px, 0"
                     ref="HeaderPlaylistButton">
                     <i class="fa fa-bookmark" />
                 </button>
@@ -70,6 +71,7 @@ export const SelectionAlbumEvents = {
                                 <button type="button"
                                     class="btn btn-tool dropdown-toggle"
                                     data-toggle="dropdown"
+                                    data-offset="-110px, 0"
                                     ref="RowPlaylistButtons">
                                     <i class="fa fa-bookmark" />
                                 </button>
