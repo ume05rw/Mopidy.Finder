@@ -205,7 +205,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-    /// #region "Events"
+    // #region "Events"
 
     private OnInputTitle(): void {
         if (this.listMode === ListMode.Playable)
@@ -257,16 +257,20 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.TryUpdate();
     }
 
-    protected OnSelectionChanged(args: ITrackSelectionChangedArgs): void {
+    protected async OnSelectionChanged(args: ITrackSelectionChangedArgs): Promise<boolean> {
         if (this.listMode === ListMode.Playable) {
             // 再生モード時
             const isAllTracksRegistered = Libraries.Enumerable.from(this.playlist.Tracks)
                 .all((e): boolean => e.TlId !== null);
 
             // トラックリスト登録状況で再生方法を変える。
-            (isAllTracksRegistered)
-                ? this.store.PlayByTlId(args.Entity.TlId)
-                : this.store.PlayPlaylist(this.playlist, args.Entity);
+            const response = (isAllTracksRegistered)
+                ? await this.store.PlayByTlId(args.Entity.TlId)
+                : await this.store.PlayPlaylist(this.playlist, args.Entity);
+
+            (response)
+                ? Libraries.ShowToast.Success(`Track [ ${args.Entity.Name} ] Started.`)
+                : Libraries.ShowToast.Error('Track Play Order Failed.');
 
         } else if (this.listMode === ListMode.Editable) {
             // 編集モード時
@@ -274,6 +278,8 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
                 ? args.View.Deselect()
                 : args.View.Select();
         }
+
+        return true;
     }
 
     private async OnDeleteRowOrdered(args: ITrackDeleteOrderedArgs): Promise<boolean> {
@@ -292,9 +298,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-    /// #endregion
+    // #endregion
 
-    /// #region "Edit"
+    // #region "Edit"
 
     private async GoIntoEditor(): Promise<boolean> {
         // タイトル・編集開始ボタン非表示化
@@ -414,9 +420,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-    /// #endregion
+    // #endregion
 
-    /// #region "Register"
+    // #region "Register"
 
     private async TryUpdate(): Promise<boolean> {
         const update = this.GetUpdate();
@@ -429,10 +435,10 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             if ((await this.UpdateDialog.ConfirmUpdate(update)) === true) {
                 // 更新許可OK
                 if ((await this.Update(update)) === true) {
-                    Libraries.ShowToast.Success('Update Succeeded!');
+                    Libraries.ShowToast.Success('Playlist Update Succeeded.');
                     this.GoBackToPlayer();
                 } else {
-                    Libraries.ShowToast.Error('Update Failed!');
+                    Libraries.ShowToast.Error('Playlist Update Failed.');
                     // そのまま編集モードを維持
                 }
             } else {
@@ -598,8 +604,9 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-    /// #endregion
+    // #endregion
 
+    // #region "InfiniteLoading"
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
      * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -645,4 +652,5 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
         return result;
     }
+    // #endregion
 }

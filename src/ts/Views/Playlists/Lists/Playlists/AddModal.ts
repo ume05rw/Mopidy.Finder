@@ -1,8 +1,8 @@
 import Component from 'vue-class-component';
 import Libraries from '../../../../Libraries';
+import Playlist from '../../../../Models/Playlists/Playlist';
 import ViewBase from '../../../Bases/ViewBase';
 import { ModalEvents } from '../../../Events/BootstrapEvents';
-import Playlist from '../../../../Models/Playlists/Playlist';
 
 export const AddModalEvents = {
     AddOrdered: 'AddOrdered'

@@ -1,12 +1,11 @@
 import Component from 'vue-class-component';
+import Artist from '../../Models/Artists/Artist';
+import Genre from '../../Models/Genres/Genre';
 import ContentViewBase from '../Bases/ContentViewBase';
 import { ISelectionChangedArgs } from '../Shared/SelectionItem';
-import AlbumList from './Lists/Albums/AlbumList';
+import { AlbumListEvents, default as AlbumList } from './Lists/Albums/AlbumList';
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
-import Genre from '../../Models/Genres/Genre';
-import Artist from '../../Models/Artists/Artist';
-import { SelectionAlbumEvents } from './Lists/Albums/SelectionAlbumTracks';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade show active"
@@ -24,7 +23,7 @@ import { SelectionAlbumEvents } from './Lists/Albums/SelectionAlbumTracks';
             @Refreshed="OnArtistRefreshed" />
         <album-list
             ref="AlbumList"
-            @PlaylistCreated="OnPlaylistCreated"/>
+            @PlaylistUpdated="OnPlaylistUpdated"/>
     </div>
 </section>`,
     components: {
@@ -55,8 +54,8 @@ export default class Finder extends ContentViewBase {
         return true;
     }
 
-    private OnPlaylistCreated(): void {
-        this.$emit(SelectionAlbumEvents.PlaylistCreated);
+    private OnPlaylistUpdated(): void {
+        this.$emit(AlbumListEvents.PlaylistUpdated);
     }
 
     private OnGenreSelectionChanged(args: ISelectionChangedArgs<Genre>): void {

@@ -1,16 +1,17 @@
 import Component from 'vue-class-component';
-import ViewBase from './Bases/ViewBase';
+import Exception from '../Utils/Exception';
 import { IContentView } from './Bases/ContentViewBase';
+import ViewBase from './Bases/ViewBase';
 import Finder from './Finders/Finder';
 import HeaderBar from './HeaderBars/HeaderBar';
 import Playlists from './Playlists/Playlists';
 import Settings from './Settings/Settings';
-import { default as Sidebar, Pages, IContentChanged, IContentOrdered } from './Sidebars/Sidebar';
-import Exception from '../Utils/Exception';
+import { default as Sidebar, IContentChanged, IContentOrdered, Pages } from './Sidebars/Sidebar';
 
 @Component({
     template: `<div class="wrapper" style="height: 100%; min-height: 100%;">
-    <header-bar ref="HeaderBar" />
+    <header-bar
+        ref="HeaderBar" />
     <sidebar
         @ContentOrdered="OnContentOrdered"
         @ContentChanged="OnContentChanged"
@@ -18,7 +19,7 @@ import Exception from '../Utils/Exception';
     <div class="content-wrapper h-100 pt-3 tab-content">
         <finder
             ref="Finder"
-            @PlaylistCreated="OnPlaylistCreatedByFinder" />
+            @PlaylistUpdated="OnPlaylistUpdatedByFinder" />
         <playlists
             ref="Playlists"
             @PlaylistsUpdated="OnPlaylistsUpdatedByPlaylists" />
@@ -56,12 +57,11 @@ export default class RootView extends ViewBase {
         await super.Initialize();
 
         this.activeContent = this.Finder;
-        //this.OnContentChanged = this.OnContentChanged.bind(this);
 
         return true;
     }
 
-    private OnPlaylistCreatedByFinder(): void {
+    private OnPlaylistUpdatedByFinder(): void {
         this.Playlists.RefreshPlaylist();
     }
 

@@ -1,6 +1,6 @@
-import ViewBase from './ViewBase';
+import { Animation, default as Animate, Speed } from '../../Utils/Animate';
 import Exception from '../../Utils/Exception';
-import { default as Animate, Animation, Speed } from '../../Utils/Animate';
+import ViewBase from './ViewBase';
 
 export { Animation, Speed } from '../../Utils/Animate';
 

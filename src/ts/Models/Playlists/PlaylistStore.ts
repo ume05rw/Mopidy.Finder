@@ -1,14 +1,13 @@
 import Libraries from '../../Libraries';
+import Exception from '../../Utils/Exception';
+import AlbumTracks from '../AlbumTracks/AlbumTracks';
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
-import IPlaylist from '../Mopidies/IPlaylist';
+import { default as IPlaylist, default as MopidyPlaylist } from '../Mopidies/IPlaylist';
 import IRef from '../Mopidies/IRef';
 import ITlTrack from '../Mopidies/ITlTrack';
 import Track from '../Tracks/Track';
 import TrackStore from '../Tracks/TrackStore';
 import Playlist from './Playlist';
-import AlbumTracks from '../AlbumTracks/AlbumTracks';
-import MopidyPlaylist from '../Mopidies/IPlaylist';
-import Exception from '../../Utils/Exception';
 
 export default class PlaylistStore extends JsonRpcQueryableBase {
 

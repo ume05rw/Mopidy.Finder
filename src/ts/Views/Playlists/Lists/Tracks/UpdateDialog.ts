@@ -1,5 +1,5 @@
-import { default as ConfirmDialog, ConfirmType } from '../../../Shared/Dialogs/ConfirmDialog';
 import { IUpdate } from '../../../../Models/Playlists/Playlist';
+import { ConfirmType, default as ConfirmDialog } from '../../../Shared/Dialogs/ConfirmDialog';
 
 export default class UpdateDialog extends ConfirmDialog {
 

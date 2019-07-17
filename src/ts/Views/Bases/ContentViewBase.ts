@@ -1,7 +1,7 @@
-import ViewBase from './ViewBase';
 import Vue from 'vue';
 import Libraries from '../../Libraries';
 import { ModalEvents } from '../Events/BootstrapEvents';
+import ViewBase from './ViewBase';
 
 export interface IContentView extends Vue {
     GetIsPermitLeave(): boolean;

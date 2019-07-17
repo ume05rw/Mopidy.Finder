@@ -11,7 +11,11 @@ import Delay from '../../../../Utils/Delay';
 import Exception from '../../../../Utils/Exception';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionList, SelectionEvents } from '../../../Shared/SelectionList';
-import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs, SelectionAlbumEvents } from './SelectionAlbumTracks';
+import { default as SelectionAlbumTracks, IAddToPlaylistOrderedArgs, ICreatePlaylistOrderedArgs, IPlayOrderedArgs } from './SelectionAlbumTracks';
+
+export const AlbumListEvents = {
+    PlaylistUpdated: 'PlaylistUpdated'
+};
 
 @Component({
     template: `<div class="col-md-6">
@@ -34,8 +38,9 @@ import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs, SelectionAlb
                             v-bind:playlists="playlists"
                             ref="Items"
                             v-bind:entity="entity"
-                            @AlbumTracksSelected="OnAlbumTracksSelected"
-                            @PlaylistCreated="OnPlaylistCreated"/>
+                            @PlayOrdered="OnPlayOrdered"
+                            @CreatePlaylistOrdered="OnCreatePlaylistOrdered"
+                            @AddToPlaylistOrdered="OnAddToPlaylistOrdered" />
                     </template>
                     <infinite-loading
                         @infinite="OnInfinite"
@@ -119,33 +124,7 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         return true;
     }
 
-    private OnPlaylistCreated(): void {
-        this.$emit(SelectionAlbumEvents.PlaylistCreated);
-        this.InitPlaylistList();
-    }
-
-    /**
-     * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
-     * superクラスの同名メソッドが実行されるが、superクラス上のthisが
-     * バインドされずにnullになってしまう。
-     * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
-     */
-    protected async OnInfinite($state: StateChanger): Promise<boolean> {
-        return super.OnInfinite($state);
-    }
-
-    protected async GetPagenatedList(): Promise<IPagenatedResult<AlbumTracks>> {
-        const args: IPagenateQueryArgs = {
-            GenreIds: this.genreIds,
-            ArtistIds: this.artistIds,
-            FilterText: this.Filterbox.GetText(),
-            Page: this.Page
-        };
-
-        return await this.store.GetList(args);
-    }
-
-    private async OnAlbumTracksSelected(args: IAlbumTracksSelectedArgs): Promise<boolean> {
+    private async OnPlayOrdered(args: IPlayOrderedArgs): Promise<boolean> {
 
         if (this.isEntitiesRefreshed) {
             await this.store.ClearList();
@@ -200,11 +179,75 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         }
     }
 
+    private async OnCreatePlaylistOrdered(args: ICreatePlaylistOrderedArgs): Promise<boolean> {
+        const store = new PlaylistStore();
+        const newPlaylist = await store.AddPlaylistByAlbumTracks(args.AlbumTracks);
+
+        if (!newPlaylist) {
+            Libraries.ShowToast.Error('Playlist Create Failed.');
+
+            return false;
+        }
+
+        this.$emit(AlbumListEvents.PlaylistUpdated);
+        this.InitPlaylistList();
+        Libraries.ShowToast.Success(`New Playlist [ ${newPlaylist.Name} ] Created.`);
+
+        return true;
+    }
+
+    private async OnAddToPlaylistOrdered(args: IAddToPlaylistOrderedArgs): Promise<boolean> {
+        const playlist = args.Playlist;
+        if (!playlist.Tracks)
+            playlist.Tracks = [];
+
+        for (let i = 0; i < args.Tracks.length; i++) {
+            const track = args.Tracks[i];
+            playlist.Tracks.push(track);
+        }
+
+        const store = new PlaylistStore();
+        const result = await store.UpdatePlayllist(playlist);
+
+        if (result === true) {
+            this.$emit(AlbumListEvents.PlaylistUpdated);
+            this.InitPlaylistList();
+            Libraries.ShowToast.Success(`Add ${args.Tracks.length} Track(s) to Playlist [ ${playlist.Name} ]`);
+        } else {
+            Libraries.ShowToast.Error('Playlist Update Failed.');
+        }
+
+        return result;
+    }
+
     protected Refresh(): void {
         super.Refresh();
         this.isEntitiesRefreshed = true;
     }
 
+    // #region "InfiniteLoading"
+    /**
+     * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
+     * superクラスの同名メソッドが実行されるが、superクラス上のthisが
+     * バインドされずにnullになってしまう。
+     * 必ず実装クラス側でハンドルしてsuperクラスに渡すようにする。
+     */
+    protected async OnInfinite($state: StateChanger): Promise<boolean> {
+        return super.OnInfinite($state);
+    }
+    protected async GetPagenatedList(): Promise<IPagenatedResult<AlbumTracks>> {
+        const args: IPagenateQueryArgs = {
+            GenreIds: this.genreIds,
+            ArtistIds: this.artistIds,
+            FilterText: this.Filterbox.GetText(),
+            Page: this.Page
+        };
+
+        return await this.store.GetList(args);
+    }
+    // #endregion
+
+    // #region "Filters"
     private HasGenre(genreId: number): boolean {
         return (0 <= _.indexOf(this.genreIds, genreId));
     }
@@ -262,4 +305,5 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
             this.Refresh();
         }
     }
+    // #endregion
 }

@@ -72,18 +72,10 @@ export const PlaylistListEvents = {
 export default class PlaylistList extends SelectionList<Playlist, PlaylistStore> {
 
     private static readonly PageLength: number = 30;
-    private static readonly Classes = {
-        DisplayNone: 'd-none',
-        Animated: 'animated',
-        In: 'fadeInUp',
-        Out: 'fadeOutDown',
-        Speed: 'faster'
-    };
 
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Playlist[] = [];
     protected allEntities: Playlist[] = [];
-    private windowAdd: JQuery;
 
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
@@ -113,6 +105,7 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         return true;
     }
 
+    // #region "InfiniteLoading"
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
      * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -162,6 +155,7 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
 
         return result;
     }
+    // #endregion
 
     private OnClickAdd(): void {
         this.AddModal.Show();
@@ -169,14 +163,16 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
 
     private async OnAddOrdered(): Promise<boolean> {
         const name = this.AddModal.GetName();
-        const newPlaylist = await this.store.AddPlaylist(name);
+        const playlist = await this.store.AddPlaylist(name);
 
-        if (!newPlaylist) {
+        if (!playlist) {
             this.AddModal.Hide();
             Libraries.ShowToast.Error('Playlist Create Failed');
 
             return false;
         }
+
+        Libraries.ShowToast.Success(`Playlist [ ${playlist.Name} ] Created.`);
 
         this.AddModal.Hide();        
         this.entities = [];

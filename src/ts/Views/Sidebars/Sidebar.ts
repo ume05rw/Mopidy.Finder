@@ -1,7 +1,7 @@
 import Component from 'vue-class-component';
+import Libraries from '../../Libraries';
 import ViewBase from '../Bases/ViewBase';
 import PlayerPanel from './PlayerPanel';
-import Libraries from '../../Libraries';
 
 export enum Pages {
     Finder = 'Finder',

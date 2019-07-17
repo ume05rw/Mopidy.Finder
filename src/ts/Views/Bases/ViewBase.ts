@@ -1,5 +1,5 @@
-import Vue from 'vue';
 import * as _ from 'lodash';
+import Vue from 'vue';
 
 export default abstract class ViewBase extends Vue {
 

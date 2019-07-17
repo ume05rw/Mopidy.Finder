@@ -1,6 +1,6 @@
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import { default as AnimatedViewBase, Animation } from '../../Bases/AnimatedViewBase';
+import { Animation, default as AnimatedViewBase } from '../../Bases/AnimatedViewBase';
 
 export const SearchInputEvents = {
     Input: 'Input',

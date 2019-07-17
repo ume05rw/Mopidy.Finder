@@ -1,10 +1,10 @@
 import Component from 'vue-class-component';
+import Libraries from '../../Libraries';
 import Playlist from '../../Models/Playlists/Playlist';
 import ContentViewBase from '../Bases/ContentViewBase';
-import { ISelectionOrderedArgs, ISelectionChangedArgs } from '../Shared/SelectionItem';
-import { default as PlaylistList, PlaylistListEvents } from './Lists/Playlists/PlaylistList';
-import { default as TrackList, TrackListEvents } from './Lists/Tracks/TrackList';
-import Libraries from '../../Libraries';
+import { ISelectionChangedArgs, ISelectionOrderedArgs } from '../Shared/SelectionItem';
+import PlaylistList from './Lists/Playlists/PlaylistList';
+import TrackList from './Lists/Tracks/TrackList';
 
 export const PlaylistsEvents = {
     PlaylistsUpdated: 'PlaylistsUpdated'

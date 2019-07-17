@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
+import Libraries from '../../../Libraries';
 import Artist from '../../../Models/Artists/Artist';
 import { default as ArtistStore, IPagenateQueryArgs } from '../../../Models/Artists/ArtistStore';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
 import SelectionList from '../../Shared/SelectionList';
-import Libraries from '../../../Libraries';
 
 @Component({
     template: `<div class="col-md-3">

@@ -1,7 +1,7 @@
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import { default as AnimatedViewBase, Animation } from '../Bases/AnimatedViewBase';
 import Libraries from '../../Libraries';
+import { Animation, default as AnimatedViewBase } from '../Bases/AnimatedViewBase';
 
 export const SlideupButtonEvents = {
     Clicked: 'Clicked'

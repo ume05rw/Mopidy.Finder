@@ -4,16 +4,25 @@ import Libraries from '../../../../Libraries';
 import AlbumTracks from '../../../../Models/AlbumTracks/AlbumTracks';
 import Playlist from '../../../../Models/Playlists/Playlist';
 import Track from '../../../../Models/Tracks/Track';
+import Exception from '../../../../Utils/Exception';
 import ViewBase from '../../../Bases/ViewBase';
 import { ISelectionChangedArgs } from '../../../Shared/SelectionItem';
-import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 
-export interface IAlbumTracksSelectedArgs extends ISelectionChangedArgs<AlbumTracks> {
+export interface IPlayOrderedArgs extends ISelectionChangedArgs<AlbumTracks> {
     Track: Track;
 }
-export const SelectionAlbumEvents = {
-    AlbumTracksSelected: 'AlbumTracksSelected',
-    PlaylistCreated: 'PlaylistCreated'
+export interface ICreatePlaylistOrderedArgs {
+    AlbumTracks: AlbumTracks;
+}
+export interface IAddToPlaylistOrderedArgs {
+    Playlist: Playlist
+    Tracks: Track[];
+}
+
+export const SelectionAlbumTracksEvents = {
+    PlayOrdered: 'PlayOrdered',
+    CreatePlaylistOrdered: 'CreatePlaylistOrdered',
+    AddToPlaylistOrdered: 'AddToPlaylistOrdered'
 };
 
 @Component({
@@ -28,7 +37,7 @@ export const SelectionAlbumEvents = {
                 <button type="button"
                     class="btn btn-tool"
                     ref="AlbumPlayButton"
-                    @click="OnClickAlbumPlay" >
+                    @click="OnHeaderPlayClicked" >
                     <i class="fa fa-play" />
                 </button>
                 <button type="button"
@@ -64,11 +73,11 @@ export const SelectionAlbumEvents = {
                         <template v-for="track in entity.Tracks">
                         <tr v-bind:data-trackid="track.Id">
                             <td class="tracknum"
-                                @click="OnClickTrack">{{ track.TrackNo }}</td>
+                                @click="OnRowClicked">{{ track.TrackNo }}</td>
                             <td class="trackname text-truncate"
-                                @click="OnClickTrack">{{ track.Name }}</td>
+                                @click="OnRowClicked">{{ track.Name }}</td>
                             <td class="tracklength"
-                                @click="OnClickTrack">{{ track.GetTimeString() }}</td>
+                                @click="OnRowClicked">{{ track.GetTimeString() }}</td>
                             <td class="trackoperation">
                                 <button type="button"
                                     class="btn btn-tool dropdown-toggle"
@@ -83,6 +92,7 @@ export const SelectionAlbumEvents = {
                                         <a class="dropdown-item text-truncate"
                                             href="javascript:void(0)"
                                             v-bind:data-uri="playlist.Uri"
+                                            v-bind:data-trackid="track.Id"
                                             @click="OnRowPlaylistClicked">{{ playlist.Name }}</a>
                                         </template>
                                     </div>
@@ -141,63 +151,84 @@ export default class SelectionAlbumTracks extends ViewBase {
         return true;
     }
 
-    private OnClickAlbumPlay(): void {
+    private OnHeaderPlayClicked(): void {
         const tracks = Libraries.Enumerable.from(this.entity.Tracks);
         const track = tracks
             .first((e): boolean => e.TrackNo === tracks.min((e2): number => e2.TrackNo));
 
-        const selectionArgs: IAlbumTracksSelectedArgs = {
+        const args: IPlayOrderedArgs = {
             Entity: this.entity,
             Track: track,
             Selected: true
         };
-        this.$emit(SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
+        this.$emit(SelectionAlbumTracksEvents.PlayOrdered, args);
     }
 
-    private async OnHeaderNewPlaylistClicked(): Promise<boolean> {
-        const store = new PlaylistStore();
-        const newPlaylist = await store.AddPlaylistByAlbumTracks(this.entity);
-
-        if (!newPlaylist) {
-            Libraries.ShowToast.Error('Playlist Create Failed.');
-
-            return false;
-        }
-
-        Libraries.ShowToast.Success(`New Playlist [ ${newPlaylist.Name} ] Created.`);
-        this.$emit(SelectionAlbumEvents.PlaylistCreated);
-
-        return true;
+    private OnHeaderNewPlaylistClicked(): void {
+        const args: ICreatePlaylistOrderedArgs = {
+            AlbumTracks: this.entity
+        };
+        this.$emit(SelectionAlbumTracksEvents.CreatePlaylistOrdered, args);
     }
 
     private OnHeaderPlaylistClicked(ev: MouseEvent): void {
         const uri = (ev.target as HTMLElement).getAttribute('data-uri');
-        console.log(uri);
+        const playlist = Libraries.Enumerable.from(this.playlists)
+            .firstOrDefault(e => e.Uri === uri);
+
+        if (!playlist)
+            Exception.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
+
+        const args: IAddToPlaylistOrderedArgs = {
+            Playlist: playlist,
+            Tracks: this.entity.Tracks
+        };
+        this.$emit(SelectionAlbumTracksEvents.AddToPlaylistOrdered, args);
     }
 
-    private OnClickTrack(args: Event): void {
+    private OnRowClicked(args: Event): void {
         const tr = (args.currentTarget as HTMLElement).parentElement;
         const trackIdString = tr.getAttribute('data-trackid');
         if (!trackIdString || trackIdString === '')
-            return;
+            Exception.Throw('SelectionAlbumTrack.OnRowClicked: Track-Id not found.');
 
         const trackId = parseInt(trackIdString, 10);
         const tracks = Libraries.Enumerable.from(this.entity.Tracks);
         const track = tracks.firstOrDefault((e): boolean => e.Id === trackId);
         if (!track)
-            return;
+            Exception.Throw('SelectionAlbumTrack.OnRowClicked: Track entity not found.');
 
-        const selectionArgs: IAlbumTracksSelectedArgs = {
+        const orderedArgs: IPlayOrderedArgs = {
             Entity: this.entity,
             Track: track,
             Selected: true
         };
-
-        this.$emit(SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
+        this.$emit(SelectionAlbumTracksEvents.PlayOrdered, orderedArgs);
     }
 
     private OnRowPlaylistClicked(ev: MouseEvent): void {
-        const uri = (ev.target as HTMLElement).getAttribute('data-uri');
-        console.log(uri);
+        const elem = ev.currentTarget as HTMLElement;
+        const uri = elem.getAttribute('data-uri');
+        const playlist = Libraries.Enumerable.from(this.playlists)
+            .firstOrDefault(e => e.Uri === uri);
+
+        if (!playlist)
+            Exception.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
+
+        const trackIdString = elem.getAttribute('data-trackid');
+        if (!trackIdString || trackIdString === '')
+            Exception.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
+
+        const trackId = parseInt(trackIdString, 10)
+        const track = Libraries.Enumerable.from(this.entity.Tracks)
+            .firstOrDefault(e => e.Id === trackId);
+        if (!track)
+            Exception.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
+
+        const args: IAddToPlaylistOrderedArgs = {
+            Playlist: playlist,
+            Tracks: [ track ]
+        };
+        this.$emit(SelectionAlbumTracksEvents.AddToPlaylistOrdered, args);
     }
 }

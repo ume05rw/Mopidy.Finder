@@ -1,6 +1,6 @@
-import ViewBase from '../../Bases/ViewBase';
 import Component from 'vue-class-component';
 import Libraries from '../../../Libraries';
+import ViewBase from '../../Bases/ViewBase';
 
 export enum ConfirmType {
     Normal = 'bg-info',

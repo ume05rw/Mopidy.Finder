@@ -1,6 +1,6 @@
-import ViewBase from '../Bases/ViewBase';
 import Component from 'vue-class-component';
-import { Pages, IContentChanged } from '../Sidebars/Sidebar';
+import ViewBase from '../Bases/ViewBase';
+import { IContentChanged, Pages } from '../Sidebars/Sidebar';
 
 @Component({
     template: `<nav class="main-header navbar navbar-expand border-bottom">
