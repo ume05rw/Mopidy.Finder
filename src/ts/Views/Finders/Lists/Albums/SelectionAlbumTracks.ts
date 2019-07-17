@@ -6,12 +6,14 @@ import Playlist from '../../../../Models/Playlists/Playlist';
 import Track from '../../../../Models/Tracks/Track';
 import ViewBase from '../../../Bases/ViewBase';
 import { ISelectionChangedArgs } from '../../../Shared/SelectionItem';
+import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 
 export interface IAlbumTracksSelectedArgs extends ISelectionChangedArgs<AlbumTracks> {
     Track: Track;
 }
 export const SelectionAlbumEvents = {
-    AlbumTracksSelected: 'AlbumTracksSelected'
+    AlbumTracksSelected: 'AlbumTracksSelected',
+    PlaylistCreated: 'PlaylistCreated'
 };
 
 @Component({
@@ -152,7 +154,11 @@ export default class SelectionAlbumTracks extends ViewBase {
         this.$emit(SelectionAlbumEvents.AlbumTracksSelected, selectionArgs);
     }
 
-    private OnHeaderNewPlaylistClicked(): void {
+    private async OnHeaderNewPlaylistClicked(): Promise<boolean> {
+        const store = new PlaylistStore();
+        const newPlaylist = await store.AddPlaylistByAlbumTracks(this.entity);
+
+        return true;
     }
 
     private OnHeaderPlaylistClicked(ev: MouseEvent): void {

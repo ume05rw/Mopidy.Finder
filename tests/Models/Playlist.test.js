@@ -29,6 +29,33 @@ describe('Playlistエンティティ', function () {
         var playlist = Playlist_1.default.CreateFromRef(null);
         chai.assert.isNull(playlist);
     });
+    it('Playlist.CreateFromMopidy: 値割り当てが正しい', function () {
+        var iPlaylist = {
+            uri: 'uri',
+            name: 'name',
+            last_modified: 1,
+            tracks: []
+        };
+        var playlist = Playlist_1.default.CreateFromMopidy(iPlaylist);
+        chai.assert.isNotNull(playlist);
+        chai.assert.equal(iPlaylist.uri, playlist.Uri);
+        chai.assert.equal(iPlaylist.name, playlist.Name);
+        chai.assert.isArray(playlist.Tracks);
+        chai.assert.equal(playlist.Tracks.length, 0);
+    });
+    it('Playlist.CreateFromMopidy: 空オブジェクトから生成できる', function () {
+        var iPlaylist = {};
+        var playlist = Playlist_1.default.CreateFromMopidy(iPlaylist);
+        chai.assert.isNotNull(playlist);
+        chai.assert.isNull(playlist.Uri);
+        chai.assert.isNull(playlist.Name);
+        chai.assert.isArray(playlist.Tracks);
+        chai.assert.equal(playlist.Tracks.length, 0);
+    });
+    it('Playlist.CreateFromMopidy: nullを渡すとnullが返ってくる', function () {
+        var playlist = Playlist_1.default.CreateFromMopidy(null);
+        chai.assert.isNull(playlist);
+    });
     it('Playlist.CreateArrayFromRefs: 値割り当てが正しい', function () {
         var iRef1 = {
             uri: 'uri',

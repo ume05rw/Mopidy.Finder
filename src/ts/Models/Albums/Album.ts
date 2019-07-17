@@ -15,8 +15,14 @@ export interface IAlbum {
 
 export default class Album implements IAlbum {
 
-    public static DefaultImage: string =
-        `${location.protocol}//${location.host}/img/nullImage.jpg`;
+    /**
+     * テストドライバー上ではlocationが存在しない。
+     */
+    public static get DefaultImage(): string {
+        return (!location)
+            ? 'http://localhost:6680/img/nullImage.jpg'
+            : `${location.protocol}//${location.host}/img/nullImage.jpg`;
+    }
 
     public static Create(entity: IAlbum): Album {
         if (!entity)

@@ -78,10 +78,13 @@ export default class SelectionTrack extends ViewBase {
 
     private GetDetailString(): string {
         const albumName = this.entity.GetAlbumName();
-        const year = this.entity.GetFormattedYearString();
         const artistsName = this.entity.GetFormattedArtistsName();
+        const year = this.entity.GetFormattedYearString();
+        const yearString = (year === '')
+            ? ''
+            : ' ' + year
 
-        return `${albumName}${(year === '') ? '' : ' ' + year} : ${artistsName}`;
+        return `${albumName}${yearString} : ${artistsName}`;
     }
 
     private SetLiClasses(): void {

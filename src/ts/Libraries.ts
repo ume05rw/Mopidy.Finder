@@ -80,14 +80,17 @@ export default class Libraries {
     /**
      * SlimScroll (on JQuery)
      */
+    /* eslint-disable @typescript-eslint/indent */
     public static readonly SlimScroll: (element: HTMLElement, opstions?: ISlimScrollOption) => void
         = (element: HTMLElement, opstions?: ISlimScrollOption): void => {
             Libraries.$(element).slimScroll(opstions);
         };
+    /* eslint-enable @typescript-eslint/indent */
 
     /**
      * Popper (on JQuery)
      */
+    /* eslint-disable @typescript-eslint/indent */
     public static readonly SetTooltip: (element: HTMLElement, message: string) => void
         = (element: HTMLElement, message: string): void => {
             Libraries.$(element).tooltip({
@@ -100,6 +103,7 @@ export default class Libraries {
                 }
             });
         };
+    /* eslint-enable @typescript-eslint/indent */
 
     /**
      * SweetAlert2 - Toast
@@ -114,6 +118,7 @@ export default class Libraries {
         timer: 3000
     });
 
+    /* eslint-disable @typescript-eslint/indent */
     private static readonly InnerShowToast: (toastType: Swal.SweetAlertType, message: string) => void
         = (toastType, message): void => {
             Libraries.Toast.fire({
@@ -121,6 +126,7 @@ export default class Libraries {
                 title: message
             });
         };
+    /* eslint-enable @typescript-eslint/indent */
 
     /**
      * SweerAlert2のToast表示メソッド

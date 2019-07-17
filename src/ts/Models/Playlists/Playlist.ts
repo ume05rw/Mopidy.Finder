@@ -1,4 +1,5 @@
 import IRef from '../Mopidies/IRef';
+import MopidyPlaylist from '../Mopidies/IPlaylist';
 import Track from '../Tracks/Track';
 
 export interface IUpdate {
@@ -23,6 +24,18 @@ export default class Playlist {
         result.Name = entity.name || null;
         result.Uri = entity.uri || null;
         result.Tracks = [];
+
+        return result;
+    }
+
+    public static CreateFromMopidy(entity: MopidyPlaylist): Playlist {
+        if (!entity)
+            return null;
+
+        const result = new Playlist();
+        result.Name = entity.name || null;
+        result.Uri = entity.uri || null;
+        result.Tracks = Track.CreateArrayFromMopidy(entity.tracks);
 
         return result;
     }

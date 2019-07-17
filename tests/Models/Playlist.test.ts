@@ -1,6 +1,7 @@
 import * as mocha from 'mocha';
 import * as chai from 'chai';
 import IRef from '../../src/ts/Models/Mopidies/IRef';
+import MopidyPlaylist from '../../src/ts/Models/Mopidies/IPlaylist';
 import Playlist from '../../src/ts/Models/Playlists/Playlist';
 
 describe('Playlistエンティティ', () => {
@@ -31,6 +32,36 @@ describe('Playlistエンティティ', () => {
 
     it('Playlist.CreateFromRef: nullを渡すとnullが返ってくる', () => {
         const playlist = Playlist.CreateFromRef(null);
+        chai.assert.isNull(playlist);
+    });
+
+    it('Playlist.CreateFromMopidy: 値割り当てが正しい', () => {
+        const iPlaylist: MopidyPlaylist = {
+            uri: 'uri',
+            name: 'name',
+            last_modified: 1,
+            tracks: []
+        };
+        const playlist = Playlist.CreateFromMopidy(iPlaylist);
+        chai.assert.isNotNull(playlist);
+        chai.assert.equal(iPlaylist.uri, playlist.Uri);
+        chai.assert.equal(iPlaylist.name, playlist.Name);
+        chai.assert.isArray(playlist.Tracks);
+        chai.assert.equal(playlist.Tracks.length, 0);
+    });
+
+    it('Playlist.CreateFromMopidy: 空オブジェクトから生成できる', () => {
+        const iPlaylist = {} as MopidyPlaylist;
+        const playlist = Playlist.CreateFromMopidy(iPlaylist);
+        chai.assert.isNotNull(playlist);
+        chai.assert.isNull(playlist.Uri);
+        chai.assert.isNull(playlist.Name);
+        chai.assert.isArray(playlist.Tracks);
+        chai.assert.equal(playlist.Tracks.length, 0);
+    });
+
+    it('Playlist.CreateFromMopidy: nullを渡すとnullが返ってくる', () => {
+        const playlist = Playlist.CreateFromMopidy(null);
         chai.assert.isNull(playlist);
     });
 

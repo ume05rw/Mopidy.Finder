@@ -14,16 +14,16 @@ export default abstract class ContentViewBase extends ViewBase implements IConte
         await super.Initialize();
 
         const elem = Libraries.$(this.$el as HTMLElement);
-        elem.on(ModalEvents.Show, () => {
+        elem.on(ModalEvents.Show, (): void => {
             this.OnShow();
         });
-        elem.on(ModalEvents.Shown, () => {
+        elem.on(ModalEvents.Shown, (): void => {
             this.OnShown();
         });
-        elem.on(ModalEvents.Hide, () => {
+        elem.on(ModalEvents.Hide, (): void => {
             this.OnHide();
         });
-        elem.on(ModalEvents.Hidden, () => {
+        elem.on(ModalEvents.Hidden, (): void => {
             this.OnHidden();
         });
 

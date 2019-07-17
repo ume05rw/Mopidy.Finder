@@ -6,6 +6,9 @@ import ITlTrack from '../Mopidies/ITlTrack';
 import Track from '../Tracks/Track';
 import TrackStore from '../Tracks/TrackStore';
 import Playlist from './Playlist';
+import AlbumTracks from '../AlbumTracks/AlbumTracks';
+import MopidyPlaylist from '../Mopidies/IPlaylist';
+import Exception from '../../Utils/Exception';
 
 export default class PlaylistStore extends JsonRpcQueryableBase {
 
@@ -50,6 +53,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
 
         if (tracks.length <= 0) {
             playlist.Tracks = [];
+
             return true;
         }
 
@@ -94,7 +98,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
             });
 
         if (resAdd.error)
-            throw new Error(resAdd.error);
+            Exception.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
 
         const tlTracks = resAdd.result as ITlTrack[];
         const tlDictionary = Libraries.Enumerable.from(tlTracks)
@@ -108,7 +112,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         }
 
         if (track.TlId === null)
-            throw new Error(`track: ${track.Name} not assigned TlId`);
+            Exception.Throw(`track: ${track.Name} not assigned TlId`);
 
         await this.PlayByTlId(track.TlId);
 
@@ -123,12 +127,38 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         return true;
     }
 
-    public async AddPlaylist(name: string): Promise<boolean> {
-        await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistCreate, {
+    public async AddPlaylist(name: string): Promise<Playlist> {
+        const response = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistCreate, {
             name: name
         });
 
-        return true;
+        if (response && response.error) {
+            Exception.Throw('PlaylistStore.AddPlaylist: Playlist Create Failed.', response.error);
+        }
+
+        const mpPlaylist = response.result as MopidyPlaylist;
+        const result = Playlist.CreateFromMopidy(mpPlaylist)
+
+        return result;
+    }
+
+    public async AddPlaylistByAlbumTracks(albumTracks: AlbumTracks): Promise<Playlist> {
+        const name = `${albumTracks.GetArtistName()} - ${albumTracks.Album.Name}`;
+        const playlist = await this.AddPlaylist(name);
+
+        if (!playlist) {
+            Exception.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Playlist Create Failed');
+        }
+
+        playlist.Tracks = albumTracks.Tracks;
+
+        const response = await this.UpdatePlayllist(playlist);
+
+        if (response !== true) {
+            Exception.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Track Update Failed.');
+        }
+
+        return playlist;
     }
 
     public async UpdatePlayllist(playlist: Playlist): Promise<boolean> {
@@ -151,13 +181,21 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
             }
         });
 
+        if (response && response.error) {
+            Exception.Throw('PlaylistStore.UpdatePlayllist: Track Update Failed.', response.error);
+        }
+
         return (response.result !== null);
     }
 
     public async DeletePlaylist(playlist: Playlist): Promise<boolean> {
-        await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistDelete, {
+        const response = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistDelete, {
             uri: playlist.Uri
         });
+
+        if (response && response.error) {
+            Exception.Throw('PlaylistStore.DeletePlaylist: Delete Failed.', response.error);
+        }
 
         return true;
     }
