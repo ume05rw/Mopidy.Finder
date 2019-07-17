@@ -44,6 +44,10 @@ export default class Genre implements IGenre {
         return result;
     }
 
+
+    private constructor() {
+    }
+
     public Id: number = null;
     public Name: string = null;
     public LowerName: string = null;

@@ -2,10 +2,10 @@ import Libraries from '../../Libraries';
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import IPlaylist from '../Mopidies/IPlaylist';
 import IRef from '../Mopidies/IRef';
-import ITrack from '../Mopidies/ITrack';
-import Playlist from './Playlist';
-import Track from '../Tracks/Track';
 import ITlTrack from '../Mopidies/ITlTrack';
+import Track from '../Tracks/Track';
+import TrackStore from '../Tracks/TrackStore';
+import Playlist from './Playlist';
 
 export default class PlaylistStore extends JsonRpcQueryableBase {
 
@@ -15,7 +15,6 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         PlaylistCreate: 'core.playlists.create',
         PlaylistSave: 'core.playlists.save',
         PlaylistDelete: 'core.playlists.delete',
-        LibraryLookup: 'core.library.lookup',
         LibraryGetImages: 'core.library.get_images',
         TracklistClearList: 'core.tracklist.clear',
         TracklistAdd: 'core.tracklist.add',
@@ -36,43 +35,32 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         return result;
     }
 
-    public async GetTracksByPlaylist(playlist: Playlist): Promise<Track[]> {
+    public async SetPlaylistTracks(playlist: Playlist): Promise<boolean> {
         const response
             = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
                 uri: playlist.Uri
             });
 
         const mpPlaylist = response.result as IPlaylist;
-        if (!mpPlaylist.tracks)
-            return [];
+        // Createしたてでトラック未登録のプレイリストのとき、
+        // tracksプロパティが存在しない。
+        const tracks = (mpPlaylist.tracks && 0 <= mpPlaylist.tracks.length)
+            ? Track.CreateArrayFromMopidy(mpPlaylist.tracks)
+            : [];
 
-        const trackUris = Libraries.Enumerable.from(mpPlaylist.tracks)
-            .select((e): string => e.uri)
-            .toArray();
-
-        const response2
-            = await this.JsonRpcRequest(PlaylistStore.Methods.LibraryLookup, {
-                uris: trackUris
-            });
-
-        const pairList = response2.result as { [uri: string]: ITrack[] };
-
-        // プレイリストの順序通りにトラックを並べて取得する。
-        const mpTracks: ITrack[] = [];
-        for (let i = 0; i < mpPlaylist.tracks.length; i++) {
-            const track = mpPlaylist.tracks[i];
-
-            if (!pairList[track.uri])
-                continue;
-
-            const completedTrack = pairList[track.uri][0];
-            if (completedTrack)
-                mpTracks.push(completedTrack);
+        if (tracks.length <= 0) {
+            playlist.Tracks = [];
+            return true;
         }
 
-        const result = Track.CreateArrayFromMopidy(mpTracks);
+        const trackStore = new TrackStore();
+        await trackStore.EnsureTracks(tracks);
 
-        return result;
+        // 未Ensure状態のtracksをplaylist.TracksにセットするとVueが描画してしまうため、
+        // Ensure後にセットする。
+        playlist.Tracks = tracks;
+
+        return true;
     }
 
     public async GetImageUri(uri: string): Promise<string> {

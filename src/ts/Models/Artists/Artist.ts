@@ -78,6 +78,10 @@ export default class Artist implements IArtist {
         return result;
     }
 
+
+    private constructor() {
+    }
+
     public Id: number = null;
     public Name: string = null;
     public LowerName: string = null;

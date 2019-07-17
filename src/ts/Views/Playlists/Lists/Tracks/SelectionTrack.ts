@@ -31,11 +31,11 @@ export interface ITrackSelectionChangedArgs extends ISelectionChangedArgs<Track>
     ref="Li"
     @click="OnClickRow">
     <div class="product-img ml-2">
-        <img v-bind:src="((entity.Album) ? entity.Album.GetImageFullUri() : '')" alt="ALbum Image">
+        <img v-bind:src="entity.GetAlbumImageFullUri()" alt="ALbum Image">
     </div>
     <div class="product-info">
         <span class="product-title pl-2">
-            {{ entity.Name }}
+            {{ entity.GetDisplayName() }}
             <div class="btn-group pull-right mr-2 editmode-buttons">
                 <button
                     class="btn btn-sm btn-outline-dark"
@@ -46,9 +46,7 @@ export interface ITrackSelectionChangedArgs extends ISelectionChangedArgs<Track>
             </div>
             <span class="pull-right length mr-2">{{ entity.GetTimeString() }}</span>
         </span>
-        <span class="product-description pl-2">
-            {{ entity.GetAlbumName() }} {{ entity.GetFormattedYearString() }} {{ ' : ' + entity.GetFormattedArtistName() }}
-        </span>
+        <span class="product-description pl-2">{{ GetDetailString() }}</span>
     </div>
 </li>`
 })
@@ -80,6 +78,14 @@ export default class SelectionTrack extends ViewBase {
         await super.Initialize();
 
         return true;
+    }
+
+    private GetDetailString(): string {
+        const albumName = this.entity.GetAlbumName();
+        const year = this.entity.GetFormattedYearString();
+        const artistsName = this.entity.GetFormattedArtistsName();
+
+        return `${albumName}${(year === '') ? '' : ' ' + year} : ${artistsName}`;
     }
 
     private SetLiClasses(): void {

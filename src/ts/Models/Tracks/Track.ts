@@ -1,6 +1,7 @@
 import { default as Album, IAlbum } from '../Albums/Album';
 import { default as Artist, IArtist } from '../Artists/Artist';
 import { default as MopidyTrack } from '../Mopidies/ITrack';
+import Exception from '../../Utils/Exception';
 
 export interface ITrack {
     Id: number;
@@ -84,6 +85,31 @@ export default class Track implements ITrack {
         return result;
     }
 
+    public static EnsureTrackByMopidy(entity: Track, mopidyTrack: MopidyTrack): void {
+        if (!entity)
+            Exception.Dump('argument entity null');
+
+        if (!mopidyTrack)
+            Exception.Dump('argument mopidyTrack null');
+
+        entity.Id = null;
+        entity.Name = mopidyTrack.name || null;
+        entity.LowerName = (mopidyTrack.name)
+            ? mopidyTrack.name.toLowerCase()
+            : null;
+        entity.Uri = mopidyTrack.uri || null;
+        entity.TlId = null;
+        entity.DiscNo = mopidyTrack.disc_no || null;
+        entity.TrackNo = mopidyTrack.track_no || null;
+        entity.Date = mopidyTrack.date || null;
+        entity.Comment = mopidyTrack.comment || null;
+        entity.Length = mopidyTrack.length || null;
+        entity.BitRate = mopidyTrack.bitrate || null;
+        entity.LastModified = mopidyTrack.last_modified || null;
+        entity.Album = Album.CreateFromMopidy(mopidyTrack.album);
+        entity.Artists = Artist.CreateArrayFromMopidy(mopidyTrack.artists);
+    }
+
     public static CreateArray(entities: ITrack[]): Track[] {
         const result: Track[] = [];
 
@@ -114,6 +140,9 @@ export default class Track implements ITrack {
         return result;
     }
 
+    private constructor() {
+    }
+
     public Id: number = null;
     public Name: string = null;
     public LowerName: string = null;
@@ -135,7 +164,7 @@ export default class Track implements ITrack {
 
     public GetTimeString(): string {
         if (!this.Length)
-            return '';
+            return '--:--';
 
         const minute = Math.floor(this.Length / 60000);
         const second = Math.floor((this.Length % 60000) / 1000);
@@ -143,6 +172,20 @@ export default class Track implements ITrack {
         const secondStr = ('00' + second.toString()).slice(-2);
 
         return minuteStr + ':' + secondStr;
+    }
+
+    /**
+     * ※Uri以外のプロパティが取得出来ないトラックがある。
+     */
+    public GetDisplayName(): string {
+        if (this.Name && this.Name !== '')
+            return this.Name;
+
+        const uriParts = this.Uri.split('/');
+        if (uriParts.length <= 0)
+            return '--';
+
+        return uriParts[uriParts.length - 1];
     }
 
     public GetYear(): number {
@@ -165,14 +208,20 @@ export default class Track implements ITrack {
     public GetAlbumName(): string {
         return (this.Album && this.Album.Name)
             ? this.Album.Name
-            : '';
+            : '--';
     }
 
-    public GetFormattedArtistName(): string {
+    public GetFormattedArtistsName(): string {
         return (!this.Artists || this.Artists.length <= 0)
             ? '--'
             : (this.Artists.length === 1)
                 ? this.Artists[0].Name
                 : (this.Artists[0].Name + ' and more...');
+    }
+
+    public GetAlbumImageFullUri(): string {
+        return (!this.Album)
+            ? Album.DefaultImage
+            : this.Album.GetImageFullUri()
     }
 }

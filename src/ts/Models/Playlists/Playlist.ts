@@ -39,6 +39,10 @@ export default class Playlist {
         return result;
     }
 
+
+    private constructor() {
+    }
+
     public Name: string = null;
     public Uri: string = null;
     public Tracks: Track[] = [];

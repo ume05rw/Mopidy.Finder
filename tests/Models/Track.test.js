@@ -180,6 +180,7 @@ describe('Trackエンティティ', function () {
         };
         var track = Track_1.default.CreateFromMopidy(iTrack);
         chai.assert.isNotNull(track);
+        chai.assert.isNull(track.Id);
         chai.assert.equal(track.Name, iTrack.name);
         chai.assert.equal(track.TrackNo, iTrack.track_no);
         chai.assert.equal(track.DiscNo, iTrack.disc_no);
@@ -214,6 +215,40 @@ describe('Trackエンティティ', function () {
     it('Track.CreateFromMopidy: nullを渡すとnullが返ってくる', function () {
         var track = Track_1.default.CreateFromMopidy(null);
         chai.assert.isNull(track);
+    });
+    it('Track.CreateFromMopidy: 値割り当てが正しい', function () {
+        var iTrack = {
+            uri: 'uri',
+            name: 'name',
+            album: null,
+            artists: [],
+            composers: [],
+            performers: [],
+            genre: 'genre',
+            track_no: 1,
+            disc_no: 2,
+            date: '1999/01/01',
+            length: 3,
+            bitrate: 4,
+            comment: 'comment',
+            musicbrainz_id: 'musicbrainz_id',
+            last_modified: 6
+        };
+        var track = Track_1.default.Create({});
+        Track_1.default.EnsureTrackByMopidy(track, iTrack);
+        chai.assert.isNotNull(track);
+        chai.assert.isNull(track.Id);
+        chai.assert.equal(track.Name, iTrack.name);
+        chai.assert.equal(track.TrackNo, iTrack.track_no);
+        chai.assert.equal(track.DiscNo, iTrack.disc_no);
+        chai.assert.equal(track.Date, iTrack.date);
+        chai.assert.equal(track.Length, iTrack.length);
+        chai.assert.equal(track.BitRate, iTrack.bitrate);
+        chai.assert.equal(track.Comment, iTrack.comment);
+        chai.assert.equal(track.LastModified, iTrack.last_modified);
+        chai.assert.isNull(track.Album);
+        chai.assert.isArray(track.Artists);
+        chai.assert.equal(track.Artists.length, 0);
     });
     it('Track.CreateArrayFromMopidy: 値割り当てが正しい', function () {
         var iTrack1 = {
@@ -255,6 +290,7 @@ describe('Trackエンティティ', function () {
         chai.assert.equal(tracks.length, 2);
         var track1 = tracks[0];
         chai.assert.isNotNull(track1);
+        chai.assert.isNull(track1.Id);
         chai.assert.equal(track1.Name, iTrack1.name);
         chai.assert.equal(track1.TrackNo, iTrack1.track_no);
         chai.assert.equal(track1.DiscNo, iTrack1.disc_no);
@@ -268,6 +304,7 @@ describe('Trackエンティティ', function () {
         chai.assert.equal(track1.Artists.length, 0);
         var track2 = tracks[1];
         chai.assert.isNotNull(track2);
+        chai.assert.isNull(track2.Id);
         chai.assert.equal(track2.Name, iTrack2.name);
         chai.assert.equal(track2.TrackNo, iTrack2.track_no);
         chai.assert.equal(track2.DiscNo, iTrack2.disc_no);
@@ -303,6 +340,7 @@ describe('Trackエンティティ', function () {
         chai.assert.equal(tracks.length, 1);
         var track1 = tracks[0];
         chai.assert.isNotNull(track1);
+        chai.assert.isNull(track1.Id);
         chai.assert.equal(track1.Name, iTrack1.name);
         chai.assert.equal(track1.TrackNo, iTrack1.track_no);
         chai.assert.equal(track1.DiscNo, iTrack1.disc_no);

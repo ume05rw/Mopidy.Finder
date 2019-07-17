@@ -30,6 +30,9 @@ export default class ArtistAlbum implements IArtistAlbum {
         return result;
     }
 
+    private constructor() {
+    }
+
     public ArtistId: number = null;
     public AlbumId: number = null;
 }

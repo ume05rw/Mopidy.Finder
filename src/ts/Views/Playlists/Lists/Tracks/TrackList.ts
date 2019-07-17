@@ -597,7 +597,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         }
 
         if (!this.playlist.Tracks || this.playlist.Tracks.length <= 0)
-            this.playlist.Tracks = await this.store.GetTracksByPlaylist(this.playlist);
+            await this.store.SetPlaylistTracks(this.playlist);
 
         let entities = Libraries.Enumerable.from(this.playlist.Tracks);
         const filterText = this.Filterbox.GetText().toLowerCase();

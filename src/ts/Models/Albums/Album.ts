@@ -15,6 +15,9 @@ export interface IAlbum {
 
 export default class Album implements IAlbum {
 
+    public static DefaultImage: string =
+        `${location.protocol}//${location.host}/img/nullImage.jpg`;
+
     public static Create(entity: IAlbum): Album {
         if (!entity)
             return null;
@@ -87,6 +90,10 @@ export default class Album implements IAlbum {
         return result;
     }
 
+
+    private constructor() {
+    }
+
     public Id: number = null;
     public Name: string = null;
     public LowerName: string = null;
@@ -98,7 +105,7 @@ export default class Album implements IAlbum {
 
     public GetImageFullUri(): string {
         return (!this.ImageUri || this.ImageUri == '')
-            ? `${location.protocol}//${location.host}/img/nullImage.jpg`
+            ? Album.DefaultImage
             : `${location.protocol}//${location.host}${this.ImageUri}`;
     }
 }

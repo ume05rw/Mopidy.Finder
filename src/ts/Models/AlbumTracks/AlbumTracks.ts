@@ -19,6 +19,12 @@ export default class AlbumTracks implements IAlbumTracks {
         result.Artists = Artist.CreateArray(entity.Artists);
         result.Tracks = Track.CreateArray(entity.Tracks);
 
+        for (let i = 0; i < result.Tracks.length; i++) {
+            const track = result.Tracks[i];
+            track.Album = result.Album;
+            track.Artists = result.Artists;
+        }
+
         return result;
     }
 
@@ -35,6 +41,10 @@ export default class AlbumTracks implements IAlbumTracks {
         }
 
         return result;
+    }
+
+
+    private constructor() {
     }
 
     public Album: Album = null;

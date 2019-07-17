@@ -30,6 +30,10 @@ export default class GenreAlbum implements IGenreAlbum {
         return result;
     }
 
+
+    private constructor() {
+    }
+
     public GenreId: number = null;
     public AlbumId: number = null;
 }

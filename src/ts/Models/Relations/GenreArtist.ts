@@ -30,6 +30,10 @@ export default class GenreArtist implements IGenreArtist {
         return result;
     }
 
+
+    private constructor() {
+    }
+
     public GenreId: number = null;
     public ArtistId: number = null;
 }

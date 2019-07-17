@@ -40,8 +40,10 @@ namespace MopidyFinder.Models.Mopidies.Methods
             }
             catch (Exception ex)
             {
-                var response = new JsonRpcParamsResponse();
-                response.Error = ex;
+                var response = new JsonRpcParamsResponse()
+                {
+                    Error = ex
+                };
                 var id = default(int?);
                 try
                 {
