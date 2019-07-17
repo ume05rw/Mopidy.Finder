@@ -1,13 +1,10 @@
-import * as mocha from 'mocha';
-import * as chai from 'chai';
-import { default as Track, ITrack } from '../../../src/ts/Models/Tracks/Track';
-import { default as MopidyTrack } from '../../../src/ts/Models/Mopidies/ITrack';
-
-
-describe('Trackエンティティ', () => {
-
-    it('Track.Create: 値割り当てが正しい', () => {
-        const iTrack: ITrack = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var chai = require("chai");
+var Track_1 = require("../../src/ts/Models/Tracks/Track");
+describe('Trackエンティティ', function () {
+    it('Track.Create: 値割り当てが正しい', function () {
+        var iTrack = {
             Id: 1,
             Name: 'Name',
             LowerName: 'lowername',
@@ -23,7 +20,7 @@ describe('Trackエンティティ', () => {
             Album: null,
             Artists: []
         };
-        const track = Track.Create(iTrack);
+        var track = Track_1.default.Create(iTrack);
         chai.assert.isNotNull(track);
         chai.assert.equal(iTrack.Id, track.Id);
         chai.assert.equal(iTrack.Name, track.Name);
@@ -36,14 +33,12 @@ describe('Trackエンティティ', () => {
         chai.assert.equal(iTrack.Length, track.Length);
         chai.assert.equal(iTrack.BitRate, track.BitRate);
         chai.assert.equal(iTrack.LastModified, track.LastModified);
-
         //chai.assert.equal(iTrack.Album, track.Album);
         //chai.assert.equal(iTrack.Artists, track.Artists);
     });
-
-    it('Track.Create: 空オブジェクトから生成できる', () => {
-        const iTrack = {} as ITrack;
-        const track = Track.Create(iTrack);
+    it('Track.Create: 空オブジェクトから生成できる', function () {
+        var iTrack = {};
+        var track = Track_1.default.Create(iTrack);
         chai.assert.isNotNull(track);
         chai.assert.isNull(track.Id);
         chai.assert.isNull(track.Name);
@@ -60,15 +55,12 @@ describe('Trackエンティティ', () => {
         chai.assert.isArray(track.Artists);
         chai.assert.equal(track.Artists.length, 0);
     });
-
-    it('Track.Create: nullを渡すとnullが返ってくる', () => {
-        const track = Track.Create(null);
+    it('Track.Create: nullを渡すとnullが返ってくる', function () {
+        var track = Track_1.default.Create(null);
         chai.assert.isNull(track);
     });
-
-
-    it('Track.CreateArray: 値割り当てが正しい', () => {
-        const iTrack1: ITrack = {
+    it('Track.CreateArray: 値割り当てが正しい', function () {
+        var iTrack1 = {
             Id: 1,
             Name: 'Name',
             LowerName: 'lowername',
@@ -84,7 +76,7 @@ describe('Trackエンティティ', () => {
             Album: null,
             Artists: []
         };
-        const iTrack2: ITrack = {
+        var iTrack2 = {
             Id: 8,
             Name: 'Name2',
             LowerName: 'lowername2',
@@ -100,42 +92,40 @@ describe('Trackエンティティ', () => {
             Album: null,
             Artists: []
         };
-        const tracks = Track.CreateArray([iTrack1, iTrack2]);
+        var tracks = Track_1.default.CreateArray([iTrack1, iTrack2]);
         chai.assert.isArray(tracks);
         chai.assert.equal(tracks.length, 2);
-
-        chai.assert.isNotNull(tracks[0]);
-        chai.assert.equal(iTrack1.Id, tracks[0].Id);
-        chai.assert.equal(iTrack1.Name, tracks[0].Name);
-        chai.assert.equal(iTrack1.LowerName, tracks[0].LowerName);
-        chai.assert.equal(iTrack1.TlId, tracks[0].TlId);
-        chai.assert.equal(iTrack1.DiscNo, tracks[0].DiscNo);
-        chai.assert.equal(iTrack1.TrackNo, tracks[0].TrackNo);
-        chai.assert.equal(iTrack1.Date, tracks[0].Date);
-        chai.assert.equal(iTrack1.Comment, tracks[0].Comment);
-        chai.assert.equal(iTrack1.Length, tracks[0].Length);
-        chai.assert.equal(iTrack1.BitRate, tracks[0].BitRate);
-        chai.assert.equal(iTrack1.LastModified, tracks[0].LastModified);
-
-        chai.assert.isNotNull(tracks[1]);
-        chai.assert.equal(iTrack2.Id, tracks[1].Id);
-        chai.assert.equal(iTrack2.Name, tracks[1].Name);
-        chai.assert.equal(iTrack2.LowerName, tracks[1].LowerName);
-        chai.assert.equal(iTrack2.TlId, tracks[1].TlId);
-        chai.assert.equal(iTrack2.DiscNo, tracks[1].DiscNo);
-        chai.assert.equal(iTrack2.TrackNo, tracks[1].TrackNo);
-        chai.assert.equal(iTrack2.Date, tracks[1].Date);
-        chai.assert.equal(iTrack2.Comment, tracks[1].Comment);
-        chai.assert.equal(iTrack2.Length, tracks[1].Length);
-        chai.assert.equal(iTrack2.BitRate, tracks[1].BitRate);
-        chai.assert.equal(iTrack2.LastModified, tracks[1].LastModified);
-
+        var track1 = tracks[0];
+        chai.assert.isNotNull(track1);
+        chai.assert.equal(iTrack1.Id, track1.Id);
+        chai.assert.equal(iTrack1.Name, track1.Name);
+        chai.assert.equal(iTrack1.LowerName, track1.LowerName);
+        chai.assert.equal(iTrack1.TlId, track1.TlId);
+        chai.assert.equal(iTrack1.DiscNo, track1.DiscNo);
+        chai.assert.equal(iTrack1.TrackNo, track1.TrackNo);
+        chai.assert.equal(iTrack1.Date, track1.Date);
+        chai.assert.equal(iTrack1.Comment, track1.Comment);
+        chai.assert.equal(iTrack1.Length, track1.Length);
+        chai.assert.equal(iTrack1.BitRate, track1.BitRate);
+        chai.assert.equal(iTrack1.LastModified, track1.LastModified);
+        var track2 = tracks[1];
+        chai.assert.isNotNull(track2);
+        chai.assert.equal(iTrack2.Id, track2.Id);
+        chai.assert.equal(iTrack2.Name, track2.Name);
+        chai.assert.equal(iTrack2.LowerName, track2.LowerName);
+        chai.assert.equal(iTrack2.TlId, track2.TlId);
+        chai.assert.equal(iTrack2.DiscNo, track2.DiscNo);
+        chai.assert.equal(iTrack2.TrackNo, track2.TrackNo);
+        chai.assert.equal(iTrack2.Date, track2.Date);
+        chai.assert.equal(iTrack2.Comment, track2.Comment);
+        chai.assert.equal(iTrack2.Length, track2.Length);
+        chai.assert.equal(iTrack2.BitRate, track2.BitRate);
+        chai.assert.equal(iTrack2.LastModified, track2.LastModified);
         //chai.assert.equal(iTrack.Album, track.Album);
         //chai.assert.equal(iTrack.Artists, track.Artists);
     });
-
-    it('Track.CreateArray: 渡し値配列内のnullはスキップされる', () => {
-        const iTrack1: ITrack = {
+    it('Track.CreateArray: 渡し値配列内のnullはスキップされる', function () {
+        var iTrack2 = {
             Id: 1,
             Name: 'Name',
             LowerName: 'lowername',
@@ -151,30 +141,27 @@ describe('Trackエンティティ', () => {
             Album: null,
             Artists: []
         };
-        const tracks = Track.CreateArray([null, iTrack1]);
+        var tracks = Track_1.default.CreateArray([null, iTrack2]);
         chai.assert.isArray(tracks);
         chai.assert.equal(tracks.length, 1);
-
-        chai.assert.isNotNull(tracks[0]);
-        chai.assert.equal(iTrack1.Id, tracks[0].Id);
-        chai.assert.equal(iTrack1.Name, tracks[0].Name);
-        chai.assert.equal(iTrack1.LowerName, tracks[0].LowerName);
-        chai.assert.equal(iTrack1.TlId, tracks[0].TlId);
-        chai.assert.equal(iTrack1.DiscNo, tracks[0].DiscNo);
-        chai.assert.equal(iTrack1.TrackNo, tracks[0].TrackNo);
-        chai.assert.equal(iTrack1.Date, tracks[0].Date);
-        chai.assert.equal(iTrack1.Comment, tracks[0].Comment);
-        chai.assert.equal(iTrack1.Length, tracks[0].Length);
-        chai.assert.equal(iTrack1.BitRate, tracks[0].BitRate);
-        chai.assert.equal(iTrack1.LastModified, tracks[0].LastModified);
-
+        var track1 = tracks[0];
+        chai.assert.isNotNull(track1);
+        chai.assert.equal(iTrack2.Id, track1.Id);
+        chai.assert.equal(iTrack2.Name, track1.Name);
+        chai.assert.equal(iTrack2.LowerName, track1.LowerName);
+        chai.assert.equal(iTrack2.TlId, track1.TlId);
+        chai.assert.equal(iTrack2.DiscNo, track1.DiscNo);
+        chai.assert.equal(iTrack2.TrackNo, track1.TrackNo);
+        chai.assert.equal(iTrack2.Date, track1.Date);
+        chai.assert.equal(iTrack2.Comment, track1.Comment);
+        chai.assert.equal(iTrack2.Length, track1.Length);
+        chai.assert.equal(iTrack2.BitRate, track1.BitRate);
+        chai.assert.equal(iTrack2.LastModified, track1.LastModified);
         //chai.assert.equal(iTrack.Album, track.Album);
         //chai.assert.equal(iTrack.Artists, track.Artists);
     });
-
-
-    it('Track.CreateFromMopidy: 値割り当てが正しい', () => {
-        const iTrack: MopidyTrack = {
+    it('Track.CreateFromMopidy: 値割り当てが正しい', function () {
+        var iTrack = {
             uri: 'uri',
             name: 'name',
             album: null,
@@ -191,7 +178,7 @@ describe('Trackエンティティ', () => {
             musicbrainz_id: 'musicbrainz_id',
             last_modified: 6
         };
-        const track = Track.CreateFromMopidy(iTrack);
+        var track = Track_1.default.CreateFromMopidy(iTrack);
         chai.assert.isNotNull(track);
         chai.assert.equal(track.Name, iTrack.name);
         chai.assert.equal(track.TrackNo, iTrack.track_no);
@@ -205,10 +192,9 @@ describe('Trackエンティティ', () => {
         chai.assert.isArray(track.Artists);
         chai.assert.equal(track.Artists.length, 0);
     });
-
-    it('Track.CreateFromMopidy: 空オブジェクトから生成できる', () => {
-        const iTrack1 = {} as MopidyTrack;
-        const track = Track.CreateFromMopidy(iTrack1);
+    it('Track.CreateFromMopidy: 空オブジェクトから生成できる', function () {
+        var iTrack1 = {};
+        var track = Track_1.default.CreateFromMopidy(iTrack1);
         chai.assert.isNotNull(track);
         chai.assert.isNull(track.Id);
         chai.assert.isNull(track.Name);
@@ -225,14 +211,12 @@ describe('Trackエンティティ', () => {
         chai.assert.isArray(track.Artists);
         chai.assert.equal(track.Artists.length, 0);
     });
-
-    it('Track.CreateFromMopidy: nullを渡すとnullが返ってくる', () => {
-        const track = Track.CreateFromMopidy(null);
+    it('Track.CreateFromMopidy: nullを渡すとnullが返ってくる', function () {
+        var track = Track_1.default.CreateFromMopidy(null);
         chai.assert.isNull(track);
     });
-
-    it('Track.CreateFromMopidy: 値割り当てが正しい', () => {
-        const iTrack1: MopidyTrack = {
+    it('Track.CreateArrayFromMopidy: 値割り当てが正しい', function () {
+        var iTrack1 = {
             uri: 'uri',
             name: 'name',
             album: null,
@@ -249,7 +233,7 @@ describe('Trackエンティティ', () => {
             musicbrainz_id: 'musicbrainz_id',
             last_modified: 6
         };
-        const iTrack2: MopidyTrack = {
+        var iTrack2 = {
             uri: 'uri2',
             name: 'name2',
             album: null,
@@ -266,39 +250,38 @@ describe('Trackエンティティ', () => {
             musicbrainz_id: 'musicbrainz_id2',
             last_modified: 11
         };
-        const tracks = Track.CreateArrayFromMopidy([iTrack1, iTrack2]);
-        chai.assert.isArray(tracks)
+        var tracks = Track_1.default.CreateArrayFromMopidy([iTrack1, iTrack2]);
+        chai.assert.isArray(tracks);
         chai.assert.equal(tracks.length, 2);
-
-        chai.assert.isNotNull(tracks[0]);
-        chai.assert.equal(tracks[0].Name, iTrack1.name);
-        chai.assert.equal(tracks[0].TrackNo, iTrack1.track_no);
-        chai.assert.equal(tracks[0].DiscNo, iTrack1.disc_no);
-        chai.assert.equal(tracks[0].Date, iTrack1.date);
-        chai.assert.equal(tracks[0].Length, iTrack1.length);
-        chai.assert.equal(tracks[0].BitRate, iTrack1.bitrate);
-        chai.assert.equal(tracks[0].Comment, iTrack1.comment);
-        chai.assert.equal(tracks[0].LastModified, iTrack1.last_modified);
-        chai.assert.isNull(tracks[0].Album);
-        chai.assert.isArray(tracks[0].Artists);
-        chai.assert.equal(tracks[0].Artists.length, 0);
-
-        chai.assert.isNotNull(tracks[1]);
-        chai.assert.equal(tracks[1].Name, iTrack2.name);
-        chai.assert.equal(tracks[1].TrackNo, iTrack2.track_no);
-        chai.assert.equal(tracks[1].DiscNo, iTrack2.disc_no);
-        chai.assert.equal(tracks[1].Date, iTrack2.date);
-        chai.assert.equal(tracks[1].Length, iTrack2.length);
-        chai.assert.equal(tracks[1].BitRate, iTrack2.bitrate);
-        chai.assert.equal(tracks[1].Comment, iTrack2.comment);
-        chai.assert.equal(tracks[1].LastModified, iTrack2.last_modified);
-        chai.assert.isNull(tracks[1].Album);
-        chai.assert.isArray(tracks[1].Artists);
-        chai.assert.equal(tracks[1].Artists.length, 0);
+        var track1 = tracks[0];
+        chai.assert.isNotNull(track1);
+        chai.assert.equal(track1.Name, iTrack1.name);
+        chai.assert.equal(track1.TrackNo, iTrack1.track_no);
+        chai.assert.equal(track1.DiscNo, iTrack1.disc_no);
+        chai.assert.equal(track1.Date, iTrack1.date);
+        chai.assert.equal(track1.Length, iTrack1.length);
+        chai.assert.equal(track1.BitRate, iTrack1.bitrate);
+        chai.assert.equal(track1.Comment, iTrack1.comment);
+        chai.assert.equal(track1.LastModified, iTrack1.last_modified);
+        chai.assert.isNull(track1.Album);
+        chai.assert.isArray(track1.Artists);
+        chai.assert.equal(track1.Artists.length, 0);
+        var track2 = tracks[1];
+        chai.assert.isNotNull(track2);
+        chai.assert.equal(track2.Name, iTrack2.name);
+        chai.assert.equal(track2.TrackNo, iTrack2.track_no);
+        chai.assert.equal(track2.DiscNo, iTrack2.disc_no);
+        chai.assert.equal(track2.Date, iTrack2.date);
+        chai.assert.equal(track2.Length, iTrack2.length);
+        chai.assert.equal(track2.BitRate, iTrack2.bitrate);
+        chai.assert.equal(track2.Comment, iTrack2.comment);
+        chai.assert.equal(track2.LastModified, iTrack2.last_modified);
+        chai.assert.isNull(track2.Album);
+        chai.assert.isArray(track2.Artists);
+        chai.assert.equal(track2.Artists.length, 0);
     });
-
-    it('Track.CreateFromMopidy: 渡し値配列内のnullはスキップされる', () => {
-        const iTrack1: MopidyTrack = {
+    it('Track.CreateArrayFromMopidy: 渡し値配列内のnullはスキップされる', function () {
+        var iTrack1 = {
             uri: 'uri',
             name: 'name',
             album: null,
@@ -315,25 +298,24 @@ describe('Trackエンティティ', () => {
             musicbrainz_id: 'musicbrainz_id',
             last_modified: 6
         };
-
-        const tracks = Track.CreateArrayFromMopidy([null, iTrack1]);
-        chai.assert.isArray(tracks)
+        var tracks = Track_1.default.CreateArrayFromMopidy([null, iTrack1]);
+        chai.assert.isArray(tracks);
         chai.assert.equal(tracks.length, 1);
-        chai.assert.isNotNull(tracks[0]);
-        chai.assert.equal(tracks[0].Name, iTrack1.name);
-        chai.assert.equal(tracks[0].TrackNo, iTrack1.track_no);
-        chai.assert.equal(tracks[0].DiscNo, iTrack1.disc_no);
-        chai.assert.equal(tracks[0].Date, iTrack1.date);
-        chai.assert.equal(tracks[0].Length, iTrack1.length);
-        chai.assert.equal(tracks[0].BitRate, iTrack1.bitrate);
-        chai.assert.equal(tracks[0].Comment, iTrack1.comment);
-        chai.assert.equal(tracks[0].LastModified, iTrack1.last_modified);
-        chai.assert.isNull(tracks[0].Album);
-        chai.assert.isArray(tracks[0].Artists);
-        chai.assert.equal(tracks[0].Artists.length, 0);
+        var track1 = tracks[0];
+        chai.assert.isNotNull(track1);
+        chai.assert.equal(track1.Name, iTrack1.name);
+        chai.assert.equal(track1.TrackNo, iTrack1.track_no);
+        chai.assert.equal(track1.DiscNo, iTrack1.disc_no);
+        chai.assert.equal(track1.Date, iTrack1.date);
+        chai.assert.equal(track1.Length, iTrack1.length);
+        chai.assert.equal(track1.BitRate, iTrack1.bitrate);
+        chai.assert.equal(track1.Comment, iTrack1.comment);
+        chai.assert.equal(track1.LastModified, iTrack1.last_modified);
+        chai.assert.isNull(track1.Album);
+        chai.assert.isArray(track1.Artists);
+        chai.assert.equal(track1.Artists.length, 0);
     });
-
-    it('Track: 各種補助メソッド', () => {
-
+    it('Track: 各種補助メソッド', function () {
     });
 });
+//# sourceMappingURL=Track.test.js.map

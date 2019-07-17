@@ -3506,7 +3506,7 @@ define("Models/Playlists/Playlist", ["require", "exports"], function (require, e
             this.Uri = null;
             this.Tracks = [];
         }
-        Playlist.CreateByRef = function (entity) {
+        Playlist.CreateFromRef = function (entity) {
             if (!entity)
                 return null;
             var result = new Playlist();
@@ -3515,10 +3515,10 @@ define("Models/Playlists/Playlist", ["require", "exports"], function (require, e
             result.Tracks = [];
             return result;
         };
-        Playlist.CreateArrayByRefs = function (entities) {
+        Playlist.CreateArrayFromRefs = function (entities) {
             var result = [];
             for (var i = 0; i < entities.length; i++) {
-                var entity = Playlist.CreateByRef(entities[i]);
+                var entity = Playlist.CreateFromRef(entities[i]);
                 if (entity)
                     result.push(entity);
             }
@@ -3554,7 +3554,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Mo
                             ordered = Libraries_10.default.Enumerable.from(refs)
                                 .orderBy(function (e) { return e.name; })
                                 .toArray();
-                            result = Playlist_1.default.CreateArrayByRefs(ordered);
+                            result = Playlist_1.default.CreateArrayFromRefs(ordered);
                             return [2 /*return*/, result];
                     }
                 });

@@ -15,7 +15,7 @@ export default class Playlist {
     public static readonly MinNameLength: number = 1;
     public static readonly MaxNameLength: number = 40;
 
-    public static CreateByRef(entity: IRef): Playlist {
+    public static CreateFromRef(entity: IRef): Playlist {
         if (!entity)
             return null;
 
@@ -27,11 +27,11 @@ export default class Playlist {
         return result;
     }
 
-    public static CreateArrayByRefs(entities: IRef[]): Playlist[] {
+    public static CreateArrayFromRefs(entities: IRef[]): Playlist[] {
         const result: Playlist[] = [];
 
         for (let i = 0; i < entities.length; i++) {
-            const entity = Playlist.CreateByRef(entities[i]);
+            const entity = Playlist.CreateFromRef(entities[i]);
             if (entity)
                 result.push(entity);
         }

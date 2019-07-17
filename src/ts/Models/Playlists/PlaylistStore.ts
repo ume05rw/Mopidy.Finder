@@ -31,7 +31,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         const ordered = Libraries.Enumerable.from(refs)
             .orderBy((e): string => e.name)
             .toArray();
-        const result = Playlist.CreateArrayByRefs(ordered);
+        const result = Playlist.CreateArrayFromRefs(ordered);
 
         return result;
     }
