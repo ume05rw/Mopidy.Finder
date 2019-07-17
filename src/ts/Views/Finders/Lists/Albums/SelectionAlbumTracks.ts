@@ -158,6 +158,15 @@ export default class SelectionAlbumTracks extends ViewBase {
         const store = new PlaylistStore();
         const newPlaylist = await store.AddPlaylistByAlbumTracks(this.entity);
 
+        if (!newPlaylist) {
+            Libraries.ShowToast.Error('Playlist Create Failed.');
+
+            return false;
+        }
+
+        Libraries.ShowToast.Success(`New Playlist [ ${newPlaylist.Name} ] Created.`);
+        this.$emit(SelectionAlbumEvents.PlaylistCreated);
+
         return true;
     }
 

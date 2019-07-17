@@ -15,6 +15,11 @@ import SlideupButton from '../../../Shared/SlideupButton';
 import { default as SelectionTrack, ITrackDeleteOrderedArgs, ITrackSelectionChangedArgs } from './SelectionTrack';
 import UpdateDialog from './UpdateDialog';
 
+export const TrackListEvents = {
+    PlaylistDeleted: 'PlaylistDeleted',
+    PlaylistUpdated: 'PlaylistUpdated'
+};
+
 enum ListMode {
     Playable = 'playable',
     Editable = 'editable'
@@ -569,6 +574,10 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
 
         const result = await this.store.UpdatePlayllist(this.playlist);
 
+        if (result === true) {
+            this.$emit(TrackListEvents.PlaylistUpdated);
+        }
+
         return result;
     }
 
@@ -579,6 +588,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
                 Libraries.ShowToast.Success('Delete Succeeded!');
                 this.playlist = null;
                 this.removedEntities = [];
+                this.$emit(TrackListEvents.PlaylistDeleted);
                 await this.GoBackToPlayer();
             } else {
                 Libraries.ShowToast.Error('Delete Failed!');

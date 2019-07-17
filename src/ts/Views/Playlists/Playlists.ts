@@ -2,9 +2,13 @@ import Component from 'vue-class-component';
 import Playlist from '../../Models/Playlists/Playlist';
 import ContentViewBase from '../Bases/ContentViewBase';
 import { ISelectionOrderedArgs, ISelectionChangedArgs } from '../Shared/SelectionItem';
-import PlaylistList from './Lists/Playlists/PlaylistList';
-import TrackList from './Lists/Tracks/TrackList';
+import { default as PlaylistList, PlaylistListEvents } from './Lists/Playlists/PlaylistList';
+import { default as TrackList, TrackListEvents } from './Lists/Tracks/TrackList';
 import Libraries from '../../Libraries';
+
+export const PlaylistsEvents = {
+    PlaylistsUpdated: 'PlaylistsUpdated'
+};
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
@@ -17,7 +21,9 @@ import Libraries from '../../Libraries';
             @SelectionOrdered="OnPlaylistsSelectionOrdered"
             @SelectionChanged="OnPlaylistsSelectionChanged" />
         <track-list
-            ref="TrackList" />
+            ref="TrackList"
+            @PlaylistDeleted="OnPlaylistDeleted"
+            @PlaylistUpdated="OnPlaylistUpdated" />
     </div>
 </section>`,
     components: {
@@ -54,6 +60,20 @@ export default class Playlists extends ContentViewBase {
         }
     }
 
+    private OnPlaylistCreated(): void {
+        this.$emit(PlaylistsEvents.PlaylistsUpdated);
+    }
+
+    private OnPlaylistDeleted(): void {
+        this.PlaylistList.RefreshPlaylist();
+        this.$emit(PlaylistsEvents.PlaylistsUpdated);
+    }
+
+    private OnPlaylistUpdated(): void {
+        this.PlaylistList.RefreshPlaylist();
+        this.$emit(PlaylistsEvents.PlaylistsUpdated);
+    }
+
     public GetIsPermitLeave(): boolean {
 
         // プレイリスト画面からの移動可否判定
@@ -64,5 +84,9 @@ export default class Playlists extends ContentViewBase {
         }
 
         return isSaved;
+    }
+
+    public RefreshPlaylist(): void {
+        this.PlaylistList.RefreshPlaylist();
     }
 }

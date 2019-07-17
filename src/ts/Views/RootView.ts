@@ -16,9 +16,14 @@ import Exception from '../Utils/Exception';
         @ContentChanged="OnContentChanged"
         ref="Sidebar" />
     <div class="content-wrapper h-100 pt-3 tab-content">
-        <finder ref="Finder" />
-        <playlists ref="Playlists" />
-        <settings ref="Settings" />
+        <finder
+            ref="Finder"
+            @PlaylistCreated="OnPlaylistCreatedByFinder" />
+        <playlists
+            ref="Playlists"
+            @PlaylistsUpdated="OnPlaylistsUpdatedByPlaylists" />
+        <settings
+            ref="Settings" />
     </div>
 </div>`,
     components: {
@@ -31,20 +36,37 @@ import Exception from '../Utils/Exception';
 })
 export default class RootView extends ViewBase {
 
-    private get Finder(): IContentView {
-        return this.$refs.Finder as IContentView;
+    private get Finder(): Finder {
+        return this.$refs.Finder as Finder;
     }
-    private get Playlists(): IContentView {
-        return this.$refs.Playlists as IContentView;
+    private get Playlists(): Playlists {
+        return this.$refs.Playlists as Playlists;
     }
-    private get Settings(): IContentView {
-        return this.$refs.Settings as IContentView;
+    private get Settings(): Settings {
+        return this.$refs.Settings as Settings;
     }
 
-    private activeContent: IContentView = this.Finder;
+    private activeContent: IContentView;
 
     private get HeaderBar(): HeaderBar {
         return this.$refs.HeaderBar as HeaderBar;
+    }
+
+    public async Initialize(): Promise<boolean> {
+        await super.Initialize();
+
+        this.activeContent = this.Finder;
+        //this.OnContentChanged = this.OnContentChanged.bind(this);
+
+        return true;
+    }
+
+    private OnPlaylistCreatedByFinder(): void {
+        this.Playlists.RefreshPlaylist();
+    }
+
+    private OnPlaylistsUpdatedByPlaylists(): void {
+        this.Finder.RefreshPlaylist();
     }
 
     private OnContentOrdered(args: IContentOrdered): void {

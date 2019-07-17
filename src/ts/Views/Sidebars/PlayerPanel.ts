@@ -119,8 +119,8 @@ export default class PlayerPanel extends ViewBase {
                 this.ButtonRepeat.classList.add(PlayerPanel.ClassDisabled);
         });
 
-        // ポーリング一時停止
-        //this.monitor.StartPolling();
+        // ポーリング一時停止するときは、ここをコメントアウト
+        this.monitor.StartPolling();
 
         return true;
     }

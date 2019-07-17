@@ -6,6 +6,7 @@ import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
 import Genre from '../../Models/Genres/Genre';
 import Artist from '../../Models/Artists/Artist';
+import { SelectionAlbumEvents } from './Lists/Albums/SelectionAlbumTracks';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade show active"
@@ -22,7 +23,8 @@ import Artist from '../../Models/Artists/Artist';
             @SelectionChanged="OnArtistSelectionChanged"
             @Refreshed="OnArtistRefreshed" />
         <album-list
-            ref="AlbumList" />
+            ref="AlbumList"
+            @PlaylistCreated="OnPlaylistCreated"/>
     </div>
 </section>`,
     components: {
@@ -53,6 +55,10 @@ export default class Finder extends ContentViewBase {
         return true;
     }
 
+    private OnPlaylistCreated(): void {
+        this.$emit(SelectionAlbumEvents.PlaylistCreated);
+    }
+
     private OnGenreSelectionChanged(args: ISelectionChangedArgs<Genre>): void {
         if (args.Selected) {
             this.ArtistList.AddFilterGenreId(args.Entity.Id);
@@ -79,6 +85,10 @@ export default class Finder extends ContentViewBase {
 
     private OnArtistRefreshed(): void {
         this.AlbumList.RemoveFilterAllArtists();
+    }
+
+    public RefreshPlaylist(): void {
+        this.AlbumList.InitPlaylistList();
     }
 
     public GetIsPermitLeave(): boolean {

@@ -2670,6 +2670,12 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
                             return [4 /*yield*/, store.AddPlaylistByAlbumTracks(this.entity)];
                         case 1:
                             newPlaylist = _a.sent();
+                            if (!newPlaylist) {
+                                Libraries_7.default.ShowToast.Error('Playlist Create Failed.');
+                                return [2 /*return*/, false];
+                            }
+                            Libraries_7.default.ShowToast.Success("New Playlist [ " + newPlaylist.Name + " ] Created.");
+                            this.$emit(exports.SelectionAlbumEvents.PlaylistCreated);
                             return [2 /*return*/, true];
                     }
                 });
@@ -2818,6 +2824,10 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                 });
             });
         };
+        AlbumList.prototype.OnPlaylistCreated = function () {
+            this.$emit(SelectionAlbumTracks_1.SelectionAlbumEvents.PlaylistCreated);
+            this.InitPlaylistList();
+        };
         /**
          * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
          * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -2879,14 +2889,22 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             return [4 /*yield*/, this.store.PlayAlbumByTlId(track.TlId)];
                         case 3:
                             result = _a.sent();
+                            (result)
+                                ? Libraries_8.default.ShowToast.Success("Track [ " + track.Name + " ] Started.")
+                                : Libraries_8.default.ShowToast.Error('Track Play Order Failed.');
                             return [2 /*return*/, result];
                         case 4: return [4 /*yield*/, this.store.PlayAlbumByTrack(track)];
                         case 5:
                             resultAtls = _a.sent();
+                            if (!resultAtls) {
+                                Libraries_8.default.ShowToast.Error('Track Play Order Failed.');
+                                return [2 /*return*/, false];
+                            }
                             updatedTracks_1 = Libraries_8.default.Enumerable.from(resultAtls.Tracks);
                             _.each(albumTracks.Tracks, function (track) {
                                 track.TlId = updatedTracks_1.firstOrDefault(function (e) { return e.Id == track.Id; }).TlId;
                             });
+                            Libraries_8.default.ShowToast.Success("Track [ " + track.Name + " ] Started.");
                             return [2 /*return*/, true];
                     }
                 });
@@ -2947,7 +2965,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList = __decorate([
             vue_class_component_6.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body album-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-album-tracks\n                            v-bind:playlists=\"playlists\"\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @AlbumTracksSelected=\"OnAlbumTracksSelected\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.album-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body album-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-album-tracks\n                            v-bind:playlists=\"playlists\"\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @AlbumTracksSelected=\"OnAlbumTracksSelected\"\n                            @PlaylistCreated=\"OnPlaylistCreated\"/>\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.album-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_1.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
@@ -3277,7 +3295,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionList_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, ContentViewBase_1, AlbumList_1, ArtistList_1, GenreList_1) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, vue_class_component_9, ContentViewBase_1, AlbumList_1, ArtistList_1, GenreList_1, SelectionAlbumTracks_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -3320,6 +3338,9 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
                 });
             });
         };
+        Finder.prototype.OnPlaylistCreated = function () {
+            this.$emit(SelectionAlbumTracks_2.SelectionAlbumEvents.PlaylistCreated);
+        };
         Finder.prototype.OnGenreSelectionChanged = function (args) {
             if (args.Selected) {
                 this.ArtistList.AddFilterGenreId(args.Entity.Id);
@@ -3346,12 +3367,15 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
         Finder.prototype.OnArtistRefreshed = function () {
             this.AlbumList.RemoveFilterAllArtists();
         };
+        Finder.prototype.RefreshPlaylist = function () {
+            this.AlbumList.InitPlaylistList();
+        };
         Finder.prototype.GetIsPermitLeave = function () {
             return true;
         };
         Finder = __decorate([
             vue_class_component_9.default({
-                template: "<section class=\"content h-100 tab-pane fade show active\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"finder-tab\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\" />\n    </div>\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade show active\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"finder-tab\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\"\n            @PlaylistCreated=\"OnPlaylistCreated\"/>\n    </div>\n</section>",
                 components: {
                     'genre-list': GenreList_1.default,
                     'artist-list': ArtistList_1.default,
@@ -3938,8 +3962,8 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                                 else if (!_this.monitor.IsRepeat && enabled)
                                     _this.ButtonRepeat.classList.add(PlayerPanel_1.ClassDisabled);
                             });
-                            // ポーリング一時停止
-                            //this.monitor.StartPolling();
+                            // ポーリング一時停止するときは、ここをコメントアウト
+                            this.monitor.StartPolling();
                             return [2 /*return*/, true];
                     }
                 });
@@ -4211,7 +4235,8 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistListEvents = {
-        AnimationEnd: 'animationend'
+        AnimationEnd: 'animationend',
+        PlaylistCreated: 'PlaylistCreated'
     };
     var PlaylistList = /** @class */ (function (_super) {
         __extends(PlaylistList, _super);
@@ -4342,21 +4367,33 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         };
         PlaylistList.prototype.OnAddOrdered = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var name;
+                var name, newPlaylist;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             name = this.AddModal.GetName();
                             return [4 /*yield*/, this.store.AddPlaylist(name)];
                         case 1:
-                            _a.sent();
+                            newPlaylist = _a.sent();
+                            if (!newPlaylist) {
+                                this.AddModal.Hide();
+                                Libraries_14.default.ShowToast.Error('Playlist Create Failed');
+                                return [2 /*return*/, false];
+                            }
                             this.AddModal.Hide();
+                            this.entities = [];
                             this.allEntities = [];
                             this.Refresh();
+                            this.$emit(exports.PlaylistListEvents.PlaylistCreated);
                             return [2 /*return*/, true];
                     }
                 });
             });
+        };
+        PlaylistList.prototype.RefreshPlaylist = function () {
+            this.entities = [];
+            this.allEntities = [];
+            this.Refresh();
         };
         var PlaylistList_1;
         PlaylistList.PageLength = 30;
@@ -4662,6 +4699,10 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
 define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_17, vue_infinite_loading_5, Libraries_17, Playlist_3, PlaylistStore_4, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TrackListEvents = {
+        PlaylistDeleted: 'PlaylistDeleted',
+        PlaylistUpdated: 'PlaylistUpdated'
+    };
     var ListMode;
     (function (ListMode) {
         ListMode["Playable"] = "playable";
@@ -5232,6 +5273,9 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             return [4 /*yield*/, this.store.UpdatePlayllist(this.playlist)];
                         case 1:
                             result = _a.sent();
+                            if (result === true) {
+                                this.$emit(exports.TrackListEvents.PlaylistUpdated);
+                            }
                             return [2 /*return*/, result];
                     }
                 });
@@ -5252,6 +5296,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             Libraries_17.default.ShowToast.Success('Delete Succeeded!');
                             this.playlist = null;
                             this.removedEntities = [];
+                            this.$emit(exports.TrackListEvents.PlaylistDeleted);
                             return [4 /*yield*/, this.GoBackToPlayer()];
                         case 3:
                             _a.sent();
@@ -5342,6 +5387,9 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
 define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Libraries"], function (require, exports, vue_class_component_18, ContentViewBase_2, PlaylistList_2, TrackList_2, Libraries_18) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PlaylistsEvents = {
+        PlaylistsUpdated: 'PlaylistsUpdated'
+    };
     var Playlists = /** @class */ (function (_super) {
         __extends(Playlists, _super);
         function Playlists() {
@@ -5382,6 +5430,17 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                 this.TrackList.SetPlaylist(null);
             }
         };
+        Playlists.prototype.OnPlaylistCreated = function () {
+            this.$emit(exports.PlaylistsEvents.PlaylistsUpdated);
+        };
+        Playlists.prototype.OnPlaylistDeleted = function () {
+            this.PlaylistList.RefreshPlaylist();
+            this.$emit(exports.PlaylistsEvents.PlaylistsUpdated);
+        };
+        Playlists.prototype.OnPlaylistUpdated = function () {
+            this.PlaylistList.RefreshPlaylist();
+            this.$emit(exports.PlaylistsEvents.PlaylistsUpdated);
+        };
         Playlists.prototype.GetIsPermitLeave = function () {
             // プレイリスト画面からの移動可否判定
             var isSaved = this.TrackList.GetIsSavedPlaylistChanges();
@@ -5390,9 +5449,12 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             }
             return isSaved;
         };
+        Playlists.prototype.RefreshPlaylist = function () {
+            this.PlaylistList.RefreshPlaylist();
+        };
         Playlists = __decorate([
             vue_class_component_18.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n    id=\"tab-playlists\"\n    role=\"tabpanel\"\n    aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionOrdered=\"OnPlaylistsSelectionOrdered\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\" />\n        <track-list\n            ref=\"TrackList\" />\n    </div>\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n    id=\"tab-playlists\"\n    role=\"tabpanel\"\n    aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionOrdered=\"OnPlaylistsSelectionOrdered\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\" />\n        <track-list\n            ref=\"TrackList\"\n            @PlaylistDeleted=\"OnPlaylistDeleted\"\n            @PlaylistUpdated=\"OnPlaylistUpdated\" />\n    </div>\n</section>",
                 components: {
                     'playlist-list': PlaylistList_2.default,
                     'track-list': TrackList_2.default
@@ -5431,9 +5493,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
     var RootView = /** @class */ (function (_super) {
         __extends(RootView, _super);
         function RootView() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.activeContent = _this.Finder;
-            return _this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         Object.defineProperty(RootView.prototype, "Finder", {
             get: function () {
@@ -5463,6 +5523,26 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
             enumerable: true,
             configurable: true
         });
+        RootView.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 1:
+                            _a.sent();
+                            this.activeContent = this.Finder;
+                            //this.OnContentChanged = this.OnContentChanged.bind(this);
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        RootView.prototype.OnPlaylistCreatedByFinder = function () {
+            this.Playlists.RefreshPlaylist();
+        };
+        RootView.prototype.OnPlaylistsUpdatedByPlaylists = function () {
+            this.Finder.RefreshPlaylist();
+        };
         RootView.prototype.OnContentOrdered = function (args) {
             args.Permitted = this.activeContent.GetIsPermitLeave();
         };
@@ -5484,7 +5564,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
         };
         RootView = __decorate([
             vue_class_component_20.default({
-                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar\n        @ContentOrdered=\"OnContentOrdered\"\n        @ContentChanged=\"OnContentChanged\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder ref=\"Finder\" />\n        <playlists ref=\"Playlists\" />\n        <settings ref=\"Settings\" />\n    </div>\n</div>",
+                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar\n        @ContentOrdered=\"OnContentOrdered\"\n        @ContentChanged=\"OnContentChanged\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder\n            ref=\"Finder\"\n            @PlaylistCreated=\"OnPlaylistCreatedByFinder\" />\n        <playlists\n            ref=\"Playlists\"\n            @PlaylistsUpdated=\"OnPlaylistsUpdatedByPlaylists\" />\n        <settings\n            ref=\"Settings\" />\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
                     'sidebar': Sidebar_2.default,

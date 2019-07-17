@@ -11,7 +11,8 @@ import { default as SelectionList } from '../../../Shared/SelectionList';
 import AddModal from './AddModal';
 
 export const PlaylistListEvents = {
-    AnimationEnd: 'animationend'
+    AnimationEnd: 'animationend',
+    PlaylistCreated: 'PlaylistCreated'
 };
 
 @Component({
@@ -168,12 +169,28 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
 
     private async OnAddOrdered(): Promise<boolean> {
         const name = this.AddModal.GetName();
-        await this.store.AddPlaylist(name);
+        const newPlaylist = await this.store.AddPlaylist(name);
 
-        this.AddModal.Hide();
+        if (!newPlaylist) {
+            this.AddModal.Hide();
+            Libraries.ShowToast.Error('Playlist Create Failed');
+
+            return false;
+        }
+
+        this.AddModal.Hide();        
+        this.entities = [];
         this.allEntities = [];
         this.Refresh();
 
+        this.$emit(PlaylistListEvents.PlaylistCreated);
+
         return true;
+    }
+
+    public RefreshPlaylist(): void {
+        this.entities = [];
+        this.allEntities = [];
+        this.Refresh();
     }
 }

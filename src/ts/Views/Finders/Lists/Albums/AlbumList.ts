@@ -11,7 +11,7 @@ import Delay from '../../../../Utils/Delay';
 import Exception from '../../../../Utils/Exception';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionList, SelectionEvents } from '../../../Shared/SelectionList';
-import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './SelectionAlbumTracks';
+import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs, SelectionAlbumEvents } from './SelectionAlbumTracks';
 
 @Component({
     template: `<div class="col-md-6">
@@ -34,7 +34,8 @@ import { default as SelectionAlbumTracks, IAlbumTracksSelectedArgs } from './Sel
                             v-bind:playlists="playlists"
                             ref="Items"
                             v-bind:entity="entity"
-                            @AlbumTracksSelected="OnAlbumTracksSelected" />
+                            @AlbumTracksSelected="OnAlbumTracksSelected"
+                            @PlaylistCreated="OnPlaylistCreated"/>
                     </template>
                     <infinite-loading
                         @infinite="OnInfinite"
@@ -118,6 +119,11 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         return true;
     }
 
+    private OnPlaylistCreated(): void {
+        this.$emit(SelectionAlbumEvents.PlaylistCreated);
+        this.InitPlaylistList();
+    }
+
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
      * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -167,15 +173,28 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
             // TlId割り当て済みの場合
             const result = await this.store.PlayAlbumByTlId(track.TlId);
 
+            (result)
+                ? Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started.`)
+                : Libraries.ShowToast.Error('Track Play Order Failed.');
+
             return result;
         } else {
             // TlId未割り当ての場合
             const resultAtls = await this.store.PlayAlbumByTrack(track);
+
+            if (!resultAtls) {
+                Libraries.ShowToast.Error('Track Play Order Failed.');
+
+                return false;
+            }
+
             const updatedTracks = Libraries.Enumerable.from(resultAtls.Tracks);
 
             _.each(albumTracks.Tracks, (track): void => {
                 track.TlId = updatedTracks.firstOrDefault((e): boolean => e.Id == track.Id).TlId;
             });
+
+            Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started.`)
 
             return true;
         }
