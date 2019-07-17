@@ -1,5 +1,5 @@
 import Component from 'vue-class-component';
-import ViewBase from '../Bases/ViewBase';
+import ContentViewBase from '../Bases/ContentViewBase';
 import { ISelectionChangedArgs } from '../Shared/SelectionItem';
 import AlbumList from './Lists/Albums/AlbumList';
 import ArtistList from './Lists/ArtistList';
@@ -31,7 +31,7 @@ import Artist from '../../Models/Artists/Artist';
         'album-list': AlbumList
     }
 })
-export default class Finder extends ViewBase {
+export default class Finder extends ContentViewBase {
 
     private get GenreList(): GenreList {
         return this.$refs.GenreList as GenreList;
@@ -71,5 +71,9 @@ export default class Finder extends ViewBase {
 
     private OnArtistRefreshed(): void {
         this.AlbumList.RemoveFilterAllArtists();
+    }
+
+    public GetIsPermitLeave(): boolean {
+        return true;
     }
 }

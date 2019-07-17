@@ -1,6 +1,6 @@
 import Component from 'vue-class-component';
 import Playlist from '../../Models/Playlists/Playlist';
-import ViewBase from '../Bases/ViewBase';
+import ContentViewBase from '../Bases/ContentViewBase';
 import { ISelectionOrderedArgs, ISelectionChangedArgs } from '../Shared/SelectionItem';
 import PlaylistList from './Lists/Playlists/PlaylistList';
 import TrackList from './Lists/Tracks/TrackList';
@@ -25,7 +25,7 @@ import Libraries from '../../Libraries';
         'track-list': TrackList
     }
 })
-export default class Playlists extends ViewBase {
+export default class Playlists extends ContentViewBase {
 
     private get PlaylistList(): PlaylistList {
         return this.$refs.PlaylistList as PlaylistList;
@@ -39,11 +39,12 @@ export default class Playlists extends ViewBase {
         console.log(args);
 
         // プレイリスト変更可否判定
-        const switchable = this.TrackList.GetIsPlaylistSwichable();
-        args.Permitted = switchable;
+        const isSaved = this.TrackList.GetIsSavedPlaylistChanges();
+        args.Permitted = isSaved;
 
-        if (!switchable)
-            Libraries.ShowToast.Warning('Please complete editing.')
+        if (!isSaved) {
+            Libraries.ShowToast.Warning('Please complete editing.');
+        }
 
         return true;
     }
@@ -54,5 +55,17 @@ export default class Playlists extends ViewBase {
         } else {
             this.TrackList.SetPlaylist(null);
         }
+    }
+
+    public GetIsPermitLeave(): boolean {
+
+        // プレイリスト画面からの移動可否判定
+        const isSaved = this.TrackList.GetIsSavedPlaylistChanges();
+
+        if (!isSaved) {
+            Libraries.ShowToast.Warning('Please complete editing.');
+        }
+
+        return isSaved;
     }
 }

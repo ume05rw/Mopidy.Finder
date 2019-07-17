@@ -158,7 +158,7 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         return true;
     }
 
-    public GetIsPlaylistSwichable(): boolean {
+    public GetIsSavedPlaylistChanges(): boolean {
         if (this.listMode === ListMode.Playable)
             return true;
 

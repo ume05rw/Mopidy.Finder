@@ -12,9 +12,13 @@ export enum Pages {
 export interface IContentChanged {
     Page: Pages;
 }
+export interface IContentOrdered extends IContentChanged {
+    Permitted: boolean;
+}
 
 export const SidebarEvents = {
-    ContentChanged: 'ContentChanged'
+    ContentOrdered: 'ContentOrdered',
+    ContentChanged: 'ContentChanged',
 }
 
 @Component({
@@ -92,24 +96,57 @@ export default class Sidebar extends ViewBase {
         return true;
     }
 
-    private OnClickFinder(): void {
-        const args: IContentChanged = {
+    private OnClickFinder(ev: MouseEvent): void {
+        const orderedArgs: IContentOrdered = {
+            Page: Pages.Finder,
+            Permitted: true
+        };
+        this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
+
+        if (!orderedArgs.Permitted) {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+
+        const changedArgs: IContentChanged = {
             Page: Pages.Finder
         };
-        this.$emit(SidebarEvents.ContentChanged, args)
+        this.$emit(SidebarEvents.ContentChanged, changedArgs)
     }
 
-    private OnClickPlaylists(): void {
-        const args: IContentChanged = {
+    private OnClickPlaylists(ev: MouseEvent): void {
+        const orderedArgs: IContentOrdered = {
+            Page: Pages.Playlists,
+            Permitted: true
+        };
+        this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
+
+        if (!orderedArgs.Permitted) {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+
+        const changedArgs: IContentChanged = {
             Page: Pages.Playlists
         };
-        this.$emit(SidebarEvents.ContentChanged, args)
+        this.$emit(SidebarEvents.ContentChanged, changedArgs)
     }
 
-    private OnClickSettings(): void {
-        const args: IContentChanged = {
+    private OnClickSettings(ev: MouseEvent): void {
+        const orderedArgs: IContentOrdered = {
+            Page: Pages.Settings,
+            Permitted: true
+        };
+        this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
+
+        if (!orderedArgs.Permitted) {
+            ev.preventDefault();
+            ev.stopPropagation();
+        }
+
+        const changedArgs: IContentChanged = {
             Page: Pages.Settings
         };
-        this.$emit(SidebarEvents.ContentChanged, args)
+        this.$emit(SidebarEvents.ContentChanged, changedArgs)
     }
 }

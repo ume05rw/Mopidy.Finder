@@ -20,6 +20,7 @@
     <None Remove="src\ts\Utils\Delay.ts" />
     <None Remove="src\ts\Utils\Exception.ts" />
     <None Remove="src\ts\Views\Bases\AnimatedViewBase.ts" />
+    <None Remove="src\ts\Views\Bases\ContentViewBase.ts" />
     <None Remove="src\ts\Views\Events\AdminLteEvents.ts" />
     <None Remove="src\ts\Libraries.ts" />
     <None Remove="src\ts\MainController.ts" />
@@ -96,6 +97,7 @@
     <TypeScriptCompile Include="src\ts\Utils\Delay.ts" />
     <TypeScriptCompile Include="src\ts\Utils\Exception.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\AnimatedViewBase.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Bases\ContentViewBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Events\AdminLteEvents.ts" />
     <TypeScriptCompile Include="src\ts\Libraries.ts" />
     <TypeScriptCompile Include="src\ts\Main.ts" />

@@ -153,7 +153,7 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
                 uri: track.Uri
             });
         }
-        // 渡し値フォーマットがダメらしい。
+
         const response = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistSave, {
             playlist: {
                 __model__: 'Playlist',

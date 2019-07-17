@@ -270,7 +270,19 @@ define("Views/Bases/ViewBase", ["require", "exports", "vue", "lodash"], function
     }(vue_1.default));
     exports.default = ViewBase;
 });
-define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_1, vue_property_decorator_1, ViewBase_1) {
+define("Views/Bases/ContentViewBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ContentViewBase = /** @class */ (function (_super) {
+        __extends(ContentViewBase, _super);
+        function ContentViewBase() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return ContentViewBase;
+    }(ViewBase_1.default));
+    exports.default = ContentViewBase;
+});
+define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_1, vue_property_decorator_1, ViewBase_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionItemEvents = {
@@ -341,7 +353,7 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
             })
         ], SelectionItem);
         return SelectionItem;
-    }(ViewBase_1.default));
+    }(ViewBase_2.default));
     exports.default = SelectionItem;
 });
 define("Models/Mopidies/IArtist", ["require", "exports"], function (require, exports) {
@@ -1466,7 +1478,7 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], fun
     }());
     exports.default = Animate;
 });
-define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewBase", "Utils/Exception", "Utils/Animate", "Utils/Animate"], function (require, exports, ViewBase_2, Exception_3, Animate_1, Animate_2) {
+define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewBase", "Utils/Exception", "Utils/Animate", "Utils/Animate"], function (require, exports, ViewBase_3, Exception_3, Animate_1, Animate_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Animation = Animate_2.Animation;
@@ -1550,7 +1562,7 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Views/Bases/ViewB
             return !this.Element.classList.contains(this.ClassHide);
         };
         return AnimatedViewBase;
-    }(ViewBase_2.default));
+    }(ViewBase_3.default));
     exports.default = AnimatedViewBase;
 });
 define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/AnimatedViewBase", "Libraries"], function (require, exports, vue_class_component_2, vue_property_decorator_2, AnimatedViewBase_1, Libraries_2) {
@@ -1654,7 +1666,7 @@ define("Views/Shared/Filterboxes/SearchInput", ["require", "exports", "vue-class
     }(AnimatedViewBase_2.default));
     exports.default = SearchInput;
 });
-define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-component", "vue-property-decorator", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SlideupButton", "Views/Shared/Filterboxes/SearchInput"], function (require, exports, vue_class_component_4, vue_property_decorator_4, Delay_1, ViewBase_3, SlideupButton_1, SearchInput_1) {
+define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-component", "vue-property-decorator", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SlideupButton", "Views/Shared/Filterboxes/SearchInput"], function (require, exports, vue_class_component_4, vue_property_decorator_4, Delay_1, ViewBase_4, SlideupButton_1, SearchInput_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FilterboxEvents = {
@@ -1804,7 +1816,7 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
             })
         ], Filterbox);
         return Filterbox;
-    }(ViewBase_3.default));
+    }(ViewBase_4.default));
     exports.default = Filterbox;
 });
 define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
@@ -1818,7 +1830,7 @@ define("Views/Events/AdminLteEvents", ["require", "exports"], function (require,
         Removed: 'removed.lte.widget'
     };
 });
-define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Utils/Exception", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, Libraries_3, ViewBase_4, AdminLteEvents_1, Exception_4, SelectionItem_2) {
+define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Utils/Exception", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, Libraries_3, ViewBase_5, AdminLteEvents_1, Exception_4, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionEvents = {
@@ -1970,10 +1982,10 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
             }
         };
         return SelectionList;
-    }(ViewBase_4.default));
+    }(ViewBase_5.default));
     exports.default = SelectionList;
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_4, AlbumTracks_2, ViewBase_5) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_4, AlbumTracks_2, ViewBase_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumEvents = {
@@ -2033,7 +2045,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
-    }(ViewBase_5.default));
+    }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
 define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks", "Utils/Delay"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_5, AlbumTracksStore_1, Exception_5, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1, Delay_2) {
@@ -2542,7 +2554,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionList_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, ViewBase_6, AlbumList_1, ArtistList_1, GenreList_1) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, ContentViewBase_1, AlbumList_1, ArtistList_1, GenreList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -2597,6 +2609,9 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
         Finder.prototype.OnArtistRefreshed = function () {
             this.AlbumList.RemoveFilterAllArtists();
         };
+        Finder.prototype.GetIsPermitLeave = function () {
+            return true;
+        };
         Finder = __decorate([
             vue_class_component_9.default({
                 template: "<section class=\"content h-100 tab-pane fade show active\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"finder-tab\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\" />\n    </div>\n</section>",
@@ -2608,7 +2623,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
             })
         ], Finder);
         return Finder;
-    }(ViewBase_6.default));
+    }(ContentViewBase_1.default));
     exports.default = Finder;
 });
 define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_2) {
@@ -3357,7 +3372,8 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
         Pages["Settings"] = "Settings";
     })(Pages = exports.Pages || (exports.Pages = {}));
     exports.SidebarEvents = {
-        ContentChanged: 'ContentChanged'
+        ContentOrdered: 'ContentOrdered',
+        ContentChanged: 'ContentChanged',
     };
     var Sidebar = /** @class */ (function (_super) {
         __extends(Sidebar, _super);
@@ -3386,23 +3402,50 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                 });
             });
         };
-        Sidebar.prototype.OnClickFinder = function () {
-            var args = {
+        Sidebar.prototype.OnClickFinder = function (ev) {
+            var orderedArgs = {
+                Page: Pages.Finder,
+                Permitted: true
+            };
+            this.$emit(exports.SidebarEvents.ContentOrdered, orderedArgs);
+            if (!orderedArgs.Permitted) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+            var changedArgs = {
                 Page: Pages.Finder
             };
-            this.$emit(exports.SidebarEvents.ContentChanged, args);
+            this.$emit(exports.SidebarEvents.ContentChanged, changedArgs);
         };
-        Sidebar.prototype.OnClickPlaylists = function () {
-            var args = {
+        Sidebar.prototype.OnClickPlaylists = function (ev) {
+            var orderedArgs = {
+                Page: Pages.Playlists,
+                Permitted: true
+            };
+            this.$emit(exports.SidebarEvents.ContentOrdered, orderedArgs);
+            if (!orderedArgs.Permitted) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+            var changedArgs = {
                 Page: Pages.Playlists
             };
-            this.$emit(exports.SidebarEvents.ContentChanged, args);
+            this.$emit(exports.SidebarEvents.ContentChanged, changedArgs);
         };
-        Sidebar.prototype.OnClickSettings = function () {
-            var args = {
+        Sidebar.prototype.OnClickSettings = function (ev) {
+            var orderedArgs = {
+                Page: Pages.Settings,
+                Permitted: true
+            };
+            this.$emit(exports.SidebarEvents.ContentOrdered, orderedArgs);
+            if (!orderedArgs.Permitted) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+            var changedArgs = {
                 Page: Pages.Settings
             };
-            this.$emit(exports.SidebarEvents.ContentChanged, args);
+            this.$emit(exports.SidebarEvents.ContentChanged, changedArgs);
         };
         Sidebar = __decorate([
             vue_class_component_11.default({
@@ -4358,7 +4401,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                 });
             });
         };
-        TrackList.prototype.GetIsPlaylistSwichable = function () {
+        TrackList.prototype.GetIsSavedPlaylistChanges = function () {
             if (this.listMode === ListMode.Playable)
                 return true;
             return !(this.GetUpdate()).HasUpdate;
@@ -4898,7 +4941,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionList_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Libraries"], function (require, exports, vue_class_component_18, ViewBase_13, PlaylistList_2, TrackList_2, Libraries_16) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Libraries"], function (require, exports, vue_class_component_18, ContentViewBase_2, PlaylistList_2, TrackList_2, Libraries_16) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Playlists = /** @class */ (function (_super) {
@@ -4922,14 +4965,15 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
         });
         Playlists.prototype.OnPlaylistsSelectionOrdered = function (args) {
             return __awaiter(this, void 0, void 0, function () {
-                var switchable;
+                var isSaved;
                 return __generator(this, function (_a) {
                     console.log('Playlists.OnPlaylistsSelectionOrdered:');
                     console.log(args);
-                    switchable = this.TrackList.GetIsPlaylistSwichable();
-                    args.Permitted = switchable;
-                    if (!switchable)
+                    isSaved = this.TrackList.GetIsSavedPlaylistChanges();
+                    args.Permitted = isSaved;
+                    if (!isSaved) {
                         Libraries_16.default.ShowToast.Warning('Please complete editing.');
+                    }
                     return [2 /*return*/, true];
                 });
             });
@@ -4942,6 +4986,14 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                 this.TrackList.SetPlaylist(null);
             }
         };
+        Playlists.prototype.GetIsPermitLeave = function () {
+            // プレイリスト画面からの移動可否判定
+            var isSaved = this.TrackList.GetIsSavedPlaylistChanges();
+            if (!isSaved) {
+                Libraries_16.default.ShowToast.Warning('Please complete editing.');
+            }
+            return isSaved;
+        };
         Playlists = __decorate([
             vue_class_component_18.default({
                 template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-playlists\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"playlists-tab\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionOrdered=\"OnPlaylistsSelectionOrdered\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\" />\n        <track-list\n            ref=\"TrackList\" />\n    </div>\n</section>",
@@ -4952,10 +5004,10 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             })
         ], Playlists);
         return Playlists;
-    }(ViewBase_13.default));
+    }(ContentViewBase_2.default));
     exports.default = Playlists;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_19, ViewBase_14) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase"], function (require, exports, vue_class_component_19, ContentViewBase_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Settings = /** @class */ (function (_super) {
@@ -4963,6 +5015,10 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         function Settings() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Settings.prototype.GetIsPermitLeave = function () {
+            // DBリフレッシュ中はページ移動NGにする。
+            return true;
+        };
         Settings = __decorate([
             vue_class_component_19.default({
                 template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n</section>",
@@ -4970,17 +5026,40 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             })
         ], Settings);
         return Settings;
-    }(ViewBase_14.default));
+    }(ContentViewBase_3.default));
     exports.default = Settings;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_20, ViewBase_15, Finder_1, HeaderBar_1, Playlists_1, Settings_1, Sidebar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Utils/Exception"], function (require, exports, vue_class_component_20, ViewBase_13, Finder_1, HeaderBar_1, Playlists_1, Settings_1, Sidebar_2, Exception_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
         __extends(RootView, _super);
         function RootView() {
-            return _super !== null && _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.activeContent = _this.Finder;
+            return _this;
         }
+        Object.defineProperty(RootView.prototype, "Finder", {
+            get: function () {
+                return this.$refs.Finder;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RootView.prototype, "Playlists", {
+            get: function () {
+                return this.$refs.Playlists;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RootView.prototype, "Settings", {
+            get: function () {
+                return this.$refs.Settings;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(RootView.prototype, "HeaderBar", {
             get: function () {
                 return this.$refs.HeaderBar;
@@ -4988,12 +5067,28 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
             enumerable: true,
             configurable: true
         });
+        RootView.prototype.OnContentOrdered = function (args) {
+            args.Permitted = this.activeContent.GetIsPermitLeave();
+        };
         RootView.prototype.OnContentChanged = function (args) {
+            switch (args.Page) {
+                case Sidebar_2.Pages.Finder:
+                    this.activeContent = this.Finder;
+                    break;
+                case Sidebar_2.Pages.Playlists:
+                    this.activeContent = this.Playlists;
+                    break;
+                case Sidebar_2.Pages.Settings:
+                    this.activeContent = this.Settings;
+                    break;
+                default:
+                    Exception_7.default.Throw('Unexpected Page.', args);
+            }
             this.HeaderBar.SetHeader(args);
         };
         RootView = __decorate([
             vue_class_component_20.default({
-                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar\n        @ContentChanged=\"OnContentChanged\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder ref=\"Finder\" />\n        <playlists ref=\"Playlists\" />\n        <settings ref=\"Settings\" />\n    </div>\n</div>",
+                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar ref=\"HeaderBar\" />\n    <sidebar\n        @ContentOrdered=\"OnContentOrdered\"\n        @ContentChanged=\"OnContentChanged\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder ref=\"Finder\" />\n        <playlists ref=\"Playlists\" />\n        <settings ref=\"Settings\" />\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
                     'sidebar': Sidebar_2.default,
@@ -5004,7 +5099,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
             })
         ], RootView);
         return RootView;
-    }(ViewBase_15.default));
+    }(ViewBase_13.default));
     exports.default = RootView;
 });
 define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_17, RootView_1) {

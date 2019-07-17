@@ -1,5 +1,5 @@
 import Component from 'vue-class-component';
-import ViewBase from '../Bases/ViewBase';
+import ContentViewBase from '../Bases/ContentViewBase';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
@@ -10,6 +10,9 @@ import ViewBase from '../Bases/ViewBase';
     components: {
     }
 })
-export default class Settings extends ViewBase {
-
+export default class Settings extends ContentViewBase {
+    public GetIsPermitLeave(): boolean {
+        // DBリフレッシュ中はページ移動NGにする。
+        return true;
+    }
 }
