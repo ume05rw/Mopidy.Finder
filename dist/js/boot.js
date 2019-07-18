@@ -20,8 +20,8 @@ define('font-awesome/css/font-awesome.css', ["exports"], function (exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {};
 });
-// ダミー: admin-lte/dist/css/adminlte.css
-define('admin-lte/dist/css/adminlte.css', ["exports"], function (exports) {
+// ダミー: ../css/adminlte.css
+define('../css/adminlte.css', ["exports"], function (exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {};
