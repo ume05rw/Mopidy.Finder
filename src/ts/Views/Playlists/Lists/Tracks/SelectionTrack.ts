@@ -38,7 +38,7 @@ export interface ITrackSelectionChangedArgs extends ISelectionChangedArgs<Track>
             {{ entity.GetDisplayName() }}
             <div class="btn-group pull-right mr-2 editmode-buttons">
                 <button
-                    class="btn btn-sm btn-outline-dark"
+                    class="btn btn-sm btn-outline-light"
                     @click="OnClickDelete"
                     ref="DeleteButton" >
                     <i class="fa fa-trash" />

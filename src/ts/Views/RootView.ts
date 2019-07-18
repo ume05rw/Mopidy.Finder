@@ -56,7 +56,10 @@ export default class RootView extends ViewBase {
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        this.activeContent = this.Finder;
+        const args: IContentChanged = {
+            Page: Pages.Finder
+        }
+        this.OnContentChanged(args);
 
         return true;
     }
@@ -87,6 +90,7 @@ export default class RootView extends ViewBase {
             default:
                 Exception.Throw('Unexpected Page.', args);
         }
+        this.activeContent.InitContent();
         this.HeaderBar.SetHeader(args);
     }
 }

@@ -8,6 +8,7 @@ import 'font-awesome/css/font-awesome.css';
 import 'admin-lte/dist/css/adminlte.css';
 import 'admin-lte/plugins/ion-rangeSlider/css/ion.rangeSlider.css';
 import 'admin-lte/plugins/sweetalert2/sweetalert2.css';
+import '../css/bootstrap4-neon-glow.css';
 import '../css/site.css';
 
 /**

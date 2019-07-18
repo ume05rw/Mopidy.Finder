@@ -49,6 +49,11 @@ module.exports = {
             {
                 test: /\.(woff|woff2|eot|ttf|svg)$/,
                 loader: 'file-loader?name=../font/[name].[ext]'
+            },
+            // Image
+            {
+                test: /\.(jpg|jpeg|png|gif)$/,
+                loader: 'file-loader?name=../img/[name].[ext]'
             }
             //// TypeScript
             //// 予めtscでコンパイルしておく。

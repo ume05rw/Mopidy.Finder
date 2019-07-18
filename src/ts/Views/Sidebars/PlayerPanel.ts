@@ -12,17 +12,17 @@ import ViewBase from '../Bases/ViewBase';
         <span>{{ monitor.ArtistName }}{{ (monitor.Year) ? '(' + monitor.Year + ')' : '' }}</span>
         <div class="player-box btn-group btn-group-sm w-100 mt-2" role="group">
             <button type="button"
-                class="btn btn-secondary"
+                class="btn btn-warning"
                 @click="OnClickPrevious">
                 <i class="fa fa-fast-backward" />
             </button>
             <button type="button"
-                class="btn btn-secondary"
+                class="btn btn-warning"
                 @click="OnClickPlayPause">
                 <i v-bind:class="GetPlayPauseIconClass()" ref="PlayPauseIcon"/>
             </button>
             <button type="button"
-                class="btn btn-secondary"
+                class="btn btn-warning"
                 @click="OnClickNext">
                 <i class="fa fa-fast-forward" />
             </button>
@@ -30,13 +30,13 @@ import ViewBase from '../Bases/ViewBase';
 
         <div class="btn-group btn-group-sm w-100 mt-2" role="group">
             <button type="button"
-                class="btn btn-secondary disabled"
+                class="btn btn-warning disabled"
                 ref="ButtonShuffle"
                 @click="OnClickShuffle">
                 <i class="fa fa fa-random" />
             </button>
             <button type="button"
-                class="btn btn-secondary disabled"
+                class="btn btn-warning disabled"
                 ref="ButtonRepeat"
                 @click="OnClickRepeat" >
                 <i class="fa fa-retweet" />

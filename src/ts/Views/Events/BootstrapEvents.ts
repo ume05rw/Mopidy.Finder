@@ -4,3 +4,9 @@ export const ModalEvents = {
     Hide: 'hide.bs.modal',
     Hidden: 'hidden.bs.modal'
 };
+export const TabEvents = {
+    Show: 'show.bs.tab',
+    Shown: 'shown.bs.tab',
+    Hide: 'hide.bs.tab',
+    Hidden: 'hidden.bs.tab'
+};

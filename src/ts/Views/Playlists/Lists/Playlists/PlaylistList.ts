@@ -18,7 +18,7 @@ export const PlaylistListEvents = {
 @Component({
     template: `<div class="col-md-3">
     <div class="card plain-list">
-        <div class="card-header with-border bg-info">
+        <div class="card-header with-border bg-warning">
             <h3 class="card-title">Playlists</h3>
             <div class="card-tools form-row">
                 <filter-textbox

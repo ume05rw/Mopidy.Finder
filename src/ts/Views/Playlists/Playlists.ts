@@ -5,6 +5,7 @@ import ContentViewBase from '../Bases/ContentViewBase';
 import { ISelectionChangedArgs, ISelectionOrderedArgs } from '../Shared/SelectionItem';
 import PlaylistList from './Lists/Playlists/PlaylistList';
 import TrackList from './Lists/Tracks/TrackList';
+import Delay from '../../Utils/Delay';
 
 export const PlaylistsEvents = {
     PlaylistsUpdated: 'PlaylistsUpdated'
@@ -40,6 +41,24 @@ export default class Playlists extends ContentViewBase {
         return this.$refs.TrackList as TrackList;
     }
 
+    // #region "IContentView"
+    public GetIsPermitLeave(): boolean {
+        // プレイリスト画面からの移動可否判定
+        const isSaved = this.TrackList.GetIsSavedPlaylistChanges();
+        if (!isSaved) {
+            Libraries.ShowToast.Warning('Please complete editing.');
+        }
+
+        return isSaved;
+    }
+    public InitContent(): void {
+        Delay.Wait(500)
+            .then((): void => {
+                this.PlaylistList.RefreshPlaylist();
+            });
+    }
+    // #endregion
+
     private async OnPlaylistsSelectionOrdered(args: ISelectionOrderedArgs<Playlist>): Promise<boolean> {
         // プレイリスト変更可否判定
         const isSaved = this.TrackList.GetIsSavedPlaylistChanges();
@@ -72,18 +91,6 @@ export default class Playlists extends ContentViewBase {
     private OnPlaylistUpdated(): void {
         this.PlaylistList.RefreshPlaylist();
         this.$emit(PlaylistsEvents.PlaylistsUpdated);
-    }
-
-    public GetIsPermitLeave(): boolean {
-
-        // プレイリスト画面からの移動可否判定
-        const isSaved = this.TrackList.GetIsSavedPlaylistChanges();
-
-        if (!isSaved) {
-            Libraries.ShowToast.Warning('Please complete editing.');
-        }
-
-        return isSaved;
     }
 
     public RefreshPlaylist(): void {

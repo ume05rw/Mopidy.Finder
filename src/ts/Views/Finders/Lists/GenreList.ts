@@ -11,7 +11,7 @@ import SelectionList from '../../Shared/SelectionList';
 @Component({
     template: `<div class="col-md-3">
     <div class="card plain-list">
-        <div class="card-header with-border bg-green">
+        <div class="card-header with-border bg-warning">
             <h3 class="card-title">Genres</h3>
             <div class="card-tools form-row">
                 <filter-textbox

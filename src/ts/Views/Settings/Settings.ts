@@ -11,8 +11,13 @@ import ContentViewBase from '../Bases/ContentViewBase';
     }
 })
 export default class Settings extends ContentViewBase {
+
+    // #region "IContentView"
     public GetIsPermitLeave(): boolean {
         // DBリフレッシュ中はページ移動NGにする。
         return true;
     }
+    public InitContent(): void {
+    }
+    // #endregion
 }

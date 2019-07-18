@@ -46,13 +46,14 @@ export default class Finder extends ContentViewBase {
         return this.$refs.AlbumList as AlbumList;
     }
 
-    protected async OnShown(): Promise<boolean> {
-        super.OnShown();
-
-        await this.AlbumList.InitPlaylistList();
-
+    // #region "IContentView"
+    public GetIsPermitLeave(): boolean {
         return true;
     }
+    public InitContent(): void {
+        this.AlbumList.InitPlaylistList();
+    }
+    // #endregion
 
     private OnPlaylistUpdated(): void {
         this.$emit(AlbumListEvents.PlaylistUpdated);
@@ -88,9 +89,5 @@ export default class Finder extends ContentViewBase {
 
     public RefreshPlaylist(): void {
         this.AlbumList.InitPlaylistList();
-    }
-
-    public GetIsPermitLeave(): boolean {
-        return true;
     }
 }

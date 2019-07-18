@@ -150,7 +150,7 @@ define("EventableBase", ["require", "exports", "lodash"], function (require, exp
     }());
     exports.default = EventableBase;
 });
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "admin-lte/plugins/sweetalert2/sweetalert2", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy, sweetalert2_1) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "admin-lte/plugins/sweetalert2/sweetalert2", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "admin-lte/dist/css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy, sweetalert2_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // SweetAlert2 は個別読み込みOK.
@@ -297,6 +297,12 @@ define("Views/Events/BootstrapEvents", ["require", "exports"], function (require
         Hide: 'hide.bs.modal',
         Hidden: 'hidden.bs.modal'
     };
+    exports.TabEvents = {
+        Show: 'show.bs.tab',
+        Shown: 'shown.bs.tab',
+        Hide: 'hide.bs.tab',
+        Hidden: 'hidden.bs.tab'
+    };
 });
 define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function (require, exports, _, vue_1) {
     "use strict";
@@ -336,7 +342,7 @@ define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function
     }(vue_1.default));
     exports.default = ViewBase;
 });
-define("Views/Bases/ContentViewBase", ["require", "exports", "Libraries", "Views/Events/BootstrapEvents", "Views/Bases/ViewBase"], function (require, exports, Libraries_1, BootstrapEvents_1, ViewBase_1) {
+define("Views/Bases/ContentViewBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ContentViewBase = /** @class */ (function (_super) {
@@ -344,61 +350,6 @@ define("Views/Bases/ContentViewBase", ["require", "exports", "Libraries", "Views
         function ContentViewBase() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        ContentViewBase.prototype.Initialize = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var elem;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
-                        case 1:
-                            _a.sent();
-                            elem = Libraries_1.default.$(this.$el);
-                            elem.on(BootstrapEvents_1.ModalEvents.Show, function () {
-                                _this.OnShow();
-                            });
-                            elem.on(BootstrapEvents_1.ModalEvents.Shown, function () {
-                                _this.OnShown();
-                            });
-                            elem.on(BootstrapEvents_1.ModalEvents.Hide, function () {
-                                _this.OnHide();
-                            });
-                            elem.on(BootstrapEvents_1.ModalEvents.Hidden, function () {
-                                _this.OnHidden();
-                            });
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        ContentViewBase.prototype.OnShow = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    return [2 /*return*/, true];
-                });
-            });
-        };
-        ContentViewBase.prototype.OnShown = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    return [2 /*return*/, true];
-                });
-            });
-        };
-        ContentViewBase.prototype.OnHide = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    return [2 /*return*/, true];
-                });
-            });
-        };
-        ContentViewBase.prototype.OnHidden = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    return [2 /*return*/, true];
-                });
-            });
-        };
         return ContentViewBase;
     }(ViewBase_1.default));
     exports.default = ContentViewBase;
@@ -1146,14 +1097,14 @@ define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "E
     }(EventableBase_1.default));
     exports.default = XhrQueryableBase;
 });
-define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_2, XhrQueryableBase_1) {
+define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_1, XhrQueryableBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var StoreBase = /** @class */ (function (_super) {
         __extends(StoreBase, _super);
         function StoreBase() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.Enumerable = Libraries_2.default.Enumerable;
+            _this.Enumerable = Libraries_1.default.Enumerable;
             return _this;
         }
         return StoreBase;
@@ -1389,7 +1340,7 @@ define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, ex
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_3, Exception_2, JsonRpcQueryableBase_1, Track_3) {
+define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_2, Exception_2, JsonRpcQueryableBase_1, Track_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackStore = /** @class */ (function (_super) {
@@ -1403,7 +1354,7 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Ex
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            trackUris = Libraries_3.default.Enumerable.from(tracks)
+                            trackUris = Libraries_2.default.Enumerable.from(tracks)
                                 .where(function (e) { return (!e.Name
                                 || !e.Length); })
                                 .select(function (e) { return e.Uri; })
@@ -1440,7 +1391,7 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Ex
     }(JsonRpcQueryableBase_1.default));
     exports.default = TrackStore;
 });
-define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_4, Exception_3, JsonRpcQueryableBase_2, Track_4, TrackStore_1, Playlist_1) {
+define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_3, Exception_3, JsonRpcQueryableBase_2, Track_4, TrackStore_1, Playlist_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlaylistStore = /** @class */ (function (_super) {
@@ -1457,7 +1408,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             refs = response.result;
-                            ordered = Libraries_4.default.Enumerable.from(refs)
+                            ordered = Libraries_3.default.Enumerable.from(refs)
                                 .orderBy(function (e) { return e.name; })
                                 .toArray();
                             result = Playlist_1.default.CreateArrayFromRefs(ordered);
@@ -1526,7 +1477,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                             resClear = _a.sent();
                             if (resClear.error)
                                 throw new Error(resClear.error);
-                            uris = Libraries_4.default.Enumerable.from(playlist.Tracks)
+                            uris = Libraries_3.default.Enumerable.from(playlist.Tracks)
                                 .select(function (e) { return e.Uri; })
                                 .toArray();
                             return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.TracklistAdd, {
@@ -1537,7 +1488,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                             if (resAdd.error)
                                 Exception_3.default.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
                             tlTracks = resAdd.result;
-                            tlDictionary = Libraries_4.default.Enumerable.from(tlTracks)
+                            tlDictionary = Libraries_3.default.Enumerable.from(tlTracks)
                                 .toDictionary(function (e) { return e.track.uri; }, function (e2) { return e2.tlid; });
                             for (i = 0; i < playlist.Tracks.length; i++) {
                                 tr = playlist.Tracks[i];
@@ -2203,7 +2154,7 @@ define("Views/Bases/AnimatedViewBase", ["require", "exports", "Utils/Animate", "
     }(ViewBase_3.default));
     exports.default = AnimatedViewBase;
 });
-define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Views/Bases/AnimatedViewBase"], function (require, exports, vue_class_component_2, vue_property_decorator_2, Libraries_5, AnimatedViewBase_1) {
+define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Views/Bases/AnimatedViewBase"], function (require, exports, vue_class_component_2, vue_property_decorator_2, Libraries_4, AnimatedViewBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SlideupButtonEvents = {
@@ -2227,7 +2178,7 @@ define("Views/Shared/SlideupButton", ["require", "exports", "vue-class-component
                             if (this.hideOnInit === true)
                                 this.HideNow();
                             if (this.tooltip && 0 < this.tooltip.length)
-                                Libraries_5.default.SetTooltip(this.$el, this.tooltip);
+                                Libraries_4.default.SetTooltip(this.$el, this.tooltip);
                             return [2 /*return*/, true];
                     }
                 });
@@ -2464,7 +2415,7 @@ define("Views/Events/AdminLteEvents", ["require", "exports"], function (require,
         Removed: 'removed.lte.widget'
     };
 });
-define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, Libraries_6, Exception_7, ViewBase_5, AdminLteEvents_1, SelectionItem_2) {
+define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/adminlte", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ViewBase", "Views/Events/AdminLteEvents", "Views/Shared/SelectionItem"], function (require, exports, AdminLte, _, Libraries_5, Exception_7, ViewBase_5, AdminLteEvents_1, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionEvents = {
@@ -2479,7 +2430,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.isAutoCollapse = true;
             _this.page = 1;
-            _this.viewport = Libraries_6.default.ResponsiveBootstrapToolkit;
+            _this.viewport = Libraries_5.default.ResponsiveBootstrapToolkit;
             _this.isCollapsed = false;
             return _this;
         }
@@ -2520,7 +2471,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
                         case 1:
                             _a.sent();
                             if (this.isAutoCollapse) {
-                                this.button = Libraries_6.default.$(this.ButtonCollaplse);
+                                this.button = Libraries_5.default.$(this.ButtonCollaplse);
                                 this.boxWidget = new AdminLte.Widget(this.button);
                                 this.button.on(AdminLteEvents_1.WidgetEvents.Collapsed, function () {
                                     _this.isCollapsed = true;
@@ -2528,7 +2479,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
                                 this.button.on(AdminLteEvents_1.WidgetEvents.Expanded, function () {
                                     _this.isCollapsed = false;
                                 });
-                                Libraries_6.default.$(window).resize(this.viewport.changed(function () {
+                                Libraries_5.default.$(window).resize(this.viewport.changed(function () {
                                     _this.ToggleListByViewport();
                                 }));
                                 _.delay(function () {
@@ -2619,7 +2570,7 @@ define("Views/Shared/SelectionList", ["require", "exports", "admin-lte/dist/js/a
     }(ViewBase_5.default));
     exports.default = SelectionList;
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_7, AlbumTracks_2, Exception_8, ViewBase_6) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_8, ViewBase_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumTracksEvents = {
@@ -2675,16 +2626,16 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_7.default.SetTooltip(this.AlbumPlayButton, 'Play Album');
-                            Libraries_7.default.SetTooltip(this.HeaderPlaylistButton, 'To Playlist');
-                            Libraries_7.default.SlimScroll(this.HeaderDropDownDiv);
+                            Libraries_6.default.SetTooltip(this.AlbumPlayButton, 'Play Album');
+                            Libraries_6.default.SetTooltip(this.HeaderPlaylistButton, 'To Playlist');
+                            Libraries_6.default.SlimScroll(this.HeaderDropDownDiv);
                             for (i = 0; i < this.RowPlaylistButtons.length; i++) {
                                 elem = this.RowPlaylistButtons[i];
-                                Libraries_7.default.SetTooltip(elem, 'To Playlist');
+                                Libraries_6.default.SetTooltip(elem, 'To Playlist');
                             }
                             for (i = 0; i < this.RowDropDownDivs.length; i++) {
                                 elem = this.RowDropDownDivs[i];
-                                Libraries_7.default.SlimScroll(elem);
+                                Libraries_6.default.SlimScroll(elem);
                             }
                             return [2 /*return*/, true];
                     }
@@ -2692,7 +2643,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             });
         };
         SelectionAlbumTracks.prototype.OnHeaderPlayClicked = function () {
-            var tracks = Libraries_7.default.Enumerable.from(this.entity.Tracks);
+            var tracks = Libraries_6.default.Enumerable.from(this.entity.Tracks);
             var track = tracks
                 .first(function (e) { return e.TrackNo === tracks.min(function (e2) { return e2.TrackNo; }); });
             var args = {
@@ -2710,7 +2661,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         };
         SelectionAlbumTracks.prototype.OnHeaderPlaylistClicked = function (ev) {
             var uri = ev.target.getAttribute('data-uri');
-            var playlist = Libraries_7.default.Enumerable.from(this.playlists)
+            var playlist = Libraries_6.default.Enumerable.from(this.playlists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
                 Exception_8.default.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
@@ -2726,7 +2677,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             if (!trackIdString || trackIdString === '')
                 Exception_8.default.Throw('SelectionAlbumTrack.OnRowClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
-            var tracks = Libraries_7.default.Enumerable.from(this.entity.Tracks);
+            var tracks = Libraries_6.default.Enumerable.from(this.entity.Tracks);
             var track = tracks.firstOrDefault(function (e) { return e.Id === trackId; });
             if (!track)
                 Exception_8.default.Throw('SelectionAlbumTrack.OnRowClicked: Track entity not found.');
@@ -2740,7 +2691,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         SelectionAlbumTracks.prototype.OnRowPlaylistClicked = function (ev) {
             var elem = ev.currentTarget;
             var uri = elem.getAttribute('data-uri');
-            var playlist = Libraries_7.default.Enumerable.from(this.playlists)
+            var playlist = Libraries_6.default.Enumerable.from(this.playlists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
                 Exception_8.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
@@ -2748,7 +2699,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             if (!trackIdString || trackIdString === '')
                 Exception_8.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
-            var track = Libraries_7.default.Enumerable.from(this.entity.Tracks)
+            var track = Libraries_6.default.Enumerable.from(this.entity.Tracks)
                 .firstOrDefault(function (e) { return e.Id === trackId; });
             if (!track)
                 Exception_8.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
@@ -2768,14 +2719,14 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         ], SelectionAlbumTracks.prototype, "playlists", void 0);
         SelectionAlbumTracks = __decorate([
             vue_class_component_5.default({
-                template: "<li class=\"nav-item albumtrack w-100\"\n                   ref=\"Li\" >\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnHeaderPlayClicked\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool dropdown-toggle\"\n                    data-toggle=\"dropdown\"\n                    data-offset=\"-110px, 0\"\n                    ref=\"HeaderPlaylistButton\">\n                    <i class=\"fa fa-bookmark\" />\n                </button>\n                <div class=\"dropdown-menu header-dropdown\">\n                    <div class=\"inner-header-dorpdown\" ref=\"HeaderDropDownDiv\">\n                        <a class=\"dropdown-item\"\n                            href=\"javascript:void(0)\"\n                            @click=\"OnHeaderNewPlaylistClicked\">New Playlist</a>\n                        <div class=\"dropdown-divider\"></div>\n                        <template v-for=\"playlist in playlists\">\n                        <a class=\"dropdown-item text-truncate\"\n                            href=\"javascript:void(0)\"\n                            v-bind:data-uri=\"playlist.Uri\"\n                            @click=\"OnHeaderPlaylistClicked\">{{ playlist.Name }}</a>\n                        </template>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\"\n                                @click=\"OnRowClicked\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\"\n                                @click=\"OnRowClicked\">{{ track.Name }}</td>\n                            <td class=\"tracklength\"\n                                @click=\"OnRowClicked\">{{ track.GetTimeString() }}</td>\n                            <td class=\"trackoperation\">\n                                <button type=\"button\"\n                                    class=\"btn btn-tool dropdown-toggle\"\n                                    data-toggle=\"dropdown\"\n                                    data-offset=\"-110px, 0\"\n                                    ref=\"RowPlaylistButtons\">\n                                    <i class=\"fa fa-bookmark\" />\n                                </button>\n                                <div class=\"dropdown-menu row-dropdown\">\n                                    <div class=\"inner-row-dorpdown\" ref=\"RowDropDownDivs\">\n                                        <template v-for=\"playlist in playlists\">\n                                        <a class=\"dropdown-item text-truncate\"\n                                            href=\"javascript:void(0)\"\n                                            v-bind:data-uri=\"playlist.Uri\"\n                                            v-bind:data-trackid=\"track.Id\"\n                                            @click=\"OnRowPlaylistClicked\">{{ playlist.Name }}</a>\n                                        </template>\n                                    </div>\n                                </div>\n                            </td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
+                template: "<li class=\"nav-item albumtrack w-100\"\n                   ref=\"Li\" >\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnHeaderPlayClicked\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool dropdown-toggle\"\n                    data-toggle=\"dropdown\"\n                    data-offset=\"-110px, 0\"\n                    ref=\"HeaderPlaylistButton\">\n                    <i class=\"fa fa-bookmark\" />\n                </button>\n                <div class=\"dropdown-menu header-dropdown\">\n                    <div class=\"inner-header-dorpdown\" ref=\"HeaderDropDownDiv\">\n                        <a class=\"dropdown-item\"\n                            href=\"javascript:void(0)\"\n                            @click=\"OnHeaderNewPlaylistClicked\">New Playlist</a>\n                        <div class=\"dropdown-divider\"></div>\n                        <template v-for=\"playlist in playlists\">\n                        <a class=\"dropdown-item text-truncate\"\n                            href=\"javascript:void(0)\"\n                            v-bind:data-uri=\"playlist.Uri\"\n                            @click=\"OnHeaderPlaylistClicked\">{{ playlist.Name }}</a>\n                        </template>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\"\n                                @click=\"OnRowClicked\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\"\n                                @click=\"OnRowClicked\">{{ track.Name }}</td>\n                            <td class=\"tracklength\"\n                                @click=\"OnRowClicked\">{{ track.GetTimeString() }}</td>\n                            <td class=\"trackoperation\">\n                                <button type=\"button\"\n                                    class=\"btn btn-tool dropdown-toggle\"\n                                    data-toggle=\"dropdown\"\n                                    data-offset=\"-160px, 0\"\n                                    ref=\"RowPlaylistButtons\">\n                                    <i class=\"fa fa-bookmark\" />\n                                </button>\n                                <div class=\"dropdown-menu row-dropdown\">\n                                    <div class=\"inner-row-dorpdown\" ref=\"RowDropDownDivs\">\n                                        <template v-for=\"playlist in playlists\">\n                                        <a class=\"dropdown-item text-truncate\"\n                                            href=\"javascript:void(0)\"\n                                            v-bind:data-uri=\"playlist.Uri\"\n                                            v-bind:data-trackid=\"track.Id\"\n                                            @click=\"OnRowPlaylistClicked\">{{ playlist.Name }}</a>\n                                        </template>\n                                    </div>\n                                </div>\n                            </td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_8, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_9, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_9, Filterbox_1, SelectionList_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AlbumListEvents = {
@@ -2826,7 +2777,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_8.default.SlimScroll(this.CardInnerBody, {
+                            Libraries_7.default.SlimScroll(this.CardInnerBody, {
                                 height: 'calc(100vh - 200px)',
                                 wheelStep: 20
                             });
@@ -2904,28 +2855,28 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             track = args.Track;
                             if (!track)
                                 Exception_9.default.Throw('Track Not Found', args);
-                            isAllTracksRegistered = Libraries_8.default.Enumerable.from(albumTracks.Tracks)
+                            isAllTracksRegistered = Libraries_7.default.Enumerable.from(albumTracks.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
                             return [4 /*yield*/, this.store.PlayAlbumByTlId(track.TlId)];
                         case 3:
                             result = _a.sent();
                             (result)
-                                ? Libraries_8.default.ShowToast.Success("Track [ " + track.Name + " ] Started.")
-                                : Libraries_8.default.ShowToast.Error('Track Play Order Failed.');
+                                ? Libraries_7.default.ShowToast.Success("Track [ " + track.Name + " ] Started.")
+                                : Libraries_7.default.ShowToast.Error('Track Play Order Failed.');
                             return [2 /*return*/, result];
                         case 4: return [4 /*yield*/, this.store.PlayAlbumByTrack(track)];
                         case 5:
                             resultAtls = _a.sent();
                             if (!resultAtls) {
-                                Libraries_8.default.ShowToast.Error('Track Play Order Failed.');
+                                Libraries_7.default.ShowToast.Error('Track Play Order Failed.');
                                 return [2 /*return*/, false];
                             }
-                            updatedTracks_1 = Libraries_8.default.Enumerable.from(resultAtls.Tracks);
+                            updatedTracks_1 = Libraries_7.default.Enumerable.from(resultAtls.Tracks);
                             _.each(albumTracks.Tracks, function (track) {
                                 track.TlId = updatedTracks_1.firstOrDefault(function (e) { return e.Id == track.Id; }).TlId;
                             });
-                            Libraries_8.default.ShowToast.Success("Track [ " + track.Name + " ] Started.");
+                            Libraries_7.default.ShowToast.Success("Track [ " + track.Name + " ] Started.");
                             return [2 /*return*/, true];
                     }
                 });
@@ -2942,12 +2893,12 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 1:
                             newPlaylist = _a.sent();
                             if (!newPlaylist) {
-                                Libraries_8.default.ShowToast.Error('Playlist Create Failed.');
+                                Libraries_7.default.ShowToast.Error('Playlist Create Failed.');
                                 return [2 /*return*/, false];
                             }
                             this.$emit(exports.AlbumListEvents.PlaylistUpdated);
                             this.InitPlaylistList();
-                            Libraries_8.default.ShowToast.Success("New Playlist [ " + newPlaylist.Name + " ] Created.");
+                            Libraries_7.default.ShowToast.Success("New Playlist [ " + newPlaylist.Name + " ] Created.");
                             return [2 /*return*/, true];
                     }
                 });
@@ -2973,10 +2924,10 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             if (result === true) {
                                 this.$emit(exports.AlbumListEvents.PlaylistUpdated);
                                 this.InitPlaylistList();
-                                Libraries_8.default.ShowToast.Success("Add " + args.Tracks.length + " Track(s) to Playlist [ " + playlist.Name + " ]");
+                                Libraries_7.default.ShowToast.Success("Add " + args.Tracks.length + " Track(s) to Playlist [ " + playlist.Name + " ]");
                             }
                             else {
-                                Libraries_8.default.ShowToast.Error('Playlist Update Failed.');
+                                Libraries_7.default.ShowToast.Error('Playlist Update Failed.');
                             }
                             return [2 /*return*/, result];
                     }
@@ -3072,7 +3023,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList = __decorate([
             vue_class_component_6.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body album-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-album-tracks\n                            v-bind:playlists=\"playlists\"\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @PlayOrdered=\"OnPlayOrdered\"\n                            @CreatePlaylistOrdered=\"OnCreatePlaylistOrdered\"\n                            @AddToPlaylistOrdered=\"OnAddToPlaylistOrdered\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.album-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Albums</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body album-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-album-tracks\n                            v-bind:playlists=\"playlists\"\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @PlayOrdered=\"OnPlayOrdered\"\n                            @CreatePlaylistOrdered=\"OnCreatePlaylistOrdered\"\n                            @AddToPlaylistOrdered=\"OnAddToPlaylistOrdered\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.album-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_1.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
@@ -3113,7 +3064,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
     }(StoreBase_2.default));
     exports.default = ArtistStore;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, Libraries_9, ArtistStore_1, Filterbox_2, SelectionItem_3, SelectionList_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, Libraries_8, ArtistStore_1, Filterbox_2, SelectionItem_3, SelectionList_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistList = /** @class */ (function (_super) {
@@ -3149,12 +3100,12 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_9.default.SlimScroll(this.CardInnerBody, {
+                            Libraries_8.default.SlimScroll(this.CardInnerBody, {
                                 height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
-                            Libraries_9.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
-                            Libraries_9.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
+                            Libraries_8.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
+                            Libraries_8.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                             return [2 /*return*/, true];
                     }
                 });
@@ -3222,7 +3173,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body artist-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.artist-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Artists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body artist-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.artist-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_2.default,
                     'selection-item': SelectionItem_3.default,
@@ -3263,7 +3214,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
     }(StoreBase_3.default));
     exports.default = GenreStore;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Genres/GenreStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, Libraries_10, GenreStore_1, Filterbox_3, SelectionItem_4, SelectionList_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Genres/GenreStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, Libraries_9, GenreStore_1, Filterbox_3, SelectionItem_4, SelectionList_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -3298,12 +3249,12 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_10.default.SlimScroll(this.CardInnerBody, {
+                            Libraries_9.default.SlimScroll(this.CardInnerBody, {
                                 height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
-                            Libraries_10.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
-                            Libraries_10.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
+                            Libraries_9.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
+                            Libraries_9.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                             return [2 /*return*/, true];
                     }
                 });
@@ -3349,7 +3300,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         };
         GenreList = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-green\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body genre-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.genre-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Genres</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body genre-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.genre-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_3.default,
                     'selection-item': SelectionItem_4.default,
@@ -3390,20 +3341,14 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
             enumerable: true,
             configurable: true
         });
-        Finder.prototype.OnShown = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _super.prototype.OnShown.call(this);
-                            return [4 /*yield*/, this.AlbumList.InitPlaylistList()];
-                        case 1:
-                            _a.sent();
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
+        // #region "IContentView"
+        Finder.prototype.GetIsPermitLeave = function () {
+            return true;
         };
+        Finder.prototype.InitContent = function () {
+            this.AlbumList.InitPlaylistList();
+        };
+        // #endregion
         Finder.prototype.OnPlaylistUpdated = function () {
             this.$emit(AlbumList_1.AlbumListEvents.PlaylistUpdated);
         };
@@ -3435,9 +3380,6 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
         };
         Finder.prototype.RefreshPlaylist = function () {
             this.AlbumList.InitPlaylistList();
-        };
-        Finder.prototype.GetIsPermitLeave = function () {
-            return true;
         };
         Finder = __decorate([
             vue_class_component_9.default({
@@ -3968,7 +3910,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_4.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_10, Libraries_11, Monitor_2, Player_1, ViewBase_7) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_10, Libraries_10, Monitor_2, Player_1, ViewBase_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlayerPanel = /** @class */ (function (_super) {
@@ -4002,7 +3944,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.volumeSlider = Libraries_11.default.$(this.$refs.Slider).ionRangeSlider({
+                            this.volumeSlider = Libraries_10.default.$(this.$refs.Slider).ionRangeSlider({
                                 onFinish: function (data) {
                                     // スライダー操作完了時のイベント
                                     _this.player.SetVolume(data.from);
@@ -4078,14 +4020,14 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
         PlayerPanel.ClassDisabled = 'disabled';
         PlayerPanel = PlayerPanel_1 = __decorate([
             vue_class_component_10.default({
-                template: "<div class=\"card siderbar-control pb-10\">\n    <div class=\"card-body\">\n        <img v-bind:src=\"monitor.ImageFullUri\" class=\"albumart\" />\n        <h6 class=\"card-title\">{{ monitor.TrackName }}</h6>\n        <span>{{ monitor.ArtistName }}{{ (monitor.Year) ? '(' + monitor.Year + ')' : '' }}</span>\n        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickPrevious\">\n                <i class=\"fa fa-fast-backward\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickPlayPause\">\n                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary\"\n                @click=\"OnClickNext\">\n                <i class=\"fa fa-fast-forward\" />\n            </button>\n        </div>\n\n        <div class=\"btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-secondary disabled\"\n                ref=\"ButtonShuffle\"\n                @click=\"OnClickShuffle\">\n                <i class=\"fa fa fa-random\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-secondary disabled\"\n                ref=\"ButtonRepeat\"\n                @click=\"OnClickRepeat\" >\n                <i class=\"fa fa-retweet\" />\n            </button>\n        </div>\n\n        <div class=\"row volume-box w-100 mt-2\">\n            <div class=\"col-1 volume-button volume-min\">\n                <a @click=\"OnClickVolumeMin\">\n                    <i class=\"fa fa-volume-off\" />\n                </a>\n            </div>\n            <div class=\"col-10\">\n                <input type=\"text\"\n                    data-type=\"single\"\n                    data-min=\"0\"\n                    data-max=\"100\"\n                    data-from=\"100\"\n                    data-grid=\"true\"\n                    data-hide-min-max=\"true\"\n                    ref=\"Slider\" />\n            </div>\n            <div class=\"col-1 volume-button volume-max\">\n                <a @click=\"OnClickVolumeMax\">\n                    <i class=\"fa fa-volume-up\" />\n                </a>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"card siderbar-control pb-10\">\n    <div class=\"card-body\">\n        <img v-bind:src=\"monitor.ImageFullUri\" class=\"albumart\" />\n        <h6 class=\"card-title\">{{ monitor.TrackName }}</h6>\n        <span>{{ monitor.ArtistName }}{{ (monitor.Year) ? '(' + monitor.Year + ')' : '' }}</span>\n        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickPrevious\">\n                <i class=\"fa fa-fast-backward\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickPlayPause\">\n                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickNext\">\n                <i class=\"fa fa-fast-forward\" />\n            </button>\n        </div>\n\n        <div class=\"btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-warning disabled\"\n                ref=\"ButtonShuffle\"\n                @click=\"OnClickShuffle\">\n                <i class=\"fa fa fa-random\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning disabled\"\n                ref=\"ButtonRepeat\"\n                @click=\"OnClickRepeat\" >\n                <i class=\"fa fa-retweet\" />\n            </button>\n        </div>\n\n        <div class=\"row volume-box w-100 mt-2\">\n            <div class=\"col-1 volume-button volume-min\">\n                <a @click=\"OnClickVolumeMin\">\n                    <i class=\"fa fa-volume-off\" />\n                </a>\n            </div>\n            <div class=\"col-10\">\n                <input type=\"text\"\n                    data-type=\"single\"\n                    data-min=\"0\"\n                    data-max=\"100\"\n                    data-from=\"100\"\n                    data-grid=\"true\"\n                    data-hide-min-max=\"true\"\n                    ref=\"Slider\" />\n            </div>\n            <div class=\"col-1 volume-button volume-max\">\n                <a @click=\"OnClickVolumeMax\">\n                    <i class=\"fa fa-volume-up\" />\n                </a>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], PlayerPanel);
         return PlayerPanel;
     }(ViewBase_7.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_11, Libraries_12, ViewBase_8, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_11, Libraries_11, ViewBase_8, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Pages;
@@ -4117,8 +4059,8 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Libraries_12.default.SlimScroll(this.SidebarSection, {
-                                height: '100vh'
+                            Libraries_11.default.SlimScroll(this.SidebarSection, {
+                                height: 'calc(100%)'
                             });
                             return [2 /*return*/, true];
                     }
@@ -4172,7 +4114,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
         };
         Sidebar = __decorate([
             vue_class_component_11.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-primary elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SidebarSection\">\n        <nav class=\"mt-2\">\n            <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link active\"\n                        href=\"#tab-finder\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-finder\"\n                        aria-selected=\"true\"\n                        @click=\"OnClickFinder\" >\n                        <i class=\"fa fa-search nav-icon\" />\n                        <p>Finder</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-playlists\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-playlists\"\n                        aria-selected=\"false\"\n                        @click=\"OnClickPlaylists\" >\n                        <i class=\"fa fa-bookmark nav-icon\" />\n                        <p>Playlists</p>\n                    </a>\n                </li>\n                <li class=\"nav-item\">\n                    <a  class=\"nav-link\"\n                        href=\"#tab-settings\"\n                        role=\"tab\"\n                        data-toggle=\"tab\"\n                        aria-controls=\"tab-settings\"\n                        aria-selected=\"false\"\n                        @click=\"OnClickSettings\" >\n                        <i class=\"fa fa-cog nav-icon\" />\n                        <p>Settings</p>\n                    </a>\n                </li>\n            </ul>\n        </nav>\n        <div class=\"row mt-2\">\n            <div class=\"col-12\">\n                <player-panel ref=\"PlayerPanel\" />\n            </div>\n        </div>\n    </section>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-warning elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SidebarSection\">\n        <div class=\"w-100 inner-sidebar\">\n            <nav class=\"mt-2\">\n                <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link active\"\n                            href=\"#tab-finder\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-finder\"\n                            aria-selected=\"true\"\n                            @click=\"OnClickFinder\" >\n                            <i class=\"fa fa-search nav-icon\" />\n                            <p>Finder</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-playlists\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-playlists\"\n                            aria-selected=\"false\"\n                            @click=\"OnClickPlaylists\" >\n                            <i class=\"fa fa-bookmark nav-icon\" />\n                            <p>Playlists</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-settings\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-settings\"\n                            aria-selected=\"false\"\n                            @click=\"OnClickSettings\" >\n                            <i class=\"fa fa-cog nav-icon\" />\n                            <p>Settings</p>\n                        </a>\n                    </li>\n                </ul>\n            </nav>\n            <div class=\"row mt-2\">\n                <div class=\"col-12\">\n                    <player-panel ref=\"PlayerPanel\" />\n                </div>\n            </div>\n        </div>\n    </section>\n</aside>",
                 components: {
                     'player-panel': PlayerPanel_2.default
                 }
@@ -4204,7 +4146,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
     }(ViewBase_9.default));
     exports.default = HeaderBar;
 });
-define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Models/Playlists/Playlist", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_13, Libraries_13, Playlist_2, ViewBase_10, BootstrapEvents_2) {
+define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Models/Playlists/Playlist", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_13, Libraries_12, Playlist_2, ViewBase_10, BootstrapEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AddModalEvents = {
@@ -4246,8 +4188,8 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.modal = Libraries_13.default.$(this.$el);
-                            this.modal.on(BootstrapEvents_2.ModalEvents.Shown, function () {
+                            this.modal = Libraries_12.default.$(this.$el);
+                            this.modal.on(BootstrapEvents_1.ModalEvents.Shown, function () {
                                 _this.TextName.focus();
                             });
                             return [2 /*return*/, true];
@@ -4297,7 +4239,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
     }(ViewBase_10.default));
     exports.default = AddModal;
 });
-define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_14, PlaylistStore_2, Filterbox_4, SelectionItem_5, SelectionList_4, AddModal_1) {
+define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_13, PlaylistStore_2, Filterbox_4, SelectionItem_5, SelectionList_4, AddModal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistListEvents = {
@@ -4352,12 +4294,12 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_14.default.SlimScroll(this.CardInnerBody, {
+                            Libraries_13.default.SlimScroll(this.CardInnerBody, {
                                 height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
-                            Libraries_14.default.SetTooltip(this.$refs.ButtonAdd, 'Add Playlist');
-                            Libraries_14.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
+                            Libraries_13.default.SetTooltip(this.$refs.ButtonAdd, 'Add Playlist');
+                            Libraries_13.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                             return [2 /*return*/, true];
                     }
                 });
@@ -4408,7 +4350,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                             _a.allEntities = _b.sent();
                             _b.label = 2;
                         case 2:
-                            entities = Libraries_14.default.Enumerable.from(this.allEntities);
+                            entities = Libraries_13.default.Enumerable.from(this.allEntities);
                             filterText = this.Filterbox.GetText().toLowerCase();
                             if (0 < filterText.length)
                                 entities = entities
@@ -4445,10 +4387,10 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                             playlist = _a.sent();
                             if (!playlist) {
                                 this.AddModal.Hide();
-                                Libraries_14.default.ShowToast.Error('Playlist Create Failed');
+                                Libraries_13.default.ShowToast.Error('Playlist Create Failed');
                                 return [2 /*return*/, false];
                             }
-                            Libraries_14.default.ShowToast.Success("Playlist [ " + playlist.Name + " ] Created.");
+                            Libraries_13.default.ShowToast.Success("Playlist [ " + playlist.Name + " ] Created.");
                             this.AddModal.Hide();
                             this.entities = [];
                             this.allEntities = [];
@@ -4468,7 +4410,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         PlaylistList.PageLength = 30;
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_14.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-info\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body playlist-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionOrdered=\"OnSelectionOrdered\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.playlist-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">Playlists</h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool d-inline d-md-none collapse\"\n                    ref=\"ButtonCollaplse\"\n                    @click=\"OnClickCollapse\" >\n                    <i class=\"fa fa-minus\" />\n                </button>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body playlist-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionOrdered=\"OnSelectionOrdered\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.playlist-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_4.default,
                     'selection-item': SelectionItem_5.default,
@@ -4481,7 +4423,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_15, vue_property_decorator_6, Libraries_15, Track_5, Animate_3, Delay_3, ViewBase_11, SelectionList_5) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_15, vue_property_decorator_6, Libraries_14, Track_5, Animate_3, Delay_3, ViewBase_11, SelectionList_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionList_5.SelectionEvents), {
@@ -4511,7 +4453,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
                     switch (_a.label) {
                         case 0:
                             if (!this.GetIsInitialized())
-                                Libraries_15.default.SetTooltip(this.$refs.DeleteButton, 'Delete');
+                                Libraries_14.default.SetTooltip(this.$refs.DeleteButton, 'Delete');
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
@@ -4619,14 +4561,14 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
         ], SelectionTrack.prototype, "entity", void 0);
         SelectionTrack = SelectionTrack_1 = __decorate([
             vue_class_component_15.default({
-                template: "<li v-bind:class=\"liClasses\"\n    v-bind:data-uri=\"entity.Uri\"\n    ref=\"Li\"\n    @click=\"OnClickRow\">\n    <div class=\"product-img ml-2\">\n        <img v-bind:src=\"entity.GetAlbumImageFullUri()\" alt=\"ALbum Image\">\n    </div>\n    <div class=\"product-info\">\n        <span class=\"product-title pl-2\">\n            {{ entity.GetDisplayName() }}\n            <div class=\"btn-group pull-right mr-2 editmode-buttons\">\n                <button\n                    class=\"btn btn-sm btn-outline-dark\"\n                    @click=\"OnClickDelete\"\n                    ref=\"DeleteButton\" >\n                    <i class=\"fa fa-trash\" />\n                </button>\n            </div>\n            <span class=\"pull-right length mr-2\">{{ entity.GetTimeString() }}</span>\n        </span>\n        <span class=\"product-description pl-2\">{{ GetDetailString() }}</span>\n    </div>\n</li>"
+                template: "<li v-bind:class=\"liClasses\"\n    v-bind:data-uri=\"entity.Uri\"\n    ref=\"Li\"\n    @click=\"OnClickRow\">\n    <div class=\"product-img ml-2\">\n        <img v-bind:src=\"entity.GetAlbumImageFullUri()\" alt=\"ALbum Image\">\n    </div>\n    <div class=\"product-info\">\n        <span class=\"product-title pl-2\">\n            {{ entity.GetDisplayName() }}\n            <div class=\"btn-group pull-right mr-2 editmode-buttons\">\n                <button\n                    class=\"btn btn-sm btn-outline-light\"\n                    @click=\"OnClickDelete\"\n                    ref=\"DeleteButton\" >\n                    <i class=\"fa fa-trash\" />\n                </button>\n            </div>\n            <span class=\"pull-right length mr-2\">{{ entity.GetTimeString() }}</span>\n        </span>\n        <span class=\"product-description pl-2\">{{ GetDetailString() }}</span>\n    </div>\n</li>"
             })
         ], SelectionTrack);
         return SelectionTrack;
     }(ViewBase_11.default));
     exports.default = SelectionTrack;
 });
-define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_16, Libraries_16, ViewBase_12) {
+define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_16, Libraries_15, ViewBase_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ConfirmType;
@@ -4653,7 +4595,7 @@ define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-c
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.modal = Libraries_16.default.$(this.$el);
+                            this.modal = Libraries_15.default.$(this.$el);
                             return [2 /*return*/, true];
                     }
                 });
@@ -4758,7 +4700,7 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
     }(ConfirmDialog_2.default));
     exports.default = UpdateDialog;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_17, vue_infinite_loading_5, Libraries_17, Playlist_3, PlaylistStore_3, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_17, vue_infinite_loading_5, Libraries_16, Playlist_3, PlaylistStore_3, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackListEvents = {
@@ -4893,7 +4835,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                                 });
                             }); });
                             // 利便性的にどうなのか、悩む。
-                            Libraries_17.default.SlimScroll(this.CardInnerBody, {
+                            Libraries_16.default.SlimScroll(this.CardInnerBody, {
                                 height: 'calc(100vh - 200px)',
                                 wheelStep: 60
                             });
@@ -5013,7 +4955,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     switch (_b.label) {
                         case 0:
                             if (!(this.listMode === ListMode.Playable)) return [3 /*break*/, 5];
-                            isAllTracksRegistered = Libraries_17.default.Enumerable.from(this.playlist.Tracks)
+                            isAllTracksRegistered = Libraries_16.default.Enumerable.from(this.playlist.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!(isAllTracksRegistered)) return [3 /*break*/, 2];
                             return [4 /*yield*/, this.store.PlayByTlId(args.Entity.TlId)];
@@ -5027,8 +4969,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 4:
                             response = _a;
                             (response)
-                                ? Libraries_17.default.ShowToast.Success("Track [ " + args.Entity.Name + " ] Started.")
-                                : Libraries_17.default.ShowToast.Error('Track Play Order Failed.');
+                                ? Libraries_16.default.ShowToast.Success("Track [ " + args.Entity.Name + " ] Started.")
+                                : Libraries_16.default.ShowToast.Error('Track Play Order Failed.');
                             return [3 /*break*/, 6];
                         case 5:
                             if (this.listMode === ListMode.Editable) {
@@ -5235,11 +5177,11 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 2:
                             // 更新許可OK
                             if ((_a.sent()) === true) {
-                                Libraries_17.default.ShowToast.Success('Playlist Update Succeeded.');
+                                Libraries_16.default.ShowToast.Success('Playlist Update Succeeded.');
                                 this.GoBackToPlayer();
                             }
                             else {
-                                Libraries_17.default.ShowToast.Error('Playlist Update Failed.');
+                                Libraries_16.default.ShowToast.Error('Playlist Update Failed.');
                                 // そのまま編集モードを維持
                             }
                             return [3 /*break*/, 3];
@@ -5279,7 +5221,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.prototype.GetEditedTracks = function () {
             // entitiesをUL要素内の見た目の順序に取得する。
             var result = [];
-            var enEntities = Libraries_17.default.Enumerable.from(this.entities);
+            var enEntities = Libraries_16.default.Enumerable.from(this.entities);
             var children = this.TrackListUl.querySelectorAll('li');
             var _loop_1 = function (i) {
                 var uri = children[i].getAttribute('data-uri');
@@ -5315,14 +5257,14 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             if (update.IsNameChanged !== false
                 && (!update.NewName
                     || update.NewName.length < Playlist_3.default.MinNameLength)) {
-                Libraries_17.default.ShowToast.Warning('Name required.');
+                Libraries_16.default.ShowToast.Warning('Name required.');
                 this.SetTitleValidationBorder(false);
                 this.TitleInput.focus();
                 return false;
             }
             if (update.IsNameChanged !== false
                 && Playlist_3.default.MaxNameLength < update.NewName.length) {
-                Libraries_17.default.ShowToast.Warning('Name too long.');
+                Libraries_16.default.ShowToast.Warning('Name too long.');
                 this.SetTitleValidationBorder(false);
                 this.TitleInput.focus();
                 return false;
@@ -5376,7 +5318,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 2:
                             result = _a.sent();
                             if (!(result === true)) return [3 /*break*/, 4];
-                            Libraries_17.default.ShowToast.Success('Delete Succeeded!');
+                            Libraries_16.default.ShowToast.Success('Delete Succeeded!');
                             this.playlist = null;
                             this.removedEntities = [];
                             this.$emit(exports.TrackListEvents.PlaylistDeleted);
@@ -5385,7 +5327,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             _a.sent();
                             return [3 /*break*/, 5];
                         case 4:
-                            Libraries_17.default.ShowToast.Error('Delete Failed!');
+                            Libraries_16.default.ShowToast.Error('Delete Failed!');
                             _a.label = 5;
                         case 5: return [2 /*return*/, true];
                     }
@@ -5428,7 +5370,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             _a.sent();
                             _a.label = 2;
                         case 2:
-                            entities = Libraries_17.default.Enumerable.from(this.playlist.Tracks);
+                            entities = Libraries_16.default.Enumerable.from(this.playlist.Tracks);
                             filterText = this.Filterbox.GetText().toLowerCase();
                             if (0 < filterText.length)
                                 entities = entities
@@ -5454,7 +5396,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.ListBaseClasses = 'products-list product-list-in-box track-list ';
         TrackList = TrackList_1 = __decorate([
             vue_class_component_17.default({
-                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-secondary\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body track-list\"\n                ref=\"CardInnerBody\">\n                <ul v-bind:class=\"listClasses\"\n                    ref=\"TrackListUl\">\n                    <template v-for=\"entity in entities\">\n                    <selection-track\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\"\n                        @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.track-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
+                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                Tracks\n            </h3>\n            <input class=\"form-control form-control-sm d-none title-input\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body track-list\"\n                ref=\"CardInnerBody\">\n                <ul v-bind:class=\"listClasses\"\n                    ref=\"TrackListUl\">\n                    <template v-for=\"entity in entities\">\n                    <selection-track\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\"\n                        @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.track-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
                     'slideup-button': SlideupButton_2.default,
@@ -5468,7 +5410,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionList_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList"], function (require, exports, vue_class_component_18, Libraries_18, ContentViewBase_2, PlaylistList_2, TrackList_2) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay"], function (require, exports, vue_class_component_18, Libraries_17, ContentViewBase_2, PlaylistList_2, TrackList_2, Delay_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistsEvents = {
@@ -5493,6 +5435,23 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             enumerable: true,
             configurable: true
         });
+        // #region "IContentView"
+        Playlists.prototype.GetIsPermitLeave = function () {
+            // プレイリスト画面からの移動可否判定
+            var isSaved = this.TrackList.GetIsSavedPlaylistChanges();
+            if (!isSaved) {
+                Libraries_17.default.ShowToast.Warning('Please complete editing.');
+            }
+            return isSaved;
+        };
+        Playlists.prototype.InitContent = function () {
+            var _this = this;
+            Delay_5.default.Wait(500)
+                .then(function () {
+                _this.PlaylistList.RefreshPlaylist();
+            });
+        };
+        // #endregion
         Playlists.prototype.OnPlaylistsSelectionOrdered = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 var isSaved;
@@ -5500,7 +5459,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                     isSaved = this.TrackList.GetIsSavedPlaylistChanges();
                     args.Permitted = isSaved;
                     if (!isSaved) {
-                        Libraries_18.default.ShowToast.Warning('Please complete editing.');
+                        Libraries_17.default.ShowToast.Warning('Please complete editing.');
                     }
                     return [2 /*return*/, true];
                 });
@@ -5524,14 +5483,6 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
         Playlists.prototype.OnPlaylistUpdated = function () {
             this.PlaylistList.RefreshPlaylist();
             this.$emit(exports.PlaylistsEvents.PlaylistsUpdated);
-        };
-        Playlists.prototype.GetIsPermitLeave = function () {
-            // プレイリスト画面からの移動可否判定
-            var isSaved = this.TrackList.GetIsSavedPlaylistChanges();
-            if (!isSaved) {
-                Libraries_18.default.ShowToast.Warning('Please complete editing.');
-            }
-            return isSaved;
         };
         Playlists.prototype.RefreshPlaylist = function () {
             this.PlaylistList.RefreshPlaylist();
@@ -5557,9 +5508,12 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         function Settings() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        // #region "IContentView"
         Settings.prototype.GetIsPermitLeave = function () {
             // DBリフレッシュ中はページ移動NGにする。
             return true;
+        };
+        Settings.prototype.InitContent = function () {
         };
         Settings = __decorate([
             vue_class_component_19.default({
@@ -5609,12 +5563,16 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
         });
         RootView.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var args;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.activeContent = this.Finder;
+                            args = {
+                                Page: Sidebar_2.Pages.Finder
+                            };
+                            this.OnContentChanged(args);
                             return [2 /*return*/, true];
                     }
                 });
@@ -5643,6 +5601,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
                 default:
                     Exception_11.default.Throw('Unexpected Page.', args);
             }
+            this.activeContent.InitContent();
             this.HeaderBar.SetHeader(args);
         };
         RootView = __decorate([
@@ -5661,7 +5620,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
     }(ViewBase_13.default));
     exports.default = RootView;
 });
-define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_19, RootView_1) {
+define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_18, RootView_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -5672,7 +5631,7 @@ define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Libraries_19.default.Initialize();
+                            Libraries_18.default.Initialize();
                             this._view = new RootView_1.default();
                             this._view.$mount('#root');
                             return [4 /*yield*/, this._view.Initialize()];

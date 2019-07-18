@@ -38,6 +38,12 @@ define('admin-lte/plugins/sweetalert2/sweetalert2.css', ["exports"], function (e
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = {};
 });
+// ダミー: bootstrap4-neon-glow.css
+define('../css/bootstrap4-neon-glow.css', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = {};
+});
 // ダミー: site.css
 define('../css/site.css', ["exports"], function (exports) {
     "use strict";

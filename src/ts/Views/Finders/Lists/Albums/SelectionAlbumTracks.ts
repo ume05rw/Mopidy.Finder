@@ -29,7 +29,7 @@ export const SelectionAlbumTracksEvents = {
     template: `<li class="nav-item albumtrack w-100"
                    ref="Li" >
     <div class="card">
-        <div class="card-header with-border bg-secondary">
+        <div class="card-header with-border bg-warning">
             <h3 class="card-title text-nowrap text-truncate">
                 {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}
             </h3>
@@ -82,7 +82,7 @@ export const SelectionAlbumTracksEvents = {
                                 <button type="button"
                                     class="btn btn-tool dropdown-toggle"
                                     data-toggle="dropdown"
-                                    data-offset="-110px, 0"
+                                    data-offset="-160px, 0"
                                     ref="RowPlaylistButtons">
                                     <i class="fa fa-bookmark" />
                                 </button>
