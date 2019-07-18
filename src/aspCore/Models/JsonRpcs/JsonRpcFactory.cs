@@ -67,5 +67,12 @@ namespace MopidyFinder.Models.JsonRpcs
 
             return result;
         }
+
+        public static JsonRpcResult CreateErrorResult(int id, Exception ex)
+        {
+            var result = new JsonRpcResultError(id, ex);
+
+            return result;
+        }
     }
 }

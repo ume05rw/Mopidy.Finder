@@ -33,7 +33,8 @@ enum ListMode {
                 ref="TitleH3">
                 Tracks
             </h3>
-            <input class="form-control form-control-sm d-none title-input"
+            <input type="text" class="form-control form-control-sm d-none title-input"
+                maxlength="40"
                 ref="TitleInput"
                 @input="OnInputTitle"/>
             <div class="card-tools form-row">

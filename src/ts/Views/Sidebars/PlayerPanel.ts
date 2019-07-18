@@ -120,7 +120,7 @@ export default class PlayerPanel extends ViewBase {
         });
 
         // ポーリング一時停止するときは、ここをコメントアウト
-        this.monitor.StartPolling();
+        //this.monitor.StartPolling();
 
         return true;
     }

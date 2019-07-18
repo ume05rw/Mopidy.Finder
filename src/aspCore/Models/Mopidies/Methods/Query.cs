@@ -1,4 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using MopidyFinder.Models.JsonRpcs;
+using MopidyFinder.Models.Settings;
 using Newtonsoft.Json;
 using System;
 using System.Net.Http;
@@ -10,6 +12,38 @@ namespace MopidyFinder.Models.Mopidies.Methods
 {
     public static class Query
     {
+        private static IServiceProvider Provider = null;
+        private static Settings.Settings _settings = null;
+
+        public static void SetServiceProvider(IServiceProvider provider)
+        {
+            Query.Provider = provider;
+        }
+
+        public static void ReleaseServiceProvider()
+        {
+            Query.Provider = null;
+        }
+
+        private static Settings.Settings Settings
+        {
+            get
+            {
+                if (Query._settings == null)
+                {
+                    using (var serviceScope = Query.Provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                    using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
+                    using (var store = new SettingsStore(dbc))
+                    {
+                        Query._settings = store.Entity;
+                    }
+                }
+
+                return Query._settings;
+            }
+        }
+
+
         /// <summary>
         /// 
         /// </summary>
@@ -21,7 +55,8 @@ namespace MopidyFinder.Models.Mopidies.Methods
         /// </remarks>
         public static async Task<JsonRpcParamsResponse> Exec(JsonRpcQuery request)
         {
-            var url = "http://192.168.254.251:6680/mopidy/rpc";
+            var url = Query.Settings.RpcUri;
+
             HttpResponseMessage message;
             var client = new HttpClient();
             client.DefaultRequestHeaders.Accept.Clear();

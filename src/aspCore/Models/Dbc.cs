@@ -14,7 +14,7 @@ namespace MopidyFinder.Models
     {
         private class LockerObject
         {
-            public bool IsLocked { get; set; }
+            public bool IsLocked { get; set; } = false;
         }
 
         private static LockerObject Locker = new LockerObject();
@@ -26,6 +26,7 @@ namespace MopidyFinder.Models
         public DbSet<ArtistAlbum> ArtistAlbums { get; set; }
         public DbSet<GenreAlbum> GenreAlbums { get; set; }
         public DbSet<GenreArtist> GenreArtists { get; set; }
+        public DbSet<Settings.Settings> Settings { get; set; }
 
         public IQueryable<Genre> GetGenreQuery()
             => this.Genres

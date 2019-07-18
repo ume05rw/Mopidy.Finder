@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MopidyFinder.Models.Settings;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -15,9 +16,12 @@ namespace MopidyFinder.Controllers
     public class ImagesController : Controller
     {
         [HttpGet("{fileName}")]
-        public async Task<FileStreamResult> Index([FromRoute] string fileName)
+        public async Task<FileStreamResult> Index(
+            [FromRoute] string fileName,
+            [FromServices] SettingsStore store
+        )
         {
-            var url = $"http://192.168.254.251:6680/images/{fileName}";
+            var url = $"{store.Entity.ImageUri}/{fileName}";
 
             HttpResponseMessage message;
             var client = new HttpClient();

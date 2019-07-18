@@ -30,6 +30,7 @@ export const AddModalEvents = {
                     <label for="new-playlist-name">Playlist Name</label>
                     <div class="input-group">
                         <input type="text"
+                            maxlength="40"
                             id="new-playlist-name"
                             class="form-control"
                             required

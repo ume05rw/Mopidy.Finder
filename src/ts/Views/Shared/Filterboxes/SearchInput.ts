@@ -10,6 +10,7 @@ export const SearchInputEvents = {
 @Component({
     template: `<input class="form-control form-control-navbar form-control-sm text-filter d-none"
         type="search"
+        maxlength="20"
         v-bind:placeholder="placeHolder"
         v-bind:aria-label="placeHolder"
         @input="OnInput"

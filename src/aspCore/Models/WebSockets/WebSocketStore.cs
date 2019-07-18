@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
+using MopidyFinder.Models.Bases;
+using MopidyFinder.Models.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,13 +17,14 @@ namespace MopidyFinder.Models.WebSockets
     /// <remarks>
     /// 肝心のMopidy側からリモートホスト接続を拒否されるため、断念。
     /// </remarks>
-    public class WebSocketStore
+    public class WebSocketStore: StoreBase<bool>
     {
         private const int MessageBufferSize = 8192;
+        private static Settings.Settings _settings = null;
         private List<WebSocket> _accepts = new List<WebSocket>();
         private ClientWebSocket _client;
 
-        public WebSocketStore()
+        public WebSocketStore([FromServices] Dbc dbc): base(dbc)
         {
             this.Connect();
         }
@@ -31,10 +35,14 @@ namespace MopidyFinder.Models.WebSockets
 
             try
             {
-                await this._client.ConnectAsync(
-                    new Uri("ws://192.168.254.251/mopidy/ws/"),
-                    CancellationToken.None
-                );
+                if (WebSocketStore._settings == null)
+                {
+                    var store = new SettingsStore(this.Dbc);
+                    WebSocketStore._settings = store.Entity;
+                }
+
+                var uri = new Uri($"{WebSocketStore._settings.WebSocketUri}/");
+                await this._client.ConnectAsync(uri, CancellationToken.None);
             }
             catch (Exception ex)
             {

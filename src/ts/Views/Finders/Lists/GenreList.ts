@@ -84,6 +84,10 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
         return true;
     }
 
+    public ForceRefresh(): void {
+        this.Refresh();
+    }
+
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
      * superクラスの同名メソッドが実行されるが、superクラス上のthisが

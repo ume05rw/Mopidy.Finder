@@ -87,6 +87,12 @@ export default class Finder extends ContentViewBase {
         this.AlbumList.RemoveFilterAllArtists();
     }
 
+    public RefreshAll(): void {
+        this.GenreList.ForceRefresh();
+        this.ArtistList.RemoveAllFilters();
+        this.AlbumList.RemoveAllFilters();
+    }
+
     public RefreshPlaylist(): void {
         this.AlbumList.InitPlaylistList();
     }

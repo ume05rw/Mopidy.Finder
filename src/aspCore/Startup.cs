@@ -11,7 +11,9 @@ using MopidyFinder.Models.Albums;
 using MopidyFinder.Models.AlbumTracks;
 using MopidyFinder.Models.Artists;
 using MopidyFinder.Models.Genres;
+using MopidyFinder.Models.Mopidies.Methods;
 using MopidyFinder.Models.Relations;
+using MopidyFinder.Models.Settings;
 using MopidyFinder.Models.Tracks;
 using MopidyFinder.Models.WebSockets;
 using Newtonsoft.Json.Serialization;
@@ -93,7 +95,8 @@ namespace MopidyFinder
                 .AddTransient<GenreAlbumStore, GenreAlbumStore>()
                 .AddTransient<GenreArtistStore, GenreArtistStore>()
                 .AddTransient<AlbumTracksStore, AlbumTracksStore>()
-                .AddTransient<TrackStore, TrackStore>();
+                .AddTransient<TrackStore, TrackStore>()
+                .AddTransient<SettingsStore, SettingsStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -102,6 +105,7 @@ namespace MopidyFinder
             IHostingEnvironment env
         )
         {
+            Query.SetServiceProvider(app.ApplicationServices);
             Initializer.SetServiceProvider(app.ApplicationServices);
 
             if (env.IsDevelopment())
@@ -116,9 +120,9 @@ namespace MopidyFinder
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            // WebSocketお試し実装、ダメだった。--->
-            if (Startup._webSocketStore == null)
-                Startup._webSocketStore = new WebSocketStore();
+            //// WebSocketお試し実装、ダメだった。--->
+            //if (Startup._webSocketStore == null)
+            //    Startup._webSocketStore = new WebSocketStore();
 
             var options = new WebSocketOptions { ReceiveBufferSize = 8192 };
             app.UseWebSockets(options);

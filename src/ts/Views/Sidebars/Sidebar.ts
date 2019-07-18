@@ -40,6 +40,7 @@ export const SidebarEvents = {
                             data-toggle="tab"
                             aria-controls="tab-finder"
                             aria-selected="true"
+                            ref="FinderAnchor"
                             @click="OnClickFinder" >
                             <i class="fa fa-search nav-icon" />
                             <p>Finder</p>
@@ -52,6 +53,7 @@ export const SidebarEvents = {
                             data-toggle="tab"
                             aria-controls="tab-playlists"
                             aria-selected="false"
+                            ref="PlaylistsAnchor"
                             @click="OnClickPlaylists" >
                             <i class="fa fa-bookmark nav-icon" />
                             <p>Playlists</p>
@@ -64,6 +66,7 @@ export const SidebarEvents = {
                             data-toggle="tab"
                             aria-controls="tab-settings"
                             aria-selected="false"
+                            ref="SettingsAnchor"
                             @click="OnClickSettings" >
                             <i class="fa fa-cog nav-icon" />
                             <p>Settings</p>
@@ -85,8 +88,23 @@ export const SidebarEvents = {
 })
 export default class Sidebar extends ViewBase {
 
+    private static readonly ShowTabMethod = 'show';
+
+    private finderTabAnchor: JQuery;
+    private playlistsTabAnchor: JQuery;
+    private settingsTabAnchor: JQuery;
+
     private get SidebarSection(): HTMLTableSectionElement {
         return this.$refs.SidebarSection as HTMLTableSectionElement;
+    }
+    private get FinderAnchor(): HTMLAnchorElement {
+        return this.$refs.FinderAnchor as HTMLAnchorElement;
+    }
+    private get PlaylistsAnchor(): HTMLAnchorElement {
+        return this.$refs.PlaylistsAnchor as HTMLAnchorElement;
+    }
+    private get SettingsAnchor(): HTMLAnchorElement {
+        return this.$refs.SettingsAnchor as HTMLAnchorElement;
     }
 
     public async Initialize(): Promise<boolean> {
@@ -96,8 +114,25 @@ export default class Sidebar extends ViewBase {
             height: 'calc(100%)'
         });
 
+        this.finderTabAnchor = Libraries.$(this.FinderAnchor);
+        this.playlistsTabAnchor = Libraries.$(this.PlaylistsAnchor);
+        this.settingsTabAnchor = Libraries.$(this.SettingsAnchor);
+
         return true;
     }
+
+    public ShowFinder(): void {
+        this.finderTabAnchor.tab(Sidebar.ShowTabMethod);
+    }
+
+    public ShowPlaylists(): void {
+        this.playlistsTabAnchor.tab(Sidebar.ShowTabMethod);
+    }
+
+    public ShowSettings(): void {
+        this.settingsTabAnchor.tab(Sidebar.ShowTabMethod);
+    }
+    
 
     private OnClickFinder(ev: MouseEvent): void {
         const orderedArgs: IContentOrdered = {

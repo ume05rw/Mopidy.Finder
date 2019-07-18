@@ -7,6 +7,7 @@ import HeaderBar from './HeaderBars/HeaderBar';
 import Playlists from './Playlists/Playlists';
 import Settings from './Settings/Settings';
 import { default as Sidebar, IContentChanged, IContentOrdered, Pages } from './Sidebars/Sidebar';
+import SettingsStore from '../Models/Settings/SettingsStore';
 
 @Component({
     template: `<div class="wrapper" style="height: 100%; min-height: 100%;">
@@ -24,7 +25,8 @@ import { default as Sidebar, IContentChanged, IContentOrdered, Pages } from './S
             ref="Playlists"
             @PlaylistsUpdated="OnPlaylistsUpdatedByPlaylists" />
         <settings
-            ref="Settings" />
+            ref="Settings"
+            @ServerFound="OnServerFound"/>
     </div>
 </div>`,
     components: {
@@ -46,6 +48,9 @@ export default class RootView extends ViewBase {
     private get Settings(): Settings {
         return this.$refs.Settings as Settings;
     }
+    private get Sidebar(): Sidebar {
+        return this.$refs.Sidebar as Sidebar;
+    }
 
     private activeContent: IContentView;
 
@@ -56,8 +61,17 @@ export default class RootView extends ViewBase {
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
+        const store = new SettingsStore();
+        const isConnectable = await store.TryConnect();
+
+        (isConnectable)
+            ? this.Sidebar.ShowFinder()
+            : this.Sidebar.ShowSettings();
+
         const args: IContentChanged = {
-            Page: Pages.Finder
+            Page: (isConnectable)
+                ? Pages.Finder
+                : Pages.Settings
         }
         this.OnContentChanged(args);
 
@@ -70,6 +84,11 @@ export default class RootView extends ViewBase {
 
     private OnPlaylistsUpdatedByPlaylists(): void {
         this.Finder.RefreshPlaylist();
+    }
+
+    private OnServerFound(): void {
+        this.Finder.RefreshAll();
+        this.Playlists.RefreshPlaylist();
     }
 
     private OnContentOrdered(args: IContentOrdered): void {

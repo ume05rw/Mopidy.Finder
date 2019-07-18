@@ -16,8 +16,14 @@ export default abstract class ViewBase extends Vue {
 
         const promises: Promise<boolean>[] = [];
         _.each(this.$children, (view): void => {
-            if (view instanceof ViewBase)
-                promises.push((view as ViewBase).Initialize());
+            if (view instanceof ViewBase) {
+                try {
+                    promises.push((view as ViewBase).Initialize());
+                } catch (e) {
+                    console.error('Initialize Error');
+                    console.error(e);
+                }
+            }
         });
 
         await Promise.all(promises);
