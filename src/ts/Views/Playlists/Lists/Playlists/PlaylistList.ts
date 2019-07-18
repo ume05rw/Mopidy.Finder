@@ -102,6 +102,8 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         Libraries.SetTooltip(this.$refs.ButtonAdd as HTMLElement, 'Add Playlist');
         Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');
 
+        this.RefreshPlaylist();
+
         return true;
     }
 
@@ -188,5 +190,13 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         this.entities = [];
         this.allEntities = [];
         this.Refresh();
+    }
+
+    /**
+     * 非表示時にInfiniteLoadingが反応しない現象への対策。
+     */
+    public LoadIfEmpty(): void {
+        if (!this.entities || this.entities.length <= 0)
+            this.RefreshPlaylist();
     }
 }

@@ -125,7 +125,9 @@ export default abstract class SelectionList<TEntity, TStore> extends ViewBase {
     }
 
     protected OnSelectionChanged(args: ISelectionChangedArgs<TEntity>): void {
-        this.$emit(SelectionEvents.SelectionChanged, args);
+        _.delay((): void => {
+            this.$emit(SelectionEvents.SelectionChanged, args);
+        }, 300);
     }
 
     protected abstract async GetPagenatedList(): Promise<IPagenatedResult<TEntity>>;
