@@ -963,6 +963,33 @@ define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "E
         XhrQueryableBase.ParamsSerializer = function (params) {
             return qs.stringify(params);
         };
+        Object.defineProperty(XhrQueryableBase, "Protocol", {
+            get: function () {
+                return (location)
+                    ? location.protocol
+                    : 'http:';
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(XhrQueryableBase, "HostName", {
+            get: function () {
+                return (location)
+                    ? location.hostname
+                    : 'localhost';
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(XhrQueryableBase, "Port", {
+            get: function () {
+                return (location)
+                    ? location.port
+                    : '8080';
+            },
+            enumerable: true,
+            configurable: true
+        });
         XhrQueryableBase.prototype.ParseResponse = function (data) {
             if (!data) {
                 var error = {
@@ -1085,7 +1112,7 @@ define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "E
         };
         XhrQueryableBase.XhrInstance = axios_1.default.create({
             //// APIの基底URLが存在するとき
-            baseURL: 'http://localhost:8080/',
+            baseURL: XhrQueryableBase.Protocol + "//" + XhrQueryableBase.HostName + ":" + XhrQueryableBase.Port + "/",
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',

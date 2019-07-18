@@ -22,9 +22,27 @@ export default abstract class XhrQueryableBase extends EventableBase {
         return qs.stringify(params);
     }
 
+    private static get Protocol(): string {
+        return (location)
+            ? location.protocol
+            : 'http:';
+    }
+
+    private static get HostName(): string {
+        return (location)
+            ? location.hostname
+            : 'localhost';
+    }
+
+    private static get Port(): string {
+        return (location)
+            ? location.port
+            : '8080';
+    }
+
     protected static XhrInstance: AxiosInstance = Axios.create({
         //// APIの基底URLが存在するとき
-        baseURL: 'http://localhost:8080/',
+        baseURL: `${XhrQueryableBase.Protocol}//${XhrQueryableBase.HostName}:${XhrQueryableBase.Port}/`,
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
