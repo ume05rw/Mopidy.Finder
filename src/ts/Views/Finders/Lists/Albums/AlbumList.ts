@@ -168,8 +168,8 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
             const result = await this.store.PlayAlbumByTlId(track.TlId);
 
             (result)
-                ? Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started.`)
-                : Libraries.ShowToast.Error('Track Play Order Failed.');
+                ? Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started!`)
+                : Libraries.ShowToast.Error('Track Play Order Failed...');
 
             return result;
         } else {
@@ -177,7 +177,7 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
             const resultAtls = await this.store.PlayAlbumByTrack(track);
 
             if (!resultAtls) {
-                Libraries.ShowToast.Error('Track Play Order Failed.');
+                Libraries.ShowToast.Error('Track Play Order Failed...');
 
                 return false;
             }
@@ -188,7 +188,7 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
                 track.TlId = updatedTracks.firstOrDefault((e): boolean => e.Id == track.Id).TlId;
             });
 
-            Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started.`)
+            Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started!`)
 
             return true;
         }
@@ -199,14 +199,14 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         const newPlaylist = await store.AddPlaylistByAlbumTracks(args.AlbumTracks);
 
         if (!newPlaylist) {
-            Libraries.ShowToast.Error('Playlist Create Failed.');
+            Libraries.ShowToast.Error('Playlist Create Failed...');
 
             return false;
         }
 
         this.$emit(AlbumListEvents.PlaylistUpdated);
         this.InitPlaylistList();
-        Libraries.ShowToast.Success(`New Playlist [ ${newPlaylist.Name} ] Created.`);
+        Libraries.ShowToast.Success(`New Playlist [ ${newPlaylist.Name} ] Created!`);
 
         return true;
     }
@@ -227,9 +227,9 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         if (result === true) {
             this.$emit(AlbumListEvents.PlaylistUpdated);
             this.InitPlaylistList();
-            Libraries.ShowToast.Success(`Add ${args.Tracks.length} Track(s) to Playlist [ ${playlist.Name} ]`);
+            Libraries.ShowToast.Success(`Add ${args.Tracks.length} Track(s) to [ ${playlist.Name} ]`);
         } else {
-            Libraries.ShowToast.Error('Playlist Update Failed.');
+            Libraries.ShowToast.Error('Playlist Update Failed...');
         }
 
         return result;

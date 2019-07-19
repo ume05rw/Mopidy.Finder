@@ -270,8 +270,8 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
                 : await this.store.PlayPlaylist(this.playlist, args.Entity);
 
             (response)
-                ? Libraries.ShowToast.Success(`Track [ ${args.Entity.Name} ] Started.`)
-                : Libraries.ShowToast.Error('Track Play Order Failed.');
+                ? Libraries.ShowToast.Success(`Track [ ${args.Entity.Name} ] Started!`)
+                : Libraries.ShowToast.Error('Track Order Failed...');
 
         } else if (this.listMode === ListMode.Editable) {
             // 編集モード時
@@ -436,10 +436,10 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
             if ((await this.UpdateDialog.ConfirmUpdate(update)) === true) {
                 // 更新許可OK
                 if ((await this.Update(update)) === true) {
-                    Libraries.ShowToast.Success('Playlist Update Succeeded.');
+                    Libraries.ShowToast.Success('Playlist Updated!');
                     this.GoBackToPlayer();
                 } else {
-                    Libraries.ShowToast.Error('Playlist Update Failed.');
+                    Libraries.ShowToast.Error('Playlist Update Failed...');
                     // そのまま編集モードを維持
                 }
             } else {
@@ -592,13 +592,13 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         if ((await this.UpdateDialog.ConfirmDeleteAll()) === true) {
             const result = await this.store.DeletePlaylist(this.playlist);
             if (result === true) {
-                Libraries.ShowToast.Success('Delete Succeeded!');
+                Libraries.ShowToast.Success('Deleted!');
                 this.playlist = null;
                 this.removedEntities = [];
                 this.$emit(TrackListEvents.PlaylistDeleted);
                 await this.GoBackToPlayer();
             } else {
-                Libraries.ShowToast.Error('Delete Failed!');
+                Libraries.ShowToast.Error('Delete Failed...');
             }
         }
 

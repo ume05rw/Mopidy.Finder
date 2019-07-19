@@ -2909,21 +2909,21 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 3:
                             result = _a.sent();
                             (result)
-                                ? Libraries_7.default.ShowToast.Success("Track [ " + track.Name + " ] Started.")
-                                : Libraries_7.default.ShowToast.Error('Track Play Order Failed.');
+                                ? Libraries_7.default.ShowToast.Success("Track [ " + track.Name + " ] Started!")
+                                : Libraries_7.default.ShowToast.Error('Track Play Order Failed...');
                             return [2 /*return*/, result];
                         case 4: return [4 /*yield*/, this.store.PlayAlbumByTrack(track)];
                         case 5:
                             resultAtls = _a.sent();
                             if (!resultAtls) {
-                                Libraries_7.default.ShowToast.Error('Track Play Order Failed.');
+                                Libraries_7.default.ShowToast.Error('Track Play Order Failed...');
                                 return [2 /*return*/, false];
                             }
                             updatedTracks_1 = Libraries_7.default.Enumerable.from(resultAtls.Tracks);
                             _.each(albumTracks.Tracks, function (track) {
                                 track.TlId = updatedTracks_1.firstOrDefault(function (e) { return e.Id == track.Id; }).TlId;
                             });
-                            Libraries_7.default.ShowToast.Success("Track [ " + track.Name + " ] Started.");
+                            Libraries_7.default.ShowToast.Success("Track [ " + track.Name + " ] Started!");
                             return [2 /*return*/, true];
                     }
                 });
@@ -2940,12 +2940,12 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 1:
                             newPlaylist = _a.sent();
                             if (!newPlaylist) {
-                                Libraries_7.default.ShowToast.Error('Playlist Create Failed.');
+                                Libraries_7.default.ShowToast.Error('Playlist Create Failed...');
                                 return [2 /*return*/, false];
                             }
                             this.$emit(exports.AlbumListEvents.PlaylistUpdated);
                             this.InitPlaylistList();
-                            Libraries_7.default.ShowToast.Success("New Playlist [ " + newPlaylist.Name + " ] Created.");
+                            Libraries_7.default.ShowToast.Success("New Playlist [ " + newPlaylist.Name + " ] Created!");
                             return [2 /*return*/, true];
                     }
                 });
@@ -2971,10 +2971,10 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             if (result === true) {
                                 this.$emit(exports.AlbumListEvents.PlaylistUpdated);
                                 this.InitPlaylistList();
-                                Libraries_7.default.ShowToast.Success("Add " + args.Tracks.length + " Track(s) to Playlist [ " + playlist.Name + " ]");
+                                Libraries_7.default.ShowToast.Success("Add " + args.Tracks.length + " Track(s) to [ " + playlist.Name + " ]");
                             }
                             else {
-                                Libraries_7.default.ShowToast.Error('Playlist Update Failed.');
+                                Libraries_7.default.ShowToast.Error('Playlist Update Failed...');
                             }
                             return [2 /*return*/, result];
                     }
@@ -4514,10 +4514,10 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                             playlist = _a.sent();
                             if (!playlist) {
                                 this.AddModal.Hide();
-                                Libraries_13.default.ShowToast.Error('Playlist Create Failed');
+                                Libraries_13.default.ShowToast.Error('Playlist Create Failed...');
                                 return [2 /*return*/, false];
                             }
-                            Libraries_13.default.ShowToast.Success("Playlist [ " + playlist.Name + " ] Created.");
+                            Libraries_13.default.ShowToast.Success("Playlist [ " + playlist.Name + " ] Created!");
                             this.AddModal.Hide();
                             this.entities = [];
                             this.allEntities = [];
@@ -5111,8 +5111,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 4:
                             response = _a;
                             (response)
-                                ? Libraries_16.default.ShowToast.Success("Track [ " + args.Entity.Name + " ] Started.")
-                                : Libraries_16.default.ShowToast.Error('Track Play Order Failed.');
+                                ? Libraries_16.default.ShowToast.Success("Track [ " + args.Entity.Name + " ] Started!")
+                                : Libraries_16.default.ShowToast.Error('Track Order Failed...');
                             return [3 /*break*/, 6];
                         case 5:
                             if (this.listMode === ListMode.Editable) {
@@ -5319,11 +5319,11 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 2:
                             // 更新許可OK
                             if ((_a.sent()) === true) {
-                                Libraries_16.default.ShowToast.Success('Playlist Update Succeeded.');
+                                Libraries_16.default.ShowToast.Success('Playlist Updated!');
                                 this.GoBackToPlayer();
                             }
                             else {
-                                Libraries_16.default.ShowToast.Error('Playlist Update Failed.');
+                                Libraries_16.default.ShowToast.Error('Playlist Update Failed...');
                                 // そのまま編集モードを維持
                             }
                             return [3 /*break*/, 3];
@@ -5460,7 +5460,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         case 2:
                             result = _a.sent();
                             if (!(result === true)) return [3 /*break*/, 4];
-                            Libraries_16.default.ShowToast.Success('Delete Succeeded!');
+                            Libraries_16.default.ShowToast.Success('Deleted!');
                             this.playlist = null;
                             this.removedEntities = [];
                             this.$emit(exports.TrackListEvents.PlaylistDeleted);
@@ -5469,7 +5469,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             _a.sent();
                             return [3 /*break*/, 5];
                         case 4:
-                            Libraries_16.default.ShowToast.Error('Delete Failed!');
+                            Libraries_16.default.ShowToast.Error('Delete Failed...');
                             _a.label = 5;
                         case 5: return [2 /*return*/, true];
                     }

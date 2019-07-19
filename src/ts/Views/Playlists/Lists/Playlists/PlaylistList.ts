@@ -172,12 +172,12 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
 
         if (!playlist) {
             this.AddModal.Hide();
-            Libraries.ShowToast.Error('Playlist Create Failed');
+            Libraries.ShowToast.Error('Playlist Create Failed...');
 
             return false;
         }
 
-        Libraries.ShowToast.Success(`Playlist [ ${playlist.Name} ] Created.`);
+        Libraries.ShowToast.Success(`Playlist [ ${playlist.Name} ] Created!`);
 
         this.AddModal.Hide();        
         this.entities = [];
