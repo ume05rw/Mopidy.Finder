@@ -4,6 +4,7 @@ using MopidyFinder.Models.Artists;
 using MopidyFinder.Models.Genres;
 using MopidyFinder.Models.Relations;
 using MopidyFinder.Models.Tracks;
+using MopidyFinder.Models.Jobs;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,12 +13,7 @@ namespace MopidyFinder.Models
 {
     public class Dbc: DbContext
     {
-        private class LockerObject
-        {
-            public bool IsLocked { get; set; } = false;
-        }
-
-        private static LockerObject Locker = new LockerObject();
+        private static Locker Locker = new Locker();
 
         public DbSet<Album> Albums { get; set; }
         public DbSet<Genre> Genres { get; set; }
@@ -27,6 +23,7 @@ namespace MopidyFinder.Models
         public DbSet<GenreAlbum> GenreAlbums { get; set; }
         public DbSet<GenreArtist> GenreArtists { get; set; }
         public DbSet<Settings.Settings> Settings { get; set; }
+        public DbSet<Job> Jobs { get; set; }
 
         public IQueryable<Genre> GetGenreQuery()
             => this.Genres

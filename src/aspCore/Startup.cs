@@ -11,6 +11,7 @@ using MopidyFinder.Models.Albums;
 using MopidyFinder.Models.AlbumTracks;
 using MopidyFinder.Models.Artists;
 using MopidyFinder.Models.Genres;
+using MopidyFinder.Models.Jobs;
 using MopidyFinder.Models.Mopidies.Methods;
 using MopidyFinder.Models.Relations;
 using MopidyFinder.Models.Settings;
@@ -96,7 +97,8 @@ namespace MopidyFinder
                 .AddTransient<GenreArtistStore, GenreArtistStore>()
                 .AddTransient<AlbumTracksStore, AlbumTracksStore>()
                 .AddTransient<TrackStore, TrackStore>()
-                .AddTransient<SettingsStore, SettingsStore>();
+                .AddTransient<SettingsStore, SettingsStore>()
+                .AddTransient<JobStore, JobStore>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -106,7 +108,9 @@ namespace MopidyFinder
         )
         {
             Query.SetServiceProvider(app.ApplicationServices);
+            JobStore.SetServiceProvider(app.ApplicationServices);
             DbMaintainer.SetServiceProvider(app.ApplicationServices);
+            DbMaintainer.RunUpdateAlbumTask();
 
             if (env.IsDevelopment())
             {

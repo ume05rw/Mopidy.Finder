@@ -15,6 +15,35 @@ namespace MopidyFinder.Models
 {
     public class DbMaintainer
     {
+        private static bool _isUpdateAlbumRunning = false;
+        public static void RunUpdateAlbumTask()
+        {
+            if (DbMaintainer._isUpdateAlbumRunning)
+                return;
+
+            DbMaintainer._isUpdateAlbumRunning = true;
+            var task = Task.Run(async() => {
+                while(true)
+                {
+                    await DbMaintainer.ScanAlbum();
+                    await Task.Delay(10000);
+                }
+            });
+        }
+
+        private async static Task<bool> ScanAlbum()
+        {
+            using (var serviceScope = DbMaintainer._provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
+            using (var albumStore = new AlbumStore(dbc))
+            {
+                await albumStore.ScanAlbumDetail();
+            }
+
+            return true;
+        }
+
+
         private enum Phase
         {
             None,
@@ -55,7 +84,6 @@ namespace MopidyFinder.Models
         {
             DbMaintainer._provider = null;
         }
-
 
 
         private Phase _currentPhase = Phase.None;
@@ -207,9 +235,6 @@ namespace MopidyFinder.Models
                     dbc.SaveChanges();
                     this._message = $"{genreArtistCount} Genre-Artist Relations Added. Process Completed.";
 
-                    // 投げっぱなしにする。
-                    this.UpdateAlbumImage();
-
                     this._finished = true;
                     this._succeeded = true;
 
@@ -241,18 +266,6 @@ namespace MopidyFinder.Models
 
                 return true;
             }
-        }
-
-        public async Task<bool> UpdateAlbumImage()
-        {
-            using (var serviceScope = DbMaintainer._provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
-            using (var albumStore = new AlbumStore(dbc))
-            {
-                await albumStore.UpdateAlbumImages();
-            }
-
-            return true;
         }
     }
 }

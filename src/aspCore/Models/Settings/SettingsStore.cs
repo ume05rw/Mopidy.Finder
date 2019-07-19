@@ -10,17 +10,13 @@ namespace MopidyFinder.Models.Settings
 {
     public class SettingsStore: StoreBase<Settings>
     {
-        private class LockerObject
-        {
-            public bool IsLocked { get; set; } = false;
-        }
-
-        private static LockerObject Locker = new LockerObject();
+        private static Locker Locker = new Locker();
         private static Settings _entity;
 
         public Settings Entity
         {
-            get {
+            get
+            {
                 this.Ensure();
 
                 return SettingsStore._entity;

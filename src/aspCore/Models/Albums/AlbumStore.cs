@@ -146,37 +146,74 @@ namespace MopidyFinder.Models.Albums
             return newEntityDictionary.Count();
         }
 
-        public async Task<bool> UpdateAlbumImages()
+        public async Task<bool> ScanAlbumDetail()
         {
-            var albumAllUris = this.Dbc.Albums
-                .Where(e => e.ImageUri == null)
+            var albums = this.Dbc.Albums
+                .GroupJoin(
+                    this.Dbc.Tracks,
+                    al => al.Id,
+                    tr => tr.AlbumId,
+                    (al, tr) => new
+                    {
+                        Album = al,
+                        Track = tr
+                    }
+                )
+                .Where(e => !e.Track.Any())
+                .Select(e => e.Album)
+                .Take(10);
+
+            if (!albums.Any())
+                return true;
+
+            // 画像を取得
+            var noImageAlbumUris = albums
+                .Where(e => string.IsNullOrEmpty(e.ImageUri))
                 .Select(e => e.Uri)
                 .ToArray();
 
-            for (var i = 0; i < albumAllUris.Length; i += 10)
+            var imageDictionary = await Library.GetImages(noImageAlbumUris);
+            if (imageDictionary != null)
             {
-                var albumUris = albumAllUris
-                    .Skip(i)
-                    .Take(10)
-                    .ToArray();
-
-                Debug.WriteLine($"AlbumImage Progress: {i + albumUris.Length } / {albumAllUris.Length}");
-
-                var imageDictionary = await Library.GetImages(albumUris);
-
                 foreach (var pair in imageDictionary)
                 {
-                    var album = this.Dbc.Albums.FirstOrDefault(e => e.Uri == pair.Key);
+                    var album = albums.FirstOrDefault(e => e.Uri == pair.Key);
                     if (album == null || !string.IsNullOrEmpty(album.ImageUri))
                         continue;
 
                     album.ImageUri = pair.Value.Uri;
                     this.Dbc.Entry(album).State = EntityState.Modified;
                 }
-
-                // 待機時間を挟む。
-                await Task.Delay(1000);
             }
+
+            // トラックを取得
+            var albumUris = albums.Select(e => e.Uri).ToArray();
+            var mopidyTrackDictionary = await Library.Lookup(albumUris);
+            if (mopidyTrackDictionary != null)
+            {
+                using (var trackStore = new TrackStore(this.Dbc))
+                {
+                    foreach (var pair in mopidyTrackDictionary)
+                    {
+                        var album = albums
+                            .FirstOrDefault(e => e.Uri == pair.Key);
+                        if (album == null)
+                            continue;
+
+                        var tracks = pair.Value
+                            .Select(mt => trackStore.CreateTrack(mt))
+                            .OrderBy(e => e.TrackNo)
+                            .ToArray();
+
+                        foreach (var track in tracks)
+                        {
+                            track.AlbumId = album.Id;
+                            this.Dbc.Tracks.Add(track);
+                        }
+                    }
+                }
+            }
+
             this.Dbc.SaveChanges();
 
             return true;
