@@ -89,6 +89,20 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     }
 
     /**
+     * 非表示時にInfiniteLoadingが反応しない現象への対策。
+     */
+    public LoadIfEmpty(): void {
+        if (!this.entities || this.entities.length <= 0)
+            this.Refresh();
+    }
+
+    public ForceRefresh(): void {
+        this.genreIds = [];
+        this.entities = [];
+        this.Refresh();
+    }
+
+    /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
      * superクラスの同名メソッドが実行されるが、superクラス上のthisが
      * バインドされずにnullになってしまう。

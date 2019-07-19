@@ -85,7 +85,7 @@ export default class RootView extends ViewBase {
     }
 
     private OnServerFound(): void {
-        this.Finder.RefreshAll();
+        this.Finder.ForceRefresh();
         this.Playlists.RefreshPlaylist();
     }
 

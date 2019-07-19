@@ -9,6 +9,7 @@ import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs, ISelectionOrderedArgs } from '../../../Shared/SelectionItem';
 import { default as SelectionList } from '../../../Shared/SelectionList';
 import AddModal from './AddModal';
+import Delay from '../../../../Utils/Delay';
 
 export const PlaylistListEvents = {
     AnimationEnd: 'animationend',
@@ -124,11 +125,13 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
         return super.OnSelectionOrdered(args);
     }
     protected OnSelectionChanged(args: ISelectionChangedArgs<Playlist>): void {
-        _.each(this.Items, (si): void => {
-            if (si.GetEntity() !== args.Entity && si.GetSelected()) {
-                si.SetSelected(false);
-            }
-        });
+        if (args.Selected === true) {
+            _.each(this.Items, (si): void => {
+                if (si.GetEntity() !== args.Entity && si.GetSelected()) {
+                    si.SetSelected(false);
+                }
+            });
+        }
 
         super.OnSelectionChanged(args);
     }
@@ -198,5 +201,14 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
     public LoadIfEmpty(): void {
         if (!this.entities || this.entities.length <= 0)
             this.RefreshPlaylist();
+
+        Delay.Wait(800)
+            .then((): void => {
+                const items = Libraries.Enumerable.from(this.Items);
+                if (items.count() <= 0 || items.any(e => e.GetSelected() === true))
+                    return;
+
+                items.first().SetSelected(true);
+            });
     }
 }

@@ -595,7 +595,10 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
             this.$emit(exports.SelectionItemEvents.SelectionOrdered, orderedArgs);
             if (orderedArgs.Permitted !== true)
                 return;
-            this.selected = !this.selected;
+            this.SetSelected(!this.selected);
+        };
+        SelectionItem.prototype.SetSelected = function (selected) {
+            this.selected = selected;
             this.SetClassBySelection();
             var changedArgs = {
                 Entity: this.entity,
@@ -618,10 +621,6 @@ define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component
         };
         SelectionItem.prototype.GetEntity = function () {
             return this.entity;
-        };
-        SelectionItem.prototype.SetSelected = function (selected) {
-            this.selected = selected;
-            this.SetClassBySelection();
         };
         var SelectionItem_1;
         SelectionItem.SelectedColor = 'selected';
@@ -2846,6 +2845,19 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                 });
             });
         };
+        /**
+         * 非表示時にInfiniteLoadingが反応しない現象への対策。
+         */
+        AlbumList.prototype.LoadIfEmpty = function () {
+            if (!this.entities || this.entities.length <= 0)
+                this.Refresh();
+        };
+        AlbumList.prototype.ForceRefresh = function () {
+            this.genreIds = [];
+            this.artistIds = [];
+            this.entities = [];
+            this.Refresh();
+        };
         AlbumList.prototype.InitPlaylistList = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var store, _a, i;
@@ -3147,6 +3159,18 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             });
         };
         /**
+         * 非表示時にInfiniteLoadingが反応しない現象への対策。
+         */
+        ArtistList.prototype.LoadIfEmpty = function () {
+            if (!this.entities || this.entities.length <= 0)
+                this.Refresh();
+        };
+        ArtistList.prototype.ForceRefresh = function () {
+            this.genreIds = [];
+            this.entities = [];
+            this.Refresh();
+        };
+        /**
          * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
          * superクラスの同名メソッドが実行されるが、superクラス上のthisが
          * バインドされずにnullになってしまう。
@@ -3295,7 +3319,15 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                 });
             });
         };
+        /**
+         * 非表示時にInfiniteLoadingが反応しない現象への対策。
+         */
+        GenreList.prototype.LoadIfEmpty = function () {
+            if (!this.entities || this.entities.length <= 0)
+                this.Refresh();
+        };
         GenreList.prototype.ForceRefresh = function () {
+            this.entities = [];
             this.Refresh();
         };
         /**
@@ -3350,7 +3382,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionList_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "lodash", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, _, vue_class_component_9, ContentViewBase_1, AlbumList_1, ArtistList_1, GenreList_1) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList", "Utils/Delay"], function (require, exports, vue_class_component_9, ContentViewBase_1, AlbumList_1, ArtistList_1, GenreList_1, Delay_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -3384,7 +3416,14 @@ define("Views/Finders/Finder", ["require", "exports", "lodash", "vue-class-compo
             return true;
         };
         Finder.prototype.InitContent = function () {
+            var _this = this;
             this.AlbumList.InitPlaylistList();
+            Delay_3.default.Wait(800)
+                .then(function () {
+                _this.GenreList.LoadIfEmpty();
+                _this.ArtistList.LoadIfEmpty();
+                _this.AlbumList.LoadIfEmpty();
+            });
         };
         // #endregion
         Finder.prototype.OnPlaylistUpdated = function () {
@@ -3416,13 +3455,10 @@ define("Views/Finders/Finder", ["require", "exports", "lodash", "vue-class-compo
         Finder.prototype.OnArtistRefreshed = function () {
             this.AlbumList.RemoveFilterAllArtists();
         };
-        Finder.prototype.RefreshAll = function () {
-            var _this = this;
-            _.delay(function () {
-                _this.GenreList.ForceRefresh();
-                _this.ArtistList.RemoveAllFilters();
-                _this.AlbumList.RemoveAllFilters();
-            }, 500);
+        Finder.prototype.ForceRefresh = function () {
+            this.GenreList.ForceRefresh();
+            this.ArtistList.ForceRefresh();
+            this.AlbumList.ForceRefresh();
         };
         Finder.prototype.RefreshPlaylist = function () {
             this.AlbumList.InitPlaylistList();
@@ -4327,7 +4363,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
     }(ViewBase_10.default));
     exports.default = AddModal;
 });
-define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_13, PlaylistStore_2, Filterbox_4, SelectionItem_5, SelectionList_4, AddModal_1) {
+define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Shared/SelectionList", "Views/Playlists/Lists/Playlists/AddModal", "Utils/Delay"], function (require, exports, _, vue_class_component_14, vue_infinite_loading_4, Libraries_13, PlaylistStore_2, Filterbox_4, SelectionItem_5, SelectionList_4, AddModal_1, Delay_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistListEvents = {
@@ -4419,11 +4455,13 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
             });
         };
         PlaylistList.prototype.OnSelectionChanged = function (args) {
-            _.each(this.Items, function (si) {
-                if (si.GetEntity() !== args.Entity && si.GetSelected()) {
-                    si.SetSelected(false);
-                }
-            });
+            if (args.Selected === true) {
+                _.each(this.Items, function (si) {
+                    if (si.GetEntity() !== args.Entity && si.GetSelected()) {
+                        si.SetSelected(false);
+                    }
+                });
+            }
             _super.prototype.OnSelectionChanged.call(this, args);
         };
         PlaylistList.prototype.GetPagenatedList = function () {
@@ -4499,8 +4537,16 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
          * 非表示時にInfiniteLoadingが反応しない現象への対策。
          */
         PlaylistList.prototype.LoadIfEmpty = function () {
+            var _this = this;
             if (!this.entities || this.entities.length <= 0)
                 this.RefreshPlaylist();
+            Delay_4.default.Wait(800)
+                .then(function () {
+                var items = Libraries_13.default.Enumerable.from(_this.Items);
+                if (items.count() <= 0 || items.any(function (e) { return e.GetSelected() === true; }))
+                    return;
+                items.first().SetSelected(true);
+            });
         };
         var PlaylistList_1;
         PlaylistList.PageLength = 30;
@@ -4519,7 +4565,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionList_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_15, vue_property_decorator_6, Libraries_14, Track_5, Animate_3, Delay_3, ViewBase_11, SelectionList_5) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Shared/SelectionList"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_15, vue_property_decorator_6, Libraries_14, Track_5, Animate_3, Delay_5, ViewBase_11, SelectionList_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionList_5.SelectionEvents), {
@@ -4604,7 +4650,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
                             //console.log('SelectionTrack.DeleteTrack');
                             this.isDeleting = true;
                             this.SetLiClasses();
-                            return [4 /*yield*/, Delay_3.default.Wait(600)];
+                            return [4 /*yield*/, Delay_5.default.Wait(600)];
                         case 1:
                             _a.sent();
                             return [2 /*return*/, true];
@@ -4796,7 +4842,7 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
     }(ConfirmDialog_2.default));
     exports.default = UpdateDialog;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_17, vue_infinite_loading_5, Libraries_16, Playlist_3, PlaylistStore_3, Animate_4, Delay_4, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionList", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_17, vue_infinite_loading_5, Libraries_16, Playlist_3, PlaylistStore_3, Animate_4, Delay_6, Filterbox_5, SelectionList_6, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackListEvents = {
@@ -4917,7 +4963,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                                 var items, i, item;
                                 return __generator(this, function (_a) {
                                     switch (_a.label) {
-                                        case 0: return [4 /*yield*/, Delay_4.default.Wait(500)];
+                                        case 0: return [4 /*yield*/, Delay_6.default.Wait(500)];
                                         case 1:
                                             _a.sent();
                                             items = this.$refs.Items;
@@ -5101,7 +5147,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, Delay_4.default.Wait(500)];
+                        case 0: return [4 /*yield*/, Delay_6.default.Wait(500)];
                         case 1:
                             _a.sent();
                             this.ClearSelection();
@@ -5196,7 +5242,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     switch (_a.label) {
                         case 0:
                             this.DisposeSortable();
-                            return [4 /*yield*/, Delay_4.default.Wait(10)];
+                            return [4 /*yield*/, Delay_6.default.Wait(10)];
                         case 1:
                             _a.sent();
                             this.sortable = sortable_complete_esm_2.default.create(this.TrackListUl, {
@@ -5506,7 +5552,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionList_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay"], function (require, exports, vue_class_component_18, Libraries_17, ContentViewBase_2, PlaylistList_2, TrackList_2, Delay_5) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentViewBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay"], function (require, exports, vue_class_component_18, Libraries_17, ContentViewBase_2, PlaylistList_2, TrackList_2, Delay_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistsEvents = {
@@ -5542,7 +5588,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
         };
         Playlists.prototype.InitContent = function () {
             var _this = this;
-            Delay_5.default.Wait(500)
+            Delay_7.default.Wait(800)
                 .then(function () {
                 _this.PlaylistList.LoadIfEmpty();
             });
@@ -5728,7 +5774,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
     }(JsonRpcQueryableBase_5.default));
     exports.default = SettingsStore;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Utils/Delay", "Models/Settings/SettingsStore", "Libraries"], function (require, exports, vue_class_component_19, ContentViewBase_3, Delay_6, SettingsStore_1, Libraries_18) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Utils/Delay", "Models/Settings/SettingsStore", "Libraries"], function (require, exports, vue_class_component_19, ContentViewBase_3, Delay_8, SettingsStore_1, Libraries_18) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SettingsEvents = {
@@ -5798,7 +5844,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                         case 1:
                             _b.sent();
                             this.Update = this.Update.bind(this);
-                            this.lazyUpdater = Delay_6.default.DelayedOnce(function () {
+                            this.lazyUpdater = Delay_8.default.DelayedOnce(function () {
                                 console.log('lazyUpdater Run.');
                                 _this.Update();
                             }, 2000);
@@ -5987,7 +6033,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
             this.Finder.RefreshPlaylist();
         };
         RootView.prototype.OnServerFound = function () {
-            this.Finder.RefreshAll();
+            this.Finder.ForceRefresh();
             this.Playlists.RefreshPlaylist();
         };
         RootView.prototype.OnContentOrdered = function (args) {

@@ -84,7 +84,16 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
         return true;
     }
 
+    /**
+     * 非表示時にInfiniteLoadingが反応しない現象への対策。
+     */
+    public LoadIfEmpty(): void {
+        if (!this.entities || this.entities.length <= 0)
+            this.Refresh();
+    }
+
     public ForceRefresh(): void {
+        this.entities = [];
         this.Refresh();
     }
 

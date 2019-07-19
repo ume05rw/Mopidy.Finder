@@ -49,7 +49,11 @@ export default class SelectionItem<TEntity> extends ViewBase {
         if (orderedArgs.Permitted !== true)
             return;
 
-        this.selected = !this.selected;
+        this.SetSelected(!this.selected);
+    }
+
+    public SetSelected(selected: boolean): void {
+        this.selected = selected;
         this.SetClassBySelection();
 
         const changedArgs: ISelectionChangedArgs<TEntity> = {
@@ -75,10 +79,5 @@ export default class SelectionItem<TEntity> extends ViewBase {
 
     public GetEntity(): TEntity {
         return this.entity;
-    }
-
-    public SetSelected(selected: boolean): void {
-        this.selected = selected;
-        this.SetClassBySelection();
     }
 }

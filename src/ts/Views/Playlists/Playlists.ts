@@ -52,7 +52,7 @@ export default class Playlists extends ContentViewBase {
         return isSaved;
     }
     public InitContent(): void {
-        Delay.Wait(500)
+        Delay.Wait(800)
             .then((): void => {
                 this.PlaylistList.LoadIfEmpty();
             });

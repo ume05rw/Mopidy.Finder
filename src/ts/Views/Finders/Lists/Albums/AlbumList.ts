@@ -111,6 +111,21 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
         return true;
     }
 
+    /**
+     * 非表示時にInfiniteLoadingが反応しない現象への対策。
+     */
+    public LoadIfEmpty(): void {
+        if (!this.entities || this.entities.length <= 0)
+            this.Refresh();
+    }
+
+    public ForceRefresh(): void {
+        this.genreIds = [];
+        this.artistIds = [];
+        this.entities = [];
+        this.Refresh();
+    }
+
     public async InitPlaylistList(): Promise<boolean> {
         const store = new PlaylistStore();
         this.playlists = await store.GetPlaylists();

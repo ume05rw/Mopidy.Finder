@@ -7,6 +7,7 @@ import { ISelectionChangedArgs } from '../Shared/SelectionItem';
 import { AlbumListEvents, default as AlbumList } from './Lists/Albums/AlbumList';
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
+import Delay from '../../Utils/Delay';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
@@ -53,6 +54,12 @@ export default class Finder extends ContentViewBase {
     }
     public InitContent(): void {
         this.AlbumList.InitPlaylistList();
+        Delay.Wait(800)
+            .then((): void => {
+                this.GenreList.LoadIfEmpty();
+                this.ArtistList.LoadIfEmpty();
+                this.AlbumList.LoadIfEmpty();
+            });
     }
     // #endregion
 
@@ -88,12 +95,10 @@ export default class Finder extends ContentViewBase {
         this.AlbumList.RemoveFilterAllArtists();
     }
 
-    public RefreshAll(): void {
-        _.delay(() => {
-            this.GenreList.ForceRefresh();
-            this.ArtistList.RemoveAllFilters();
-            this.AlbumList.RemoveAllFilters();
-        }, 500);
+    public ForceRefresh(): void {
+        this.GenreList.ForceRefresh();
+        this.ArtistList.ForceRefresh();
+        this.AlbumList.ForceRefresh();
     }
 
     public RefreshPlaylist(): void {
