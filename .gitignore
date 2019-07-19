@@ -252,6 +252,8 @@ node_modules/
 # ts compiled
 src/ts/**/*.js
 src/ts/**/*.js.map
+
 # assets
 dist/content/
+database.db
 
