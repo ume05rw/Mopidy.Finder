@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MopidyFinder.Models;
 using MopidyFinder.Models.Settings;
 using MopidyFinder.Models.Xhrs;
+using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,21 +31,44 @@ namespace MopidyFinder.Controllers
             return XhrResponseFactory.CreateSucceeded(store.Entity);
         }
 
-        [HttpGet("Refresh")]
-        public XhrResponse GetStatus()
+        [HttpGet("Update")]
+        public XhrResponse GetUpdateStatus()
         {
-            var result = Initializer.Instance.GetStatus();
+            var result = DbMaintainer.Instance.GetStatus();
+
+            return XhrResponseFactory.CreateSucceeded(result);
+        }
+
+        [HttpPost("Update")]
+        public XhrResponse ExecUpdate()
+        {
+            if (DbMaintainer.Instance.IsActive)
+                return XhrResponseFactory.CreateError("Already Updating.");
+
+            Task.Run(() => {
+                DbMaintainer.Instance.Refresh(false);
+            });
+
+            return XhrResponseFactory.CreateSucceeded(true);
+        }
+
+        [HttpGet("Refresh")]
+        public XhrResponse GetRefreshStatus()
+        {
+            var result = DbMaintainer.Instance.GetStatus();
 
             return XhrResponseFactory.CreateSucceeded(result);
         }
 
         [HttpPost("Refresh")]
-        public XhrResponse Exec()
+        public XhrResponse ExecRefresh()
         {
-            if (Initializer.Instance.IsActive)
+            if (DbMaintainer.Instance.IsActive)
                 return XhrResponseFactory.CreateError("Already Refreshing.");
 
-            Initializer.Instance.Exec();
+            Task.Run(() => {
+                DbMaintainer.Instance.Refresh(true);
+            });
 
             return XhrResponseFactory.CreateSucceeded(true);
         }

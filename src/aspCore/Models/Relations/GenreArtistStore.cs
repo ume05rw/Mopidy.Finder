@@ -6,30 +6,31 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Relations
 {
-    public class GenreArtistStore : StoreBase<GenreArtist>, IRefreshable
+    public class GenreArtistStore : StoreBase<GenreArtist>, IMopidyScannable
     {
         public GenreArtistStore([FromServices] Dbc dbc) : base(dbc)
         {
         }
 
-        private decimal _refreshLength = 0;
-        private decimal _refreshed = 0;
-        public decimal RefreshProgress
+        private decimal _processLength = 0;
+        private decimal _processed = 0;
+        public decimal ScanProgress
         {
             get
             {
-                return (this._refreshLength <= 0)
+                return (this._processLength <= 0)
                     ? 0
-                    : (this._refreshLength <= this._refreshed)
+                    : (this._processLength <= this._processed)
                         ? 1
-                        : (this._refreshed / this._refreshLength);
+                        : (this._processed / this._processLength);
             }
         }
 
-        public async Task<bool> Refresh()
+        public async Task<int> Scan()
         {
-            this._refreshLength = 0;
-            this._refreshed = 0;
+            this._processLength = 0;
+            this._processed = 0;
+            var added = 0;
 
             var genreArtists = this.Dbc.GenreAlbums
                 .Join(
@@ -52,15 +53,28 @@ namespace MopidyFinder.Models.Relations
                     GenreId = e.Key.GenreId,
                     ArtistId = e.Key.ArtistId
                 })
+                .ToArray()
+                .GroupJoin(
+                    this.Dbc.GenreArtists,
+                    found => new { found.GenreId, found.ArtistId },
+                    exists => new { exists.GenreId, exists.ArtistId },
+                    (found, exists) => new
+                    {
+                        found = found,
+                        exists = exists
+                    }
+                )
+                .Where(e => !e.exists.Any())
+                .Select(e => e.found)
                 .ToArray();
 
-            this._refreshLength = genreArtists.Count();
+            this._processLength = genreArtists.Count();
 
             this.Dbc.GenreArtists.AddRange(genreArtists);
 
-            this._refreshed = this._refreshLength;
+            this._processed = this._processLength;
 
-            return true;
+            return added;
         }
     }
 }

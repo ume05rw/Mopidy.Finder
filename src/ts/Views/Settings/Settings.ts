@@ -75,7 +75,18 @@ interface IIconClasses {
                     <div class="form-row">
                         <div class="col-auto">
                             <p>
-                                Delete and Refresh <strong>Mopidy.Finder's Database.</strong>
+                                Scan New Albums.<br/>
+                                The data in <strong>Mopidy Itself is not affected.</strong>
+                            </p>
+                            <button class="btn btn-app btn-outline-warning disabled"
+                                @click="OnUpdateButtonClicked"
+                                ref="UpdateButton">
+                                <i class="fa fa-search-plus"></i> Update
+                            </button>
+                        </div>
+                        <div class="col-auto ml-4">
+                            <p>
+                                Delete and Refresh <strong>Mopidy.Finder's Database.</strong><br/>
                                 The data in <strong>Mopidy Itself is not affected.</strong>
                             </p>
                             <button class="btn btn-app btn-outline-warning disabled"
@@ -132,6 +143,9 @@ export default class Settings extends ContentViewBase {
     }
     private get RefreshButton(): HTMLButtonElement {
         return this.$refs.RefreshButton as HTMLButtonElement;
+    }
+    private get UpdateButton(): HTMLButtonElement {
+        return this.$refs.UpdateButton as HTMLButtonElement;
     }
     private get ConfirmDialog(): ConfirmDialog {
         return this.$refs.ConfirmDialog as ConfirmDialog;
@@ -201,7 +215,7 @@ export default class Settings extends ContentViewBase {
             Libraries.ShowToast.Error('Mopidy Not Found...');
         }
         this.SetConnectionIcon();
-        this.SetRefreshButton();
+        this.SetButtons();
 
         return this.isConnectable;
     }
@@ -219,19 +233,85 @@ export default class Settings extends ContentViewBase {
         }
     }
 
-    private SetRefreshButton(): void {
-        const classes = this.RefreshButton.classList;
-        if (
-            this.isConnectable === true
-            && classes.contains(this.disabled)
-        ) {
-            classes.remove(this.disabled);
-        } else if (
-            this.isConnectable !== true
-            && !classes.contains(this.disabled)
-        ) {
-            classes.add(this.disabled);
+    private SetButtons(): void {
+        const refreshClasses = this.RefreshButton.classList;
+        const updateClasses = this.UpdateButton.classList;
+        if (this.isConnectable === true) {
+            if (refreshClasses.contains(this.disabled))
+                refreshClasses.remove(this.disabled);
+            if (updateClasses.contains(this.disabled))
+                updateClasses.remove(this.disabled);
+        } else {
+            if (!refreshClasses.contains(this.disabled))
+                refreshClasses.add(this.disabled);
+            if (!updateClasses.contains(this.disabled))
+                updateClasses.add(this.disabled);
         }
+    }
+
+    private async OnUpdateButtonClicked(): Promise<boolean> {
+        if (this.isConnectable !== true) {
+            Libraries.ShowToast.Error('Mopidy Not Found...');
+            return;
+        }
+
+        this.ConfirmDialog.SetConfirmType(ConfirmType.Warning);
+        this.ConfirmDialog.SetBody('Update Mopidy.Finder Database?', [
+            'Scan New Albums, and Add to Finder Database.',
+            '',
+            'This operation can take a very long time, ',
+            'depending on the number of songs, or the device it\'s running.',
+            '',
+            'Are you sure?'
+        ]);
+
+        const result = await this.ConfirmDialog.Confirm();
+        if (!result)
+            return;
+
+        this.TryUpdate();
+    }
+
+    private TryUpdate(): Promise<boolean> {
+        return new Promise(async (resolve: (value: boolean) => void): Promise<boolean> => {
+            this.entity.SetBusy(true);
+            this.ProgressDialog.Show('Database Updating...');
+
+            const result = await this.store.UpdateDatabase();
+            if (result !== true) {
+                this.ProgressDialog.Hide();
+                Libraries.ShowToast.Error('Update Order Failed...');
+                return false;
+            }
+
+            this.timer = setInterval(async (): Promise<boolean> => {
+                if (this.nowPolling)
+                    return;
+
+                this.nowPolling = true;
+                const status = await this.store.GetUpdateProgress();
+                this.nowPolling = false;
+
+                if (status.Finished) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+
+                    this.entity.SetBusy(false);
+                    this.ProgressDialog.Hide();
+                    (status.Succeeded)
+                        ? Libraries.ShowToast.Success('Database Updated!')
+                        : Libraries.ShowToast.Error('Update Failed...');
+
+                    resolve(status.Succeeded);
+
+                    return status.Succeeded;
+                }
+
+                this.ProgressDialog.SetUpdate(status.Progress, status.Message);
+
+                return true;
+            }, 1000);
+        });
     }
 
     private async OnRefreshButtonClicked(): Promise<boolean> {
@@ -241,7 +321,7 @@ export default class Settings extends ContentViewBase {
         }
 
         this.ConfirmDialog.SetConfirmType(ConfirmType.Danger);
-        this.ConfirmDialog.SetBody('Refresh Finder Database?', [
+        this.ConfirmDialog.SetBody('Refresh Mopidy.Finder Database?', [
             'Mopidy.Finder\'s Database is Deleted & Refreshed.',
             '',
             'This operation can take a very long time, ',
@@ -260,10 +340,10 @@ export default class Settings extends ContentViewBase {
     private nowPolling: boolean = false;
     private TryRefresh(): Promise<boolean> {
         return new Promise(async (resolve: (value: boolean) => void): Promise<boolean> => {
-            this.entity.SetRefreshing(true);
+            this.entity.SetBusy(true);
             this.ProgressDialog.Show('Database Refreshing...');
 
-            const result = await this.store.Refresh();
+            const result = await this.store.RefreshDatabase();
             if (result !== true) {
                 this.ProgressDialog.Hide();
                 Libraries.ShowToast.Error('Refresh Order Failed...');
@@ -282,7 +362,7 @@ export default class Settings extends ContentViewBase {
                     clearInterval(this.timer);
                     this.timer = null;
 
-                    this.entity.SetRefreshing(false);
+                    this.entity.SetBusy(false);
                     this.ProgressDialog.Hide();
                     (status.Succeeded)
                         ? Libraries.ShowToast.Success('Database Refreshed!')
@@ -293,12 +373,14 @@ export default class Settings extends ContentViewBase {
                     return status.Succeeded;
                 }
 
-                this.ProgressDialog.SetUpdate(status.Progress, status.Process);
+                this.ProgressDialog.SetUpdate(status.Progress, status.Message);
 
                 return true;
             }, 1000);
         });
     }
+
+
 
     // #region "IContentView"
     public GetIsPermitLeave(): boolean {

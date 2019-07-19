@@ -257,3 +257,5 @@ src/ts/**/*.js.map
 dist/content/
 database.db
 
+# oters
+tmp/*

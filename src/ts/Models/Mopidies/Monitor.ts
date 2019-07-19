@@ -148,7 +148,7 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
 
     private async Polling(): Promise<boolean> {
 
-        if (this._settingsEntity.IsRefreshProcessing)
+        if (this._settingsEntity.IsBusy)
             return;
 
         this._nowOnPollingProsess = true;

@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Bases
 {
-    interface IRefreshable
+    interface IMopidyScannable
     {
-        Task<bool> Refresh();
-        decimal RefreshProgress { get; }
+        Task<int> Scan();
+        decimal ScanProgress { get; }
     }
 }

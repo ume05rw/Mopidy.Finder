@@ -106,7 +106,7 @@ namespace MopidyFinder
         )
         {
             Query.SetServiceProvider(app.ApplicationServices);
-            Initializer.SetServiceProvider(app.ApplicationServices);
+            DbMaintainer.SetServiceProvider(app.ApplicationServices);
 
             if (env.IsDevelopment())
             {

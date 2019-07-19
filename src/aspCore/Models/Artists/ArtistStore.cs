@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Artists
 {
-    public class ArtistStore : PagenagedStoreBase<Artist>, IRefreshable
+    public class ArtistStore : PagenagedStoreBase<Artist>, IMopidyScannable
     {
         public class PagenagedQueryArgs
         {
@@ -63,41 +63,43 @@ namespace MopidyFinder.Models.Artists
         }
 
 
-        private decimal _refreshLength = 0;
-        private decimal _refreshed = 0;
-        public decimal RefreshProgress
+        private decimal _processLength = 0;
+        private decimal _processed = 0;
+        public decimal ScanProgress
         {
             get
             {
-                return (this._refreshLength <= 0)
+                return (this._processLength <= 0)
                     ? 0
-                    : (this._refreshLength <= this._refreshed)
+                    : (this._processLength <= this._processed)
                         ? 1
-                        : (this._refreshed / this._refreshLength);
+                        : (this._processed / this._processLength);
             }
         }
 
-        public async Task<bool> Refresh()
+        public async Task<int> Scan()
         {
-            this._refreshLength = 0;
-            this._refreshed = 0;
+            this._processLength = 0;
+            this._processed = 0;
 
             var result = await Library.Browse(ArtistStore.QueryString);
+            var existsUris = this.Dbc.Artists.Select(e => e.Uri).ToArray();
+            var newRefs = result.Where(e => !existsUris.Contains(e.Uri));
 
-            var artists = result.Select(e => new Artist()
+            var newEntities = newRefs.Select(e => new Artist()
             {
                 Name = e.Name,
                 LowerName = e.Name.ToLower(),
                 Uri = e.Uri
             }).ToArray();
 
-            this._refreshLength = artists.Length;
+            this._processLength = newEntities.Length;
 
-            this.Dbc.Artists.AddRange(artists);
+            this.Dbc.Artists.AddRange(newEntities);
 
-            this._refreshed = this._refreshLength;
+            this._processed = this._processLength;
 
-            return true;
+            return newEntities.Length;
         }
     }
 }

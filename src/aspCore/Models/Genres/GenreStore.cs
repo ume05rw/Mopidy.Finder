@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Genres
 {
-    public class GenreStore : PagenagedStoreBase<Genre>, IRefreshable
+    public class GenreStore : PagenagedStoreBase<Genre>, IMopidyScannable
     {
         public class PagenagedQueryArgs
         {
@@ -56,41 +56,41 @@ namespace MopidyFinder.Models.Genres
         }
 
 
-        private decimal _refreshLength = 0;
-        private decimal _refreshed = 0;
-        public decimal RefreshProgress
+        private decimal _processLength = 0;
+        private decimal _processed = 0;
+        public decimal ScanProgress
         {
             get
             {
-                return (this._refreshLength <= 0)
+                return (this._processLength <= 0)
                     ? 0
-                    : (this._refreshLength <= this._refreshed)
+                    : (this._processLength <= this._processed)
                         ? 1
-                        : (this._refreshed / this._refreshLength);
+                        : (this._processed / this._processLength);
             }
         }
 
-        public async Task<bool> Refresh()
+        public async Task<int> Scan()
         {
-            this._refreshLength = 0;
-            this._refreshed = 0;
+            this._processLength = 0;
+            this._processed = 0;
 
             var result = await Library.Browse(GenreStore.QueryString);
+            var existsUris = this.Dbc.Genres.Select(e => e.Uri).ToArray();
+            var newRefs = result.Where(e => !existsUris.Contains(e.Uri)).ToArray();
+            this._processLength = newRefs.Length;
 
-            var genres = result.Select(e => new Genre()
+            var newEntities = newRefs.Select(e => new Genre()
             {
                 Name = e.Name,
                 LowerName = e.Name.ToLower(),
                 Uri = e.Uri
             }).ToArray();
+            
+            this.Dbc.Genres.AddRange(newEntities);
+            this._processed = newEntities.Length;
 
-            this._refreshLength = genres.Length;
-
-            this.Dbc.Genres.AddRange(genres);
-
-            this._refreshed = this._refreshLength;
-
-            return true;
+            return newEntities.Length;
         }
     }
 }

@@ -3484,7 +3484,7 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
         function Settings() {
             this._serverAddress = null;
             this._serverPort = null;
-            this._isRefreshProcessing = false;
+            this._isBusy = false;
         }
         Settings.Get = function () {
             return Settings._entity;
@@ -3507,15 +3507,15 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Settings.prototype, "IsRefreshProcessing", {
+        Object.defineProperty(Settings.prototype, "IsBusy", {
             get: function () {
-                return this._isRefreshProcessing;
+                return this._isBusy;
             },
             enumerable: true,
             configurable: true
         });
-        Settings.prototype.SetRefreshing = function (isRefreshing) {
-            this._isRefreshProcessing = isRefreshing;
+        Settings.prototype.SetBusy = function (isBusy) {
+            this._isBusy = isBusy;
         };
         Settings._entity = new Settings();
         return Settings;
@@ -3690,7 +3690,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (this._settingsEntity.IsRefreshProcessing)
+                            if (this._settingsEntity.IsBusy)
                                 return [2 /*return*/];
                             this._nowOnPollingProsess = true;
                             _a.label = 1;
@@ -5749,7 +5749,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                 });
             });
         };
-        SettingsStore.prototype.Refresh = function () {
+        SettingsStore.prototype.RefreshDatabase = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var response;
                 return __generator(this, function (_a) {
@@ -5780,7 +5780,46 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                                         Finished: true,
                                         Succeeded: false,
                                         Progress: 0,
-                                        Process: 'Unexpected Error'
+                                        Message: 'Unexpected Error'
+                                    }];
+                            }
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.UpdateDatabase = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Settings/Update')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_12.default.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+                            return [2 /*return*/, response.Succeeded];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.GetUpdateProgress = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var a, response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            a = 1;
+                            return [4 /*yield*/, this.QueryGet('Settings/Update')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                Exception_12.default.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+                                return [2 /*return*/, {
+                                        Finished: true,
+                                        Succeeded: false,
+                                        Progress: 0,
+                                        Message: 'Unexpected Error'
                                     }];
                             }
                             return [2 /*return*/, response.Result];
@@ -5913,6 +5952,13 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Settings.prototype, "UpdateButton", {
+            get: function () {
+                return this.$refs.UpdateButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Settings.prototype, "ConfirmDialog", {
             get: function () {
                 return this.$refs.ConfirmDialog;
@@ -5999,7 +6045,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                                 Libraries_19.default.ShowToast.Error('Mopidy Not Found...');
                             }
                             this.SetConnectionIcon();
-                            this.SetRefreshButton();
+                            this.SetButtons();
                             return [2 /*return*/, this.isConnectable];
                     }
                 });
@@ -6017,16 +6063,102 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                 this.Icon.className = this.connectionClasses.False.Icon;
             }
         };
-        Settings.prototype.SetRefreshButton = function () {
-            var classes = this.RefreshButton.classList;
-            if (this.isConnectable === true
-                && classes.contains(this.disabled)) {
-                classes.remove(this.disabled);
+        Settings.prototype.SetButtons = function () {
+            var refreshClasses = this.RefreshButton.classList;
+            var updateClasses = this.UpdateButton.classList;
+            if (this.isConnectable === true) {
+                if (refreshClasses.contains(this.disabled))
+                    refreshClasses.remove(this.disabled);
+                if (updateClasses.contains(this.disabled))
+                    updateClasses.remove(this.disabled);
             }
-            else if (this.isConnectable !== true
-                && !classes.contains(this.disabled)) {
-                classes.add(this.disabled);
+            else {
+                if (!refreshClasses.contains(this.disabled))
+                    refreshClasses.add(this.disabled);
+                if (!updateClasses.contains(this.disabled))
+                    updateClasses.add(this.disabled);
             }
+        };
+        Settings.prototype.OnUpdateButtonClicked = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.isConnectable !== true) {
+                                Libraries_19.default.ShowToast.Error('Mopidy Not Found...');
+                                return [2 /*return*/];
+                            }
+                            this.ConfirmDialog.SetConfirmType(ConfirmDialog_3.ConfirmType.Warning);
+                            this.ConfirmDialog.SetBody('Update Mopidy.Finder Database?', [
+                                'Scan New Albums, and Add to Finder Database.',
+                                '',
+                                'This operation can take a very long time, ',
+                                'depending on the number of songs, or the device it\'s running.',
+                                '',
+                                'Are you sure?'
+                            ]);
+                            return [4 /*yield*/, this.ConfirmDialog.Confirm()];
+                        case 1:
+                            result = _a.sent();
+                            if (!result)
+                                return [2 /*return*/];
+                            this.TryUpdate();
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        Settings.prototype.TryUpdate = function () {
+            var _this = this;
+            return new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
+                var result;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.entity.SetBusy(true);
+                            this.ProgressDialog.Show('Database Updating...');
+                            return [4 /*yield*/, this.store.UpdateDatabase()];
+                        case 1:
+                            result = _a.sent();
+                            if (result !== true) {
+                                this.ProgressDialog.Hide();
+                                Libraries_19.default.ShowToast.Error('Update Order Failed...');
+                                return [2 /*return*/, false];
+                            }
+                            this.timer = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
+                                var status;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            if (this.nowPolling)
+                                                return [2 /*return*/];
+                                            this.nowPolling = true;
+                                            return [4 /*yield*/, this.store.GetUpdateProgress()];
+                                        case 1:
+                                            status = _a.sent();
+                                            this.nowPolling = false;
+                                            if (status.Finished) {
+                                                clearInterval(this.timer);
+                                                this.timer = null;
+                                                this.entity.SetBusy(false);
+                                                this.ProgressDialog.Hide();
+                                                (status.Succeeded)
+                                                    ? Libraries_19.default.ShowToast.Success('Database Updated!')
+                                                    : Libraries_19.default.ShowToast.Error('Update Failed...');
+                                                resolve(status.Succeeded);
+                                                return [2 /*return*/, status.Succeeded];
+                                            }
+                                            this.ProgressDialog.SetUpdate(status.Progress, status.Message);
+                                            return [2 /*return*/, true];
+                                    }
+                                });
+                            }); }, 1000);
+                            return [2 /*return*/];
+                    }
+                });
+            }); });
         };
         Settings.prototype.OnRefreshButtonClicked = function () {
             return __awaiter(this, void 0, void 0, function () {
@@ -6039,7 +6171,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                                 return [2 /*return*/];
                             }
                             this.ConfirmDialog.SetConfirmType(ConfirmDialog_3.ConfirmType.Danger);
-                            this.ConfirmDialog.SetBody('Refresh Finder Database?', [
+                            this.ConfirmDialog.SetBody('Refresh Mopidy.Finder Database?', [
                                 'Mopidy.Finder\'s Database is Deleted & Refreshed.',
                                 '',
                                 'This operation can take a very long time, ',
@@ -6066,9 +6198,9 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            this.entity.SetRefreshing(true);
+                            this.entity.SetBusy(true);
                             this.ProgressDialog.Show('Database Refreshing...');
-                            return [4 /*yield*/, this.store.Refresh()];
+                            return [4 /*yield*/, this.store.RefreshDatabase()];
                         case 1:
                             result = _a.sent();
                             if (result !== true) {
@@ -6091,7 +6223,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                                             if (status.Finished) {
                                                 clearInterval(this.timer);
                                                 this.timer = null;
-                                                this.entity.SetRefreshing(false);
+                                                this.entity.SetBusy(false);
                                                 this.ProgressDialog.Hide();
                                                 (status.Succeeded)
                                                     ? Libraries_19.default.ShowToast.Success('Database Refreshed!')
@@ -6099,7 +6231,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                                                 resolve(status.Succeeded);
                                                 return [2 /*return*/, status.Succeeded];
                                             }
-                                            this.ProgressDialog.SetUpdate(status.Progress, status.Process);
+                                            this.ProgressDialog.SetUpdate(status.Progress, status.Message);
                                             return [2 /*return*/, true];
                                     }
                                 });
@@ -6118,7 +6250,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         };
         Settings = __decorate([
             vue_class_component_20.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Set Your Mopidy</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <div class=\"input-group\">\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">http://</div>\n                                </div>\n                                <input type=\"text\"\n                                    id=\"server_address\"\n                                    maxlength=\"255\"\n                                    class=\"form-control address\"\n                                    placeholder=\"Server Address\"\n                                    ref=\"ServerAddressInput\"\n                                    @input=\"OnServerAddressInput\" />\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">:</div>\n                                </div>\n                                <input type=\"number\"\n                                    maxlength=\"5\"\n                                    class=\"form-control port\"\n                                    placeholder=\"Server Port\"\n                                    ref=\"ServerPortInput\"\n                                    @input=\"OnServerPortInput\" />\n                                <div class=\"input-group-append\">\n                                    <div class=\"input-group-text\">/mopidy/</div>\n                                </div>\n                                <span class=\"connection-icon\"\n                                    ref=\"IconWrapper\">\n                                    <i class=\"\"\n                                        ref=\"Icon\"/>\n                                </span>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Refresh Relation Data</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <p>\n                                Delete and Refresh <strong>Mopidy.Finder's Database.</strong>\n                                The data in <strong>Mopidy Itself is not affected.</strong>\n                            </p>\n                            <button class=\"btn btn-app btn-outline-warning disabled\"\n                                @click=\"OnRefreshButtonClicked\"\n                                ref=\"RefreshButton\">\n                                <i class=\"fa fa-refresh\"></i> Delete &amp; Refresh\n                            </button>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <confirm-dialog\n        ref=\"ConfirmDialog\" />\n    <progress-dialog\n        ref=\"ProgressDialog\" />\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Set Your Mopidy</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <div class=\"input-group\">\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">http://</div>\n                                </div>\n                                <input type=\"text\"\n                                    id=\"server_address\"\n                                    maxlength=\"255\"\n                                    class=\"form-control address\"\n                                    placeholder=\"Server Address\"\n                                    ref=\"ServerAddressInput\"\n                                    @input=\"OnServerAddressInput\" />\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">:</div>\n                                </div>\n                                <input type=\"number\"\n                                    maxlength=\"5\"\n                                    class=\"form-control port\"\n                                    placeholder=\"Server Port\"\n                                    ref=\"ServerPortInput\"\n                                    @input=\"OnServerPortInput\" />\n                                <div class=\"input-group-append\">\n                                    <div class=\"input-group-text\">/mopidy/</div>\n                                </div>\n                                <span class=\"connection-icon\"\n                                    ref=\"IconWrapper\">\n                                    <i class=\"\"\n                                        ref=\"Icon\"/>\n                                </span>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Refresh Relation Data</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <p>\n                                Scan New Albums.<br/>\n                                The data in <strong>Mopidy Itself is not affected.</strong>\n                            </p>\n                            <button class=\"btn btn-app btn-outline-warning disabled\"\n                                @click=\"OnUpdateButtonClicked\"\n                                ref=\"UpdateButton\">\n                                <i class=\"fa fa-search-plus\"></i> Update\n                            </button>\n                        </div>\n                        <div class=\"col-auto ml-4\">\n                            <p>\n                                Delete and Refresh <strong>Mopidy.Finder's Database.</strong><br/>\n                                The data in <strong>Mopidy Itself is not affected.</strong>\n                            </p>\n                            <button class=\"btn btn-app btn-outline-warning disabled\"\n                                @click=\"OnRefreshButtonClicked\"\n                                ref=\"RefreshButton\">\n                                <i class=\"fa fa-refresh\"></i> Delete &amp; Refresh\n                            </button>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <confirm-dialog\n        ref=\"ConfirmDialog\" />\n    <progress-dialog\n        ref=\"ProgressDialog\" />\n</section>",
                 components: {
                     'confirm-dialog': ConfirmDialog_3.default,
                     'progress-dialog': ProgressDialog_1.default,

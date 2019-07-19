@@ -6,60 +6,67 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Relations
 {
-    public class ArtistAlbumStore : StoreBase<ArtistAlbum>, IRefreshable
+    public class ArtistAlbumStore : StoreBase<ArtistAlbum>, IMopidyScannable
     {
         public ArtistAlbumStore([FromServices] Dbc dbc) : base(dbc)
         {
         }
 
-        private decimal _refreshLength = 0;
-        private decimal _refreshed = 0;
-        public decimal RefreshProgress
+        private decimal _processLength = 0;
+        private decimal _processed = 0;
+        public decimal ScanProgress
         {
             get
             {
-                return (this._refreshLength <= 0)
+                return (this._processLength <= 0)
                     ? 0
-                    : (this._refreshLength <= this._refreshed)
+                    : (this._processLength <= this._processed)
                         ? 1
-                        : (this._refreshed / this._refreshLength);
+                        : (this._processed / this._processLength);
             }
         }
 
-        public async Task<bool> Refresh()
+        public async Task<int> Scan()
         {
-            this._refreshLength = 0;
-            this._refreshed = 0;
+            this._processLength = 0;
+            this._processed = 0;
+            var added = 0;
 
             var albumDictionary = this.Dbc.Albums
                 .ToDictionary(e => e.Uri);
 
-            this._refreshLength = albumDictionary.Count();
+            this._processLength = albumDictionary.Count();
 
             foreach (var artist in this.Dbc.Artists.ToArray())
             {
                 var refs = await Library.Browse(artist.Uri);
+                var albumUris = refs.Select(e => e.GetAlbumUri()).ToArray();
+                var albumIds = this.Dbc.Albums
+                    .Where(e => albumUris.Contains(e.Uri))
+                    .Select(e => e.Id)
+                    .ToArray();
 
-                foreach (var row in refs)
+                var exists = this.Dbc.ArtistAlbums
+                    .Where(e => albumIds.Contains(e.AlbumId) && e.ArtistId == artist.Id)
+                    .ToArray();
+
+                foreach (var albumId in albumIds)
                 {
-                    var albumUri = row.GetAlbumUri();
-                    if (albumUri == null)
-                        continue; // アルバムURIが取得出来ないことは無いはず。
-
-                    if (!albumDictionary.ContainsKey(albumUri))
-                        continue; // 合致するアルバムが取得出来ないことは無いはず
-
-                    this.Dbc.ArtistAlbums.Add(new ArtistAlbum()
+                    if (exists.All(e => e.AlbumId != albumId))
                     {
-                        ArtistId = artist.Id,
-                        AlbumId = albumDictionary[albumUri].Id
-                    });
+                        this.Dbc.ArtistAlbums.Add(new ArtistAlbum()
+                        {
+                            ArtistId = artist.Id,
+                            AlbumId = albumId
+                        });
+                        added++;
+                    }
                 }
 
-                this._refreshed++;
+                this._processed++;
             }
 
-            return true;
+            return added;
         }
     }
 }

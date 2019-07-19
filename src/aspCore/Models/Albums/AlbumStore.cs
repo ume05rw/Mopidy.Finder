@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Albums
 {
-    public class AlbumStore : PagenagedStoreBase<Album>, IRefreshable
+    public class AlbumStore : PagenagedStoreBase<Album>, IMopidyScannable
     {
         private const string AlbumQueryString = "local:directory?type=album";
         private const string YearQueryString = "local:directory?type=date&format=%25Y";
@@ -87,35 +87,38 @@ namespace MopidyFinder.Models.Albums
         }
 
 
-        private decimal _refreshLength = 0;
-        private decimal _refreshed = 0;
-        public decimal RefreshProgress
+        private decimal _processLength = 0;
+        private decimal _processed = 0;
+        public decimal ScanProgress
         {
             get
             {
-                return (this._refreshLength <= 0)
+                return (this._processLength <= 0)
                     ? 0
-                    : (this._refreshLength <= this._refreshed)
+                    : (this._processLength <= this._processed)
                         ? 1
-                        : (this._refreshed / this._refreshLength);
+                        : (this._processed / this._processLength);
             }
         }
 
-        public async Task<bool> Refresh()
+        public async Task<int> Scan()
         {
-            this._refreshLength = 0;
-            this._refreshed = 0;
+            this._processLength = 0;
+            this._processed = 0;
 
             // アルバム取得
             var albumResults = await Library.Browse(AlbumStore.AlbumQueryString);
-            var albumDictionary = albumResults.Select(e => new Album()
+            var existsUris = this.Dbc.Albums.Select(e => e.Uri).ToArray();
+            var newRefs = albumResults.Where(e => !existsUris.Contains(e.Uri)).ToArray();
+
+            var newEntityDictionary = newRefs.Select(e => new Album()
             {
                 Name = e.Name,
                 LowerName = e.Name.ToLower(),
                 Uri = e.Uri
             }).ToDictionary(e => e.Uri);
 
-            this._refreshLength = albumDictionary.Count();
+            this._processLength = newEntityDictionary.Count();
 
             // 年度別アルバムを取得して割り当て
             var yearResults = await Library.Browse(AlbumStore.YearQueryString);
@@ -130,17 +133,17 @@ namespace MopidyFinder.Models.Albums
                 foreach (var ya in yearAlbums)
                 {
                     var albumUri = ya.GetAlbumUri();
-                    if (albumDictionary.ContainsKey(albumUri))
+                    if (newEntityDictionary.ContainsKey(albumUri))
                     {
-                        albumDictionary[albumUri].Year = year;
-                        this._refreshed++;
+                        newEntityDictionary[albumUri].Year = year;
+                        this._processed++;
                     }
                 }
             }
 
-            this.Dbc.Albums.AddRange(albumDictionary.Select(e => e.Value));
+            this.Dbc.Albums.AddRange(newEntityDictionary.Select(e => e.Value));
 
-            return true;
+            return newEntityDictionary.Count();
         }
 
         public async Task<bool> UpdateAlbumImages()

@@ -6,7 +6,7 @@ export interface IRefreshStatus {
     Finished: boolean,
     Succeeded: boolean,
     Progress: number;
-    Process: string;
+    Message: string;
 }
 
 export default class SettingsStore extends JsonRpcQueryableBase {
@@ -47,7 +47,7 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         return !(response.error);
     }
 
-    public async Refresh(): Promise<boolean> {
+    public async RefreshDatabase(): Promise<boolean> {
         const response = await this.QueryPost('Settings/Refresh');
 
         if (!response.Succeeded)
@@ -67,7 +67,34 @@ export default class SettingsStore extends JsonRpcQueryableBase {
                 Finished: true,
                 Succeeded: false,
                 Progress: 0,
-                Process: 'Unexpected Error'
+                Message: 'Unexpected Error'
+            } as IRefreshStatus;
+        }
+
+        return response.Result as IRefreshStatus;
+    }
+
+    public async UpdateDatabase(): Promise<boolean> {
+        const response = await this.QueryPost('Settings/Update');
+
+        if (!response.Succeeded)
+            Exception.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+
+        return response.Succeeded;
+    }
+
+    public async GetUpdateProgress(): Promise<IRefreshStatus> {
+        const a = 1;
+        const response = await this.QueryGet('Settings/Update');
+
+        if (!response.Succeeded) {
+            Exception.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+
+            return {
+                Finished: true,
+                Succeeded: false,
+                Progress: 0,
+                Message: 'Unexpected Error'
             } as IRefreshStatus;
         }
 

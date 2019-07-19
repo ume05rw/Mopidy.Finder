@@ -22,7 +22,7 @@ export default class Settings implements ISettings {
 
     private _serverAddress: string = null;
     private _serverPort: number = null;
-    private _isRefreshProcessing = false;
+    private _isBusy = false;
 
     public get ServerAddress(): string {
         return this._serverAddress;
@@ -30,11 +30,11 @@ export default class Settings implements ISettings {
     public get ServerPort(): number {
         return this._serverPort;
     }
-    public get IsRefreshProcessing(): boolean {
-        return this._isRefreshProcessing;
+    public get IsBusy(): boolean {
+        return this._isBusy;
     }
 
-    public SetRefreshing(isRefreshing: boolean): void {
-        this._isRefreshProcessing = isRefreshing;
+    public SetBusy(isBusy: boolean): void {
+        this._isBusy = isBusy;
     }
 }
