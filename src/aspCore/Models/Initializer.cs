@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models
 {
-    public static class Initializer
+    public class Initializer
     {
         private static IServiceProvider Provider = null;
 
@@ -25,8 +25,10 @@ namespace MopidyFinder.Models
             Initializer.Provider = null;
         }
 
+        private decimal _progress = 0;
+        private string _process = "";
 
-        public static async Task<bool> Exec(bool force = false)
+        public async Task<bool> Exec(bool force = false)
         {
             using (var serviceScope = Initializer.Provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
@@ -81,7 +83,7 @@ namespace MopidyFinder.Models
                     dbc.SaveChanges();
 
                     // 投げっぱなしにする。
-                    Initializer.UpdateAlbumImage();
+                    this.UpdateAlbumImage();
                 }
                 catch (Exception ex)
                 {
@@ -92,7 +94,7 @@ namespace MopidyFinder.Models
             }
         }
 
-        public static async Task<bool> UpdateAlbumImage()
+        public async Task<bool> UpdateAlbumImage()
         {
             using (var serviceScope = Initializer.Provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
