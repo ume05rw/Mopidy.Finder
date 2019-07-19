@@ -50,6 +50,7 @@
     <None Remove="src\ts\Views\RootView.ts" />
     <None Remove="src\ts\Views\Settings\Settings.ts" />
     <None Remove="src\ts\Views\Shared\Dialogs\ConfirmDialog.ts" />
+    <None Remove="src\ts\Views\Shared\Dialogs\ProgressDialog.ts" />
     <None Remove="src\ts\Views\Shared\Filterbox.ts" />
     <None Remove="src\ts\Views\Shared\Filterboxes\SearchInput.ts" />
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
@@ -135,6 +136,7 @@
     <TypeScriptCompile Include="src\ts\Views\HeaderBars\HeaderBar.ts" />
     <TypeScriptCompile Include="src\ts\Views\Playlists\Lists\Tracks\UpdateDialog.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Dialogs\ConfirmDialog.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Shared\Dialogs\ProgressDialog.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Filterboxes\SearchInput.ts" />
     <TypeScriptCompile Include="src\ts\Views\Playlists\Lists\Playlists\PlaylistList.ts" />
     <TypeScriptCompile Include="src\ts\Views\Playlists\Lists\Tracks\TrackList.ts" />

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Genres
 {
-    public class GenreStore : PagenagedStoreBase<Genre>
+    public class GenreStore : PagenagedStoreBase<Genre>, IRefreshable
     {
         public class PagenagedQueryArgs
         {
@@ -55,8 +55,26 @@ namespace MopidyFinder.Models.Genres
             return result;
         }
 
+
+        private decimal _refreshLength = 0;
+        private decimal _refreshed = 0;
+        public decimal RefreshProgress
+        {
+            get
+            {
+                return (this._refreshLength <= 0)
+                    ? 0
+                    : (this._refreshLength <= this._refreshed)
+                        ? 1
+                        : (this._refreshed / this._refreshLength);
+            }
+        }
+
         public async Task<bool> Refresh()
         {
+            this._refreshLength = 0;
+            this._refreshed = 0;
+
             var result = await Library.Browse(GenreStore.QueryString);
 
             var genres = result.Select(e => new Genre()
@@ -66,7 +84,11 @@ namespace MopidyFinder.Models.Genres
                 Uri = e.Uri
             }).ToArray();
 
+            this._refreshLength = genres.Length;
+
             this.Dbc.Genres.AddRange(genres);
+
+            this._refreshed = this._refreshLength;
 
             return true;
         }

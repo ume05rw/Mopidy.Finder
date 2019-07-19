@@ -1,26 +1,40 @@
 using Microsoft.AspNetCore.Mvc;
-using MopidyFinder.Models.Artists;
 using MopidyFinder.Models.Bases;
-using MopidyFinder.Models.Mopidies;
 using MopidyFinder.Models.Mopidies.Methods;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Relations
 {
-    public class ArtistAlbumStore : StoreBase<ArtistAlbum>
+    public class ArtistAlbumStore : StoreBase<ArtistAlbum>, IRefreshable
     {
         public ArtistAlbumStore([FromServices] Dbc dbc) : base(dbc)
         {
         }
 
+        private decimal _refreshLength = 0;
+        private decimal _refreshed = 0;
+        public decimal RefreshProgress
+        {
+            get
+            {
+                return (this._refreshLength <= 0)
+                    ? 0
+                    : (this._refreshLength <= this._refreshed)
+                        ? 1
+                        : (this._refreshed / this._refreshLength);
+            }
+        }
+
         public async Task<bool> Refresh()
         {
+            this._refreshLength = 0;
+            this._refreshed = 0;
+
             var albumDictionary = this.Dbc.Albums
                 .ToDictionary(e => e.Uri);
+
+            this._refreshLength = albumDictionary.Count();
 
             foreach (var artist in this.Dbc.Artists.ToArray())
             {
@@ -41,6 +55,8 @@ namespace MopidyFinder.Models.Relations
                         AlbumId = albumDictionary[albumUri].Id
                     });
                 }
+
+                this._refreshed++;
             }
 
             return true;

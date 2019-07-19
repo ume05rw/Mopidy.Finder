@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Albums
 {
-    public class AlbumStore : PagenagedStoreBase<Album>
+    public class AlbumStore : PagenagedStoreBase<Album>, IRefreshable
     {
         private const string AlbumQueryString = "local:directory?type=album";
         private const string YearQueryString = "local:directory?type=date&format=%25Y";
@@ -86,10 +86,28 @@ namespace MopidyFinder.Models.Albums
             return hasUpdated;
         }
 
+
+        private decimal _refreshLength = 0;
+        private decimal _refreshed = 0;
+        public decimal RefreshProgress
+        {
+            get
+            {
+                return (this._refreshLength <= 0)
+                    ? 0
+                    : (this._refreshLength <= this._refreshed)
+                        ? 1
+                        : (this._refreshed / this._refreshLength);
+            }
+        }
+
         public async Task<bool> Refresh()
         {
-            var albumResults = await Library.Browse(AlbumStore.AlbumQueryString);
+            this._refreshLength = 0;
+            this._refreshed = 0;
 
+            // アルバム取得
+            var albumResults = await Library.Browse(AlbumStore.AlbumQueryString);
             var albumDictionary = albumResults.Select(e => new Album()
             {
                 Name = e.Name,
@@ -97,8 +115,10 @@ namespace MopidyFinder.Models.Albums
                 Uri = e.Uri
             }).ToDictionary(e => e.Uri);
 
-            var yearResults = await Library.Browse(AlbumStore.YearQueryString);
+            this._refreshLength = albumDictionary.Count();
 
+            // 年度別アルバムを取得して割り当て
+            var yearResults = await Library.Browse(AlbumStore.YearQueryString);
             foreach (var row in yearResults)
             {
                 var year = default(int);
@@ -111,7 +131,10 @@ namespace MopidyFinder.Models.Albums
                 {
                     var albumUri = ya.GetAlbumUri();
                     if (albumDictionary.ContainsKey(albumUri))
+                    {
                         albumDictionary[albumUri].Year = year;
+                        this._refreshed++;
+                    }
                 }
             }
 

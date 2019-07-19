@@ -4,6 +4,8 @@ import { default as Delay, DelayedOnceExecuter } from '../../Utils/Delay';
 import SettingsStore from '../../Models/Settings/SettingsStore';
 import { default as SettingsEntity, ISettings } from '../../Models/Settings/Settings';
 import Libraries from '../../Libraries';
+import { default as ConfirmDialog, ConfirmType } from '../Shared/Dialogs/ConfirmDialog';
+import ProgressDialog from '../Shared/Dialogs/ProgressDialog';
 
 export const SettingsEvents = {
     ServerFound: 'ServerFound'
@@ -87,9 +89,14 @@ interface IIconClasses {
             </div>
         </div>
     </div>
-
+    <confirm-dialog
+        ref="ConfirmDialog" />
+    <progress-dialog
+        ref="ProgressDialog" />
 </section>`,
     components: {
+        'confirm-dialog': ConfirmDialog,
+        'progress-dialog': ProgressDialog,
     }
 })
 export default class Settings extends ContentViewBase {
@@ -98,6 +105,7 @@ export default class Settings extends ContentViewBase {
     private store: SettingsStore;
     private entity: SettingsEntity;
     private isConnectable: boolean = false;
+    private timer: number = null;
     private readonly disabled = 'disabled';
     private connectionClasses: { True: IIconClasses, False: IIconClasses } = {
         True: {
@@ -124,6 +132,12 @@ export default class Settings extends ContentViewBase {
     }
     private get RefreshButton(): HTMLButtonElement {
         return this.$refs.RefreshButton as HTMLButtonElement;
+    }
+    private get ConfirmDialog(): ConfirmDialog {
+        return this.$refs.ConfirmDialog as ConfirmDialog;
+    }
+    private get ProgressDialog(): ProgressDialog {
+        return this.$refs.ProgressDialog as ProgressDialog;
     }
 
     public async Initialize(): Promise<boolean> {
@@ -220,13 +234,71 @@ export default class Settings extends ContentViewBase {
         }
     }
 
-    private OnRefreshButtonClicked(): void {
+    private async OnRefreshButtonClicked(): Promise<boolean> {
         if (this.isConnectable !== true) {
             Libraries.ShowToast.Error('Mopidy Not Found...');
             return;
         }
+
+        this.ConfirmDialog.SetConfirmType(ConfirmType.Danger);
+        this.ConfirmDialog.SetBody('Refresh Finder Database?', [
+            'Mopidy.Finder\'s Database is Deleted & Refreshed.',
+            '',
+            'This operation can take a very long time, ',
+            'depending on the number of songs, or the device it\'s running.',
+            '',
+            'Are you sure?'
+        ]);
+
+        const result = await this.ConfirmDialog.Confirm();
+        if (!result)
+            return;
+
+        this.TryRefresh();
     }
 
+    private nowPolling: boolean = false;
+    private TryRefresh(): Promise<boolean> {
+        return new Promise(async (resolve: (value: boolean) => void): Promise<boolean> => {
+            this.entity.SetRefreshing(true);
+            this.ProgressDialog.Show('Database Refreshing...');
+
+            const result = await this.store.Refresh();
+            if (result !== true) {
+                this.ProgressDialog.Hide();
+                Libraries.ShowToast.Error('Refresh Order Failed...');
+                return false;
+            }
+
+            this.timer = setInterval(async (): Promise<boolean> => {
+                if (this.nowPolling)
+                    return;
+
+                this.nowPolling = true;
+                const status = await this.store.GetRefreshProgress();
+                this.nowPolling = false;
+
+                if (status.Finished) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+
+                    this.entity.SetRefreshing(false);
+                    this.ProgressDialog.Hide();
+                    (status.Succeeded)
+                        ? Libraries.ShowToast.Success('Database Refreshed!')
+                        : Libraries.ShowToast.Error('Refresh Failed...');
+                    
+                    resolve(status.Succeeded);
+
+                    return status.Succeeded;
+                }
+
+                this.ProgressDialog.SetUpdate(status.Progress, status.Process);
+
+                return true;
+            }, 1000);
+        });
+    }
 
     // #region "IContentView"
     public GetIsPermitLeave(): boolean {

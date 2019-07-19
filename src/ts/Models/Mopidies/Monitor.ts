@@ -1,6 +1,7 @@
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import ITlTrack from '../Mopidies/ITlTrack';
 import Exception from '../../Utils/Exception';
+import Settings from '../Settings/Settings';
 
 export const MonitorEvents = {
     TrackChanged: 'TrackChanged',
@@ -46,6 +47,7 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
         GetRepeat: 'core.tracklist.get_repeat'
     };
 
+    private _settingsEntity: Settings = null;
     private _playerState: PlayerState = PlayerState.Paused;
     private _tlId: number = null;
     private _isPlaying: boolean = false;
@@ -60,7 +62,6 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
     private _isRepeat: boolean;
     private _timer: number;
     private _nowOnPollingProsess: boolean = false;
-
     private _backupValues: IStatus = {
         TlId: null,
         PlayerState: PlayerState.Paused,
@@ -113,11 +114,16 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
     public get IsRepeat(): boolean {
         return this._isRepeat;
     }
-
     public get ImageFullUri(): string {
         return (!this._imageUri || this._imageUri == '')
             ? `${location.protocol}//${location.host}/img/nullImage.jpg`
             : `${location.protocol}//${location.host}${this._imageUri}`;
+    }
+
+    public constructor() {
+        super();
+
+        this._settingsEntity = Settings.Get()
     }
 
     public StartPolling(): void {
@@ -141,6 +147,9 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
     }
 
     private async Polling(): Promise<boolean> {
+
+        if (this._settingsEntity.IsRefreshProcessing)
+            return;
 
         this._nowOnPollingProsess = true;
 

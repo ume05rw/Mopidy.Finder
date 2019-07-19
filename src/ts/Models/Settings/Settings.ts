@@ -22,11 +22,19 @@ export default class Settings implements ISettings {
 
     private _serverAddress: string = null;
     private _serverPort: number = null;
+    private _isRefreshProcessing = false;
 
     public get ServerAddress(): string {
         return this._serverAddress;
     }
     public get ServerPort(): number {
         return this._serverPort;
+    }
+    public get IsRefreshProcessing(): boolean {
+        return this._isRefreshProcessing;
+    }
+
+    public SetRefreshing(isRefreshing: boolean): void {
+        this._isRefreshProcessing = isRefreshing;
     }
 }

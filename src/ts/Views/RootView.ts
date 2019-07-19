@@ -52,6 +52,7 @@ export default class RootView extends ViewBase {
         return this.$refs.Sidebar as Sidebar;
     }
 
+    private isMopidyConnectable: boolean = false;
     private activeContent: IContentView;
 
     private get HeaderBar(): HeaderBar {
@@ -62,8 +63,8 @@ export default class RootView extends ViewBase {
         await super.Initialize();
 
         const store = new SettingsStore();
-        const isConnectable = await store.TryConnect();
-        const page = (isConnectable)
+        this.isMopidyConnectable = await store.TryConnect();
+        const page = (this.isMopidyConnectable)
             ? Pages.Finder
             : Pages.Settings;
         this.Sidebar.SetNavigation(page);
@@ -85,8 +86,11 @@ export default class RootView extends ViewBase {
     }
 
     private OnServerFound(): void {
-        this.Finder.ForceRefresh();
-        this.Playlists.RefreshPlaylist();
+        if (!this.isMopidyConnectable) {
+            this.Finder.ForceRefresh();
+            this.Playlists.RefreshPlaylist();
+            this.isMopidyConnectable = true;
+        }
     }
 
     private OnContentOrdered(args: IContentOrdered): void {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Artists
 {
-    public class ArtistStore : PagenagedStoreBase<Artist>
+    public class ArtistStore : PagenagedStoreBase<Artist>, IRefreshable
     {
         public class PagenagedQueryArgs
         {
@@ -62,8 +62,26 @@ namespace MopidyFinder.Models.Artists
             return result;
         }
 
+
+        private decimal _refreshLength = 0;
+        private decimal _refreshed = 0;
+        public decimal RefreshProgress
+        {
+            get
+            {
+                return (this._refreshLength <= 0)
+                    ? 0
+                    : (this._refreshLength <= this._refreshed)
+                        ? 1
+                        : (this._refreshed / this._refreshLength);
+            }
+        }
+
         public async Task<bool> Refresh()
         {
+            this._refreshLength = 0;
+            this._refreshed = 0;
+
             var result = await Library.Browse(ArtistStore.QueryString);
 
             var artists = result.Select(e => new Artist()
@@ -73,7 +91,11 @@ namespace MopidyFinder.Models.Artists
                 Uri = e.Uri
             }).ToArray();
 
+            this._refreshLength = artists.Length;
+
             this.Dbc.Artists.AddRange(artists);
+
+            this._refreshed = this._refreshLength;
 
             return true;
         }

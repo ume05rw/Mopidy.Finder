@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MopidyFinder.Models;
 using MopidyFinder.Models.Settings;
 using MopidyFinder.Models.Xhrs;
 
@@ -27,6 +28,25 @@ namespace MopidyFinder.Controllers
             store.Update();
 
             return XhrResponseFactory.CreateSucceeded(store.Entity);
+        }
+
+        [HttpGet("Refresh")]
+        public XhrResponse GetStatus()
+        {
+            var result = Initializer.Instance.GetStatus();
+
+            return XhrResponseFactory.CreateSucceeded(result);
+        }
+
+        [HttpPost("Refresh")]
+        public XhrResponse Exec()
+        {
+            if (Initializer.Instance.IsActive)
+                return XhrResponseFactory.CreateError("Already Refreshing.");
+
+            Initializer.Instance.Exec();
+
+            return XhrResponseFactory.CreateSucceeded(true);
         }
     }
 }

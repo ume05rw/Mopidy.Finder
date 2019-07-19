@@ -3,8 +3,10 @@ import { default as Settings, ISettings } from './Settings';
 import Exception from '../../Utils/Exception';
 
 export interface IRefreshStatus {
+    Finished: boolean,
+    Succeeded: boolean,
     Progress: number;
-    Prosess: string;
+    Process: string;
 }
 
 export default class SettingsStore extends JsonRpcQueryableBase {
@@ -55,14 +57,17 @@ export default class SettingsStore extends JsonRpcQueryableBase {
     }
 
     public async GetRefreshProgress(): Promise<IRefreshStatus> {
+        const a = 1;
         const response = await this.QueryGet('Settings/Refresh');
 
         if (!response.Succeeded) {
             Exception.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
 
             return {
+                Finished: true,
+                Succeeded: false,
                 Progress: 0,
-                Prosess: 'Unexpected'
+                Process: 'Unexpected Error'
             } as IRefreshStatus;
         }
 
