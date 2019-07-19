@@ -63,15 +63,13 @@ export default class RootView extends ViewBase {
 
         const store = new SettingsStore();
         const isConnectable = await store.TryConnect();
-
-        (isConnectable)
-            ? this.Sidebar.ShowFinder()
-            : this.Sidebar.ShowSettings();
+        const page = (isConnectable)
+            ? Pages.Finder
+            : Pages.Settings;
+        this.Sidebar.SetNavigation(page);
 
         const args: IContentChanged = {
-            Page: (isConnectable)
-                ? Pages.Finder
-                : Pages.Settings
+            Page: page
         }
         this.OnContentChanged(args);
 

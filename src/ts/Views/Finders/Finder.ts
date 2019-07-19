@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import Artist from '../../Models/Artists/Artist';
 import Genre from '../../Models/Genres/Genre';
@@ -8,7 +9,7 @@ import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
 
 @Component({
-    template: `<section class="content h-100 tab-pane fade show active"
+    template: `<section class="content h-100 tab-pane fade"
                         id="tab-finder"
                         role="tabpanel"
                         aria-labelledby="finder-tab">
@@ -88,9 +89,11 @@ export default class Finder extends ContentViewBase {
     }
 
     public RefreshAll(): void {
-        this.GenreList.ForceRefresh();
-        this.ArtistList.RemoveAllFilters();
-        this.AlbumList.RemoveAllFilters();
+        _.delay(() => {
+            this.GenreList.ForceRefresh();
+            this.ArtistList.RemoveAllFilters();
+            this.AlbumList.RemoveAllFilters();
+        }, 500);
     }
 
     public RefreshPlaylist(): void {

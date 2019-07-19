@@ -17,7 +17,7 @@ import { IContentChanged, Pages } from '../Sidebars/Sidebar';
 </nav>`
 })
 export default class HeaderBar extends ViewBase {
-    private title: string = Pages.Finder.toString();
+    private title: string = 'Mopidy.Finder';
 
     public SetHeader(args: IContentChanged): void {
         this.title = args.Page.toString();

@@ -66,7 +66,7 @@ module.exports = {
     resolve: {
         // node_modules をモジュールのルートディレクトリに追加
         modules: [
-            'src/lib',
+            'src/js/lib',
             'node_modules'
         ],
 

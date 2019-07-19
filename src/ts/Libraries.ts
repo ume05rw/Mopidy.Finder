@@ -132,11 +132,15 @@ export default class Libraries {
 
     /**
      * SweerAlert2のToast表示メソッド
-     * 型定義を書くと補完が使えなくなるので、しないでおく。
-     * ↓多分何かが間違っている...
-     * ShowToast: {[toastType: string]: (message: string) => void }
+     * 型定義が冗長なのはなんとかならんのか
      */
-    public static readonly ShowToast = { // eslint-disable-line
+    public static readonly ShowToast: {
+        Success: (message: string) => void,
+        Info: (message: string) => void,
+        Question: (message: string) => void,
+        Warning: (message: string) => void,
+        Error: (message: string) => void
+    } = {
         Success: (message: string): void => Libraries.InnerShowToast('success', message),
         Info: (message: string): void => Libraries.InnerShowToast('info', message),
         Question: (message: string): void => Libraries.InnerShowToast('question', message),

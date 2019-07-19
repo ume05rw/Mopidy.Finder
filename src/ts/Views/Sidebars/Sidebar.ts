@@ -1,8 +1,8 @@
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
+import Exception from '../../Utils/Exception';
 import ViewBase from '../Bases/ViewBase';
 import PlayerPanel from './PlayerPanel';
-import { TabEvents } from '../Events/BootstrapEvents';
 
 export enum Pages {
     Finder = 'Finder',
@@ -34,12 +34,12 @@ export const SidebarEvents = {
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" role="tablist">
                     <li class="nav-item">
-                        <a  class="nav-link active"
+                        <a  class="nav-link"
                             href="#tab-finder"
                             role="tab"
                             data-toggle="tab"
                             aria-controls="tab-finder"
-                            aria-selected="true"
+                            aria-selected="false"
                             ref="FinderAnchor"
                             @click="OnClickFinder" >
                             <i class="fa fa-search nav-icon" />
@@ -121,18 +121,21 @@ export default class Sidebar extends ViewBase {
         return true;
     }
 
-    public ShowFinder(): void {
-        this.finderTabAnchor.tab(Sidebar.ShowTabMethod);
+    public SetNavigation(page: Pages): void {
+        switch (page) {
+            case Pages.Finder:
+                this.finderTabAnchor.tab(Sidebar.ShowTabMethod);
+                break;
+            case Pages.Playlists:
+                this.playlistsTabAnchor.tab(Sidebar.ShowTabMethod);
+                break;
+            case Pages.Settings:
+                this.settingsTabAnchor.tab(Sidebar.ShowTabMethod);
+                break;
+            default:
+                Exception.Throw('Unexpected Page Ordered.', page);
+        }
     }
-
-    public ShowPlaylists(): void {
-        this.playlistsTabAnchor.tab(Sidebar.ShowTabMethod);
-    }
-
-    public ShowSettings(): void {
-        this.settingsTabAnchor.tab(Sidebar.ShowTabMethod);
-    }
-    
 
     private OnClickFinder(ev: MouseEvent): void {
         const orderedArgs: IContentOrdered = {

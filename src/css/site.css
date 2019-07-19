@@ -181,13 +181,11 @@ div#root {
 .albumtrack .header-dropdown {
     max-width: 200px;
 }
-.albumtrack .header-dropdown .slimScrollDiv,
-.albumtrack .header-dropdown .inner-header-dorpdown {
+.albumtrack .header-dropdown .slimScrollDiv {
     max-height: 50vh;
     max-width: 200px;
 }
-.albumtrack .row-dropdown .slimScrollDiv,
-.albumtrack .row-dropdown .inner-row-dorpdown {
+.albumtrack .row-dropdown .slimScrollDiv {
     max-height: 40vh;
     max-width: 200px;
 }
@@ -244,4 +242,22 @@ div#root {
 .track-list.editable .editmode-buttons {
     display: inline;
     color: #e5dfff;
+}
+
+/**
+ * 設定
+ */
+#tab-settings input.port {
+    max-width: 90px;
+}
+#tab-settings .connection-icon {
+    display: inline-block;
+    margin-top: 7px;
+    margin-left: 10px;
+}
+#tab-settings .connection-icon.connectable {
+    color: #17b06b;
+}
+#tab-settings .connection-icon.notconnectable {
+    color: #ff3c5c;
 }

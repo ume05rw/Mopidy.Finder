@@ -2,6 +2,11 @@ import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import { default as Settings, ISettings } from './Settings';
 import Exception from '../../Utils/Exception';
 
+export interface IRefreshStatus {
+    Progress: number;
+    Prosess: string;
+}
+
 export default class SettingsStore extends JsonRpcQueryableBase {
 
     public async Get(): Promise<Settings> {
@@ -38,5 +43,29 @@ export default class SettingsStore extends JsonRpcQueryableBase {
             Exception.Dump(response.error);
 
         return !(response.error);
+    }
+
+    public async Refresh(): Promise<boolean> {
+        const response = await this.QueryPost('Settings/Refresh');
+
+        if (!response.Succeeded)
+            Exception.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+
+        return response.Succeeded;
+    }
+
+    public async GetRefreshProgress(): Promise<IRefreshStatus> {
+        const response = await this.QueryGet('Settings/Refresh');
+
+        if (!response.Succeeded) {
+            Exception.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+
+            return {
+                Progress: 0,
+                Prosess: 'Unexpected'
+            } as IRefreshStatus;
+        }
+
+        return response.Result as IRefreshStatus;
     }
 }

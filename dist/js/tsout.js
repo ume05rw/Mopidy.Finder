@@ -249,9 +249,7 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         /* eslint-enable @typescript-eslint/indent */
         /**
          * SweerAlert2のToast表示メソッド
-         * 型定義を書くと補完が使えなくなるので、しないでおく。
-         * ↓多分何かが間違っている...
-         * ShowToast: {[toastType: string]: (message: string) => void }
+         * 型定義が冗長なのはなんとかならんのか
          */
         Libraries.ShowToast = {
             Success: function (message) { return Libraries.InnerShowToast('success', message); },
@@ -3352,7 +3350,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionList_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, ContentViewBase_1, AlbumList_1, ArtistList_1, GenreList_1) {
+define("Views/Finders/Finder", ["require", "exports", "lodash", "vue-class-component", "Views/Bases/ContentViewBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, _, vue_class_component_9, ContentViewBase_1, AlbumList_1, ArtistList_1, GenreList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -3419,16 +3417,19 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Vi
             this.AlbumList.RemoveFilterAllArtists();
         };
         Finder.prototype.RefreshAll = function () {
-            this.GenreList.ForceRefresh();
-            this.ArtistList.RemoveAllFilters();
-            this.AlbumList.RemoveAllFilters();
+            var _this = this;
+            _.delay(function () {
+                _this.GenreList.ForceRefresh();
+                _this.ArtistList.RemoveAllFilters();
+                _this.AlbumList.RemoveAllFilters();
+            }, 500);
         };
         Finder.prototype.RefreshPlaylist = function () {
             this.AlbumList.InitPlaylistList();
         };
         Finder = __decorate([
             vue_class_component_9.default({
-                template: "<section class=\"content h-100 tab-pane fade show active\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"finder-tab\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\"\n            @PlaylistUpdated=\"OnPlaylistUpdated\"/>\n    </div>\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"finder-tab\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\" />\n        <album-list\n            ref=\"AlbumList\"\n            @PlaylistUpdated=\"OnPlaylistUpdated\"/>\n    </div>\n</section>",
                 components: {
                     'genre-list': GenreList_1.default,
                     'artist-list': ArtistList_1.default,
@@ -4016,7 +4017,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                                     _this.ButtonRepeat.classList.add(PlayerPanel_1.ClassDisabled);
                             });
                             // ポーリング一時停止するときは、ここをコメントアウト
-                            //this.monitor.StartPolling();
+                            this.monitor.StartPolling();
                             return [2 /*return*/, true];
                     }
                 });
@@ -4072,7 +4073,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_7.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_11, Libraries_11, ViewBase_8, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_11, Libraries_11, Exception_11, ViewBase_8, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Pages;
@@ -4137,14 +4138,20 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                 });
             });
         };
-        Sidebar.prototype.ShowFinder = function () {
-            this.finderTabAnchor.tab(Sidebar_1.ShowTabMethod);
-        };
-        Sidebar.prototype.ShowPlaylists = function () {
-            this.playlistsTabAnchor.tab(Sidebar_1.ShowTabMethod);
-        };
-        Sidebar.prototype.ShowSettings = function () {
-            this.settingsTabAnchor.tab(Sidebar_1.ShowTabMethod);
+        Sidebar.prototype.SetNavigation = function (page) {
+            switch (page) {
+                case Pages.Finder:
+                    this.finderTabAnchor.tab(Sidebar_1.ShowTabMethod);
+                    break;
+                case Pages.Playlists:
+                    this.playlistsTabAnchor.tab(Sidebar_1.ShowTabMethod);
+                    break;
+                case Pages.Settings:
+                    this.settingsTabAnchor.tab(Sidebar_1.ShowTabMethod);
+                    break;
+                default:
+                    Exception_11.default.Throw('Unexpected Page Ordered.', page);
+            }
         };
         Sidebar.prototype.OnClickFinder = function (ev) {
             var orderedArgs = {
@@ -4195,7 +4202,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
         Sidebar.ShowTabMethod = 'show';
         Sidebar = Sidebar_1 = __decorate([
             vue_class_component_11.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-warning elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SidebarSection\">\n        <div class=\"w-100 inner-sidebar\">\n            <nav class=\"mt-2\">\n                <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link active\"\n                            href=\"#tab-finder\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-finder\"\n                            aria-selected=\"true\"\n                            ref=\"FinderAnchor\"\n                            @click=\"OnClickFinder\" >\n                            <i class=\"fa fa-search nav-icon\" />\n                            <p>Finder</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-playlists\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-playlists\"\n                            aria-selected=\"false\"\n                            ref=\"PlaylistsAnchor\"\n                            @click=\"OnClickPlaylists\" >\n                            <i class=\"fa fa-bookmark nav-icon\" />\n                            <p>Playlists</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-settings\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-settings\"\n                            aria-selected=\"false\"\n                            ref=\"SettingsAnchor\"\n                            @click=\"OnClickSettings\" >\n                            <i class=\"fa fa-cog nav-icon\" />\n                            <p>Settings</p>\n                        </a>\n                    </li>\n                </ul>\n            </nav>\n            <div class=\"row mt-2\">\n                <div class=\"col-12\">\n                    <player-panel ref=\"PlayerPanel\" />\n                </div>\n            </div>\n        </div>\n    </section>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-warning elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SidebarSection\">\n        <div class=\"w-100 inner-sidebar\">\n            <nav class=\"mt-2\">\n                <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-finder\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-finder\"\n                            aria-selected=\"false\"\n                            ref=\"FinderAnchor\"\n                            @click=\"OnClickFinder\" >\n                            <i class=\"fa fa-search nav-icon\" />\n                            <p>Finder</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-playlists\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-playlists\"\n                            aria-selected=\"false\"\n                            ref=\"PlaylistsAnchor\"\n                            @click=\"OnClickPlaylists\" >\n                            <i class=\"fa fa-bookmark nav-icon\" />\n                            <p>Playlists</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a  class=\"nav-link\"\n                            href=\"#tab-settings\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-settings\"\n                            aria-selected=\"false\"\n                            ref=\"SettingsAnchor\"\n                            @click=\"OnClickSettings\" >\n                            <i class=\"fa fa-cog nav-icon\" />\n                            <p>Settings</p>\n                        </a>\n                    </li>\n                </ul>\n            </nav>\n            <div class=\"row mt-2\">\n                <div class=\"col-12\">\n                    <player-panel ref=\"PlayerPanel\" />\n                </div>\n            </div>\n        </div>\n    </section>\n</aside>",
                 components: {
                     'player-panel': PlayerPanel_2.default
                 }
@@ -4205,14 +4212,14 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     }(ViewBase_8.default));
     exports.default = Sidebar;
 });
-define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_12, ViewBase_9, Sidebar_2) {
+define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_12, ViewBase_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var HeaderBar = /** @class */ (function (_super) {
         __extends(HeaderBar, _super);
         function HeaderBar() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.title = Sidebar_2.Pages.Finder.toString();
+            _this.title = 'Mopidy.Finder';
             return _this;
         }
         HeaderBar.prototype.SetHeader = function (args) {
@@ -5623,7 +5630,7 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
     }());
     exports.default = Settings;
 });
-define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings", "Utils/Exception"], function (require, exports, JsonRpcQueryableBase_5, Settings_1, Exception_11) {
+define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings", "Utils/Exception"], function (require, exports, JsonRpcQueryableBase_5, Settings_1, Exception_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SettingsStore = /** @class */ (function (_super) {
@@ -5640,7 +5647,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                Exception_11.default.Throw('SettingStore.Get: Unexpected Error.', response.Errors);
+                                Exception_12.default.Throw('SettingStore.Get: Unexpected Error.', response.Errors);
                             Settings_1.default.Apply(response.Result);
                             return [2 /*return*/, Settings_1.default.Get()];
                     }
@@ -5656,7 +5663,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
-                                Exception_11.default.Dump('SettingStore.Update: Unexpected Error.', response.Errors);
+                                Exception_12.default.Dump('SettingStore.Update: Unexpected Error.', response.Errors);
                                 return [2 /*return*/, false];
                             }
                             updated = response.Result;
@@ -5675,8 +5682,43 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (response.error)
-                                Exception_11.default.Dump(response.error);
+                                Exception_12.default.Dump(response.error);
                             return [2 /*return*/, !(response.error)];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.Refresh = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Settings/Refresh')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_12.default.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+                            return [2 /*return*/, response.Succeeded];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.GetRefreshProgress = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Settings/Refresh')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                Exception_12.default.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+                                return [2 /*return*/, {
+                                        Progress: 0,
+                                        Prosess: 'Unexpected'
+                                    }];
+                            }
+                            return [2 /*return*/, response.Result];
                     }
                 });
             });
@@ -5696,7 +5738,18 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         __extends(Settings, _super);
         function Settings() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.message = '';
+            _this.isConnectable = false;
+            _this.disabled = 'disabled';
+            _this.connectionClasses = {
+                True: {
+                    Icon: 'fa fa-link',
+                    Wrapper: 'connection-icon connectable'
+                },
+                False: {
+                    Icon: 'fa fa-chain-broken',
+                    Wrapper: 'connection-icon notconnectable'
+                }
+            };
             return _this;
             // #endregion
         }
@@ -5714,6 +5767,27 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Settings.prototype, "IconWrapper", {
+            get: function () {
+                return this.$refs.IconWrapper;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "Icon", {
+            get: function () {
+                return this.$refs.Icon;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "RefreshButton", {
+            get: function () {
+                return this.$refs.RefreshButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Settings.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _a;
@@ -5725,6 +5799,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             _b.sent();
                             this.Update = this.Update.bind(this);
                             this.lazyUpdater = Delay_6.default.DelayedOnce(function () {
+                                console.log('lazyUpdater Run.');
                                 _this.Update();
                             }, 2000);
                             this.store = new SettingsStore_1.default();
@@ -5734,6 +5809,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             _a.entity = _b.sent();
                             this.ServerAddressInput.value = this.entity.ServerAddress;
                             this.ServerPortInput.value = this.entity.ServerPort.toString();
+                            this.Update();
                             return [2 /*return*/, true];
                     }
                 });
@@ -5747,9 +5823,9 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         };
         Settings.prototype.Update = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var address, portString, port, update, isConnectable;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
+                var address, portString, port, update, _a;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
                         case 0:
                             address = this.ServerAddressInput.value;
                             portString = this.ServerPortInput.value;
@@ -5768,24 +5844,56 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             };
                             return [4 /*yield*/, this.store.Update(update)];
                         case 1:
-                            if ((_a.sent()) !== true) {
+                            if ((_b.sent()) !== true) {
                                 Libraries_18.default.ShowToast.Error('Update Failed...');
                                 return [2 /*return*/, false];
                             }
+                            _a = this;
                             return [4 /*yield*/, this.store.TryConnect()];
                         case 2:
-                            isConnectable = _a.sent();
-                            if (isConnectable === true) {
-                                Libraries_18.default.ShowToast.Success('Server Found!');
+                            _a.isConnectable = _b.sent();
+                            if (this.isConnectable === true) {
+                                Libraries_18.default.ShowToast.Success('Mopidy Found!');
                                 this.$emit(exports.SettingsEvents.ServerFound);
                             }
                             else {
-                                Libraries_18.default.ShowToast.Error('Server Not Found...');
+                                Libraries_18.default.ShowToast.Error('Mopidy Not Found...');
                             }
-                            return [2 /*return*/, isConnectable];
+                            this.SetConnectionIcon();
+                            this.SetRefreshButton();
+                            return [2 /*return*/, this.isConnectable];
                     }
                 });
             });
+        };
+        Settings.prototype.SetConnectionIcon = function () {
+            var wrapperClasses = this.IconWrapper.classList;
+            var iconClasses = this.Icon.classList;
+            if (this.isConnectable === true) {
+                this.IconWrapper.className = this.connectionClasses.True.Wrapper;
+                this.Icon.className = this.connectionClasses.True.Icon;
+            }
+            else {
+                this.IconWrapper.className = this.connectionClasses.False.Wrapper;
+                this.Icon.className = this.connectionClasses.False.Icon;
+            }
+        };
+        Settings.prototype.SetRefreshButton = function () {
+            var classes = this.RefreshButton.classList;
+            if (this.isConnectable === true
+                && classes.contains(this.disabled)) {
+                classes.remove(this.disabled);
+            }
+            else if (this.isConnectable !== true
+                && !classes.contains(this.disabled)) {
+                classes.add(this.disabled);
+            }
+        };
+        Settings.prototype.OnRefreshButtonClicked = function () {
+            if (this.isConnectable !== true) {
+                Libraries_18.default.ShowToast.Error('Mopidy Not Found...');
+                return;
+            }
         };
         // #region "IContentView"
         Settings.prototype.GetIsPermitLeave = function () {
@@ -5796,7 +5904,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         };
         Settings = __decorate([
             vue_class_component_19.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Find Mopidy Server</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <div class=\"input-group\">\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">http://</div>\n                                </div>\n                                <input type=\"text\"\n                                    maxlength=\"255\"\n                                    class=\"form-control\"\n                                    placeholder=\"Server Address\"\n                                    ref=\"ServerAddressInput\"\n                                    @input=\"OnServerAddressInput\" />\n                            </div>\n                        </div>\n                        <div class=\"col-auto\">\n                            <div class=\"input-group\">\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">:</div>\n                                </div>\n                                <input type=\"number\"\n                                    maxlength=\"5\"\n                                    class=\"form-control\"\n                                    placeholder=\"Server Port\"\n                                    ref=\"ServerPortInput\"\n                                    @input=\"OnServerPortInput\" />\n                                <div class=\"input-group-append\">\n                                    <div class=\"input-group-text\">/mopidy/</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"row\">\n                        <div class=\"col-auto\">\n                            {{ message }}\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Set Your Mopidy</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <div class=\"input-group\">\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">http://</div>\n                                </div>\n                                <input type=\"text\"\n                                    id=\"server_address\"\n                                    maxlength=\"255\"\n                                    class=\"form-control address\"\n                                    placeholder=\"Server Address\"\n                                    ref=\"ServerAddressInput\"\n                                    @input=\"OnServerAddressInput\" />\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">:</div>\n                                </div>\n                                <input type=\"number\"\n                                    maxlength=\"5\"\n                                    class=\"form-control port\"\n                                    placeholder=\"Server Port\"\n                                    ref=\"ServerPortInput\"\n                                    @input=\"OnServerPortInput\" />\n                                <div class=\"input-group-append\">\n                                    <div class=\"input-group-text\">/mopidy/</div>\n                                </div>\n                                <span class=\"connection-icon\"\n                                    ref=\"IconWrapper\">\n                                    <i class=\"\"\n                                        ref=\"Icon\"/>\n                                </span>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Refresh Relation Data</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <p>\n                                Delete and Refresh <strong>Mopidy.Finder's Database.</strong>\n                                The data in <strong>Mopidy Itself is not affected.</strong>\n                            </p>\n                            <button class=\"btn btn-app btn-outline-warning disabled\"\n                                @click=\"OnRefreshButtonClicked\"\n                                ref=\"RefreshButton\">\n                                <i class=\"fa fa-refresh\"></i> Delete &amp; Refresh\n                            </button>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n</section>",
                 components: {}
             })
         ], Settings);
@@ -5804,7 +5912,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ContentViewBase_3.default));
     exports.default = Settings;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Exception", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Models/Settings/SettingsStore"], function (require, exports, vue_class_component_20, Exception_12, ViewBase_13, Finder_1, HeaderBar_1, Playlists_1, Settings_2, Sidebar_3, SettingsStore_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Exception", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Models/Settings/SettingsStore"], function (require, exports, vue_class_component_20, Exception_13, ViewBase_13, Finder_1, HeaderBar_1, Playlists_1, Settings_2, Sidebar_2, SettingsStore_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -5849,7 +5957,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
         });
         RootView.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var store, isConnectable, args;
+                var store, isConnectable, page, args;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
@@ -5859,13 +5967,12 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
                             return [4 /*yield*/, store.TryConnect()];
                         case 2:
                             isConnectable = _a.sent();
-                            (isConnectable)
-                                ? this.Sidebar.ShowFinder()
-                                : this.Sidebar.ShowSettings();
+                            page = (isConnectable)
+                                ? Sidebar_2.Pages.Finder
+                                : Sidebar_2.Pages.Settings;
+                            this.Sidebar.SetNavigation(page);
                             args = {
-                                Page: (isConnectable)
-                                    ? Sidebar_3.Pages.Finder
-                                    : Sidebar_3.Pages.Settings
+                                Page: page
                             };
                             this.OnContentChanged(args);
                             return [2 /*return*/, true];
@@ -5888,17 +5995,17 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
         };
         RootView.prototype.OnContentChanged = function (args) {
             switch (args.Page) {
-                case Sidebar_3.Pages.Finder:
+                case Sidebar_2.Pages.Finder:
                     this.activeContent = this.Finder;
                     break;
-                case Sidebar_3.Pages.Playlists:
+                case Sidebar_2.Pages.Playlists:
                     this.activeContent = this.Playlists;
                     break;
-                case Sidebar_3.Pages.Settings:
+                case Sidebar_2.Pages.Settings:
                     this.activeContent = this.Settings;
                     break;
                 default:
-                    Exception_12.default.Throw('Unexpected Page.', args);
+                    Exception_13.default.Throw('Unexpected Page.', args);
             }
             this.activeContent.InitContent();
             this.HeaderBar.SetHeader(args);
@@ -5908,7 +6015,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
                 template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar\n        ref=\"HeaderBar\" />\n    <sidebar\n        @ContentOrdered=\"OnContentOrdered\"\n        @ContentChanged=\"OnContentChanged\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder\n            ref=\"Finder\"\n            @PlaylistUpdated=\"OnPlaylistUpdatedByFinder\" />\n        <playlists\n            ref=\"Playlists\"\n            @PlaylistsUpdated=\"OnPlaylistsUpdatedByPlaylists\" />\n        <settings\n            ref=\"Settings\"\n            @ServerFound=\"OnServerFound\"/>\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
-                    'sidebar': Sidebar_3.default,
+                    'sidebar': Sidebar_2.default,
                     'finder': Finder_1.default,
                     'playlists': Playlists_1.default,
                     'settings': Settings_2.default
