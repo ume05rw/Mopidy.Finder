@@ -3,7 +3,7 @@ import { default as InfiniteLoading, StateChanger } from 'vue-infinite-loading';
 import Libraries from '../../Libraries';
 import { IPagenatedResult } from '../../Models/Bases/StoreBase';
 import Exception from '../../Utils/Exception';
-import ContentSubViewBase from '../Bases/ContentSubViewBase';
+import ContentDetailBase from '../Bases/ContentDetailBase';
 import { ISelectionChangedArgs, ISelectionOrderedArgs, SelectionItemEvents } from '../Shared/SelectionItem';
 
 export interface IListUpdatedArgs<TEntity> {
@@ -18,7 +18,7 @@ export const SelectionEvents = {
 }
 
 
-export default abstract class SelectionListBase<TEntity, TStore> extends ContentSubViewBase {
+export default abstract class SelectionListBase<TEntity, TStore> extends ContentDetailBase {
 
     protected abstract readonly tabId: string;
     protected abstract readonly linkId: string;

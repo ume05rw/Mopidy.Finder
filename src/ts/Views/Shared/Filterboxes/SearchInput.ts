@@ -1,6 +1,6 @@
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
-import { Animation, default as AnimatedViewBase } from '../../Bases/AnimatedViewBase';
+import { Animation, default as AnimatedBase } from '../../Bases/AnimatedBase';
 
 export const SearchInputEvents = {
     Input: 'Input',
@@ -17,7 +17,7 @@ export const SearchInputEvents = {
         @blur="OnBlur">
 </input>`
 })
-export default class SearchInput extends AnimatedViewBase {
+export default class SearchInput extends AnimatedBase {
     protected AnimationIn: Animation = Animation.FadeInUp;
     protected AnimationOut: Animation = Animation.FadeOutDown;
 

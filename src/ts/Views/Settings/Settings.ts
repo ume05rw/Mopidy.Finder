@@ -1,25 +1,16 @@
 import Component from 'vue-class-component';
-import ContentViewBase from '../Bases/ContentViewBase';
-import { default as Delay, DelayedOnceExecuter } from '../../Utils/Delay';
-import { default as SettingsStore, IUpdateProgress, IAlbumScanProgress } from '../../Models/Settings/SettingsStore';
-import { default as SettingsEntity, ISettings } from '../../Models/Settings/Settings';
-import Libraries from '../../Libraries';
-import { default as ConfirmDialog, ConfirmType } from '../Shared/Dialogs/ConfirmDialog';
-import ProgressDialog from '../Shared/Dialogs/ProgressDialog';
-import { IContentSubView } from '../Bases/ContentSubViewBase';
+import { default as SettingsEntity } from '../../Models/Settings/Settings';
+import { default as SettingsStore, IUpdateProgress } from '../../Models/Settings/SettingsStore';
+import Exception from '../../Utils/Exception';
+import { default as IContentDetail, ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
+import ContentBase from '../Bases/ContentBase';
+import DbBlock from './Blocks/DbBlock';
 import MopidyBlock from './Blocks/MopidyBlock';
 import ScanProgressBlock from './Blocks/ScanProgressBlock';
-import DbBlock from './Blocks/DbBlock';
-import { IContentDetailArgs, ContentDetails } from '../HeaderBars/HeaderBar';
-import Exception from '../../Utils/Exception';
 
 export const SettingsEvents = {
     ServerFound: 'ServerFound'
 };
-interface IIconClasses {
-    Icon: string;
-    Wrapper: string;
-}
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
@@ -40,7 +31,7 @@ interface IIconClasses {
         'scan-progress-block': ScanProgressBlock,
     }
 })
-export default class Settings extends ContentViewBase {
+export default class Settings extends ContentBase {
 
     private store: SettingsStore;
     private entity: SettingsEntity;
@@ -65,15 +56,15 @@ export default class Settings extends ContentViewBase {
         this.DbBlock.SetSettings(this.store, this.entity);
         this.ScanProgressBlock.SetSettings(this.store, this.entity);
 
-        this.subviews.push(this.MopidyBlock);
-        this.subviews.push(this.DbBlock);
-        this.subviews.push(this.ScanProgressBlock);
+        this.details.push(this.MopidyBlock);
+        this.details.push(this.DbBlock);
+        this.details.push(this.ScanProgressBlock);
 
         return true;
     }
 
     // #region "IContentView"
-    protected subviews: IContentSubView[] = [];
+    protected details: IContentDetail[] = [];
     public GetIsPermitLeave(): boolean {
         // DBリフレッシュ中はページ移動NGにする。
         return true;

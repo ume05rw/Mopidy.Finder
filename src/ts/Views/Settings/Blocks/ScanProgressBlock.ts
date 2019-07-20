@@ -1,7 +1,7 @@
 import Component from 'vue-class-component';
 import { default as SettingsEntity } from '../../../Models/Settings/Settings';
 import { default as SettingsStore } from '../../../Models/Settings/SettingsStore';
-import ContentSubViewBase from '../../Bases/ContentSubViewBase';
+import ContentDetailBase from '../../Bases/ContentDetailBase';
 
 @Component({
     template: `<div class="row">
@@ -40,7 +40,7 @@ import ContentSubViewBase from '../../Bases/ContentSubViewBase';
     </div>
 </div>`
 })
-export default class ScanProgressBlock extends ContentSubViewBase {
+export default class ScanProgressBlock extends ContentDetailBase {
 
     protected readonly tabId: string = 'subtab-scanprogress';
     protected readonly linkId: string = 'nav-scanprogress';

@@ -1,21 +1,21 @@
 import Vue from 'vue';
 import ViewBase from './ViewBase';
 
-export const TabViewEvents = {
+export const TabEvents = {
     Show: 'Show',
     Shown: 'Shown',
     Hide: 'Hide',
     Hidden: 'Hidden',
 }
 
-export interface ITabView extends Vue {
+export interface ITab extends Vue {
     OnShow(): void;
     OnShown(): void;
     OnHide(): void;
     OnHidden(): void;
 }
 
-export default abstract class TabViewBase extends ViewBase implements ITabView {
+export default abstract class TabBase extends ViewBase implements ITab {
     public OnShow(): void {
     }
     public OnShown(): void {

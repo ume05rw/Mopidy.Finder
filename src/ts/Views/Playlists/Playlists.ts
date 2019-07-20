@@ -1,13 +1,12 @@
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
 import Playlist from '../../Models/Playlists/Playlist';
-import ContentViewBase from '../Bases/ContentViewBase';
+import ContentBase from '../Bases/ContentBase';
 import { ISelectionChangedArgs, ISelectionOrderedArgs } from '../Shared/SelectionItem';
 import PlaylistList from './Lists/Playlists/PlaylistList';
 import TrackList from './Lists/Tracks/TrackList';
 import Delay from '../../Utils/Delay';
-import { IContentSubView } from '../Bases/ContentSubViewBase';
-import { IContentDetailArgs, ContentDetails } from '../HeaderBars/HeaderBar';
+import { default as IContentDetail, ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
 import Exception from '../../Utils/Exception';
 
 export const PlaylistsEvents = {
@@ -35,7 +34,7 @@ export const PlaylistsEvents = {
         'track-list': TrackList
     }
 })
-export default class Playlists extends ContentViewBase {
+export default class Playlists extends ContentBase {
 
     private get PlaylistList(): PlaylistList {
         return this.$refs.PlaylistList as PlaylistList;
@@ -47,14 +46,14 @@ export default class Playlists extends ContentViewBase {
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        this.subviews.push(this.PlaylistList);
-        this.subviews.push(this.TrackList);
+        this.details.push(this.PlaylistList);
+        this.details.push(this.TrackList);
 
         return true;
     }
 
     // #region "IContentView"
-    protected subviews: IContentSubView[] = [];
+    protected details: IContentDetail[] = [];
     public GetIsPermitLeave(): boolean {
         // プレイリスト画面からの移動可否判定
         const isSaved = this.TrackList.GetIsSavedPlaylistChanges();

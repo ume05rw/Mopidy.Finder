@@ -1,16 +1,14 @@
-import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import Artist from '../../Models/Artists/Artist';
 import Genre from '../../Models/Genres/Genre';
-import ContentViewBase from '../Bases/ContentViewBase';
+import Delay from '../../Utils/Delay';
+import Exception from '../../Utils/Exception';
+import { default as IContentDetail, ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
+import ContentBase from '../Bases/ContentBase';
 import { ISelectionChangedArgs } from '../Shared/SelectionItem';
 import { AlbumListEvents, default as AlbumList } from './Lists/Albums/AlbumList';
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
-import Delay from '../../Utils/Delay';
-import { IContentSubView } from '../Bases/ContentSubViewBase';
-import { IContentDetailArgs, ContentDetails } from '../HeaderBars/HeaderBar';
-import Exception from '../../Utils/Exception';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
@@ -37,7 +35,7 @@ import Exception from '../../Utils/Exception';
         'album-list': AlbumList
     }
 })
-export default class Finder extends ContentViewBase {
+export default class Finder extends ContentBase {
 
     private get GenreList(): GenreList {
         return this.$refs.GenreList as GenreList;
@@ -54,15 +52,15 @@ export default class Finder extends ContentViewBase {
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        this.subviews.push(this.GenreList);
-        this.subviews.push(this.ArtistList);
-        this.subviews.push(this.AlbumList);
+        this.details.push(this.GenreList);
+        this.details.push(this.ArtistList);
+        this.details.push(this.AlbumList);
 
         return true;
     }
 
     // #region "IContentView"
-    protected subviews: IContentSubView[] = [];
+    protected details: IContentDetail[] = [];
     public GetIsPermitLeave(): boolean {
         return true;
     }

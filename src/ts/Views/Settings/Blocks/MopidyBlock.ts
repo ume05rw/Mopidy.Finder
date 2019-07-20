@@ -1,9 +1,9 @@
 import Component from 'vue-class-component';
-import ContentSubViewBase from '../../Bases/ContentSubViewBase';
-import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 import Libraries from '../../../Libraries';
 import { default as SettingsEntity, ISettings } from '../../../Models/Settings/Settings';
-import { default as SettingsStore, IUpdateProgress, IAlbumScanProgress } from '../../../Models/Settings/SettingsStore';
+import { default as SettingsStore } from '../../../Models/Settings/SettingsStore';
+import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
+import ContentDetailBase from '../../Bases/ContentDetailBase';
 
 export const MopidyBlockEvents = {
     SettingsUpdated: 'SettingsUpdated'
@@ -62,7 +62,7 @@ interface IIconClasses {
     </div>
 </div>`
 })
-export default class MopidyBlock extends ContentSubViewBase {
+export default class MopidyBlock extends ContentDetailBase {
 
     protected readonly tabId: string = 'subtab-mopidy';
     protected readonly linkId: string = 'nav-mopidy';

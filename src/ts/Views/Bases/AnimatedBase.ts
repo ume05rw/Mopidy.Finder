@@ -4,7 +4,7 @@ import ViewBase from './ViewBase';
 
 export { Animation, Speed } from '../../Utils/Animate';
 
-export default abstract class AnimatedViewBase extends ViewBase {
+export default abstract class AnimatedBase extends ViewBase {
 
     protected abstract AnimationIn: Animation;
     protected abstract AnimationOut: Animation;

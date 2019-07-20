@@ -1,23 +1,11 @@
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
 import Exception from '../../Utils/Exception';
+import { Contents, IContentArgs, IContentOrderedArgs } from '../Bases/IContent';
+import { TabEvents } from '../Bases/TabBase';
 import ViewBase from '../Bases/ViewBase';
+import { TabEvents as BsTabEvents } from '../Events/BootstrapEvents';
 import PlayerPanel from './PlayerPanel';
-import { TabEvents } from '../Events/BootstrapEvents';
-import { TabViewEvents } from '../Bases/TabViewBase';
-
-export enum Pages {
-    Finder = 'Finder',
-    Playlists = 'Playlists',
-    Settings = 'Settings'
-}
-
-export interface IContentArgs {
-    Page: Pages;
-}
-export interface IContentOrderedArgs extends IContentArgs {
-    Permitted: boolean;
-}
 
 export const SidebarEvents = {
     ContentOrdered: 'ContentOrdered',
@@ -123,70 +111,70 @@ export default class Sidebar extends ViewBase {
         this.playlistsTabAnchor = Libraries.$(this.PlaylistsAnchor);
         this.settingsTabAnchor = Libraries.$(this.SettingsAnchor);
 
-        this.finderTabAnchor.on(TabEvents.Show, () => {
-            const args: IContentArgs = { Page: Pages.Finder };
-            this.$emit(TabViewEvents.Show, args);
+        this.finderTabAnchor.on(BsTabEvents.Show, () => {
+            const args: IContentArgs = { Content: Contents.Finder };
+            this.$emit(TabEvents.Show, args);
         });
-        this.finderTabAnchor.on(TabEvents.Shown, () => {
-            const args: IContentArgs = { Page: Pages.Finder };
-            this.$emit(TabViewEvents.Shown, args);
+        this.finderTabAnchor.on(BsTabEvents.Shown, () => {
+            const args: IContentArgs = { Content: Contents.Finder };
+            this.$emit(TabEvents.Shown, args);
         });
-        this.finderTabAnchor.on(TabEvents.Hide, () => {
-            const args: IContentArgs = { Page: Pages.Finder };
-            this.$emit(TabViewEvents.Hide, args);
+        this.finderTabAnchor.on(BsTabEvents.Hide, () => {
+            const args: IContentArgs = { Content: Contents.Finder };
+            this.$emit(TabEvents.Hide, args);
         });
-        this.finderTabAnchor.on(TabEvents.Hidden, () => {
-            const args: IContentArgs = { Page: Pages.Finder };
-            this.$emit(TabViewEvents.Hidden, args);
-        });
-
-        this.playlistsTabAnchor.on(TabEvents.Show, () => {
-            const args: IContentArgs = { Page: Pages.Playlists };
-            this.$emit(TabViewEvents.Show, args);
-        });
-        this.playlistsTabAnchor.on(TabEvents.Shown, () => {
-            const args: IContentArgs = { Page: Pages.Playlists };
-            this.$emit(TabViewEvents.Shown, args);
-        });
-        this.playlistsTabAnchor.on(TabEvents.Hide, () => {
-            const args: IContentArgs = { Page: Pages.Playlists };
-            this.$emit(TabViewEvents.Hide, args);
-        });
-        this.playlistsTabAnchor.on(TabEvents.Hidden, () => {
-            const args: IContentArgs = { Page: Pages.Playlists };
-            this.$emit(TabViewEvents.Hidden, args);
+        this.finderTabAnchor.on(BsTabEvents.Hidden, () => {
+            const args: IContentArgs = { Content: Contents.Finder };
+            this.$emit(TabEvents.Hidden, args);
         });
 
-        this.settingsTabAnchor.on(TabEvents.Show, () => {
-            const args: IContentArgs = { Page: Pages.Settings };
-            this.$emit(TabViewEvents.Show, args);
+        this.playlistsTabAnchor.on(BsTabEvents.Show, () => {
+            const args: IContentArgs = { Content: Contents.Playlists };
+            this.$emit(TabEvents.Show, args);
         });
-        this.settingsTabAnchor.on(TabEvents.Shown, () => {
-            const args: IContentArgs = { Page: Pages.Settings };
-            this.$emit(TabViewEvents.Shown, args);
+        this.playlistsTabAnchor.on(BsTabEvents.Shown, () => {
+            const args: IContentArgs = { Content: Contents.Playlists };
+            this.$emit(TabEvents.Shown, args);
         });
-        this.settingsTabAnchor.on(TabEvents.Hide, () => {
-            const args: IContentArgs = { Page: Pages.Settings };
-            this.$emit(TabViewEvents.Hide, args);
+        this.playlistsTabAnchor.on(BsTabEvents.Hide, () => {
+            const args: IContentArgs = { Content: Contents.Playlists };
+            this.$emit(TabEvents.Hide, args);
         });
-        this.settingsTabAnchor.on(TabEvents.Hidden, () => {
-            const args: IContentArgs = { Page: Pages.Settings };
-            this.$emit(TabViewEvents.Hidden, args);
+        this.playlistsTabAnchor.on(BsTabEvents.Hidden, () => {
+            const args: IContentArgs = { Content: Contents.Playlists };
+            this.$emit(TabEvents.Hidden, args);
+        });
+
+        this.settingsTabAnchor.on(BsTabEvents.Show, () => {
+            const args: IContentArgs = { Content: Contents.Settings };
+            this.$emit(TabEvents.Show, args);
+        });
+        this.settingsTabAnchor.on(BsTabEvents.Shown, () => {
+            const args: IContentArgs = { Content: Contents.Settings };
+            this.$emit(TabEvents.Shown, args);
+        });
+        this.settingsTabAnchor.on(BsTabEvents.Hide, () => {
+            const args: IContentArgs = { Content: Contents.Settings };
+            this.$emit(TabEvents.Hide, args);
+        });
+        this.settingsTabAnchor.on(BsTabEvents.Hidden, () => {
+            const args: IContentArgs = { Content: Contents.Settings };
+            this.$emit(TabEvents.Hidden, args);
         });
 
 
         return true;
     }
 
-    public SetNavigation(page: Pages): void {
+    public SetNavigation(page: Contents): void {
         switch (page) {
-            case Pages.Finder:
+            case Contents.Finder:
                 this.finderTabAnchor.tab(Sidebar.ShowTabMethod);
                 break;
-            case Pages.Playlists:
+            case Contents.Playlists:
                 this.playlistsTabAnchor.tab(Sidebar.ShowTabMethod);
                 break;
-            case Pages.Settings:
+            case Contents.Settings:
                 this.settingsTabAnchor.tab(Sidebar.ShowTabMethod);
                 break;
             default:
@@ -196,7 +184,7 @@ export default class Sidebar extends ViewBase {
 
     private OnClickFinder(ev: MouseEvent): void {
         const orderedArgs: IContentOrderedArgs = {
-            Page: Pages.Finder,
+            Content: Contents.Finder,
             Permitted: true
         };
         this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
@@ -207,14 +195,14 @@ export default class Sidebar extends ViewBase {
         }
 
         const changedArgs: IContentArgs = {
-            Page: Pages.Finder
+            Content: Contents.Finder
         };
         this.$emit(SidebarEvents.ContentChanged, changedArgs)
     }
 
     private OnClickPlaylists(ev: MouseEvent): void {
         const orderedArgs: IContentOrderedArgs = {
-            Page: Pages.Playlists,
+            Content: Contents.Playlists,
             Permitted: true
         };
         this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
@@ -225,14 +213,14 @@ export default class Sidebar extends ViewBase {
         }
 
         const changedArgs: IContentArgs = {
-            Page: Pages.Playlists
+            Content: Contents.Playlists
         };
         this.$emit(SidebarEvents.ContentChanged, changedArgs)
     }
 
     private OnClickSettings(ev: MouseEvent): void {
         const orderedArgs: IContentOrderedArgs = {
-            Page: Pages.Settings,
+            Content: Contents.Settings,
             Permitted: true
         };
         this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
@@ -243,7 +231,7 @@ export default class Sidebar extends ViewBase {
         }
 
         const changedArgs: IContentArgs = {
-            Page: Pages.Settings
+            Content: Contents.Settings
         };
         this.$emit(SidebarEvents.ContentChanged, changedArgs)
     }

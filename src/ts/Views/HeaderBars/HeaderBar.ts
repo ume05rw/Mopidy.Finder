@@ -1,23 +1,10 @@
 import Component from 'vue-class-component';
 import ViewBase from '../Bases/ViewBase';
-import { IContentArgs, Pages } from '../Sidebars/Sidebar';
+import { IContentArgs, Contents } from '../Bases/IContent';
 import Exception from '../../Utils/Exception';
 import Libraries from '../../Libraries';
+import { ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
 
-export enum ContentDetails {
-    Genres,
-    Artists,
-    AlbumTracks,
-    Playlists,
-    PlaylistTracks,
-    SetMopidy,
-    Database,
-    ScanProgress
-}
-export interface IContentDetailArgs {
-    Page: Pages,
-    Detail: ContentDetails
-}
 export const HeaderBarEvents = {
     DetailOrdered: 'DetailOrdered'
 };
@@ -97,7 +84,7 @@ export const HeaderBarEvents = {
 })
 export default class HeaderBar extends ViewBase {
     private title: string = 'Mopidy.Finder';
-    private currentPage: Pages = null;
+    private currentContent: Contents = null;
 
     private readonly displayNone: string = 'd-none';
     private buttons: HTMLElement[] = [];
@@ -158,13 +145,13 @@ export default class HeaderBar extends ViewBase {
     }
 
     public SetHeader(args: IContentArgs): void {
-        this.currentPage = args.Page;
-        this.title = args.Page.toString();
+        this.currentContent = args.Content;
+        this.title = args.Content.toString();
 
         this.AllButtonToHide();
 
-        switch (this.currentPage) {
-            case Pages.Finder:
+        switch (this.currentContent) {
+            case Contents.Finder:
                 if (this.MenuGenres.classList.contains(this.displayNone))
                     this.MenuGenres.classList.remove(this.displayNone);
                 if (this.MenuArtists.classList.contains(this.displayNone))
@@ -172,13 +159,13 @@ export default class HeaderBar extends ViewBase {
                 if (this.MenuAlbumTracks.classList.contains(this.displayNone))
                     this.MenuAlbumTracks.classList.remove(this.displayNone);
                 break;
-            case Pages.Playlists:
+            case Contents.Playlists:
                 if (this.MenuPlaylists.classList.contains(this.displayNone))
                     this.MenuPlaylists.classList.remove(this.displayNone);
                 if (this.MenuPlaylistTracks.classList.contains(this.displayNone))
                     this.MenuPlaylistTracks.classList.remove(this.displayNone);
                 break;
-            case Pages.Settings:
+            case Contents.Settings:
                 if (this.MenuMopidy.classList.contains(this.displayNone))
                     this.MenuMopidy.classList.remove(this.displayNone);
                 if (this.MenuDb.classList.contains(this.displayNone))
@@ -193,56 +180,56 @@ export default class HeaderBar extends ViewBase {
 
     private OnGenresClicked(): void {
         const args: IContentDetailArgs = {
-            Page: this.currentPage,
+            Content: Contents.Finder,
             Detail: ContentDetails.Genres
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
     }
     private OnArtistsClicked(): void {
         const args: IContentDetailArgs = {
-            Page: this.currentPage,
+            Content: Contents.Finder,
             Detail: ContentDetails.Artists
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
     }
     private OnAlbumTracksClicked(): void {
         const args: IContentDetailArgs = {
-            Page: this.currentPage,
+            Content: Contents.Finder,
             Detail: ContentDetails.AlbumTracks
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
     }
     private OnPlaylistsClicked(): void {
         const args: IContentDetailArgs = {
-            Page: this.currentPage,
+            Content: Contents.Playlists,
             Detail: ContentDetails.Playlists
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
     }
     private OnPlaylistTracksClicked(): void {
         const args: IContentDetailArgs = {
-            Page: this.currentPage,
+            Content: Contents.Playlists,
             Detail: ContentDetails.PlaylistTracks
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
     }
     private OnMopidyClicked(): void {
         const args: IContentDetailArgs = {
-            Page: this.currentPage,
+            Content: Contents.Settings,
             Detail: ContentDetails.SetMopidy
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
     }
     private OnDbClicked(): void {
         const args: IContentDetailArgs = {
-            Page: this.currentPage,
+            Content: Contents.Settings,
             Detail: ContentDetails.Database
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
     }
     private OnScanProgressClicked(): void {
         const args: IContentDetailArgs = {
-            Page: this.currentPage,
+            Content: Contents.Settings,
             Detail: ContentDetails.ScanProgress
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);

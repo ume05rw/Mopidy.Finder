@@ -1,9 +1,9 @@
 import Component from 'vue-class-component';
-import ContentSubViewBase from '../../Bases/ContentSubViewBase';
 import Libraries from '../../../Libraries';
 import { default as SettingsEntity } from '../../../Models/Settings/Settings';
 import { default as SettingsStore, IUpdateProgress } from '../../../Models/Settings/SettingsStore';
-import { default as ConfirmDialog, ConfirmType } from '../../Shared/Dialogs/ConfirmDialog';
+import ContentDetailBase from '../../Bases/ContentDetailBase';
+import { ConfirmType, default as ConfirmDialog } from '../../Shared/Dialogs/ConfirmDialog';
 import ProgressDialog from '../../Shared/Dialogs/ProgressDialog';
 
 @Component({
@@ -54,7 +54,7 @@ import ProgressDialog from '../../Shared/Dialogs/ProgressDialog';
         'progress-dialog': ProgressDialog,
     }
 })
-export default class DbBlock extends ContentSubViewBase {
+export default class DbBlock extends ContentDetailBase {
 
     protected readonly tabId: string = 'subtab-db';
     protected readonly linkId: string = 'nav-db';

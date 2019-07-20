@@ -1,14 +1,15 @@
 import Component from 'vue-class-component';
+import Libraries from '../Libraries';
+import { default as SettingsStore, IUpdateProgress } from '../Models/Settings/SettingsStore';
 import Exception from '../Utils/Exception';
-import { IContentView } from './Bases/ContentViewBase';
+import { default as IContent, Contents, IContentArgs, IContentOrderedArgs } from './Bases/IContent';
+import { IContentDetailArgs } from './Bases/IContentDetail';
 import ViewBase from './Bases/ViewBase';
 import Finder from './Finders/Finder';
-import { default as HeaderBar, IContentDetailArgs } from './HeaderBars/HeaderBar';
+import { default as HeaderBar } from './HeaderBars/HeaderBar';
 import Playlists from './Playlists/Playlists';
 import Settings from './Settings/Settings';
-import { default as Sidebar, IContentArgs, IContentOrderedArgs, Pages } from './Sidebars/Sidebar';
-import { default as SettingsStore, IUpdateProgress } from '../Models/Settings/SettingsStore';
-import Libraries from '../Libraries';
+import Sidebar from './Sidebars/Sidebar';
 
 @Component({
     template: `<div class="wrapper" style="height: 100%; min-height: 100%;">
@@ -59,7 +60,7 @@ export default class RootView extends ViewBase {
     }
 
     private isMopidyConnectable: boolean = false;
-    private activeContent: IContentView;
+    private activeContent: IContent;
     private viewport = Libraries.ResponsiveBootstrapToolkit;
 
     private get HeaderBar(): HeaderBar {
@@ -93,15 +94,15 @@ export default class RootView extends ViewBase {
         await Promise.all(promises);
 
         const isDbUpdating = (updateProgress.UpdateType !== 'None');
-        const page = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
-            ? Pages.Settings
-            : Pages.Finder;
+        const content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
+            ? Contents.Settings
+            : Contents.Finder;
 
-        this.Sidebar.SetNavigation(page);
+        this.Sidebar.SetNavigation(content);
         this.isMopidyConnectable = store.Entity.IsMopidyConnectable;
 
         const args: IContentArgs = {
-            Page: page
+            Content: content
         }
         this.OnContentChanged(args);
 
@@ -133,15 +134,15 @@ export default class RootView extends ViewBase {
             args.Permitted = this.activeContent.GetIsPermitLeave();
     }
 
-    private GetContentView(args: IContentArgs): IContentView {
-        switch (args.Page) {
-            case Pages.Finder:
+    private GetContentView(args: IContentArgs): IContent {
+        switch (args.Content) {
+            case Contents.Finder:
                 return this.Finder;
                 break;
-            case Pages.Playlists:
+            case Contents.Playlists:
                 return this.Playlists;
                 break;
-            case Pages.Settings:
+            case Contents.Settings:
                 return this.Settings;
                 break;
             default:
@@ -172,14 +173,14 @@ export default class RootView extends ViewBase {
     // #region "詳細機能ごとの表示制御"
 
     private OnDetailOrdered(args: IContentDetailArgs): void {
-        switch (args.Page) {
-            case Pages.Finder:
+        switch (args.Content) {
+            case Contents.Finder:
                 this.Finder.ShowContentDetail(args);
                 break;
-            case Pages.Playlists:
+            case Contents.Playlists:
                 this.Playlists.ShowContentDetail(args);
                 break;
-            case Pages.Settings:
+            case Contents.Settings:
                 this.Settings.ShowContentDetail(args);
                 break;
             default:
