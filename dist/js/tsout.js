@@ -150,7 +150,7 @@ define("EventableBase", ["require", "exports", "lodash"], function (require, exp
     }());
     exports.default = EventableBase;
 });
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "admin-lte/plugins/sweetalert2/sweetalert2", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "../css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy, sweetalert2_1) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "admin-lte/plugins/sweetalert2/sweetalert2", "vue", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "../css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy, sweetalert2_1, vue_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // SweetAlert2 は個別読み込みOK.
@@ -258,6 +258,20 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
             Warning: function (message) { return Libraries.InnerShowToast('warning', message); },
             Error: function (message) { return Libraries.InnerShowToast('error', message); }
         };
+        Libraries.Modal = {
+            Show: function (arg) {
+                var elem = (arg instanceof vue_1.default)
+                    ? arg.$el
+                    : arg;
+                Libraries.$(elem).modal('show');
+            },
+            Hide: function (arg) {
+                var elem = (arg instanceof vue_1.default)
+                    ? arg.$el
+                    : arg;
+                Libraries.$(elem).modal('hide');
+            }
+        };
         return Libraries;
     }());
     exports.default = Libraries;
@@ -286,23 +300,7 @@ define("Utils/Exception", ["require", "exports"], function (require, exports) {
     }());
     exports.default = Exception;
 });
-define("Views/Events/BootstrapEvents", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ModalEvents = {
-        Show: 'show.bs.modal',
-        Shown: 'shown.bs.modal',
-        Hide: 'hide.bs.modal',
-        Hidden: 'hidden.bs.modal'
-    };
-    exports.TabEvents = {
-        Show: 'show.bs.tab',
-        Shown: 'shown.bs.tab',
-        Hide: 'hide.bs.tab',
-        Hidden: 'hidden.bs.tab'
-    };
-});
-define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function (require, exports, _, vue_1) {
+define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function (require, exports, _, vue_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ViewBase = /** @class */ (function (_super) {
@@ -344,10 +342,36 @@ define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function
             return this.initialized;
         };
         return ViewBase;
-    }(vue_1.default));
+    }(vue_2.default));
     exports.default = ViewBase;
 });
-define("Views/Bases/ContentViewBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_1) {
+define("Views/Bases/TabViewBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TabViewEvents = {
+        Show: 'Show',
+        Shown: 'Shown',
+        Hide: 'Hide',
+        Hidden: 'Hidden',
+    };
+    var TabViewBase = /** @class */ (function (_super) {
+        __extends(TabViewBase, _super);
+        function TabViewBase() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        TabViewBase.prototype.OnShow = function () {
+        };
+        TabViewBase.prototype.OnShown = function () {
+        };
+        TabViewBase.prototype.OnHide = function () {
+        };
+        TabViewBase.prototype.OnHidden = function () {
+        };
+        return TabViewBase;
+    }(ViewBase_1.default));
+    exports.default = TabViewBase;
+});
+define("Views/Bases/ContentViewBase", ["require", "exports", "Views/Bases/TabViewBase"], function (require, exports, TabViewBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ContentViewBase = /** @class */ (function (_super) {
@@ -356,7 +380,7 @@ define("Views/Bases/ContentViewBase", ["require", "exports", "Views/Bases/ViewBa
             return _super !== null && _super.apply(this, arguments) || this;
         }
         return ContentViewBase;
-    }(ViewBase_1.default));
+    }(TabViewBase_1.default));
     exports.default = ContentViewBase;
 });
 define("Models/Mopidies/IArtist", ["require", "exports"], function (require, exports) {
@@ -3082,7 +3106,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
     }(SelectionList_1.default));
     exports.default = AlbumList;
 });
-define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Artists/Artist"], function (require, exports, StoreBase_2, Artist_3) {
+define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Artists/Artist", "Utils/Exception"], function (require, exports, StoreBase_2, Artist_3, Exception_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistStore = /** @class */ (function (_super) {
@@ -3090,6 +3114,21 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
         function ArtistStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        ArtistStore.prototype.Exists = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Artist/Exists')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_10.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
         ArtistStore.prototype.GetList = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 var response, result;
@@ -3099,7 +3138,7 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                throw new Error('Unexpected Error on ApiQuery');
+                                Exception_10.default.Throw('Unexpected Error on ApiQuery', response.Errors);
                             result = response.Result;
                             result.ResultList = Artist_3.default.CreateArray(result.ResultList);
                             return [2 /*return*/, result];
@@ -3244,7 +3283,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
     }(SelectionList_2.default));
     exports.default = ArtistList;
 });
-define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Genres/Genre"], function (require, exports, StoreBase_3, Genre_1) {
+define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Genres/Genre", "Utils/Exception"], function (require, exports, StoreBase_3, Genre_1, Exception_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreStore = /** @class */ (function (_super) {
@@ -3252,6 +3291,21 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
         function GenreStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        GenreStore.prototype.Exists = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Genre/Exists')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_11.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
         GenreStore.prototype.GetList = function (args) {
             return __awaiter(this, void 0, void 0, function () {
                 var response, result;
@@ -3261,7 +3315,7 @@ define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBas
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                throw new Error('Unexpected Error on ApiQuery');
+                                Exception_11.default.Throw('Unexpected Error on ApiQuery', response.Errors);
                             result = response.Result;
                             result.ResultList = Genre_1.default.CreateArray(result.ResultList);
                             return [2 /*return*/, result];
@@ -3485,10 +3539,15 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
             this._serverAddress = null;
             this._serverPort = null;
             this._isBusy = false;
+            this._isMopidyConnectable = false;
         }
-        Settings.Get = function () {
-            return Settings._entity;
-        };
+        Object.defineProperty(Settings, "Entity", {
+            get: function () {
+                return Settings._entity;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Settings.Apply = function (newSettings) {
             this._entity._serverAddress = newSettings.ServerAddress;
             this._entity._serverPort = newSettings.ServerPort;
@@ -3514,15 +3573,25 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Settings.prototype, "IsMopidyConnectable", {
+            get: function () {
+                return this._isMopidyConnectable;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Settings.prototype.SetBusy = function (isBusy) {
             this._isBusy = isBusy;
+        };
+        Settings.prototype.SetMopidyConnectable = function (isConnectable) {
+            this._isMopidyConnectable = isConnectable;
         };
         Settings._entity = new Settings();
         return Settings;
     }());
     exports.default = Settings;
 });
-define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Utils/Exception", "Models/Settings/Settings"], function (require, exports, JsonRpcQueryableBase_3, Exception_10, Settings_1) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Utils/Exception", "Models/Settings/Settings"], function (require, exports, JsonRpcQueryableBase_3, Exception_12, Settings_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -3570,7 +3639,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                 IsShuffle: false,
                 IsRepeat: false
             };
-            _this._settingsEntity = Settings_1.default.Get();
+            _this._settingsEntity = Settings_1.default.Entity;
             return _this;
         }
         Object.defineProperty(Monitor.prototype, "TlId", {
@@ -3690,8 +3759,10 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (this._settingsEntity.IsBusy)
+                            if (this._settingsEntity.IsBusy
+                                || !this._settingsEntity.IsMopidyConnectable) {
                                 return [2 /*return*/];
+                            }
                             this._nowOnPollingProsess = true;
                             _a.label = 1;
                         case 1:
@@ -3758,7 +3829,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                             return [3 /*break*/, 15];
                         case 14:
                             ex_1 = _a.sent();
-                            Exception_10.default.Dump('Polling Error', ex_1);
+                            Exception_12.default.Dump('Polling Error', ex_1);
                             return [3 /*break*/, 15];
                         case 15:
                             this._nowOnPollingProsess = false;
@@ -4158,7 +4229,23 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_7.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_11, Libraries_11, Exception_11, ViewBase_8, PlayerPanel_2) {
+define("Views/Events/BootstrapEvents", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ModalEvents = {
+        Show: 'show.bs.modal',
+        Shown: 'shown.bs.modal',
+        Hide: 'hide.bs.modal',
+        Hidden: 'hidden.bs.modal'
+    };
+    exports.TabEvents = {
+        Show: 'show.bs.tab',
+        Shown: 'shown.bs.tab',
+        Hide: 'hide.bs.tab',
+        Hidden: 'hidden.bs.tab'
+    };
+});
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/ViewBase", "Views/Sidebars/PlayerPanel", "Views/Events/BootstrapEvents", "Views/Bases/TabViewBase"], function (require, exports, vue_class_component_11, Libraries_11, Exception_13, ViewBase_8, PlayerPanel_2, BootstrapEvents_1, TabViewBase_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Pages;
@@ -4207,6 +4294,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
         });
         Sidebar.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
@@ -4218,6 +4306,54 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                             this.finderTabAnchor = Libraries_11.default.$(this.FinderAnchor);
                             this.playlistsTabAnchor = Libraries_11.default.$(this.PlaylistsAnchor);
                             this.settingsTabAnchor = Libraries_11.default.$(this.SettingsAnchor);
+                            this.finderTabAnchor.on(BootstrapEvents_1.TabEvents.Show, function () {
+                                var args = { Page: Pages.Finder };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Show, args);
+                            });
+                            this.finderTabAnchor.on(BootstrapEvents_1.TabEvents.Shown, function () {
+                                var args = { Page: Pages.Finder };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Shown, args);
+                            });
+                            this.finderTabAnchor.on(BootstrapEvents_1.TabEvents.Hide, function () {
+                                var args = { Page: Pages.Finder };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Hide, args);
+                            });
+                            this.finderTabAnchor.on(BootstrapEvents_1.TabEvents.Hidden, function () {
+                                var args = { Page: Pages.Finder };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Hidden, args);
+                            });
+                            this.playlistsTabAnchor.on(BootstrapEvents_1.TabEvents.Show, function () {
+                                var args = { Page: Pages.Playlists };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Show, args);
+                            });
+                            this.playlistsTabAnchor.on(BootstrapEvents_1.TabEvents.Shown, function () {
+                                var args = { Page: Pages.Playlists };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Shown, args);
+                            });
+                            this.playlistsTabAnchor.on(BootstrapEvents_1.TabEvents.Hide, function () {
+                                var args = { Page: Pages.Playlists };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Hide, args);
+                            });
+                            this.playlistsTabAnchor.on(BootstrapEvents_1.TabEvents.Hidden, function () {
+                                var args = { Page: Pages.Playlists };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Hidden, args);
+                            });
+                            this.settingsTabAnchor.on(BootstrapEvents_1.TabEvents.Show, function () {
+                                var args = { Page: Pages.Settings };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Show, args);
+                            });
+                            this.settingsTabAnchor.on(BootstrapEvents_1.TabEvents.Shown, function () {
+                                var args = { Page: Pages.Settings };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Shown, args);
+                            });
+                            this.settingsTabAnchor.on(BootstrapEvents_1.TabEvents.Hide, function () {
+                                var args = { Page: Pages.Settings };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Hide, args);
+                            });
+                            this.settingsTabAnchor.on(BootstrapEvents_1.TabEvents.Hidden, function () {
+                                var args = { Page: Pages.Settings };
+                                _this.$emit(TabViewBase_2.TabViewEvents.Hidden, args);
+                            });
                             return [2 /*return*/, true];
                     }
                 });
@@ -4235,7 +4371,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                     this.settingsTabAnchor.tab(Sidebar_1.ShowTabMethod);
                     break;
                 default:
-                    Exception_11.default.Throw('Unexpected Page Ordered.', page);
+                    Exception_13.default.Throw('Unexpected Page Ordered.', page);
             }
         };
         Sidebar.prototype.OnClickFinder = function (ev) {
@@ -4319,7 +4455,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
     }(ViewBase_9.default));
     exports.default = HeaderBar;
 });
-define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Models/Playlists/Playlist", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_13, Libraries_12, Playlist_2, ViewBase_10, BootstrapEvents_1) {
+define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Models/Playlists/Playlist", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_13, Libraries_12, Playlist_2, ViewBase_10, BootstrapEvents_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AddModalEvents = {
@@ -4361,8 +4497,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            this.modal = Libraries_12.default.$(this.$el);
-                            this.modal.on(BootstrapEvents_1.ModalEvents.Shown, function () {
+                            Libraries_12.default.$(this.$el).on(BootstrapEvents_2.ModalEvents.Shown, function () {
                                 _this.TextName.focus();
                             });
                             return [2 /*return*/, true];
@@ -4395,10 +4530,10 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
                 this.DivValidatable.classList.remove('was-validated');
             this.errorMessage = '';
             this.TextName.value = '';
-            this.modal.modal('show');
+            Libraries_12.default.Modal.Show(this);
         };
         AddModal.prototype.Hide = function () {
-            this.modal.modal('hide');
+            Libraries_12.default.Modal.Hide(this);
         };
         AddModal.prototype.GetName = function () {
             return this.TextName.value;
@@ -4779,19 +4914,6 @@ define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-c
             return _this;
         }
         ConfirmDialog_1 = ConfirmDialog;
-        ConfirmDialog.prototype.Initialize = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
-                        case 1:
-                            _a.sent();
-                            this.modal = Libraries_15.default.$(this.$el);
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
         ConfirmDialog.prototype.OnClickOk = function () {
             this.Resolve(true);
         };
@@ -4803,7 +4925,7 @@ define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-c
                 this.resolver(result);
             }
             this.resolver = null;
-            this.modal.modal('hide');
+            Libraries_15.default.Modal.Hide(this);
         };
         ConfirmDialog.prototype.SetConfirmType = function (confirmType) {
             this.modalClasses = ConfirmDialog_1.ModalBaseClass + " " + confirmType.toString();
@@ -4817,7 +4939,7 @@ define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-c
         ConfirmDialog.prototype.Confirm = function () {
             var _this = this;
             return new Promise(function (resolve) {
-                _this.modal.modal('show');
+                Libraries_15.default.Modal.Show(_this);
                 _this.resolver = resolve;
             });
         };
@@ -5691,7 +5813,34 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
     }(ContentViewBase_2.default));
     exports.default = Playlists;
 });
-define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings", "Utils/Exception"], function (require, exports, JsonRpcQueryableBase_5, Settings_2, Exception_12) {
+define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase", "Utils/Exception"], function (require, exports, StoreBase_4, Exception_14) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AlbumStore = /** @class */ (function (_super) {
+        __extends(AlbumStore, _super);
+        function AlbumStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        AlbumStore.prototype.Exists = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Album/Exists')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_14.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        return AlbumStore;
+    }(StoreBase_4.default));
+    exports.default = AlbumStore;
+});
+define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings", "Utils/Exception", "Models/Genres/GenreStore", "Models/Artists/ArtistStore", "Models/Albums/AlbumStore"], function (require, exports, JsonRpcQueryableBase_5, Settings_2, Exception_15, GenreStore_2, ArtistStore_2, AlbumStore_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SettingsStore = /** @class */ (function (_super) {
@@ -5699,6 +5848,13 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
         function SettingsStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Object.defineProperty(SettingsStore.prototype, "Entity", {
+            get: function () {
+                return Settings_2.default.Entity;
+            },
+            enumerable: true,
+            configurable: true
+        });
         SettingsStore.prototype.Get = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var response;
@@ -5708,9 +5864,9 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                Exception_12.default.Throw('SettingStore.Get: Unexpected Error.', response.Errors);
+                                Exception_15.default.Throw('SettingStore.Get: Unexpected Error.', response.Errors);
                             Settings_2.default.Apply(response.Result);
-                            return [2 /*return*/, Settings_2.default.Get()];
+                            return [2 /*return*/, Settings_2.default.Entity];
                     }
                 });
             });
@@ -5724,7 +5880,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
-                                Exception_12.default.Dump('SettingStore.Update: Unexpected Error.', response.Errors);
+                                Exception_15.default.Dump('SettingStore.Update: Unexpected Error.', response.Errors);
                                 return [2 /*return*/, false];
                             }
                             updated = response.Result;
@@ -5743,44 +5899,47 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (response.error)
-                                Exception_12.default.Dump(response.error);
-                            return [2 /*return*/, !(response.error)];
+                                Exception_15.default.Dump(response.error);
+                            Settings_2.default.Entity.SetMopidyConnectable(!(response.error));
+                            return [2 /*return*/, Settings_2.default.Entity.IsMopidyConnectable];
                     }
                 });
             });
         };
-        SettingsStore.prototype.RefreshDatabase = function () {
+        SettingsStore.prototype.ExistsData = function () {
+            var genreStore = new GenreStore_2.default();
+            var artistStore = new ArtistStore_2.default();
+            var albumStore = new AlbumStore_1.default();
+            var existsGenres = false;
+            var existsArtists = false;
+            var existsAlbums = false;
+            var promises = [];
+            promises.push(genreStore.Exists().then(function (res) { existsGenres = res; }));
+            promises.push(artistStore.Exists().then(function (res) { existsArtists = res; }));
+            promises.push(albumStore.Exists().then(function (res) { existsAlbums = res; }));
+            // なぜか、Promise.all をawait した後で各bool値を比較しようとすると
+            // "常にfalseになるぞ"警告が出る。
+            // Promiseをまだきちんと理解してない...？
+            return Promise.all(promises)
+                .then(function () {
+                return (existsGenres === true
+                    && existsArtists === true
+                    && existsAlbums === true);
+            });
+        };
+        SettingsStore.prototype.GetAlbumScanProgress = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var response;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Settings/Refresh')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_12.default.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
-                            return [2 /*return*/, response.Succeeded];
-                    }
-                });
-            });
-        };
-        SettingsStore.prototype.GetRefreshProgress = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var a, response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            a = 1;
-                            return [4 /*yield*/, this.QueryGet('Settings/Refresh')];
+                        case 0: return [4 /*yield*/, this.QueryGet('Settings/AlbumScanProgress')];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
-                                Exception_12.default.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+                                Exception_15.default.Dump('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
                                 return [2 /*return*/, {
-                                        Finished: true,
-                                        Succeeded: false,
-                                        Progress: 0,
-                                        Message: 'Unexpected Error'
+                                        TotalAlbumCount: -1,
+                                        ScannedAlbumCount: -1
                                     }];
                             }
                             return [2 /*return*/, response.Result];
@@ -5788,35 +5947,50 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                 });
             });
         };
-        SettingsStore.prototype.UpdateDatabase = function () {
+        SettingsStore.prototype.DbScanNew = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var response;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Settings/Update')];
+                        case 0: return [4 /*yield*/, this.QueryPost('Settings/DbScanNew')];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                Exception_12.default.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+                                Exception_15.default.Dump('SettingsStore.DbScanNew: Unexpected Error.', response.Errors);
                             return [2 /*return*/, response.Succeeded];
                     }
                 });
             });
         };
-        SettingsStore.prototype.GetUpdateProgress = function () {
+        SettingsStore.prototype.DbCleanup = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Settings/DbCleanup')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_15.default.Dump('SettingsStore.DbCleanup: Unexpected Error.', response.Errors);
+                            return [2 /*return*/, response.Succeeded];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.GetDbUpdateProgress = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var a, response;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
                             a = 1;
-                            return [4 /*yield*/, this.QueryGet('Settings/Update')];
+                            return [4 /*yield*/, this.QueryGet('Settings/UpdateProgress')];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
-                                Exception_12.default.Dump('SettingsStore.Refresh: Unexpected Error.', response.Errors);
+                                Exception_15.default.Dump('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
                                 return [2 /*return*/, {
-                                        Finished: true,
+                                        IsRunning: false,
                                         Succeeded: false,
                                         Progress: 0,
                                         Message: 'Unexpected Error'
@@ -5851,24 +6025,11 @@ define("Views/Shared/Dialogs/ProgressDialog", ["require", "exports", "vue-class-
             enumerable: true,
             configurable: true
         });
-        ProgressDialog.prototype.Initialize = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
-                        case 1:
-                            _a.sent();
-                            this.modal = Libraries_18.default.$(this.$el);
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
         ProgressDialog.prototype.Show = function (title) {
             this.mainMessage = title;
             this.progress = 0;
             this.currentMessage = '';
-            this.modal.modal('show');
+            Libraries_18.default.Modal.Show(this);
         };
         ProgressDialog.prototype.SetUpdate = function (progressPercent, message) {
             if (message === void 0) { message = null; }
@@ -5879,7 +6040,7 @@ define("Views/Shared/Dialogs/ProgressDialog", ["require", "exports", "vue-class-
                 this.currentMessage = message;
         };
         ProgressDialog.prototype.Hide = function () {
-            this.modal.modal('hide');
+            Libraries_18.default.Modal.Hide(this);
         };
         ProgressDialog = __decorate([
             vue_class_component_19.default({
@@ -5900,8 +6061,11 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         __extends(Settings, _super);
         function Settings() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.isConnectable = false;
+            _this.totalAlbumCount = 0;
+            _this.scanedAlbumCount = 0;
+            _this.resolver = null;
             _this.timer = null;
+            _this.nowPolling = false;
             _this.disabled = 'disabled';
             _this.connectionClasses = {
                 True: {
@@ -5913,7 +6077,6 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                     Wrapper: 'connection-icon notconnectable'
                 }
             };
-            _this.nowPolling = false;
             return _this;
             // #endregion
         }
@@ -5945,16 +6108,23 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Settings.prototype, "RefreshButton", {
+        Object.defineProperty(Settings.prototype, "ScanNewButton", {
             get: function () {
-                return this.$refs.RefreshButton;
+                return this.$refs.ScanNewButton;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Settings.prototype, "UpdateButton", {
+        Object.defineProperty(Settings.prototype, "CleanupButton", {
             get: function () {
-                return this.$refs.UpdateButton;
+                return this.$refs.CleanupButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "AlbumScanProgressBar", {
+            get: function () {
+                return this.$refs.AlbumScanProgressBar;
             },
             enumerable: true,
             configurable: true
@@ -5995,10 +6165,14 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             this.ServerAddressInput.value = this.entity.ServerAddress;
                             this.ServerPortInput.value = this.entity.ServerPort.toString();
                             this.Update();
+                            this.SetTrackScanProgress();
                             return [2 /*return*/, true];
                     }
                 });
             });
+        };
+        Settings.prototype.OnShow = function () {
+            this.SetTrackScanProgress();
         };
         Settings.prototype.OnServerAddressInput = function () {
             this.lazyUpdater.Exec();
@@ -6008,9 +6182,9 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         };
         Settings.prototype.Update = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var address, portString, port, update, _a;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var address, portString, port, update, exists;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0:
                             address = this.ServerAddressInput.value;
                             portString = this.ServerPortInput.value;
@@ -6029,15 +6203,14 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             };
                             return [4 /*yield*/, this.store.Update(update)];
                         case 1:
-                            if ((_b.sent()) !== true) {
+                            if ((_a.sent()) !== true) {
                                 Libraries_19.default.ShowToast.Error('Update Failed...');
                                 return [2 /*return*/, false];
                             }
-                            _a = this;
                             return [4 /*yield*/, this.store.TryConnect()];
                         case 2:
-                            _a.isConnectable = _b.sent();
-                            if (this.isConnectable === true) {
+                            _a.sent();
+                            if (this.entity.IsMopidyConnectable === true) {
                                 Libraries_19.default.ShowToast.Success('Mopidy Found!');
                                 this.$emit(exports.SettingsEvents.ServerFound);
                             }
@@ -6046,7 +6219,15 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             }
                             this.SetConnectionIcon();
                             this.SetButtons();
-                            return [2 /*return*/, this.isConnectable];
+                            if (!(this.entity.IsMopidyConnectable && this.timer === null)) return [3 /*break*/, 4];
+                            return [4 /*yield*/, this.store.ExistsData()];
+                        case 3:
+                            exists = _a.sent();
+                            if (!exists) {
+                                this.InitialScan();
+                            }
+                            _a.label = 4;
+                        case 4: return [2 /*return*/, this.entity.IsMopidyConnectable];
                     }
                 });
             });
@@ -6054,7 +6235,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         Settings.prototype.SetConnectionIcon = function () {
             var wrapperClasses = this.IconWrapper.classList;
             var iconClasses = this.Icon.classList;
-            if (this.isConnectable === true) {
+            if (this.entity.IsMopidyConnectable === true) {
                 this.IconWrapper.className = this.connectionClasses.True.Wrapper;
                 this.Icon.className = this.connectionClasses.True.Icon;
             }
@@ -6064,34 +6245,88 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             }
         };
         Settings.prototype.SetButtons = function () {
-            var refreshClasses = this.RefreshButton.classList;
-            var updateClasses = this.UpdateButton.classList;
-            if (this.isConnectable === true) {
-                if (refreshClasses.contains(this.disabled))
-                    refreshClasses.remove(this.disabled);
-                if (updateClasses.contains(this.disabled))
-                    updateClasses.remove(this.disabled);
+            var scanNewClasses = this.ScanNewButton.classList;
+            var cleanupClasses = this.CleanupButton.classList;
+            if (this.entity.IsMopidyConnectable === true) {
+                if (scanNewClasses.contains(this.disabled))
+                    scanNewClasses.remove(this.disabled);
+                if (cleanupClasses.contains(this.disabled))
+                    cleanupClasses.remove(this.disabled);
             }
             else {
-                if (!refreshClasses.contains(this.disabled))
-                    refreshClasses.add(this.disabled);
-                if (!updateClasses.contains(this.disabled))
-                    updateClasses.add(this.disabled);
+                if (!scanNewClasses.contains(this.disabled))
+                    scanNewClasses.add(this.disabled);
+                if (!cleanupClasses.contains(this.disabled))
+                    cleanupClasses.add(this.disabled);
             }
         };
-        Settings.prototype.OnUpdateButtonClicked = function () {
+        Settings.prototype.SetTrackScanProgress = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var progress, rate;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.store.GetAlbumScanProgress()];
+                        case 1:
+                            progress = _a.sent();
+                            this.totalAlbumCount = progress.TotalAlbumCount;
+                            this.scanedAlbumCount = progress.ScannedAlbumCount;
+                            rate = progress.ScannedAlbumCount / progress.TotalAlbumCount * 100;
+                            this.AlbumScanProgressBar.setAttribute('style', "width: " + rate + "%;");
+                            this.AlbumScanProgressBar.setAttribute('aria-valuenow', rate.toString());
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        Settings.prototype.InitialScan = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (this.isConnectable !== true) {
+                            if (this.entity.IsMopidyConnectable !== true) {
+                                Libraries_19.default.ShowToast.Error('Mopidy Not Found...');
+                                return [2 /*return*/];
+                            }
+                            this.ConfirmDialog.SetConfirmType(ConfirmDialog_3.ConfirmType.Normal);
+                            this.ConfirmDialog.SetBody('Finder Database Initialize', [
+                                'Mopidy found! but Finder-Data is not Initialized.',
+                                '',
+                                'Let\'s Scan New Albums for Finder Database Now!',
+                                '',
+                                'This operation may take about 10 minutes or more.',
+                                'It is necessary to Finder use.',
+                                '',
+                                'Are you OK?'
+                            ]);
+                            return [4 /*yield*/, this.ConfirmDialog.Confirm()];
+                        case 1:
+                            result = _a.sent();
+                            if (!result)
+                                return [2 /*return*/];
+                            this.TryScanNew();
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        // #region "Database Maintenance"
+        Settings.prototype.OnScanNewButtonClicked = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (this.entity.IsMopidyConnectable !== true) {
                                 Libraries_19.default.ShowToast.Error('Mopidy Not Found...');
                                 return [2 /*return*/];
                             }
                             this.ConfirmDialog.SetConfirmType(ConfirmDialog_3.ConfirmType.Warning);
-                            this.ConfirmDialog.SetBody('Update Mopidy.Finder Database?', [
+                            this.ConfirmDialog.SetBody('Scan New Albums?', [
                                 'Scan New Albums, and Add to Finder Database.',
+                                '',
+                                '* If you added new albums, You need to scan by mopidy first.',
+                                '* ex) # sudo mopidyctl local scan',
                                 '',
                                 'This operation can take a very long time, ',
                                 'depending on the number of songs, or the device it\'s running.',
@@ -6103,76 +6338,49 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             result = _a.sent();
                             if (!result)
                                 return [2 /*return*/];
-                            this.TryUpdate();
+                            this.TryScanNew();
                             return [2 /*return*/];
                     }
                 });
             });
         };
-        Settings.prototype.TryUpdate = function () {
+        Settings.prototype.TryScanNew = function () {
             var _this = this;
             return new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
                 var result;
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            this.entity.SetBusy(true);
-                            this.ProgressDialog.Show('Database Updating...');
-                            return [4 /*yield*/, this.store.UpdateDatabase()];
+                        case 0: return [4 /*yield*/, this.store.DbScanNew()];
                         case 1:
                             result = _a.sent();
-                            if (result !== true) {
-                                this.ProgressDialog.Hide();
-                                Libraries_19.default.ShowToast.Error('Update Order Failed...');
+                            if (result === true) {
+                                this.resolver = resolve;
+                                this.ShowProgress('Scannin New Albums...');
+                                return [2 /*return*/, true];
+                            }
+                            else {
+                                this.entity.SetBusy(false);
+                                Libraries_19.default.ShowToast.Error('Cleanup Order Failed...');
                                 return [2 /*return*/, false];
                             }
-                            this.timer = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
-                                var status;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            if (this.nowPolling)
-                                                return [2 /*return*/];
-                                            this.nowPolling = true;
-                                            return [4 /*yield*/, this.store.GetUpdateProgress()];
-                                        case 1:
-                                            status = _a.sent();
-                                            this.nowPolling = false;
-                                            if (status.Finished) {
-                                                clearInterval(this.timer);
-                                                this.timer = null;
-                                                this.entity.SetBusy(false);
-                                                this.ProgressDialog.Hide();
-                                                (status.Succeeded)
-                                                    ? Libraries_19.default.ShowToast.Success('Database Updated!')
-                                                    : Libraries_19.default.ShowToast.Error('Update Failed...');
-                                                resolve(status.Succeeded);
-                                                return [2 /*return*/, status.Succeeded];
-                                            }
-                                            this.ProgressDialog.SetUpdate(status.Progress, status.Message);
-                                            return [2 /*return*/, true];
-                                    }
-                                });
-                            }); }, 1000);
                             return [2 /*return*/];
                     }
                 });
             }); });
         };
-        Settings.prototype.OnRefreshButtonClicked = function () {
+        Settings.prototype.OnCleanupButtonClicked = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (this.isConnectable !== true) {
+                            if (this.entity.IsMopidyConnectable !== true) {
                                 Libraries_19.default.ShowToast.Error('Mopidy Not Found...');
                                 return [2 /*return*/];
                             }
                             this.ConfirmDialog.SetConfirmType(ConfirmDialog_3.ConfirmType.Danger);
-                            this.ConfirmDialog.SetBody('Refresh Mopidy.Finder Database?', [
-                                'Mopidy.Finder\'s Database is Deleted & Refreshed.',
+                            this.ConfirmDialog.SetBody('Cleanup Mopidy.Finder Database?', [
+                                'Mopidy.Finder\'s Database is Deleted & Re-Scanned.',
                                 '',
                                 'This operation can take a very long time, ',
                                 'depending on the number of songs, or the device it\'s running.',
@@ -6194,53 +6402,78 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             var _this = this;
             return new Promise(function (resolve) { return __awaiter(_this, void 0, void 0, function () {
                 var result;
-                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            this.entity.SetBusy(true);
-                            this.ProgressDialog.Show('Database Refreshing...');
-                            return [4 /*yield*/, this.store.RefreshDatabase()];
+                        case 0: return [4 /*yield*/, this.store.DbCleanup()];
                         case 1:
                             result = _a.sent();
-                            if (result !== true) {
-                                this.ProgressDialog.Hide();
-                                Libraries_19.default.ShowToast.Error('Refresh Order Failed...');
+                            if (result === true) {
+                                this.resolver = resolve;
+                                this.ShowProgress('Cleanuping Database...');
+                                return [2 /*return*/, true];
+                            }
+                            else {
+                                Libraries_19.default.ShowToast.Error('Scan Order Failed...');
                                 return [2 /*return*/, false];
                             }
-                            this.timer = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
-                                var status;
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            if (this.nowPolling)
-                                                return [2 /*return*/];
-                                            this.nowPolling = true;
-                                            return [4 /*yield*/, this.store.GetRefreshProgress()];
-                                        case 1:
-                                            status = _a.sent();
-                                            this.nowPolling = false;
-                                            if (status.Finished) {
-                                                clearInterval(this.timer);
-                                                this.timer = null;
-                                                this.entity.SetBusy(false);
-                                                this.ProgressDialog.Hide();
-                                                (status.Succeeded)
-                                                    ? Libraries_19.default.ShowToast.Success('Database Refreshed!')
-                                                    : Libraries_19.default.ShowToast.Error('Refresh Failed...');
-                                                resolve(status.Succeeded);
-                                                return [2 /*return*/, status.Succeeded];
-                                            }
-                                            this.ProgressDialog.SetUpdate(status.Progress, status.Message);
-                                            return [2 /*return*/, true];
-                                    }
-                                });
-                            }); }, 1000);
                             return [2 /*return*/];
                     }
                 });
             }); });
         };
+        Settings.prototype.ShowProgress = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                var title;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    if (this.timer !== null) {
+                        Libraries_19.default.ShowToast.Error('Already Processing...');
+                        return [2 /*return*/, false];
+                    }
+                    this.entity.SetBusy(true);
+                    title = (typeof args === 'string')
+                        ? args
+                        : ((args.UpdateType === 'Cleanup')
+                            ? 'Cleanuping Database...'
+                            : 'Scannin New Albums...');
+                    this.ProgressDialog.Show(title);
+                    this.timer = setInterval(function () { return __awaiter(_this, void 0, void 0, function () {
+                        var status;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    if (this.nowPolling)
+                                        return [2 /*return*/];
+                                    this.nowPolling = true;
+                                    return [4 /*yield*/, this.store.GetDbUpdateProgress()];
+                                case 1:
+                                    status = _a.sent();
+                                    this.nowPolling = false;
+                                    if (status.IsRunning) {
+                                        this.ProgressDialog.SetUpdate(status.Progress, status.Message);
+                                        return [2 /*return*/, false];
+                                    }
+                                    else {
+                                        clearInterval(this.timer);
+                                        this.timer = null;
+                                        this.ProgressDialog.Hide();
+                                        this.entity.SetBusy(false);
+                                        (status.Succeeded)
+                                            ? Libraries_19.default.ShowToast.Success('Database Updated!')
+                                            : Libraries_19.default.ShowToast.Error('Update Failed...');
+                                        if (this.resolver)
+                                            this.resolver(status.Succeeded);
+                                        return [2 /*return*/, true];
+                                    }
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); }, 1000);
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        // #endregion
         // #region "IContentView"
         Settings.prototype.GetIsPermitLeave = function () {
             // DBリフレッシュ中はページ移動NGにする。
@@ -6250,7 +6483,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         };
         Settings = __decorate([
             vue_class_component_20.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Set Your Mopidy</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <div class=\"input-group\">\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">http://</div>\n                                </div>\n                                <input type=\"text\"\n                                    id=\"server_address\"\n                                    maxlength=\"255\"\n                                    class=\"form-control address\"\n                                    placeholder=\"Server Address\"\n                                    ref=\"ServerAddressInput\"\n                                    @input=\"OnServerAddressInput\" />\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">:</div>\n                                </div>\n                                <input type=\"number\"\n                                    maxlength=\"5\"\n                                    class=\"form-control port\"\n                                    placeholder=\"Server Port\"\n                                    ref=\"ServerPortInput\"\n                                    @input=\"OnServerPortInput\" />\n                                <div class=\"input-group-append\">\n                                    <div class=\"input-group-text\">/mopidy/</div>\n                                </div>\n                                <span class=\"connection-icon\"\n                                    ref=\"IconWrapper\">\n                                    <i class=\"\"\n                                        ref=\"Icon\"/>\n                                </span>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Refresh Relation Data</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <p>\n                                Scan New Albums.<br/>\n                                The data in <strong>Mopidy Itself is not affected.</strong>\n                            </p>\n                            <button class=\"btn btn-app btn-outline-warning disabled\"\n                                @click=\"OnUpdateButtonClicked\"\n                                ref=\"UpdateButton\">\n                                <i class=\"fa fa-search-plus\"></i> Update\n                            </button>\n                        </div>\n                        <div class=\"col-auto ml-4\">\n                            <p>\n                                Delete and Refresh <strong>Mopidy.Finder's Database.</strong><br/>\n                                The data in <strong>Mopidy Itself is not affected.</strong>\n                            </p>\n                            <button class=\"btn btn-app btn-outline-warning disabled\"\n                                @click=\"OnRefreshButtonClicked\"\n                                ref=\"RefreshButton\">\n                                <i class=\"fa fa-refresh\"></i> Delete &amp; Refresh\n                            </button>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <confirm-dialog\n        ref=\"ConfirmDialog\" />\n    <progress-dialog\n        ref=\"ProgressDialog\" />\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"settings-tab\">\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Set Your Mopidy</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <div class=\"input-group\">\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">http://</div>\n                                </div>\n                                <input type=\"text\"\n                                    id=\"server_address\"\n                                    maxlength=\"255\"\n                                    class=\"form-control address\"\n                                    placeholder=\"Server Address\"\n                                    ref=\"ServerAddressInput\"\n                                    @input=\"OnServerAddressInput\" />\n                                <div class=\"input-group-prepend\">\n                                    <div class=\"input-group-text\">:</div>\n                                </div>\n                                <input type=\"number\"\n                                    maxlength=\"5\"\n                                    class=\"form-control port\"\n                                    placeholder=\"Server Port\"\n                                    ref=\"ServerPortInput\"\n                                    @input=\"OnServerPortInput\" />\n                                <div class=\"input-group-append\">\n                                    <div class=\"input-group-text\">/mopidy/</div>\n                                </div>\n                                <span class=\"connection-icon\"\n                                    ref=\"IconWrapper\">\n                                    <i class=\"\"\n                                        ref=\"Icon\"/>\n                                </span>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Refresh Relation Data</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"form-row\">\n                        <div class=\"col-auto\">\n                            <p>\n                                Scan New Albums.<br/>\n                                The data in <strong>Mopidy Itself is not affected.</strong>\n                            </p>\n                            <button class=\"btn btn-app btn-outline-warning disabled\"\n                                @click=\"OnScanNewButtonClicked\"\n                                ref=\"ScanNewButton\">\n                                <i class=\"fa fa-search-plus\"></i> Scan New\n                            </button>\n                        </div>\n                        <div class=\"col-auto ml-4\">\n                            <p>\n                                Delete and Refresh <strong>Mopidy.Finder's Database.</strong><br/>\n                                The data in <strong>Mopidy Itself is not affected.</strong>\n                            </p>\n                            <button class=\"btn btn-app btn-outline-warning disabled\"\n                                @click=\"OnCleanupButtonClicked\"\n                                ref=\"CleanupButton\">\n                                <i class=\"fa fa-refresh\"></i> Cleanup\n                            </button>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\">\n        <div class=\"col-12\">\n            <div class=\"card\">\n                <div class=\"card-header with-border bg-warning\">\n                    <h3 class=\"card-title\">Album Scan Progress</h3>\n                </div>\n                <div class=\"card-body\">\n                    <div class=\"row\">\n                        <div class=\"col-auto\">\n                            <p>\n                                Mopidy.Finder Backend is always Scanning Album-Images and belonging Tracks.<br/>\n                                This action makes the operation response faster.\n                            </p>\n                            <div class=\"progress\">\n                                <div class=\"progress-bar bg-success progress-bar-striped\"\n                                    role=\"progressbar\"\n                                    aria-valuenow=\"0\"\n                                    aria-valuemin=\"0\"\n                                    aria-valuemax=\"100\"\n                                    ref=\"AlbumScanProgressBar\">\n                                    <span class=\"sr-only\">{{ progress }}% Complete</span>\n                                </div>\n                            </div>\n                            <p>\n                                Total: {{ totalAlbumCount }} Albums.<br/>\n                                Scaned: {{ scanedAlbumCount }} Albums competed.<br/>\n                            </p>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <confirm-dialog\n        ref=\"ConfirmDialog\" />\n    <progress-dialog\n        ref=\"ProgressDialog\" />\n</section>",
                 components: {
                     'confirm-dialog': ConfirmDialog_3.default,
                     'progress-dialog': ProgressDialog_1.default,
@@ -6261,7 +6494,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ContentViewBase_3.default));
     exports.default = Settings;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Exception", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Models/Settings/SettingsStore"], function (require, exports, vue_class_component_21, Exception_13, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2, SettingsStore_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Exception", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Models/Settings/SettingsStore"], function (require, exports, vue_class_component_21, Exception_16, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2, SettingsStore_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -6308,26 +6541,45 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
         });
         RootView.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var store, _a, page, args;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
+                var promises, store, isConnectable, updateProgress, isDbUpdating, page, args, existsData;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
                         case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
-                            _b.sent();
+                            _a.sent();
+                            promises = [];
                             store = new SettingsStore_2.default();
-                            _a = this;
-                            return [4 /*yield*/, store.TryConnect()];
+                            isConnectable = false;
+                            updateProgress = null;
+                            promises.push(store.TryConnect()
+                                .then(function (res) { isConnectable = res; }));
+                            promises.push(store.GetDbUpdateProgress()
+                                .then(function (res) { updateProgress = res; }));
+                            return [4 /*yield*/, Promise.all(promises)];
                         case 2:
-                            _a.isMopidyConnectable = _b.sent();
-                            page = (this.isMopidyConnectable)
-                                ? Sidebar_2.Pages.Finder
-                                : Sidebar_2.Pages.Settings;
+                            _a.sent();
+                            isDbUpdating = (updateProgress.UpdateType !== 'None');
+                            page = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
+                                ? Sidebar_2.Pages.Settings
+                                : Sidebar_2.Pages.Finder;
                             this.Sidebar.SetNavigation(page);
+                            this.isMopidyConnectable = store.Entity.IsMopidyConnectable;
                             args = {
                                 Page: page
                             };
                             this.OnContentChanged(args);
-                            return [2 /*return*/, true];
+                            if (!isDbUpdating) return [3 /*break*/, 3];
+                            this.Settings.ShowProgress(updateProgress);
+                            return [3 /*break*/, 5];
+                        case 3:
+                            if (!store.Entity.IsMopidyConnectable) return [3 /*break*/, 5];
+                            return [4 /*yield*/, store.ExistsData()];
+                        case 4:
+                            existsData = _a.sent();
+                            if (!existsData)
+                                this.Settings.InitialScan();
+                            _a.label = 5;
+                        case 5: return [2 /*return*/, true];
                     }
                 });
             });
@@ -6346,28 +6598,44 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Utils/Ex
             }
         };
         RootView.prototype.OnContentOrdered = function (args) {
-            args.Permitted = this.activeContent.GetIsPermitLeave();
+            if (this.activeContent)
+                args.Permitted = this.activeContent.GetIsPermitLeave();
         };
-        RootView.prototype.OnContentChanged = function (args) {
+        RootView.prototype.GetContentView = function (args) {
             switch (args.Page) {
                 case Sidebar_2.Pages.Finder:
-                    this.activeContent = this.Finder;
+                    return this.Finder;
                     break;
                 case Sidebar_2.Pages.Playlists:
-                    this.activeContent = this.Playlists;
+                    return this.Playlists;
                     break;
                 case Sidebar_2.Pages.Settings:
-                    this.activeContent = this.Settings;
+                    return this.Settings;
                     break;
                 default:
-                    Exception_13.default.Throw('Unexpected Page.', args);
+                    Exception_16.default.Throw('Unexpected Page.', args);
             }
+        };
+        RootView.prototype.OnContentChanged = function (args) {
+            this.activeContent = this.GetContentView(args);
             this.activeContent.InitContent();
             this.HeaderBar.SetHeader(args);
         };
+        RootView.prototype.OnShow = function (args) {
+            this.GetContentView(args).OnShow();
+        };
+        RootView.prototype.OnShown = function (args) {
+            this.GetContentView(args).OnShown();
+        };
+        RootView.prototype.OnHide = function (args) {
+            this.GetContentView(args).OnHide();
+        };
+        RootView.prototype.OnHidden = function (args) {
+            this.GetContentView(args).OnHidden();
+        };
         RootView = __decorate([
             vue_class_component_21.default({
-                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar\n        ref=\"HeaderBar\" />\n    <sidebar\n        @ContentOrdered=\"OnContentOrdered\"\n        @ContentChanged=\"OnContentChanged\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder\n            ref=\"Finder\"\n            @PlaylistUpdated=\"OnPlaylistUpdatedByFinder\" />\n        <playlists\n            ref=\"Playlists\"\n            @PlaylistsUpdated=\"OnPlaylistsUpdatedByPlaylists\" />\n        <settings\n            ref=\"Settings\"\n            @ServerFound=\"OnServerFound\"/>\n    </div>\n</div>",
+                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar\n        ref=\"HeaderBar\" />\n    <sidebar\n        @ContentOrdered=\"OnContentOrdered\"\n        @ContentChanged=\"OnContentChanged\"\n        @Show=\"OnShow\"\n        @Shown=\"OnShown\"\n        @Hide=\"OnHide\"\n        @Hidden=\"OnHidden\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder\n            ref=\"Finder\"\n            @PlaylistUpdated=\"OnPlaylistUpdatedByFinder\" />\n        <playlists\n            ref=\"Playlists\"\n            @PlaylistsUpdated=\"OnPlaylistsUpdatedByPlaylists\" />\n        <settings\n            ref=\"Settings\"\n            @ServerFound=\"OnServerFound\"/>\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
                     'sidebar': Sidebar_2.default,

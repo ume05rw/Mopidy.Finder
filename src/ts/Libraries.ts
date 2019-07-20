@@ -35,6 +35,7 @@ import 'jquery-slimscroll';
 import * as Enumerable from 'linq';
 import * as Mopidy from 'mopidy';
 import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
+import Vue from 'vue';
 
 // SweetAlert2 は個別読み込みOK.
 //import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
@@ -146,6 +147,24 @@ export default class Libraries {
         Question: (message: string): void => Libraries.InnerShowToast('question', message),
         Warning: (message: string): void => Libraries.InnerShowToast('warning', message),
         Error: (message: string): void => Libraries.InnerShowToast('error', message)
+    }
+
+    public static readonly Modal: {
+        Show: (arg: HTMLElement | Vue) => void,
+        Hide: (arg: HTMLElement | Vue) => void
+    } = {
+        Show: (arg: HTMLElement | Vue): void => {
+            const elem = (arg instanceof Vue)
+                ? (arg as Vue).$el as HTMLElement
+                : arg as HTMLElement;
+            Libraries.$(elem).modal('show');
+        },
+        Hide: (arg: HTMLElement | Vue): void => {
+            const elem = (arg instanceof Vue)
+                ? (arg as Vue).$el as HTMLElement
+                : arg as HTMLElement;
+            Libraries.$(elem).modal('hide');
+        }
     }
 
     public static Initialize(): void {

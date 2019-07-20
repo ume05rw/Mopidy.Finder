@@ -3,6 +3,8 @@ import Libraries from '../../Libraries';
 import Exception from '../../Utils/Exception';
 import ViewBase from '../Bases/ViewBase';
 import PlayerPanel from './PlayerPanel';
+import { TabEvents } from '../Events/BootstrapEvents';
+import { TabViewEvents } from '../Bases/TabViewBase';
 
 export enum Pages {
     Finder = 'Finder',
@@ -10,10 +12,10 @@ export enum Pages {
     Settings = 'Settings'
 }
 
-export interface IContentChanged {
+export interface IContentArgs {
     Page: Pages;
 }
-export interface IContentOrdered extends IContentChanged {
+export interface IContentOrderedArgs extends IContentArgs {
     Permitted: boolean;
 }
 
@@ -118,6 +120,58 @@ export default class Sidebar extends ViewBase {
         this.playlistsTabAnchor = Libraries.$(this.PlaylistsAnchor);
         this.settingsTabAnchor = Libraries.$(this.SettingsAnchor);
 
+        this.finderTabAnchor.on(TabEvents.Show, () => {
+            const args: IContentArgs = { Page: Pages.Finder };
+            this.$emit(TabViewEvents.Show, args);
+        });
+        this.finderTabAnchor.on(TabEvents.Shown, () => {
+            const args: IContentArgs = { Page: Pages.Finder };
+            this.$emit(TabViewEvents.Shown, args);
+        });
+        this.finderTabAnchor.on(TabEvents.Hide, () => {
+            const args: IContentArgs = { Page: Pages.Finder };
+            this.$emit(TabViewEvents.Hide, args);
+        });
+        this.finderTabAnchor.on(TabEvents.Hidden, () => {
+            const args: IContentArgs = { Page: Pages.Finder };
+            this.$emit(TabViewEvents.Hidden, args);
+        });
+
+        this.playlistsTabAnchor.on(TabEvents.Show, () => {
+            const args: IContentArgs = { Page: Pages.Playlists };
+            this.$emit(TabViewEvents.Show, args);
+        });
+        this.playlistsTabAnchor.on(TabEvents.Shown, () => {
+            const args: IContentArgs = { Page: Pages.Playlists };
+            this.$emit(TabViewEvents.Shown, args);
+        });
+        this.playlistsTabAnchor.on(TabEvents.Hide, () => {
+            const args: IContentArgs = { Page: Pages.Playlists };
+            this.$emit(TabViewEvents.Hide, args);
+        });
+        this.playlistsTabAnchor.on(TabEvents.Hidden, () => {
+            const args: IContentArgs = { Page: Pages.Playlists };
+            this.$emit(TabViewEvents.Hidden, args);
+        });
+
+        this.settingsTabAnchor.on(TabEvents.Show, () => {
+            const args: IContentArgs = { Page: Pages.Settings };
+            this.$emit(TabViewEvents.Show, args);
+        });
+        this.settingsTabAnchor.on(TabEvents.Shown, () => {
+            const args: IContentArgs = { Page: Pages.Settings };
+            this.$emit(TabViewEvents.Shown, args);
+        });
+        this.settingsTabAnchor.on(TabEvents.Hide, () => {
+            const args: IContentArgs = { Page: Pages.Settings };
+            this.$emit(TabViewEvents.Hide, args);
+        });
+        this.settingsTabAnchor.on(TabEvents.Hidden, () => {
+            const args: IContentArgs = { Page: Pages.Settings };
+            this.$emit(TabViewEvents.Hidden, args);
+        });
+
+
         return true;
     }
 
@@ -138,7 +192,7 @@ export default class Sidebar extends ViewBase {
     }
 
     private OnClickFinder(ev: MouseEvent): void {
-        const orderedArgs: IContentOrdered = {
+        const orderedArgs: IContentOrderedArgs = {
             Page: Pages.Finder,
             Permitted: true
         };
@@ -149,14 +203,14 @@ export default class Sidebar extends ViewBase {
             ev.stopPropagation();
         }
 
-        const changedArgs: IContentChanged = {
+        const changedArgs: IContentArgs = {
             Page: Pages.Finder
         };
         this.$emit(SidebarEvents.ContentChanged, changedArgs)
     }
 
     private OnClickPlaylists(ev: MouseEvent): void {
-        const orderedArgs: IContentOrdered = {
+        const orderedArgs: IContentOrderedArgs = {
             Page: Pages.Playlists,
             Permitted: true
         };
@@ -167,14 +221,14 @@ export default class Sidebar extends ViewBase {
             ev.stopPropagation();
         }
 
-        const changedArgs: IContentChanged = {
+        const changedArgs: IContentArgs = {
             Page: Pages.Playlists
         };
         this.$emit(SidebarEvents.ContentChanged, changedArgs)
     }
 
     private OnClickSettings(ev: MouseEvent): void {
-        const orderedArgs: IContentOrdered = {
+        const orderedArgs: IContentOrderedArgs = {
             Page: Pages.Settings,
             Permitted: true
         };
@@ -185,7 +239,7 @@ export default class Sidebar extends ViewBase {
             ev.stopPropagation();
         }
 
-        const changedArgs: IContentChanged = {
+        const changedArgs: IContentArgs = {
             Page: Pages.Settings
         };
         this.$emit(SidebarEvents.ContentChanged, changedArgs)

@@ -40,25 +40,16 @@ export default class ProgressDialog extends ViewBase {
     private mainMessage: string = '';
     private currentMessage: string = '';
     private progress: number = 0;
-    private modal: JQuery;
 
     private get ProgressBar(): HTMLDivElement {
         return this.$refs.ProgressBar as HTMLDivElement;
-    }
-
-    public async Initialize(): Promise<boolean> {
-        await super.Initialize();
-
-        this.modal = Libraries.$(this.$el as HTMLElement);
-
-        return true;
     }
 
     public Show(title: string): void {
         this.mainMessage = title;
         this.progress = 0;
         this.currentMessage = '';
-        this.modal.modal('show');
+        Libraries.Modal.Show(this);
     }
 
     public SetUpdate(progressPercent: number, message: string = null): void {
@@ -70,6 +61,6 @@ export default class ProgressDialog extends ViewBase {
     }
 
     public Hide(): void {
-        this.modal.modal('hide');
+        Libraries.Modal.Hide(this);
     }
 }

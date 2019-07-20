@@ -43,20 +43,10 @@ export default class ConfirmDialog extends ViewBase {
 
     private static ModalBaseClass: string = 'modal-content';
 
-    private modal: JQuery;
     private modalClasses: string = `${ConfirmDialog.ModalBaseClass} ${ConfirmType.Normal.toString()}`;
-
     private mainMessage: string = '';
     private detailLines: string[] = [];
     private resolver: (result: boolean) => void = null;
-
-    public async Initialize(): Promise<boolean> {
-        await super.Initialize();
-
-        this.modal = Libraries.$(this.$el as HTMLElement);
-
-        return true;
-    }
 
     private OnClickOk(): void {
         this.Resolve(true);
@@ -71,7 +61,7 @@ export default class ConfirmDialog extends ViewBase {
             this.resolver(result);
         }
         this.resolver = null;
-        this.modal.modal('hide');
+        Libraries.Modal.Hide(this);
     }
 
     public SetConfirmType(confirmType: ConfirmType): void {
@@ -88,7 +78,7 @@ export default class ConfirmDialog extends ViewBase {
 
     public Confirm(): Promise<boolean> {
         return new Promise((resolve: (value: boolean) => void): void => {
-            this.modal.modal('show');
+            Libraries.Modal.Show(this);
             this.resolver = resolve;
         });
     }

@@ -1,4 +1,3 @@
-
 export interface ISettings {
     ServerAddress: string;
     ServerPort: number;
@@ -8,7 +7,7 @@ export default class Settings implements ISettings {
 
     private static readonly _entity: Settings = new Settings();
 
-    public static Get(): Settings {
+    public static get Entity(): Settings {
         return Settings._entity;
     }
 
@@ -23,6 +22,7 @@ export default class Settings implements ISettings {
     private _serverAddress: string = null;
     private _serverPort: number = null;
     private _isBusy = false;
+    private _isMopidyConnectable: boolean = false;
 
     public get ServerAddress(): string {
         return this._serverAddress;
@@ -33,8 +33,14 @@ export default class Settings implements ISettings {
     public get IsBusy(): boolean {
         return this._isBusy;
     }
+    public get IsMopidyConnectable(): boolean {
+        return this._isMopidyConnectable;
+    }
 
     public SetBusy(isBusy: boolean): void {
         this._isBusy = isBusy;
+    }
+    public SetMopidyConnectable(isConnectable: boolean): void {
+        this._isMopidyConnectable = isConnectable;
     }
 }

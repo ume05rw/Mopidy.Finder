@@ -104,13 +104,19 @@ namespace MopidyFinder
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
+            IApplicationLifetime applicationLifetime,
             IHostingEnvironment env
         )
         {
             Query.SetServiceProvider(app.ApplicationServices);
             JobStore.SetServiceProvider(app.ApplicationServices);
             DbMaintainer.SetServiceProvider(app.ApplicationServices);
-            DbMaintainer.RunUpdateAlbumTask();
+            DbMaintainer.RunAlbumScanner();
+
+            // アプリケーション起動／終了をハンドルする。
+            // https://stackoverflow.com/questions/41675577/where-can-i-log-an-asp-net-core-apps-start-stop-error-events
+            applicationLifetime.ApplicationStopping.Register(this.OnShutdown);
+
 
             if (env.IsDevelopment())
             {
@@ -127,21 +133,20 @@ namespace MopidyFinder
             //// WebSocketお試し実装、ダメだった。--->
             //if (Startup._webSocketStore == null)
             //    Startup._webSocketStore = new WebSocketStore();
-
-            var options = new WebSocketOptions { ReceiveBufferSize = 8192 };
-            app.UseWebSockets(options);
-            app.Use(async (context, next) =>
-            {
-                if (context.WebSockets.IsWebSocketRequest)
-                {
-                    var socket = await context.WebSockets.AcceptWebSocketAsync();
-                    Startup._webSocketStore.Add(socket);
-                }
-                else
-                {
-                    await next();
-                }
-            });
+            //var options = new WebSocketOptions { ReceiveBufferSize = 8192 };
+            //app.UseWebSockets(options);
+            //app.Use(async (context, next) =>
+            //{
+            //    if (context.WebSockets.IsWebSocketRequest)
+            //    {
+            //        var socket = await context.WebSockets.AcceptWebSocketAsync();
+            //        Startup._webSocketStore.Add(socket);
+            //    }
+            //    else
+            //    {
+            //        await next();
+            //    }
+            //});
             // <---
 
             app.UseMvc(routes =>
@@ -150,6 +155,17 @@ namespace MopidyFinder
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private void OnShutdown()
+        {
+            Query.ReleaseServiceProvider();
+            JobStore.ReleaseServiceProvider();
+
+            DbMaintainer.StopAllTasks()
+                .GetAwaiter()
+                .GetResult();
+            DbMaintainer.ReleaseServiceProvider();
         }
     }
 }

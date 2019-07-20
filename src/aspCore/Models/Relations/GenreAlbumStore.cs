@@ -32,22 +32,22 @@ namespace MopidyFinder.Models.Relations
             this._processed = 0;
             var added = 0;
 
-            var genres = this.Dbc.Genres.ToList();
-            var albumDictionary = this.Dbc.Albums
-                .ToDictionary(e => e.Uri);
+            var genres = this.Dbc.Genres.ToArray();
+            var albums = this.Dbc.Albums.ToArray();
+            var genreAlbums = this.Dbc.GenreAlbums.ToArray();
 
-            this._processLength = genres.Count();
+            this._processLength = genres.Length;
 
             foreach (var genre in genres)
             {
                 var refs = await Library.Browse(genre.Uri);
                 var albumUris = refs.Select(e => e.GetAlbumUri()).ToArray();
-                var albumIds = this.Dbc.Albums
+                var albumIds = albums
                     .Where(e => albumUris.Contains(e.Uri))
                     .Select(e => e.Id)
                     .ToArray();
 
-                var exists = this.Dbc.GenreAlbums
+                var exists = genreAlbums
                     .Where(e => albumIds.Contains(e.AlbumId) && e.GenreId == genre.Id)
                     .ToArray();
 

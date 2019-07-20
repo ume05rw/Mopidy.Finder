@@ -31,44 +31,40 @@ namespace MopidyFinder.Controllers
             return XhrResponseFactory.CreateSucceeded(store.Entity);
         }
 
-        [HttpGet("Update")]
-        public XhrResponse GetUpdateStatus()
+        [HttpGet("AlbumScanProgress")]
+        public XhrResponse GetAlbumScanProgress()
         {
-            var result = DbMaintainer.Instance.GetStatus();
+            var result = DbMaintainer.GetAlbumScanProgress();
 
             return XhrResponseFactory.CreateSucceeded(result);
         }
 
-        [HttpPost("Update")]
-        public XhrResponse ExecUpdate()
+        [HttpGet("UpdateProgress")]
+        public XhrResponse GetUpdateProgress()
         {
-            if (DbMaintainer.Instance.IsActive)
+            var result = DbMaintainer.Instance.GetProgress();
+
+            return XhrResponseFactory.CreateSucceeded(result);
+        }
+
+        [HttpPost("DbScanNew")]
+        public XhrResponse DbScanNew()
+        {
+            if (DbMaintainer.Instance.IsRunning)
                 return XhrResponseFactory.CreateError("Already Updating.");
 
-            Task.Run(() => {
-                DbMaintainer.Instance.Refresh(false);
-            });
+            var task = DbMaintainer.Instance.Update(DbMaintainer.UpdateType.ScanNew);
 
             return XhrResponseFactory.CreateSucceeded(true);
         }
 
-        [HttpGet("Refresh")]
-        public XhrResponse GetRefreshStatus()
+        [HttpPost("DbCleanup")]
+        public XhrResponse DbCleanup()
         {
-            var result = DbMaintainer.Instance.GetStatus();
-
-            return XhrResponseFactory.CreateSucceeded(result);
-        }
-
-        [HttpPost("Refresh")]
-        public XhrResponse ExecRefresh()
-        {
-            if (DbMaintainer.Instance.IsActive)
+            if (DbMaintainer.Instance.IsRunning)
                 return XhrResponseFactory.CreateError("Already Refreshing.");
 
-            Task.Run(() => {
-                DbMaintainer.Instance.Refresh(true);
-            });
+            var task = DbMaintainer.Instance.Update(DbMaintainer.UpdateType.Cleanup);
 
             return XhrResponseFactory.CreateSucceeded(true);
         }

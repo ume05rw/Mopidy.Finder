@@ -1,6 +1,6 @@
 import Component from 'vue-class-component';
 import ViewBase from '../Bases/ViewBase';
-import { IContentChanged, Pages } from '../Sidebars/Sidebar';
+import { IContentArgs, Pages } from '../Sidebars/Sidebar';
 
 @Component({
     template: `<nav class="main-header navbar navbar-expand border-bottom">
@@ -19,7 +19,7 @@ import { IContentChanged, Pages } from '../Sidebars/Sidebar';
 export default class HeaderBar extends ViewBase {
     private title: string = 'Mopidy.Finder';
 
-    public SetHeader(args: IContentChanged): void {
+    public SetHeader(args: IContentArgs): void {
         this.title = args.Page.toString();
     }
 }

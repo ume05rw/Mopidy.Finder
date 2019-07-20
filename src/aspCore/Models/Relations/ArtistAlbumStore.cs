@@ -20,9 +20,9 @@ namespace MopidyFinder.Models.Relations
             {
                 return (this._processLength <= 0)
                     ? 0
-                    : (this._processLength <= this._processed)
+                    : ((this._processLength <= this._processed)
                         ? 1
-                        : (this._processed / this._processLength);
+                        : (this._processed / this._processLength));
             }
         }
 
@@ -32,21 +32,21 @@ namespace MopidyFinder.Models.Relations
             this._processed = 0;
             var added = 0;
 
-            var albumDictionary = this.Dbc.Albums
-                .ToDictionary(e => e.Uri);
+            var artists = this.Dbc.Artists.ToArray();
+            var albums = this.Dbc.Albums.ToArray();
+            var artistAlbums = this.Dbc.ArtistAlbums.ToArray();
+            this._processLength = artists.Length;
 
-            this._processLength = albumDictionary.Count();
-
-            foreach (var artist in this.Dbc.Artists.ToArray())
+            foreach (var artist in artists)
             {
                 var refs = await Library.Browse(artist.Uri);
                 var albumUris = refs.Select(e => e.GetAlbumUri()).ToArray();
-                var albumIds = this.Dbc.Albums
+                var albumIds = albums
                     .Where(e => albumUris.Contains(e.Uri))
                     .Select(e => e.Id)
                     .ToArray();
 
-                var exists = this.Dbc.ArtistAlbums
+                var exists = artistAlbums
                     .Where(e => albumIds.Contains(e.AlbumId) && e.ArtistId == artist.Id)
                     .ToArray();
 

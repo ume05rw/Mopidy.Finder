@@ -53,7 +53,6 @@ export const AddModalEvents = {
 })
 export default class AddModal extends ViewBase {
 
-    private modal: JQuery;
     private errorMessage: string = '';
 
     private get DivValidatable(): HTMLDivElement {
@@ -71,9 +70,7 @@ export default class AddModal extends ViewBase {
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
 
-        this.modal = Libraries.$(this.$el as HTMLElement);
-
-        this.modal.on(ModalEvents.Shown, (): void => {
+        Libraries.$(this.$el as HTMLElement).on(ModalEvents.Shown, (): void => {
             this.TextName.focus();
         });
 
@@ -117,11 +114,11 @@ export default class AddModal extends ViewBase {
 
         this.errorMessage = '';
         this.TextName.value = '';
-        this.modal.modal('show');
+        Libraries.Modal.Show(this);
     }
 
     public Hide(): void {
-        this.modal.modal('hide');
+        Libraries.Modal.Hide(this);
     }
 
     public GetName(): string {

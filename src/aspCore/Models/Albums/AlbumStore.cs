@@ -7,6 +7,7 @@ using MopidyFinder.Models.Tracks;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Albums
@@ -86,7 +87,7 @@ namespace MopidyFinder.Models.Albums
             return hasUpdated;
         }
 
-
+        #region "Db Refresh"
         private decimal _processLength = 0;
         private decimal _processed = 0;
         public decimal ScanProgress
@@ -145,9 +146,43 @@ namespace MopidyFinder.Models.Albums
 
             return newEntityDictionary.Count();
         }
+        #endregion
 
-        public async Task<bool> ScanAlbumDetail()
+        #region "Resident Task"
+        public class AlbumScanProgress
         {
+            public int TotalAlbumCount { get; set; }
+            public int ScannedAlbumCount { get; set; }
+        }
+
+        public AlbumScanProgress GetAlbumScanProgress()
+        {
+            var result = new AlbumScanProgress();
+            result.TotalAlbumCount = this.Dbc.Albums.Count();
+            result.ScannedAlbumCount
+                = this.Dbc.Albums
+                    .GroupJoin(
+                        this.Dbc.Tracks,
+                        al => al.Id,
+                        tr => tr.AlbumId,
+                        (al, tr) => new
+                        {
+                            Album = al,
+                            Tracks = tr
+                        }
+                    )
+                    .Where(e => e.Tracks.Any())
+                    .Count();
+
+            return result;
+        }
+
+        public async Task<int> ScanAlbumDetail(CancellationToken cancelToken)
+        {
+            if (cancelToken.IsCancellationRequested)
+                return 0;
+
+            // SELECTはここで完了
             var albums = this.Dbc.Albums
                 .GroupJoin(
                     this.Dbc.Tracks,
@@ -161,18 +196,35 @@ namespace MopidyFinder.Models.Albums
                 )
                 .Where(e => !e.Track.Any())
                 .Select(e => e.Album)
-                .Take(10);
+                .Take(10)
+                .ToArray();
 
             if (!albums.Any())
-                return true;
+                return 0;
+
+            if (cancelToken.IsCancellationRequested)
+                return -1;
 
             // 画像を取得
             var noImageAlbumUris = albums
                 .Where(e => string.IsNullOrEmpty(e.ImageUri))
                 .Select(e => e.Uri)
                 .ToArray();
-
             var imageDictionary = await Library.GetImages(noImageAlbumUris);
+
+            if (cancelToken.IsCancellationRequested)
+                return -1;
+
+            // トラックを取得
+            var albumUris = albums.Select(e => e.Uri).ToArray();
+            var mopidyTrackDictionary = await Library.Lookup(albumUris);
+
+            if (cancelToken.IsCancellationRequested)
+                return -1;
+
+            var updatedAlbums = new List<Album>();
+            var addedTracks = new List<Track>();
+
             if (imageDictionary != null)
             {
                 foreach (var pair in imageDictionary)
@@ -182,15 +234,16 @@ namespace MopidyFinder.Models.Albums
                         continue;
 
                     album.ImageUri = pair.Value.Uri;
-                    this.Dbc.Entry(album).State = EntityState.Modified;
+                    updatedAlbums.Add(album);
+
+                    //this.Dbc.Entry(album).State = EntityState.Modified;
                 }
             }
 
-            // トラックを取得
-            var albumUris = albums.Select(e => e.Uri).ToArray();
-            var mopidyTrackDictionary = await Library.Lookup(albumUris);
             if (mopidyTrackDictionary != null)
             {
+                // Dbcを渡してTrackStoreを生成しているが、
+                // trackStoreのメソッドではDbcを使っていない。
                 using (var trackStore = new TrackStore(this.Dbc))
                 {
                     foreach (var pair in mopidyTrackDictionary)
@@ -208,15 +261,23 @@ namespace MopidyFinder.Models.Albums
                         foreach (var track in tracks)
                         {
                             track.AlbumId = album.Id;
-                            this.Dbc.Tracks.Add(track);
+                            addedTracks.Add(track);
                         }
                     }
                 }
             }
 
+            if (cancelToken.IsCancellationRequested)
+                return -1;
+
+            foreach (var album in updatedAlbums)
+                this.Dbc.Entry(album).State = EntityState.Modified;
+
+            this.Dbc.Tracks.AddRange(addedTracks);
             this.Dbc.SaveChanges();
 
-            return true;
+            return albums.Length;
         }
+        #endregion
     }
 }

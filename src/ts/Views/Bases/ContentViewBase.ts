@@ -1,14 +1,11 @@
-import Vue from 'vue';
-import Libraries from '../../Libraries';
-import { TabEvents } from '../Events/BootstrapEvents';
-import ViewBase from './ViewBase';
+import { default as TabViewBase, ITabView } from './TabViewBase';
 
-export interface IContentView extends Vue {
+export interface IContentView extends ITabView {
     GetIsPermitLeave(): boolean;
     InitContent(): void;
 }
 
-export default abstract class ContentViewBase extends ViewBase implements IContentView {
+export default abstract class ContentViewBase extends TabViewBase implements IContentView {
     public abstract GetIsPermitLeave(): boolean;
     public abstract InitContent(): void;
 }
