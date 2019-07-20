@@ -3,16 +3,18 @@ import Exception from '../Utils/Exception';
 import { IContentView } from './Bases/ContentViewBase';
 import ViewBase from './Bases/ViewBase';
 import Finder from './Finders/Finder';
-import HeaderBar from './HeaderBars/HeaderBar';
+import { default as HeaderBar, IContentDetailArgs } from './HeaderBars/HeaderBar';
 import Playlists from './Playlists/Playlists';
 import Settings from './Settings/Settings';
 import { default as Sidebar, IContentArgs, IContentOrderedArgs, Pages } from './Sidebars/Sidebar';
 import { default as SettingsStore, IUpdateProgress } from '../Models/Settings/SettingsStore';
+import Libraries from '../Libraries';
 
 @Component({
     template: `<div class="wrapper" style="height: 100%; min-height: 100%;">
     <header-bar
-        ref="HeaderBar" />
+        ref="HeaderBar"
+        @DetailOrdered="OnDetailOrdered" />
     <sidebar
         @ContentOrdered="OnContentOrdered"
         @ContentChanged="OnContentChanged"
@@ -58,6 +60,7 @@ export default class RootView extends ViewBase {
 
     private isMopidyConnectable: boolean = false;
     private activeContent: IContentView;
+    private viewport = Libraries.ResponsiveBootstrapToolkit;
 
     private get HeaderBar(): HeaderBar {
         return this.$refs.HeaderBar as HeaderBar;
@@ -65,6 +68,16 @@ export default class RootView extends ViewBase {
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
+
+        (Libraries.$(window) as any).resize(
+            this.viewport.changed((): void => {
+                if (this.viewport.is('<=sm')) {
+                    this.ContentToFullscreen();
+                } else if (this.viewport.is('>sm')) {
+                    this.ContentToColumn();
+                }
+            })
+        );
 
         const promises: Promise<any>[] = [];
         const store = new SettingsStore();
@@ -103,20 +116,16 @@ export default class RootView extends ViewBase {
         return true;
     }
 
-    private OnPlaylistUpdatedByFinder(): void {
-        this.Playlists.RefreshPlaylist();
+    // #region "ナビゲーション単位の表示制御"
+    private ContentToFullscreen(): void {
+        this.Finder.SetSubViewToFulscreen();
+        this.Playlists.SetSubViewToFulscreen();
+        this.Settings.SetSubViewToFulscreen();
     }
-
-    private OnPlaylistsUpdatedByPlaylists(): void {
-        this.Finder.RefreshPlaylist();
-    }
-
-    private OnServerFound(): void {
-        if (!this.isMopidyConnectable) {
-            this.Finder.ForceRefresh();
-            this.Playlists.RefreshPlaylist();
-            this.isMopidyConnectable = true;
-        }
+    private ContentToColumn(): void {
+        this.Finder.SetSubviewToColumn();
+        this.Playlists.SetSubviewToColumn();
+        this.Settings.SetSubviewToColumn();
     }
 
     private OnContentOrdered(args: IContentOrderedArgs): void {
@@ -157,5 +166,42 @@ export default class RootView extends ViewBase {
     }
     private OnHidden(args: IContentArgs): void {
         this.GetContentView(args).OnHidden();
+    }
+    // #endregion
+
+    // #region "詳細機能ごとの表示制御"
+
+    private OnDetailOrdered(args: IContentDetailArgs): void {
+        switch (args.Page) {
+            case Pages.Finder:
+                this.Finder.ShowContentDetail(args);
+                break;
+            case Pages.Playlists:
+                this.Playlists.ShowContentDetail(args);
+                break;
+            case Pages.Settings:
+                this.Settings.ShowContentDetail(args);
+                break;
+            default:
+                Exception.Throw('Unexpected Page', args);
+        }
+    }
+
+    // #endregion
+
+    private OnPlaylistUpdatedByFinder(): void {
+        this.Playlists.RefreshPlaylist();
+    }
+
+    private OnPlaylistsUpdatedByPlaylists(): void {
+        this.Finder.RefreshPlaylist();
+    }
+
+    private OnServerFound(): void {
+        if (!this.isMopidyConnectable) {
+            this.Finder.ForceRefresh();
+            this.Playlists.RefreshPlaylist();
+            this.isMopidyConnectable = true;
+        }
     }
 }

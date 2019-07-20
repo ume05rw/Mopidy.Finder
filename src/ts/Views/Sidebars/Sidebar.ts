@@ -36,7 +36,8 @@ export const SidebarEvents = {
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" role="tablist">
                     <li class="nav-item">
-                        <a  class="nav-link"
+                        <a class="nav-link"
+                            id="nav-finder"
                             href="#tab-finder"
                             role="tab"
                             data-toggle="tab"
@@ -49,7 +50,8 @@ export const SidebarEvents = {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a  class="nav-link"
+                        <a class="nav-link"
+                            id="nav-playlists"
                             href="#tab-playlists"
                             role="tab"
                             data-toggle="tab"
@@ -62,7 +64,8 @@ export const SidebarEvents = {
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a  class="nav-link"
+                        <a class="nav-link"
+                            id="nav-settings"
                             href="#tab-settings"
                             role="tab"
                             data-toggle="tab"

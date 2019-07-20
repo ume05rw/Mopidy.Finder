@@ -8,12 +8,15 @@ import { AlbumListEvents, default as AlbumList } from './Lists/Albums/AlbumList'
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
 import Delay from '../../Utils/Delay';
+import { IContentSubView } from '../Bases/ContentSubViewBase';
+import { IContentDetailArgs, ContentDetails } from '../HeaderBars/HeaderBar';
+import Exception from '../../Utils/Exception';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
                         id="tab-finder"
                         role="tabpanel"
-                        aria-labelledby="finder-tab">
+                        aria-labelledby="nav-finder">
     <div class="row">
         <genre-list
             ref="GenreList"
@@ -48,7 +51,18 @@ export default class Finder extends ContentViewBase {
         return this.$refs.AlbumList as AlbumList;
     }
 
+    public async Initialize(): Promise<boolean> {
+        await super.Initialize();
+
+        this.subviews.push(this.GenreList);
+        this.subviews.push(this.ArtistList);
+        this.subviews.push(this.AlbumList);
+
+        return true;
+    }
+
     // #region "IContentView"
+    protected subviews: IContentSubView[] = [];
     public GetIsPermitLeave(): boolean {
         return true;
     }
@@ -60,6 +74,27 @@ export default class Finder extends ContentViewBase {
                 this.ArtistList.LoadIfEmpty();
                 this.AlbumList.LoadIfEmpty();
             });
+    }
+    public ShowContentDetail(args: IContentDetailArgs): void {
+        switch (args.Detail) {
+            case ContentDetails.Genres:
+                this.HideAllDetails();
+                this.GenreList.Show();
+                this.GenreList.LoadIfEmpty();
+                break;
+            case ContentDetails.Artists:
+                this.HideAllDetails();
+                this.ArtistList.Show();
+                this.ArtistList.LoadIfEmpty();
+                break;
+            case ContentDetails.AlbumTracks:
+                this.HideAllDetails();
+                this.AlbumList.Show();
+                this.AlbumList.LoadIfEmpty();
+                break;
+            default:
+                Exception.Throw('Unexpected ContentDetail');
+        }
     }
     // #endregion
 

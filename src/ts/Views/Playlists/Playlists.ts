@@ -6,6 +6,9 @@ import { ISelectionChangedArgs, ISelectionOrderedArgs } from '../Shared/Selectio
 import PlaylistList from './Lists/Playlists/PlaylistList';
 import TrackList from './Lists/Tracks/TrackList';
 import Delay from '../../Utils/Delay';
+import { IContentSubView } from '../Bases/ContentSubViewBase';
+import { IContentDetailArgs, ContentDetails } from '../HeaderBars/HeaderBar';
+import Exception from '../../Utils/Exception';
 
 export const PlaylistsEvents = {
     PlaylistsUpdated: 'PlaylistsUpdated'
@@ -15,7 +18,7 @@ export const PlaylistsEvents = {
     template: `<section class="content h-100 tab-pane fade"
     id="tab-playlists"
     role="tabpanel"
-    aria-labelledby="playlists-tab">
+    aria-labelledby="nav-playlists">
     <div class="row">
         <playlist-list
             ref="PlaylistList"
@@ -41,7 +44,17 @@ export default class Playlists extends ContentViewBase {
         return this.$refs.TrackList as TrackList;
     }
 
+    public async Initialize(): Promise<boolean> {
+        await super.Initialize();
+
+        this.subviews.push(this.PlaylistList);
+        this.subviews.push(this.TrackList);
+
+        return true;
+    }
+
     // #region "IContentView"
+    protected subviews: IContentSubView[] = [];
     public GetIsPermitLeave(): boolean {
         // プレイリスト画面からの移動可否判定
         const isSaved = this.TrackList.GetIsSavedPlaylistChanges();
@@ -56,6 +69,22 @@ export default class Playlists extends ContentViewBase {
             .then((): void => {
                 this.PlaylistList.LoadIfEmpty();
             });
+    }
+    public ShowContentDetail(args: IContentDetailArgs): void {
+        switch (args.Detail) {
+            case ContentDetails.Playlists:
+                this.HideAllDetails();
+                this.PlaylistList.Show();
+                this.PlaylistList.LoadIfEmpty();
+                break;
+            case ContentDetails.PlaylistTracks:
+                this.HideAllDetails();
+                this.TrackList.Show();
+                this.TrackList.LoadIfEmpty();
+                break;
+            default:
+                Exception.Throw('Unexpected ContentDetail');
+        }
     }
     // #endregion
 

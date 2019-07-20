@@ -26,7 +26,6 @@ import ViewBase from '../../Bases/ViewBase';
                             aria-valuemin="0"
                             aria-valuemax="100"
                             ref="ProgressBar">
-                            <span class="sr-only">{{ progress }}% Complete</span>
                         </div>
                     </div>
                 </div>

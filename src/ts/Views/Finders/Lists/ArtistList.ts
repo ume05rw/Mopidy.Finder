@@ -7,13 +7,16 @@ import { default as ArtistStore, IPagenateQueryArgs } from '../../../Models/Arti
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
-import SelectionList from '../../Shared/SelectionList';
+import SelectionListBase from '../../Bases/SelectionListBase';
 
 @Component({
     template: `<div class="col-md-3">
     <div class="card plain-list">
         <div class="card-header with-border bg-warning">
-            <h3 class="card-title">Artists</h3>
+            <h3 class="card-title">
+                <i class="fa fa-users" />
+                Artists
+            </h3>
             <div class="card-tools form-row">
                 <filter-textbox
                     v-bind:placeHolder="'Artist?'"
@@ -25,12 +28,6 @@ import SelectionList from '../../Shared/SelectionList';
                     ref="RefreshButton"
                     @click="OnClickRefresh" >
                     <i class="fa fa-repeat" />
-                </button>
-                <button
-                    class="btn btn-tool d-inline d-md-none collapse"
-                    ref="ButtonCollaplse"
-                    @click="OnClickCollapse" >
-                    <i class="fa fa-minus" />
                 </button>
             </div>
         </div>
@@ -59,8 +56,10 @@ import SelectionList from '../../Shared/SelectionList';
         'infinite-loading': InfiniteLoading
     }
 })
-export default class ArtistList extends SelectionList<Artist, ArtistStore> {
+export default class ArtistList extends SelectionListBase<Artist, ArtistStore> {
 
+    protected readonly tabId: string = 'subtab-artists';
+    protected readonly linkId: string = 'nav-artists';
     protected store: ArtistStore = new ArtistStore();
     protected entities: Artist[] = [];
     private genreIds: number[] = [];
@@ -73,7 +72,6 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
     }
 
     public async Initialize(): Promise<boolean> {
-        this.isAutoCollapse = true;
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
@@ -102,6 +100,7 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
         this.Refresh();
     }
 
+    // #region "InfiniteLoading"
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
      * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -110,9 +109,6 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
      */
     protected async OnInfinite($state: StateChanger): Promise<boolean> {
         return super.OnInfinite($state);
-    }
-    protected OnClickCollapse(): void {
-        super.OnClickCollapse();
     }
     protected OnClickRefresh(): void {
         super.OnClickRefresh();
@@ -129,7 +125,9 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
 
         return await this.store.GetList(args);
     }
+    // #endregion
 
+    // #region "Filters"
     private HasGenre(genreId: number): boolean {
         return (0 <= _.indexOf(this.genreIds, genreId));
     }
@@ -154,4 +152,5 @@ export default class ArtistList extends SelectionList<Artist, ArtistStore> {
             this.Refresh();
         }
     }
+    // #endregion
 }

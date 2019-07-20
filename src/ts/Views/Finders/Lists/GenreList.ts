@@ -6,13 +6,16 @@ import Genre from '../../../Models/Genres/Genre';
 import { default as GenreStore, IPagenateQueryArgs } from '../../../Models/Genres/GenreStore';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
-import SelectionList from '../../Shared/SelectionList';
+import SelectionListBase from '../../Bases/SelectionListBase';
 
 @Component({
     template: `<div class="col-md-3">
     <div class="card plain-list">
         <div class="card-header with-border bg-warning">
-            <h3 class="card-title">Genres</h3>
+            <h3 class="card-title">
+                <i class="fa fa-tags" />
+                Genres
+            </h3>
             <div class="card-tools form-row">
                 <filter-textbox
                     v-bind:placeHolder="'Genre?'"
@@ -23,12 +26,6 @@ import SelectionList from '../../Shared/SelectionList';
                     ref="RefreshButton"
                     @click="OnClickRefresh" >
                     <i class="fa fa-repeat" />
-                </button>
-                <button
-                    class="btn btn-tool d-inline d-md-none collapse"
-                    ref="ButtonCollaplse"
-                    @click="OnClickCollapse" >
-                    <i class="fa fa-minus" />
                 </button>
             </div>
         </div>
@@ -57,8 +54,10 @@ import SelectionList from '../../Shared/SelectionList';
         'infinite-loading': InfiniteLoading
     }
 })
-export default class GenreList extends SelectionList<Genre, GenreStore> {
+export default class GenreList extends SelectionListBase<Genre, GenreStore> {
 
+    protected readonly tabId: string = 'subtab-genres';
+    protected readonly linkId: string = 'nav-genres';
     protected store: GenreStore = new GenreStore();
     protected entities: Genre[] = [];
 
@@ -70,7 +69,6 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
     }
 
     public async Initialize(): Promise<boolean> {
-        this.isAutoCollapse = true;
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
@@ -97,6 +95,7 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
         this.Refresh();
     }
 
+    // #region "InfiniteLoading"
     /**
      * Vueのイベントハンドラは、実装クラス側にハンドラが無い場合に
      * superクラスの同名メソッドが実行されるが、superクラス上のthisが
@@ -105,9 +104,6 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
      */
     protected async OnInfinite($state: StateChanger): Promise<boolean> {
         return super.OnInfinite($state);
-    }
-    protected OnClickCollapse(): void {
-        super.OnClickCollapse();
     }
     protected OnClickRefresh(): void {
         super.OnClickRefresh();
@@ -123,4 +119,5 @@ export default class GenreList extends SelectionList<Genre, GenreStore> {
 
         return await this.store.GetList(args);
     }
+    // #endregion
 }

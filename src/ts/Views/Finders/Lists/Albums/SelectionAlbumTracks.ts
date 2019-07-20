@@ -53,7 +53,7 @@ export const SelectionAlbumTracksEvents = {
                             href="javascript:void(0)"
                             @click="OnHeaderNewPlaylistClicked">New Playlist</a>
                         <div class="dropdown-divider"></div>
-                        <template v-for="playlist in playlists">
+                        <template v-for="playlist in innerPlaylists">
                         <a class="dropdown-item text-truncate"
                             href="javascript:void(0)"
                             v-bind:data-uri="playlist.Uri"
@@ -88,7 +88,7 @@ export const SelectionAlbumTracksEvents = {
                                 </button>
                                 <div class="dropdown-menu row-dropdown">
                                     <div class="inner-row-dorpdown" ref="RowDropDownDivs">
-                                        <template v-for="playlist in playlists">
+                                        <template v-for="playlist in innerPlaylists">
                                         <a class="dropdown-item text-truncate"
                                             href="javascript:void(0)"
                                             v-bind:data-uri="playlist.Uri"
@@ -112,8 +112,11 @@ export default class SelectionAlbumTracks extends ViewBase {
     @Prop()
     private entity: AlbumTracks;
 
-    @Prop()
-    public playlists: Playlist[];
+    @Prop() // 初期値受け渡しのみに使用。
+    private playlists: Playlist[];
+
+    // 描画はこちらを使う。
+    private innerPlaylists: Playlist[] = [];
 
     private get AlbumPlayButton(): HTMLButtonElement {
         return this.$refs.AlbumPlayButton as HTMLButtonElement;
@@ -134,6 +137,7 @@ export default class SelectionAlbumTracks extends ViewBase {
 
     public async Initialize(): Promise<boolean> {
         await super.Initialize();
+        this.innerPlaylists = this.playlists;
 
         Libraries.SetTooltip(this.AlbumPlayButton, 'Play Album');
         Libraries.SetTooltip(this.HeaderPlaylistButton, 'To Playlist');
@@ -150,6 +154,14 @@ export default class SelectionAlbumTracks extends ViewBase {
 
         return true;
     }
+
+    public SetPlaylists(playlists: Playlist[]): void {
+        this.innerPlaylists = playlists;
+    }
+    public GetPlaylists(): Playlist[] {
+        return this.innerPlaylists;
+    }
+
 
     private OnHeaderPlayClicked(): void {
         const tracks = Libraries.Enumerable.from(this.entity.Tracks);
@@ -173,7 +185,7 @@ export default class SelectionAlbumTracks extends ViewBase {
 
     private OnHeaderPlaylistClicked(ev: MouseEvent): void {
         const uri = (ev.target as HTMLElement).getAttribute('data-uri');
-        const playlist = Libraries.Enumerable.from(this.playlists)
+        const playlist = Libraries.Enumerable.from(this.innerPlaylists)
             .firstOrDefault(e => e.Uri === uri);
 
         if (!playlist)
@@ -209,7 +221,7 @@ export default class SelectionAlbumTracks extends ViewBase {
     private OnRowPlaylistClicked(ev: MouseEvent): void {
         const elem = ev.currentTarget as HTMLElement;
         const uri = elem.getAttribute('data-uri');
-        const playlist = Libraries.Enumerable.from(this.playlists)
+        const playlist = Libraries.Enumerable.from(this.innerPlaylists)
             .firstOrDefault(e => e.Uri === uri);
 
         if (!playlist)

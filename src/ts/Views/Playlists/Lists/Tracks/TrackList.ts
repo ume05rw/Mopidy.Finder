@@ -10,7 +10,7 @@ import Track from '../../../../Models/Tracks/Track';
 import { Animation, default as Animate, Speed } from '../../../../Utils/Animate';
 import Delay from '../../../../Utils/Delay';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
-import { default as SelectionList, SelectionEvents } from '../../../Shared/SelectionList';
+import { default as SelectionListBase, SelectionEvents } from '../../../Bases/SelectionListBase';
 import SlideupButton from '../../../Shared/SlideupButton';
 import { default as SelectionTrack, ITrackDeleteOrderedArgs, ITrackSelectionChangedArgs } from './SelectionTrack';
 import UpdateDialog from './UpdateDialog';
@@ -31,7 +31,8 @@ enum ListMode {
         <div class="card-header with-border bg-warning">
             <h3 class="card-title"
                 ref="TitleH3">
-                Tracks
+                <i class="fa fa-music" />
+                Playlist Tracks
             </h3>
             <input type="text" class="form-control form-control-sm d-none title-input"
                 maxlength="40"
@@ -99,8 +100,10 @@ enum ListMode {
         'update-dialog': UpdateDialog
     }
 })
-export default class TrackList extends SelectionList<Track, PlaylistStore> {
+export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
 
+    protected readonly tabId: string = 'subtab-playlisttracks';
+    protected readonly linkId: string = 'nav-playlisttracks';
     private static readonly PageLength: number = 20;
     private static readonly ListBaseClasses = 'products-list product-list-in-box track-list ';
 
@@ -149,7 +152,6 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
     }
 
     public async Initialize(): Promise<boolean> {
-        this.isAutoCollapse = false;
         await super.Initialize();
 
         // ※$onの中ではプロパティ定義が参照出来ないらしい。
@@ -204,6 +206,14 @@ export default class TrackList extends SelectionList<Track, PlaylistStore> {
         this.Refresh();
 
         return true;
+    }
+
+    /**
+     * 非表示時にInfiniteLoadingが反応しない現象への対策。
+     */
+    public LoadIfEmpty(): void {
+        if (!this.entities || this.entities.length <= 0)
+            this.Refresh();
     }
 
     // #region "Events"

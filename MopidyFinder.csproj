@@ -24,6 +24,7 @@
     <None Remove="src\ts\Utils\Delay.ts" />
     <None Remove="src\ts\Utils\Exception.ts" />
     <None Remove="src\ts\Views\Bases\AnimatedViewBase.ts" />
+    <None Remove="src\ts\Views\Bases\ContentSubViewBase.ts" />
     <None Remove="src\ts\Views\Bases\ContentViewBase.ts" />
     <None Remove="src\ts\Views\Bases\TabViewBase.ts" />
     <None Remove="src\ts\Views\Events\AdminLteEvents.ts" />
@@ -50,13 +51,16 @@
     <None Remove="src\ts\Views\Playlists\Lists\Tracks\UpdateDialog.ts" />
     <None Remove="src\ts\Views\Playlists\Playlists.ts" />
     <None Remove="src\ts\Views\RootView.ts" />
+    <None Remove="src\ts\Views\Settings\Blocks\DbBlock.ts" />
+    <None Remove="src\ts\Views\Settings\Blocks\MopidyBlock.ts" />
+    <None Remove="src\ts\Views\Settings\Blocks\ScanProgressBlock.ts" />
     <None Remove="src\ts\Views\Settings\Settings.ts" />
     <None Remove="src\ts\Views\Shared\Dialogs\ConfirmDialog.ts" />
     <None Remove="src\ts\Views\Shared\Dialogs\ProgressDialog.ts" />
     <None Remove="src\ts\Views\Shared\Filterbox.ts" />
     <None Remove="src\ts\Views\Shared\Filterboxes\SearchInput.ts" />
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
-    <None Remove="src\ts\Views\Shared\SelectionList.ts" />
+    <None Remove="src\ts\Views\Shared\SelectionListBase.ts" />
     <None Remove="src\ts\Views\Shared\SlideupButton.ts" />
     <None Remove="src\ts\Views\Sidebars\PlayerPanel.ts" />
     <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
@@ -111,6 +115,7 @@
     <TypeScriptCompile Include="src\ts\Utils\Delay.ts" />
     <TypeScriptCompile Include="src\ts\Utils\Exception.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\AnimatedViewBase.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Bases\ContentSubViewBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\ContentViewBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\TabViewBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Events\AdminLteEvents.ts" />
@@ -139,6 +144,9 @@
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\Albums\AlbumList.ts" />
     <TypeScriptCompile Include="src\ts\Views\HeaderBars\HeaderBar.ts" />
     <TypeScriptCompile Include="src\ts\Views\Playlists\Lists\Tracks\UpdateDialog.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Settings\Blocks\DbBlock.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Settings\Blocks\MopidyBlock.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Settings\Blocks\ScanProgressBlock.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Dialogs\ConfirmDialog.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Dialogs\ProgressDialog.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Filterboxes\SearchInput.ts" />
@@ -151,7 +159,7 @@
     <TypeScriptCompile Include="src\ts\Views\Settings\Settings.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Filterboxes\Filterbox.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionItem.ts" />
-    <TypeScriptCompile Include="src\ts\Views\Shared\SelectionList.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Bases\SelectionListBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SlideupButton.ts" />
     <TypeScriptCompile Include="src\ts\Views\Sidebars\PlayerPanel.ts" />
     <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />

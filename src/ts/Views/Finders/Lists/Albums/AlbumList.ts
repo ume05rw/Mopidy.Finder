@@ -10,7 +10,7 @@ import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Delay from '../../../../Utils/Delay';
 import Exception from '../../../../Utils/Exception';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
-import { default as SelectionList, SelectionEvents } from '../../../Shared/SelectionList';
+import { default as SelectionListBase, SelectionEvents } from '../../../Bases/SelectionListBase';
 import { default as SelectionAlbumTracks, IAddToPlaylistOrderedArgs, ICreatePlaylistOrderedArgs, IPlayOrderedArgs } from './SelectionAlbumTracks';
 
 export const AlbumListEvents = {
@@ -21,7 +21,10 @@ export const AlbumListEvents = {
     template: `<div class="col-md-6">
     <div class="card">
         <div class="card-header with-border bg-warning">
-            <h3 class="card-title">Albums</h3>
+            <h3 class="card-title">
+                <i class="fa fa-music" />
+                Album Tracks
+            </h3>
             <div class="card-tools form-row">
                 <filter-textbox
                     v-bind:placeHolder="'Album?'"
@@ -57,8 +60,10 @@ export const AlbumListEvents = {
         'infinite-loading': InfiniteLoading
     }
 })
-export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksStore> {
+export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTracksStore> {
 
+    protected readonly tabId: string = 'subtab-albumtracks';
+    protected readonly linkId: string = 'nav-albumtracks';
     protected store: AlbumTracksStore = new AlbumTracksStore();
     protected entities: AlbumTracks[] = [];
 
@@ -78,7 +83,6 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
     }
 
     public async Initialize(): Promise<boolean> {
-        this.isAutoCollapse = false;
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
@@ -99,8 +103,8 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
                 if (!item.GetIsInitialized())
                     item.Initialize();
 
-                if (item.playlists !== this.playlists)
-                    item.playlists = this.playlists;
+                if (item.GetPlaylists() !== this.playlists)
+                    item.SetPlaylists(this.playlists);
             }
 
             return true;
@@ -134,7 +138,7 @@ export default class AlbumList extends SelectionList<AlbumTracks, AlbumTracksSto
             return true;
 
         for (let i = 0; i < this.Items.length; i++)
-            this.Items[i].playlists = this.playlists;
+            this.Items[i].SetPlaylists(this.playlists);
 
         return true;
     }

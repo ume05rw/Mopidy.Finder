@@ -8,7 +8,7 @@ import { Animation, default as Animate, Speed } from '../../../../Utils/Animate'
 import Delay from '../../../../Utils/Delay';
 import ViewBase from '../../../Bases/ViewBase';
 import { ISelectionChangedArgs } from '../../../Shared/SelectionItem';
-import { SelectionEvents } from '../../../Shared/SelectionList';
+import { SelectionEvents } from '../../../Bases/SelectionListBase';
 
 export const TrackSelectionEvents = _.extend(_.clone(SelectionEvents), {
     DeleteOrdered: 'DeleteOrdered'

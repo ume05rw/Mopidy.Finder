@@ -7,7 +7,7 @@ import Playlist from '../../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs, ISelectionOrderedArgs } from '../../../Shared/SelectionItem';
-import { default as SelectionList } from '../../../Shared/SelectionList';
+import { default as SelectionListBase } from '../../../Bases/SelectionListBase';
 import AddModal from './AddModal';
 import Delay from '../../../../Utils/Delay';
 
@@ -20,18 +20,15 @@ export const PlaylistListEvents = {
     template: `<div class="col-md-3">
     <div class="card plain-list">
         <div class="card-header with-border bg-warning">
-            <h3 class="card-title">Playlists</h3>
+            <h3 class="card-title">
+                <i class="fa fa-list-ul" />
+                Playlists
+            </h3>
             <div class="card-tools form-row">
                 <filter-textbox
                     v-bind:placeHolder="'List?'"
                     ref="Filterbox"
                     @TextUpdated="Refresh()"/>
-                <button
-                    class="btn btn-tool d-inline d-md-none collapse"
-                    ref="ButtonCollaplse"
-                    @click="OnClickCollapse" >
-                    <i class="fa fa-minus" />
-                </button>
                 <button
                     class="btn btn-tool"
                     ref="ButtonAdd"
@@ -70,10 +67,12 @@ export const PlaylistListEvents = {
         'add-modal': AddModal
     }
 })
-export default class PlaylistList extends SelectionList<Playlist, PlaylistStore> {
+export default class PlaylistList extends SelectionListBase<Playlist, PlaylistStore> {
 
     private static readonly PageLength: number = 30;
 
+    protected readonly tabId: string = 'subtab-playlists';
+    protected readonly linkId: string = 'nav-playlists';
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Playlist[] = [];
     protected allEntities: Playlist[] = [];
@@ -92,7 +91,6 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
     }
 
     public async Initialize(): Promise<boolean> {
-        this.isAutoCollapse = true;
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
@@ -117,9 +115,6 @@ export default class PlaylistList extends SelectionList<Playlist, PlaylistStore>
      */
     protected async OnInfinite($state: StateChanger): Promise<boolean> {
         return super.OnInfinite($state);
-    }
-    protected OnClickCollapse(): void {
-        super.OnClickCollapse();
     }
     protected async OnSelectionOrdered(args: ISelectionOrderedArgs<Playlist>): Promise<boolean> {
         return super.OnSelectionOrdered(args);
