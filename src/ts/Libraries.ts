@@ -20,7 +20,7 @@ import '../css/site.css';
 import jQuery = require('jquery');
 import * as ResponsiveBootstrapToolkit from 'responsive-toolkit/dist/bootstrap-toolkit';
 import 'admin-lte/plugins/bootstrap/js/bootstrap.bundle';
-//import * as AdminLte from 'admin-lte/dist/js/adminlte';
+import * as AdminLte from 'admin-lte/dist/js/adminlte';
 import 'admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider';
 import 'jquery-slimscroll';
 
@@ -79,6 +79,11 @@ export default class Libraries {
     public static readonly Mopidy = (((Mopidy as any).default)
         ? (Mopidy as any).default
         : Mopidy) as typeof Mopidy;
+
+    /**
+     * AdminLTE
+     */
+    public static readonly AdminLte = AdminLte;
 
     /**
      * SlimScroll (on JQuery)

@@ -150,7 +150,7 @@ define("EventableBase", ["require", "exports", "lodash"], function (require, exp
     }());
     exports.default = EventableBase;
 });
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "linq", "mopidy", "admin-lte/plugins/sweetalert2/sweetalert2", "vue", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "../css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, Enumerable, Mopidy, sweetalert2_1, vue_1) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "admin-lte/dist/js/adminlte", "linq", "mopidy", "admin-lte/plugins/sweetalert2/sweetalert2", "vue", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "../css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, AdminLte, Enumerable, Mopidy, sweetalert2_1, vue_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // SweetAlert2 は個別読み込みOK.
@@ -203,6 +203,10 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         Libraries.Mopidy = ((Mopidy.default)
             ? Mopidy.default
             : Mopidy);
+        /**
+         * AdminLte
+         */
+        Libraries.AdminLte = AdminLte;
         /**
          * SlimScroll (on JQuery)
          */
