@@ -2845,7 +2845,7 @@ define("Views/Shared/Filterboxes/Filterbox", ["require", "exports", "vue-class-c
     }(ViewBase_4.default));
     exports.default = Filterbox;
 });
-define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/TabBase"], function (require, exports, TabBase_2) {
+define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ContentDetailBase = /** @class */ (function (_super) {
@@ -2863,7 +2863,7 @@ define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/TabB
         };
         ContentDetailBase.DisplayNone = 'd-none';
         return ContentDetailBase;
-    }(TabBase_2.default));
+    }(ViewBase_5.default));
     exports.default = ContentDetailBase;
 });
 define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ContentDetailBase", "Views/Shared/SelectionItem"], function (require, exports, _, Libraries_5, Exception_11, ContentDetailBase_1, SelectionItem_2) {
@@ -2968,7 +2968,7 @@ define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Librar
     }(ContentDetailBase_1.default));
     exports.default = SelectionListBase;
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_12, ViewBase_5) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_12, ViewBase_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumTracksEvents = {
@@ -3132,7 +3132,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
-    }(ViewBase_5.default));
+    }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
 define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Bases/SelectionListBase", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_13, Filterbox_1, SelectionListBase_1, SelectionAlbumTracks_1) {
@@ -3832,7 +3832,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
     }(ContentBase_1.default));
     exports.default = Finder;
 });
-define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail"], function (require, exports, vue_class_component_10, ViewBase_6, IContent_1, Exception_15, Libraries_10, IContentDetail_2) {
+define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_15, Libraries_10, IContentDetail_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HeaderBarEvents = {
@@ -4030,7 +4030,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
             })
         ], HeaderBar);
         return HeaderBar;
-    }(ViewBase_6.default));
+    }(ViewBase_7.default));
     exports.default = HeaderBar;
 });
 define("Views/Events/BootstrapEvents", ["require", "exports"], function (require, exports) {
@@ -4049,7 +4049,7 @@ define("Views/Events/BootstrapEvents", ["require", "exports"], function (require
         Hidden: 'hidden.bs.tab'
     };
 });
-define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Models/Playlists/Playlist", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_11, Libraries_11, Playlist_2, ViewBase_7, BootstrapEvents_1) {
+define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Models/Playlists/Playlist", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_11, Libraries_11, Playlist_2, ViewBase_8, BootstrapEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AddModalEvents = {
@@ -4138,7 +4138,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
             })
         ], AddModal);
         return AddModal;
-    }(ViewBase_7.default));
+    }(ViewBase_8.default));
     exports.default = AddModal;
 });
 define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Bases/SelectionListBase", "Views/Playlists/Lists/Playlists/AddModal", "Utils/Delay"], function (require, exports, _, vue_class_component_12, vue_infinite_loading_4, Libraries_12, PlaylistStore_2, Filterbox_4, SelectionItem_5, SelectionListBase_4, AddModal_1, Delay_4) {
@@ -4340,7 +4340,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionListBase_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Bases/SelectionListBase"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_13, vue_property_decorator_6, Libraries_13, Track_5, Animate_3, Delay_5, ViewBase_8, SelectionListBase_5) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Bases/SelectionListBase"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_13, vue_property_decorator_6, Libraries_13, Track_5, Animate_3, Delay_5, ViewBase_9, SelectionListBase_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionListBase_5.SelectionEvents), {
@@ -4482,10 +4482,10 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             })
         ], SelectionTrack);
         return SelectionTrack;
-    }(ViewBase_8.default));
+    }(ViewBase_9.default));
     exports.default = SelectionTrack;
 });
-define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_14, Libraries_14, ViewBase_9) {
+define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_14, Libraries_14, ViewBase_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ConfirmType;
@@ -4542,7 +4542,7 @@ define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-c
             })
         ], ConfirmDialog);
         return ConfirmDialog;
-    }(ViewBase_9.default));
+    }(ViewBase_10.default));
     exports.default = ConfirmDialog;
 });
 define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "Views/Shared/Dialogs/ConfirmDialog"], function (require, exports, ConfirmDialog_2) {
@@ -5443,7 +5443,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
     }(ContentBase_2.default));
     exports.default = Playlists;
 });
-define("Views/Shared/Dialogs/ProgressDialog", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_17, Libraries_17, ViewBase_10) {
+define("Views/Shared/Dialogs/ProgressDialog", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_17, Libraries_17, ViewBase_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ProgressDialog = /** @class */ (function (_super) {
@@ -5485,7 +5485,7 @@ define("Views/Shared/Dialogs/ProgressDialog", ["require", "exports", "vue-class-
             })
         ], ProgressDialog);
         return ProgressDialog;
-    }(ViewBase_10.default));
+    }(ViewBase_11.default));
     exports.default = ProgressDialog;
 });
 define("Views/Settings/Blocks/DbBlock", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentDetailBase", "Views/Shared/Dialogs/ConfirmDialog", "Views/Shared/Dialogs/ProgressDialog"], function (require, exports, vue_class_component_18, Libraries_18, ContentDetailBase_2, ConfirmDialog_3, ProgressDialog_1) {
@@ -6609,7 +6609,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_5.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_20, Monitor_2, Player_1, ViewBase_11) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_20, Monitor_2, Player_1, ViewBase_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlayerPanel = /** @class */ (function (_super) {
@@ -6723,10 +6723,10 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
             })
         ], PlayerPanel);
         return PlayerPanel;
-    }(ViewBase_11.default));
+    }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_19, IContent_2, TabBase_3, ViewBase_12, BootstrapEvents_2, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_19, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_2, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -6783,51 +6783,51 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                             this.settingsTabAnchor = Libraries_21.default.$(this.SettingsAnchor);
                             this.finderTabAnchor.on(BootstrapEvents_2.TabEvents.Show, function () {
                                 var args = { Content: IContent_2.Contents.Finder };
-                                _this.$emit(TabBase_3.TabEvents.Show, args);
+                                _this.$emit(TabBase_2.TabEvents.Show, args);
                             });
                             this.finderTabAnchor.on(BootstrapEvents_2.TabEvents.Shown, function () {
                                 var args = { Content: IContent_2.Contents.Finder };
-                                _this.$emit(TabBase_3.TabEvents.Shown, args);
+                                _this.$emit(TabBase_2.TabEvents.Shown, args);
                             });
                             this.finderTabAnchor.on(BootstrapEvents_2.TabEvents.Hide, function () {
                                 var args = { Content: IContent_2.Contents.Finder };
-                                _this.$emit(TabBase_3.TabEvents.Hide, args);
+                                _this.$emit(TabBase_2.TabEvents.Hide, args);
                             });
                             this.finderTabAnchor.on(BootstrapEvents_2.TabEvents.Hidden, function () {
                                 var args = { Content: IContent_2.Contents.Finder };
-                                _this.$emit(TabBase_3.TabEvents.Hidden, args);
+                                _this.$emit(TabBase_2.TabEvents.Hidden, args);
                             });
                             this.playlistsTabAnchor.on(BootstrapEvents_2.TabEvents.Show, function () {
                                 var args = { Content: IContent_2.Contents.Playlists };
-                                _this.$emit(TabBase_3.TabEvents.Show, args);
+                                _this.$emit(TabBase_2.TabEvents.Show, args);
                             });
                             this.playlistsTabAnchor.on(BootstrapEvents_2.TabEvents.Shown, function () {
                                 var args = { Content: IContent_2.Contents.Playlists };
-                                _this.$emit(TabBase_3.TabEvents.Shown, args);
+                                _this.$emit(TabBase_2.TabEvents.Shown, args);
                             });
                             this.playlistsTabAnchor.on(BootstrapEvents_2.TabEvents.Hide, function () {
                                 var args = { Content: IContent_2.Contents.Playlists };
-                                _this.$emit(TabBase_3.TabEvents.Hide, args);
+                                _this.$emit(TabBase_2.TabEvents.Hide, args);
                             });
                             this.playlistsTabAnchor.on(BootstrapEvents_2.TabEvents.Hidden, function () {
                                 var args = { Content: IContent_2.Contents.Playlists };
-                                _this.$emit(TabBase_3.TabEvents.Hidden, args);
+                                _this.$emit(TabBase_2.TabEvents.Hidden, args);
                             });
                             this.settingsTabAnchor.on(BootstrapEvents_2.TabEvents.Show, function () {
                                 var args = { Content: IContent_2.Contents.Settings };
-                                _this.$emit(TabBase_3.TabEvents.Show, args);
+                                _this.$emit(TabBase_2.TabEvents.Show, args);
                             });
                             this.settingsTabAnchor.on(BootstrapEvents_2.TabEvents.Shown, function () {
                                 var args = { Content: IContent_2.Contents.Settings };
-                                _this.$emit(TabBase_3.TabEvents.Shown, args);
+                                _this.$emit(TabBase_2.TabEvents.Shown, args);
                             });
                             this.settingsTabAnchor.on(BootstrapEvents_2.TabEvents.Hide, function () {
                                 var args = { Content: IContent_2.Contents.Settings };
-                                _this.$emit(TabBase_3.TabEvents.Hide, args);
+                                _this.$emit(TabBase_2.TabEvents.Hide, args);
                             });
                             this.settingsTabAnchor.on(BootstrapEvents_2.TabEvents.Hidden, function () {
                                 var args = { Content: IContent_2.Contents.Settings };
-                                _this.$emit(TabBase_3.TabEvents.Hidden, args);
+                                _this.$emit(TabBase_2.TabEvents.Hidden, args);
                             });
                             return [2 /*return*/, true];
                     }
@@ -6905,10 +6905,10 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
             })
         ], Sidebar);
         return Sidebar;
-    }(ViewBase_12.default));
+    }(ViewBase_13.default));
     exports.default = Sidebar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_20, IContent_3, ViewBase_13, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_20, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7099,7 +7099,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
             })
         ], RootView);
         return RootView;
-    }(ViewBase_13.default));
+    }(ViewBase_14.default));
     exports.default = RootView;
 });
 define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_23, RootView_1) {
