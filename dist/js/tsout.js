@@ -165,6 +165,12 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
     var Libraries = /** @class */ (function () {
         function Libraries() {
         }
+        /* eslint-enable @typescript-eslint/indent */
+        Libraries.GetElement = function (arg) {
+            return (arg instanceof vue_1.default)
+                ? arg.$el
+                : arg;
+        };
         Libraries.Initialize = function () {
             // ResponsiveBootstrapToolkitをbootstrap4に対応させる
             // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
@@ -190,6 +196,20 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
             ? jQuery.default
             : jQuery);
         Libraries.$ = Libraries.jQuery;
+        Libraries.JQueryEventBinds = {
+            On: function (element, eventName, handler) {
+                var elem = Libraries.GetElement(element);
+                Libraries.$(elem).on(eventName, handler);
+            },
+            Off: function (element, eventName, handler) {
+                var elem = Libraries.GetElement(element);
+                Libraries.$(elem).off(eventName, handler);
+            },
+            OffAll: function (element, eventName) {
+                var elem = Libraries.GetElement(element);
+                Libraries.$(elem).off(eventName);
+            }
+        };
         /**
          * Bootstrap Toolkit
          * 画面サイズ切替判定で使用
@@ -250,7 +270,6 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
                 title: message
             });
         };
-        /* eslint-enable @typescript-eslint/indent */
         /**
          * SweerAlert2のToast表示メソッド
          * 型定義が冗長なのはなんとかならんのか
@@ -264,15 +283,11 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         };
         Libraries.Modal = {
             Show: function (arg) {
-                var elem = (arg instanceof vue_1.default)
-                    ? arg.$el
-                    : arg;
+                var elem = Libraries.GetElement(arg);
                 Libraries.$(elem).modal('show');
             },
             Hide: function (arg) {
-                var elem = (arg instanceof vue_1.default)
-                    ? arg.$el
-                    : arg;
+                var elem = Libraries.GetElement(arg);
                 Libraries.$(elem).modal('hide');
             }
         };
@@ -1303,6 +1318,7 @@ define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function
                             }
                         }
                     });
+                    this.initialized = true;
                     return [2 /*return*/, true];
                 });
             });
@@ -2994,7 +3010,29 @@ define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Librar
     }(ContentDetailBase_1.default));
     exports.default = SelectionListBase;
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_9, ViewBase_6) {
+define("Views/Events/BootstrapEvents", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ModalEvents = {
+        Show: 'show.bs.modal',
+        Shown: 'shown.bs.modal',
+        Hide: 'hide.bs.modal',
+        Hidden: 'hidden.bs.modal'
+    };
+    exports.TabEvents = {
+        Show: 'show.bs.tab',
+        Shown: 'shown.bs.tab',
+        Hide: 'hide.bs.tab',
+        Hidden: 'hidden.bs.tab'
+    };
+    exports.DropdownEvents = {
+        Show: 'show.bs.dropdown',
+        Shown: 'shown.bs.dropdown',
+        Hide: 'hide.bs.dropdown',
+        Hidden: 'hidden.bs.dropdown'
+    };
+});
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_9, ViewBase_6, BootstrapEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumTracksEvents = {
@@ -3024,9 +3062,9 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SelectionAlbumTracks.prototype, "HeaderDropDownDiv", {
+        Object.defineProperty(SelectionAlbumTracks.prototype, "HeaderDropDownInnerDiv", {
             get: function () {
-                return this.$refs.HeaderDropDownDiv;
+                return this.$refs.HeaderDropDownInnerDiv;
             },
             enumerable: true,
             configurable: true
@@ -3038,9 +3076,16 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SelectionAlbumTracks.prototype, "RowDropDownDivs", {
+        Object.defineProperty(SelectionAlbumTracks.prototype, "RowDropdownWrappers", {
             get: function () {
-                return this.$refs.RowDropDownDivs;
+                return this.$refs.RowDropdownWrappers;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SelectionAlbumTracks.prototype, "RowDropdownInnerDiv", {
+            get: function () {
+                return this.$refs.RowDropdownInnerDiv;
             },
             enumerable: true,
             configurable: true
@@ -3048,19 +3093,39 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         SelectionAlbumTracks.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var i, elem, i, elem;
+                var _this = this;
                 return __generator(this, function (_a) {
+                    if (this.GetIsInitialized())
+                        return [2 /*return*/];
                     _super.prototype.Initialize.call(this);
                     this.innerPlaylists = this.playlists;
                     Libraries_6.default.SetTooltip(this.AlbumPlayButton, 'Play Album');
                     Libraries_6.default.SetTooltip(this.HeaderPlaylistButton, 'To Playlist');
-                    Libraries_6.default.SlimScroll(this.HeaderDropDownDiv);
+                    Libraries_6.default.SlimScroll(this.HeaderDropDownInnerDiv);
                     for (i = 0; i < this.RowPlaylistButtons.length; i++) {
                         elem = this.RowPlaylistButtons[i];
                         Libraries_6.default.SetTooltip(elem, 'To Playlist');
                     }
-                    for (i = 0; i < this.RowDropDownDivs.length; i++) {
-                        elem = this.RowDropDownDivs[i];
-                        Libraries_6.default.SlimScroll(elem);
+                    // SlimScrollをインスタンシエイト後にdomTreeから削除し、参照を保持しておく。
+                    Libraries_6.default.SlimScroll(this.RowDropdownInnerDiv);
+                    this.rowDropdownContent = this.RowDropdownInnerDiv.parentElement;
+                    this.rowDropdownContent.parentElement.removeChild(this.rowDropdownContent);
+                    for (i = 0; i < this.RowDropdownWrappers.length; i++) {
+                        elem = this.RowDropdownWrappers[i];
+                        // トラックごとのプレイリストボタン操作で、SlimScrollDivをappend/removeする。
+                        Libraries_6.default.JQueryEventBinds.On(elem, BootstrapEvents_1.DropdownEvents.Show, function (ev) {
+                            var wrapper = ev.currentTarget;
+                            var outer = wrapper.querySelector('div.dropdown-menu');
+                            outer.appendChild(_this.rowDropdownContent);
+                        });
+                        Libraries_6.default.JQueryEventBinds.On(elem, BootstrapEvents_1.DropdownEvents.Hide, function (ev) {
+                            // 行選択イベントよりHideイベントの方が遅いため、DomTreeを辿った
+                            // トラックID取得には支障が無い。
+                            //console.log('hide event handled.');
+                            var wrapper = ev.currentTarget;
+                            var outer = wrapper.querySelector('div.dropdown-menu');
+                            outer.removeChild(_this.rowDropdownContent);
+                        });
                     }
                     return [2 /*return*/, true];
                 });
@@ -3119,13 +3184,14 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             this.$emit(exports.SelectionAlbumTracksEvents.PlayOrdered, orderedArgs);
         };
         SelectionAlbumTracks.prototype.OnRowPlaylistClicked = function (ev) {
+            console.log('row playlist selected');
             var elem = ev.currentTarget;
             var uri = elem.getAttribute('data-uri');
             var playlist = Libraries_6.default.Enumerable.from(this.innerPlaylists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
                 Exception_9.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
-            var trackIdString = elem.getAttribute('data-trackid');
+            var trackIdString = Libraries_6.default.$(elem).parents('tr.track-row').attr('data-trackid');
             if (!trackIdString || trackIdString === '')
                 Exception_9.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
@@ -3150,7 +3216,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         ], SelectionAlbumTracks.prototype, "playlists", void 0);
         SelectionAlbumTracks = __decorate([
             vue_class_component_5.default({
-                template: "<li class=\"nav-item albumtrack w-100\"\n                   ref=\"Li\" >\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnHeaderPlayClicked\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool dropdown-toggle\"\n                    data-toggle=\"dropdown\"\n                    data-offset=\"-160px, 0\"\n                    ref=\"HeaderPlaylistButton\">\n                    <i class=\"fa fa-bookmark\" />\n                </button>\n                <div class=\"dropdown-menu header-dropdown\">\n                    <div class=\"inner-header-dorpdown\" ref=\"HeaderDropDownDiv\">\n                        <a class=\"dropdown-item\"\n                            href=\"javascript:void(0)\"\n                            @click=\"OnHeaderNewPlaylistClicked\">New Playlist</a>\n                        <div class=\"dropdown-divider\"></div>\n                        <template v-for=\"playlist in innerPlaylists\">\n                        <a class=\"dropdown-item text-truncate\"\n                            href=\"javascript:void(0)\"\n                            v-bind:data-uri=\"playlist.Uri\"\n                            @click=\"OnHeaderPlaylistClicked\">{{ playlist.Name }}</a>\n                        </template>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\"\n                                @click=\"OnRowClicked\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\"\n                                @click=\"OnRowClicked\">{{ track.Name }}</td>\n                            <td class=\"tracklength\"\n                                @click=\"OnRowClicked\">{{ track.GetTimeString() }}</td>\n                            <td class=\"trackoperation\">\n                                <button type=\"button\"\n                                    class=\"btn btn-tool dropdown-toggle\"\n                                    data-toggle=\"dropdown\"\n                                    data-offset=\"-160px, 0\"\n                                    ref=\"RowPlaylistButtons\">\n                                    <i class=\"fa fa-bookmark\" />\n                                </button>\n                                <div class=\"dropdown-menu row-dropdown\">\n                                    <div class=\"inner-row-dorpdown\" ref=\"RowDropDownDivs\">\n                                        <template v-for=\"playlist in innerPlaylists\">\n                                        <a class=\"dropdown-item text-truncate\"\n                                            href=\"javascript:void(0)\"\n                                            v-bind:data-uri=\"playlist.Uri\"\n                                            v-bind:data-trackid=\"track.Id\"\n                                            @click=\"OnRowPlaylistClicked\">{{ playlist.Name }}</a>\n                                        </template>\n                                    </div>\n                                </div>\n                            </td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</li>"
+                template: "<li class=\"nav-item albumtrack w-100\"\n                   ref=\"Li\" >\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnHeaderPlayClicked\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <div class=\"dropdown\">\n                    <button type=\"button\"\n                        class=\"btn btn-tool dropdown-toggle\"\n                        data-toggle=\"dropdown\"\n                        data-offset=\"-160px, 0\"\n                        ref=\"HeaderPlaylistButton\">\n                        <i class=\"fa fa-bookmark\" />\n                    </button>\n                    <div class=\"dropdown-menu header-dropdown\">\n                        <div class=\"inner\" ref=\"HeaderDropDownInnerDiv\">\n                            <a class=\"dropdown-item\"\n                                href=\"javascript:void(0)\"\n                                @click=\"OnHeaderNewPlaylistClicked\">New Playlist</a>\n                            <div class=\"dropdown-divider\"></div>\n                            <template v-for=\"playlist in innerPlaylists\">\n                            <a class=\"dropdown-item text-truncate\"\n                                href=\"javascript:void(0)\"\n                                v-bind:data-uri=\"playlist.Uri\"\n                                @click=\"OnHeaderPlaylistClicked\">{{ playlist.Name }}</a>\n                            </template>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr class=\"track-row\"\n                            v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\"\n                                @click=\"OnRowClicked\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\"\n                                @click=\"OnRowClicked\">{{ track.Name }}</td>\n                            <td class=\"tracklength\"\n                                @click=\"OnRowClicked\">{{ track.GetTimeString() }}</td>\n                            <td class=\"trackoperation\">\n                                <div class=\"dropdown\"\n                                    ref=\"RowDropdownWrappers\">\n                                    <button type=\"button\"\n                                        class=\"btn btn-tool dropdown-toggle\"\n                                        data-toggle=\"dropdown\"\n                                        data-offset=\"-160px, 0\"\n                                        ref=\"RowPlaylistButtons\">\n                                        <i class=\"fa fa-bookmark\" />\n                                    </button>\n                                    <div class=\"dropdown-menu row-dropdown\">\n                                    </div>\n                                </div>\n                            </td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n    <div class=\"d-none\">\n        <div class=\"inner\" ref=\"RowDropdownInnerDiv\">\n            <template v-for=\"playlist in innerPlaylists\">\n            <a class=\"dropdown-item text-truncate\"\n                href=\"javascript:void(0)\"\n                v-bind:data-uri=\"playlist.Uri\"\n                @click=\"OnRowPlaylistClicked\">{{ playlist.Name }}</a>\n            </template>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
@@ -4042,23 +4108,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
     }(ViewBase_7.default));
     exports.default = HeaderBar;
 });
-define("Views/Events/BootstrapEvents", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.ModalEvents = {
-        Show: 'show.bs.modal',
-        Shown: 'shown.bs.modal',
-        Hide: 'hide.bs.modal',
-        Hidden: 'hidden.bs.modal'
-    };
-    exports.TabEvents = {
-        Show: 'show.bs.tab',
-        Shown: 'shown.bs.tab',
-        Hide: 'hide.bs.tab',
-        Hidden: 'hidden.bs.tab'
-    };
-});
-define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Models/Playlists/Playlist", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_11, Libraries_11, Playlist_2, ViewBase_8, BootstrapEvents_1) {
+define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-class-component", "Libraries", "Models/Playlists/Playlist", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_11, Libraries_11, Playlist_2, ViewBase_8, BootstrapEvents_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AddModalEvents = {
@@ -4097,7 +4147,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
                 var _this = this;
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    Libraries_11.default.$(this.$el).on(BootstrapEvents_1.ModalEvents.Shown, function () {
+                    Libraries_11.default.$(this.$el).on(BootstrapEvents_2.ModalEvents.Shown, function () {
                         _this.TextName.focus();
                     });
                     return [2 /*return*/, true];
@@ -6739,7 +6789,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_15, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_2, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_15, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -6791,51 +6841,51 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                     this.finderTabAnchor = Libraries_21.default.$(this.FinderAnchor);
                     this.playlistsTabAnchor = Libraries_21.default.$(this.PlaylistsAnchor);
                     this.settingsTabAnchor = Libraries_21.default.$(this.SettingsAnchor);
-                    this.finderTabAnchor.on(BootstrapEvents_2.TabEvents.Show, function () {
+                    this.finderTabAnchor.on(BootstrapEvents_3.TabEvents.Show, function () {
                         var args = { Content: IContent_2.Contents.Finder };
                         _this.$emit(TabBase_2.TabEvents.Show, args);
                     });
-                    this.finderTabAnchor.on(BootstrapEvents_2.TabEvents.Shown, function () {
+                    this.finderTabAnchor.on(BootstrapEvents_3.TabEvents.Shown, function () {
                         var args = { Content: IContent_2.Contents.Finder };
                         _this.$emit(TabBase_2.TabEvents.Shown, args);
                     });
-                    this.finderTabAnchor.on(BootstrapEvents_2.TabEvents.Hide, function () {
+                    this.finderTabAnchor.on(BootstrapEvents_3.TabEvents.Hide, function () {
                         var args = { Content: IContent_2.Contents.Finder };
                         _this.$emit(TabBase_2.TabEvents.Hide, args);
                     });
-                    this.finderTabAnchor.on(BootstrapEvents_2.TabEvents.Hidden, function () {
+                    this.finderTabAnchor.on(BootstrapEvents_3.TabEvents.Hidden, function () {
                         var args = { Content: IContent_2.Contents.Finder };
                         _this.$emit(TabBase_2.TabEvents.Hidden, args);
                     });
-                    this.playlistsTabAnchor.on(BootstrapEvents_2.TabEvents.Show, function () {
+                    this.playlistsTabAnchor.on(BootstrapEvents_3.TabEvents.Show, function () {
                         var args = { Content: IContent_2.Contents.Playlists };
                         _this.$emit(TabBase_2.TabEvents.Show, args);
                     });
-                    this.playlistsTabAnchor.on(BootstrapEvents_2.TabEvents.Shown, function () {
+                    this.playlistsTabAnchor.on(BootstrapEvents_3.TabEvents.Shown, function () {
                         var args = { Content: IContent_2.Contents.Playlists };
                         _this.$emit(TabBase_2.TabEvents.Shown, args);
                     });
-                    this.playlistsTabAnchor.on(BootstrapEvents_2.TabEvents.Hide, function () {
+                    this.playlistsTabAnchor.on(BootstrapEvents_3.TabEvents.Hide, function () {
                         var args = { Content: IContent_2.Contents.Playlists };
                         _this.$emit(TabBase_2.TabEvents.Hide, args);
                     });
-                    this.playlistsTabAnchor.on(BootstrapEvents_2.TabEvents.Hidden, function () {
+                    this.playlistsTabAnchor.on(BootstrapEvents_3.TabEvents.Hidden, function () {
                         var args = { Content: IContent_2.Contents.Playlists };
                         _this.$emit(TabBase_2.TabEvents.Hidden, args);
                     });
-                    this.settingsTabAnchor.on(BootstrapEvents_2.TabEvents.Show, function () {
+                    this.settingsTabAnchor.on(BootstrapEvents_3.TabEvents.Show, function () {
                         var args = { Content: IContent_2.Contents.Settings };
                         _this.$emit(TabBase_2.TabEvents.Show, args);
                     });
-                    this.settingsTabAnchor.on(BootstrapEvents_2.TabEvents.Shown, function () {
+                    this.settingsTabAnchor.on(BootstrapEvents_3.TabEvents.Shown, function () {
                         var args = { Content: IContent_2.Contents.Settings };
                         _this.$emit(TabBase_2.TabEvents.Shown, args);
                     });
-                    this.settingsTabAnchor.on(BootstrapEvents_2.TabEvents.Hide, function () {
+                    this.settingsTabAnchor.on(BootstrapEvents_3.TabEvents.Hide, function () {
                         var args = { Content: IContent_2.Contents.Settings };
                         _this.$emit(TabBase_2.TabEvents.Hide, args);
                     });
-                    this.settingsTabAnchor.on(BootstrapEvents_2.TabEvents.Hidden, function () {
+                    this.settingsTabAnchor.on(BootstrapEvents_3.TabEvents.Hidden, function () {
                         var args = { Content: IContent_2.Contents.Settings };
                         _this.$emit(TabBase_2.TabEvents.Hidden, args);
                     });

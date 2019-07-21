@@ -53,6 +53,10 @@ div#root {
     padding: 0.375rem 0.375rem;
 }
 
+div.dropdown {
+    display: inline-block;
+}
+
 .main-header.navbar.border-bottom {
     border-bottom: 1px solid #4b545c !important;
 }

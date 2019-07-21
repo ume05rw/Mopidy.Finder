@@ -7,6 +7,7 @@ import Track from '../../../../Models/Tracks/Track';
 import Exception from '../../../../Utils/Exception';
 import ViewBase from '../../../Bases/ViewBase';
 import { ISelectionChangedArgs } from '../../../Shared/SelectionItem';
+import { DropdownEvents } from '../../../Events/BootstrapEvents';
 
 export interface IPlayOrderedArgs extends ISelectionChangedArgs<AlbumTracks> {
     Track: Track;
@@ -40,25 +41,27 @@ export const SelectionAlbumTracksEvents = {
                     @click="OnHeaderPlayClicked" >
                     <i class="fa fa-play" />
                 </button>
-                <button type="button"
-                    class="btn btn-tool dropdown-toggle"
-                    data-toggle="dropdown"
-                    data-offset="-160px, 0"
-                    ref="HeaderPlaylistButton">
-                    <i class="fa fa-bookmark" />
-                </button>
-                <div class="dropdown-menu header-dropdown">
-                    <div class="inner-header-dorpdown" ref="HeaderDropDownDiv">
-                        <a class="dropdown-item"
-                            href="javascript:void(0)"
-                            @click="OnHeaderNewPlaylistClicked">New Playlist</a>
-                        <div class="dropdown-divider"></div>
-                        <template v-for="playlist in innerPlaylists">
-                        <a class="dropdown-item text-truncate"
-                            href="javascript:void(0)"
-                            v-bind:data-uri="playlist.Uri"
-                            @click="OnHeaderPlaylistClicked">{{ playlist.Name }}</a>
-                        </template>
+                <div class="dropdown">
+                    <button type="button"
+                        class="btn btn-tool dropdown-toggle"
+                        data-toggle="dropdown"
+                        data-offset="-160px, 0"
+                        ref="HeaderPlaylistButton">
+                        <i class="fa fa-bookmark" />
+                    </button>
+                    <div class="dropdown-menu header-dropdown">
+                        <div class="inner" ref="HeaderDropDownInnerDiv">
+                            <a class="dropdown-item"
+                                href="javascript:void(0)"
+                                @click="OnHeaderNewPlaylistClicked">New Playlist</a>
+                            <div class="dropdown-divider"></div>
+                            <template v-for="playlist in innerPlaylists">
+                            <a class="dropdown-item text-truncate"
+                                href="javascript:void(0)"
+                                v-bind:data-uri="playlist.Uri"
+                                @click="OnHeaderPlaylistClicked">{{ playlist.Name }}</a>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -71,7 +74,8 @@ export const SelectionAlbumTracksEvents = {
                 <table class="table table-sm table-hover tracks">
                     <tbody>
                         <template v-for="track in entity.Tracks">
-                        <tr v-bind:data-trackid="track.Id">
+                        <tr class="track-row"
+                            v-bind:data-trackid="track.Id">
                             <td class="tracknum"
                                 @click="OnRowClicked">{{ track.TrackNo }}</td>
                             <td class="trackname text-truncate"
@@ -79,22 +83,16 @@ export const SelectionAlbumTracksEvents = {
                             <td class="tracklength"
                                 @click="OnRowClicked">{{ track.GetTimeString() }}</td>
                             <td class="trackoperation">
-                                <button type="button"
-                                    class="btn btn-tool dropdown-toggle"
-                                    data-toggle="dropdown"
-                                    data-offset="-160px, 0"
-                                    ref="RowPlaylistButtons">
-                                    <i class="fa fa-bookmark" />
-                                </button>
-                                <div class="dropdown-menu row-dropdown">
-                                    <div class="inner-row-dorpdown" ref="RowDropDownDivs">
-                                        <template v-for="playlist in innerPlaylists">
-                                        <a class="dropdown-item text-truncate"
-                                            href="javascript:void(0)"
-                                            v-bind:data-uri="playlist.Uri"
-                                            v-bind:data-trackid="track.Id"
-                                            @click="OnRowPlaylistClicked">{{ playlist.Name }}</a>
-                                        </template>
+                                <div class="dropdown"
+                                    ref="RowDropdownWrappers">
+                                    <button type="button"
+                                        class="btn btn-tool dropdown-toggle"
+                                        data-toggle="dropdown"
+                                        data-offset="-160px, 0"
+                                        ref="RowPlaylistButtons">
+                                        <i class="fa fa-bookmark" />
+                                    </button>
+                                    <div class="dropdown-menu row-dropdown">
                                     </div>
                                 </div>
                             </td>
@@ -103,6 +101,16 @@ export const SelectionAlbumTracksEvents = {
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+    <div class="d-none">
+        <div class="inner" ref="RowDropdownInnerDiv">
+            <template v-for="playlist in innerPlaylists">
+            <a class="dropdown-item text-truncate"
+                href="javascript:void(0)"
+                v-bind:data-uri="playlist.Uri"
+                @click="OnRowPlaylistClicked">{{ playlist.Name }}</a>
+            </template>
         </div>
     </div>
 </li>`
@@ -118,38 +126,65 @@ export default class SelectionAlbumTracks extends ViewBase {
     // 描画はこちらを使う。
     private innerPlaylists: Playlist[] = [];
 
+    private rowDropdownContent: HTMLDivElement;
+
     private get AlbumPlayButton(): HTMLButtonElement {
         return this.$refs.AlbumPlayButton as HTMLButtonElement;
     }
     private get HeaderPlaylistButton(): HTMLButtonElement {
         return this.$refs.HeaderPlaylistButton as HTMLButtonElement;
     }
-    private get HeaderDropDownDiv(): HTMLDivElement {
-        return this.$refs.HeaderDropDownDiv as HTMLDivElement;
+    private get HeaderDropDownInnerDiv(): HTMLDivElement {
+        return this.$refs.HeaderDropDownInnerDiv as HTMLDivElement;
     }
     private get RowPlaylistButtons(): HTMLButtonElement[] {
         return this.$refs.RowPlaylistButtons as HTMLButtonElement[];
     }
-
-    private get RowDropDownDivs(): HTMLDivElement[] {
-        return this.$refs.RowDropDownDivs as HTMLDivElement[];
+    private get RowDropdownWrappers(): HTMLDivElement[] {
+        return this.$refs.RowDropdownWrappers as HTMLDivElement[];
+    }
+    private get RowDropdownInnerDiv(): HTMLDivElement {
+        return this.$refs.RowDropdownInnerDiv as HTMLDivElement;
     }
 
     public async Initialize(): Promise<boolean> {
+        if (this.GetIsInitialized())
+            return;
+
         super.Initialize();
+
         this.innerPlaylists = this.playlists;
 
         Libraries.SetTooltip(this.AlbumPlayButton, 'Play Album');
         Libraries.SetTooltip(this.HeaderPlaylistButton, 'To Playlist');
-        Libraries.SlimScroll(this.HeaderDropDownDiv);
+        Libraries.SlimScroll(this.HeaderDropDownInnerDiv);
 
         for (let i = 0; i < this.RowPlaylistButtons.length; i++) {
             const elem = this.RowPlaylistButtons[i];
             Libraries.SetTooltip(elem, 'To Playlist');
         }
-        for (let i = 0; i < this.RowDropDownDivs.length; i++) {
-            const elem = this.RowDropDownDivs[i];
-            Libraries.SlimScroll(elem);
+
+        // SlimScrollをインスタンシエイト後にdomTreeから削除し、参照を保持しておく。
+        Libraries.SlimScroll(this.RowDropdownInnerDiv);
+        this.rowDropdownContent = this.RowDropdownInnerDiv.parentElement as HTMLDivElement;
+        this.rowDropdownContent.parentElement.removeChild(this.rowDropdownContent);
+
+        for (let i = 0; i < this.RowDropdownWrappers.length; i++) {
+            const elem = this.RowDropdownWrappers[i];
+            // トラックごとのプレイリストボタン操作で、SlimScrollDivをappend/removeする。
+            Libraries.JQueryEventBinds.On(elem, DropdownEvents.Show, (ev: Event) => {
+                const wrapper = ev.currentTarget as HTMLElement;
+                const outer = wrapper.querySelector('div.dropdown-menu') as HTMLDivElement;
+                outer.appendChild(this.rowDropdownContent);
+            });
+            Libraries.JQueryEventBinds.On(elem, DropdownEvents.Hide, (ev: Event) => {
+                // 行選択イベントよりHideイベントの方が遅いため、DomTreeを辿った
+                // トラックID取得には支障が無い。
+                //console.log('hide event handled.');
+                const wrapper = ev.currentTarget as HTMLElement;
+                const outer = wrapper.querySelector('div.dropdown-menu') as HTMLDivElement;
+                outer.removeChild(this.rowDropdownContent);
+            });
         }
 
         return true;
@@ -219,7 +254,9 @@ export default class SelectionAlbumTracks extends ViewBase {
     }
 
     private OnRowPlaylistClicked(ev: MouseEvent): void {
+        console.log('row playlist selected');
         const elem = ev.currentTarget as HTMLElement;
+
         const uri = elem.getAttribute('data-uri');
         const playlist = Libraries.Enumerable.from(this.innerPlaylists)
             .firstOrDefault(e => e.Uri === uri);
@@ -227,7 +264,7 @@ export default class SelectionAlbumTracks extends ViewBase {
         if (!playlist)
             Exception.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
 
-        const trackIdString = elem.getAttribute('data-trackid');
+        const trackIdString = Libraries.$(elem).parents('tr.track-row').attr('data-trackid');
         if (!trackIdString || trackIdString === '')
             Exception.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
 

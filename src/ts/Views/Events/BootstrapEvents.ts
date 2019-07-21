@@ -10,3 +10,9 @@ export const TabEvents = {
     Hide: 'hide.bs.tab',
     Hidden: 'hidden.bs.tab'
 };
+export const DropdownEvents = {
+    Show: 'show.bs.dropdown',
+    Shown: 'shown.bs.dropdown',
+    Hide: 'hide.bs.dropdown',
+    Hidden: 'hidden.bs.dropdown'    
+};

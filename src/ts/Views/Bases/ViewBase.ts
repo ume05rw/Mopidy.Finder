@@ -25,6 +25,8 @@ export default abstract class ViewBase extends Vue {
             }
         });
 
+        this.initialized = true;
+
         return true;
     }
 

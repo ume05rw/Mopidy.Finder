@@ -65,6 +65,25 @@ export default class Libraries {
         : jQuery) as typeof jQuery;
     public static readonly $ = Libraries.jQuery;
 
+    public static readonly JQueryEventBinds: {
+        On: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => void,
+        Off: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => void,
+        OffAll: (element: HTMLElement | Vue, eventName: string) => void
+    } = {
+        On: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => {
+            const elem = Libraries.GetElement(element);
+            Libraries.$(elem).on(eventName, handler);
+        },
+        Off: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => {
+            const elem = Libraries.GetElement(element);
+            Libraries.$(elem).off(eventName, handler);
+        },
+        OffAll: (element: HTMLElement | Vue, eventName: string) => {
+            const elem = Libraries.GetElement(element);
+            Libraries.$(elem).off(eventName);
+        }
+    }
+
     /**
      * Bootstrap Toolkit
      * 画面サイズ切替判定で使用
@@ -136,6 +155,12 @@ export default class Libraries {
         };
     /* eslint-enable @typescript-eslint/indent */
 
+    private static GetElement(arg: HTMLElement | Vue): HTMLElement {
+        return (arg instanceof Vue)
+            ? (arg as Vue).$el as HTMLElement
+            : arg as HTMLElement;
+    }
+
     /**
      * SweerAlert2のToast表示メソッド
      * 型定義が冗長なのはなんとかならんのか
@@ -159,15 +184,11 @@ export default class Libraries {
         Hide: (arg: HTMLElement | Vue) => void
     } = {
         Show: (arg: HTMLElement | Vue): void => {
-            const elem = (arg instanceof Vue)
-                ? (arg as Vue).$el as HTMLElement
-                : arg as HTMLElement;
+            const elem = Libraries.GetElement(arg);
             Libraries.$(elem).modal('show');
         },
         Hide: (arg: HTMLElement | Vue): void => {
-            const elem = (arg instanceof Vue)
-                ? (arg as Vue).$el as HTMLElement
-                : arg as HTMLElement;
+            const elem = Libraries.GetElement(arg);
             Libraries.$(elem).modal('hide');
         }
     }
