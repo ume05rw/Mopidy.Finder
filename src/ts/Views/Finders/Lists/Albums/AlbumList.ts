@@ -219,22 +219,14 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     }
 
     private async OnAddToPlaylistOrdered(args: IAddToPlaylistOrderedArgs): Promise<boolean> {
-        const playlist = args.Playlist;
-        if (!playlist.Tracks)
-            playlist.Tracks = [];
-
-        for (let i = 0; i < args.Tracks.length; i++) {
-            const track = args.Tracks[i];
-            playlist.Tracks.push(track);
-        }
-
+        // 現在のトラックを取得する。
         const store = new PlaylistStore();
-        const result = await store.UpdatePlayllist(playlist);
+        const result = await store.AppendTracks(args.Playlist, args.Tracks);
 
         if (result === true) {
             this.$emit(AlbumListEvents.PlaylistUpdated);
             this.InitPlaylistList();
-            Libraries.ShowToast.Success(`Add ${args.Tracks.length} Track(s) to [ ${playlist.Name} ]`);
+            Libraries.ShowToast.Success(`Add ${args.Tracks.length} Track(s) to [ ${args.Playlist.Name} ]`);
         } else {
             Libraries.ShowToast.Error('Playlist Update Failed...');
         }

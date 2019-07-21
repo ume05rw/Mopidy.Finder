@@ -242,6 +242,9 @@ div.dropdown {
 .track-row * {
     transition: all 0.3s ease-in-out;
 }
+.track-row .trackoperation .dropdown {
+    transition: none;
+}
 
 .track-list.playable .editmode-buttons {
     display: none;

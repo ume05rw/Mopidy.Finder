@@ -160,6 +160,27 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         return playlist;
     }
 
+    public async AppendTracks(playlist: Playlist, newTracks: Track[]): Promise<boolean> {
+        const resLookup
+            = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
+                uri: playlist.Uri
+            });
+
+        const mpPlaylist = resLookup.result as IPlaylist;
+        // Createしたてでトラック未登録のプレイリストのとき、
+        // tracksプロパティが存在しない。
+        playlist.Tracks = (mpPlaylist.tracks && 0 <= mpPlaylist.tracks.length)
+            ? Track.CreateArrayFromMopidy(mpPlaylist.tracks)
+            : [];
+
+        for (let i = 0; i < newTracks.length; i++)
+            playlist.Tracks.push(newTracks[i]);
+
+        const resUpdate = this.UpdatePlayllist(playlist);
+
+        return resUpdate;
+    }
+
     public async UpdatePlayllist(playlist: Playlist): Promise<boolean> {
 
         const tracks: { __model__: string; uri: string }[] = [];

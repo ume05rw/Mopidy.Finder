@@ -2196,6 +2196,30 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                 });
             });
         };
+        PlaylistStore.prototype.AppendTracks = function (playlist, newTracks) {
+            return __awaiter(this, void 0, void 0, function () {
+                var resLookup, mpPlaylist, i, resUpdate;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(PlaylistStore.Methods.PlaylistLookup, {
+                                uri: playlist.Uri
+                            })];
+                        case 1:
+                            resLookup = _a.sent();
+                            mpPlaylist = resLookup.result;
+                            // Createしたてでトラック未登録のプレイリストのとき、
+                            // tracksプロパティが存在しない。
+                            playlist.Tracks = (mpPlaylist.tracks && 0 <= mpPlaylist.tracks.length)
+                                ? Track_4.default.CreateArrayFromMopidy(mpPlaylist.tracks)
+                                : [];
+                            for (i = 0; i < newTracks.length; i++)
+                                playlist.Tracks.push(newTracks[i]);
+                            resUpdate = this.UpdatePlayllist(playlist);
+                            return [2 /*return*/, resUpdate];
+                    }
+                });
+            });
+        };
         PlaylistStore.prototype.UpdatePlayllist = function (playlist) {
             return __awaiter(this, void 0, void 0, function () {
                 var tracks, i, track, response;
@@ -3417,25 +3441,18 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList.prototype.OnAddToPlaylistOrdered = function (args) {
             return __awaiter(this, void 0, void 0, function () {
-                var playlist, i, track, store, result;
+                var store, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            playlist = args.Playlist;
-                            if (!playlist.Tracks)
-                                playlist.Tracks = [];
-                            for (i = 0; i < args.Tracks.length; i++) {
-                                track = args.Tracks[i];
-                                playlist.Tracks.push(track);
-                            }
                             store = new PlaylistStore_1.default();
-                            return [4 /*yield*/, store.UpdatePlayllist(playlist)];
+                            return [4 /*yield*/, store.AppendTracks(args.Playlist, args.Tracks)];
                         case 1:
                             result = _a.sent();
                             if (result === true) {
                                 this.$emit(exports.AlbumListEvents.PlaylistUpdated);
                                 this.InitPlaylistList();
-                                Libraries_7.default.ShowToast.Success("Add " + args.Tracks.length + " Track(s) to [ " + playlist.Name + " ]");
+                                Libraries_7.default.ShowToast.Success("Add " + args.Tracks.length + " Track(s) to [ " + args.Playlist.Name + " ]");
                             }
                             else {
                                 Libraries_7.default.ShowToast.Error('Playlist Update Failed...');
@@ -5177,7 +5194,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             var enEntities = Libraries_15.default.Enumerable.from(this.entities);
             var children = this.TrackListUl.querySelectorAll('li');
             var _loop_1 = function (i) {
-                var uri = children[i].getAttribute('data-uri');
+                var row = children[i];
+                var uri = row.getAttribute('data-uri');
                 var entity = enEntities.firstOrDefault(function (e) { return e.Uri == uri; });
                 if (entity && result.indexOf(entity) <= -1)
                     result.push(entity);
@@ -5185,13 +5203,19 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             for (var i = 0; i < children.length; i++) {
                 _loop_1(i);
             }
-            for (var i = 0; i < this.playlist.Tracks.length; i++) {
-                var track = this.playlist.Tracks[i];
+            var enResult = Libraries_15.default.Enumerable.from(result);
+            var enRemoved = Libraries_15.default.Enumerable.from(this.removedEntities);
+            var _loop_2 = function (i) {
+                var track = this_1.playlist.Tracks[i];
                 // 表示圏外だったエンティティを追加する。
-                if (result.indexOf(track) <= -1
-                    && this.removedEntities.indexOf(track) <= 1) {
+                if (enResult.all(function (e) { return e.Uri !== track.Uri; })
+                    && enRemoved.all(function (e) { return e.Uri !== track.Uri; })) {
                     result.push(track);
                 }
+            };
+            var this_1 = this;
+            for (var i = 0; i < this.playlist.Tracks.length; i++) {
+                _loop_2(i);
             }
             return result;
         };

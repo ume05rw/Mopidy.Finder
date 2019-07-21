@@ -497,19 +497,23 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
         const enEntities = Libraries.Enumerable.from(this.entities);
         const children = this.TrackListUl.querySelectorAll('li');
         for (let i = 0; i < children.length; i++) {
-            const uri = children[i].getAttribute('data-uri');
+            const row = children[i];
+            const uri = row.getAttribute('data-uri');
             const entity = enEntities.firstOrDefault((e): boolean => e.Uri == uri);
             if (entity && result.indexOf(entity) <= -1)
                 result.push(entity);
         }
+
+        const enResult = Libraries.Enumerable.from(result);
+        const enRemoved = Libraries.Enumerable.from(this.removedEntities);
 
         for (let i = 0; i < this.playlist.Tracks.length; i++) {
             const track = this.playlist.Tracks[i];
 
             // 表示圏外だったエンティティを追加する。
             if (
-                result.indexOf(track) <= -1
-                && this.removedEntities.indexOf(track) <= 1
+                enResult.all(e => e.Uri !== track.Uri)
+                && enRemoved.all(e => e.Uri !== track.Uri)
             ) {
                 result.push(track);
             }
