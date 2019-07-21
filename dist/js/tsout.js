@@ -4584,7 +4584,7 @@ define("Views/Shared/Dialogs/ConfirmDialog", ["require", "exports", "vue-class-c
         ConfirmDialog.ModalBaseClass = 'modal-content';
         ConfirmDialog = ConfirmDialog_1 = __decorate([
             vue_class_component_14.default({
-                template: "<div class=\"modal fade\"\n    data-backdrop=\"static\"\n    data-keyboard=\"false\"\n    data-focus=\"true\"\n    style=\"display: none;\"\n    aria-hidden=\"true\">\n    <div class=\"modal-dialog\">\n        <div v-bind:class=\"modalClasses\">\n            <div class=\"modal-header\">\n                <h4 class=\"modal-title\">{{ mainMessage }}</h4>\n            </div>\n            <div class=\"modal-body\">\n                <p>\n                <template v-for=\"line in detailLines\">\n                    <span>{{ line }}</span><br/>\n                </template>\n                </p>\n            </div>\n            <div class=\"modal-footer ustify-content-between\">\n                <button type=\"button\"\n                    class=\"btn btn-outline-light\"\n                    @click=\"OnClickCancel\">Cancel</button>\n                <button type=\"button\"\n                    class=\"btn btn-outline-light\"\n                    @click=\"OnClickOk\">OK</button>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"modal fade\"\n    data-backdrop=\"static\"\n    data-keyboard=\"false\"\n    data-focus=\"true\"\n    style=\"display: none;\"\n    aria-hidden=\"true\">\n    <div class=\"modal-dialog\">\n        <div v-bind:class=\"modalClasses\">\n            <div class=\"modal-header\">\n                <h4 class=\"modal-title\">{{ mainMessage }}</h4>\n            </div>\n            <div class=\"modal-body\">\n                <p>\n                <template v-for=\"line in detailLines\">\n                    <span>{{ line }}</span><br/>\n                </template>\n                </p>\n            </div>\n            <div class=\"modal-footer justify-content-between\">\n                <button type=\"button\"\n                    class=\"btn btn-outline-light\"\n                    @click=\"OnClickCancel\">Cancel</button>\n                <button type=\"button\"\n                    class=\"btn btn-outline-light\"\n                    @click=\"OnClickOk\">OK</button>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], ConfirmDialog);
         return ConfirmDialog;
@@ -5813,7 +5813,7 @@ define("Views/Settings/Blocks/DbBlock", ["require", "exports", "vue-class-compon
         };
         DbBlock = __decorate([
             vue_class_component_18.default({
-                template: "<div class=\"row\">\n    <div class=\"col-12\">\n        <div class=\"card\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-database\" />\n                    Refresh Relation Data\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"form-row\">\n                    <div class=\"col-auto\">\n                        <p>\n                            Scan New Albums.<br/>\n                            The data in <strong>Mopidy Itself is not affected.</strong>\n                        </p>\n                        <button class=\"btn btn-app btn-outline-warning disabled\"\n                            @click=\"OnScanNewButtonClicked\"\n                            ref=\"ScanNewButton\">\n                            <i class=\"fa fa-search-plus\"></i> Scan New\n                        </button>\n                    </div>\n                    <div class=\"col-auto ml-4\">\n                        <p>\n                            Delete and Refresh <strong>Mopidy.Finder's Database.</strong><br/>\n                            The data in <strong>Mopidy Itself is not affected.</strong>\n                        </p>\n                        <button class=\"btn btn-app btn-outline-warning disabled\"\n                            @click=\"OnCleanupButtonClicked\"\n                            ref=\"CleanupButton\">\n                            <i class=\"fa fa-refresh\"></i> Cleanup\n                        </button>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <confirm-dialog\n        ref=\"ConfirmDialog\" />\n    <progress-dialog\n        ref=\"ProgressDialog\" />\n</div>",
+                template: "<div class=\"row\">\n    <div class=\"col-12\">\n        <div class=\"card\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-database\" />\n                    Refresh Relation Data\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"form-row\">\n                    <div class=\"col-md-3 px-2\">\n                        <p>\n                            Scan New Albums.<br/>\n                            The data in <strong>Mopidy Itself is not affected.</strong>\n                        </p>\n                        <p class=\"d-flex flex-row justify-content-center\">\n                            <button class=\"btn btn-app btn-outline-warning disabled button-database\"\n                                @click=\"OnScanNewButtonClicked\"\n                                ref=\"ScanNewButton\">\n                                <i class=\"fa fa-search-plus\"></i> Scan New\n                            </button>\n                        </p>\n                    </div>\n                    <div class=\"col-md-3 px-2\">\n                        <p>\n                            Delete All and Refresh.<br/>\n                            The data in <strong>Mopidy Itself is not affected.</strong>\n                        </p>\n                        <p class=\"d-flex flex-row justify-content-center\">\n                            <button class=\"btn btn-app btn-outline-warning disabled button-database\"\n                                @click=\"OnCleanupButtonClicked\"\n                                ref=\"CleanupButton\">\n                                <i class=\"fa fa-refresh\"></i> Cleanup\n                            </button>\n                        </p>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <confirm-dialog\n        ref=\"ConfirmDialog\" />\n    <progress-dialog\n        ref=\"ProgressDialog\" />\n</div>",
                 components: {
                     'confirm-dialog': ConfirmDialog_3.default,
                     'progress-dialog': ProgressDialog_1.default,
@@ -5836,6 +5836,7 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.tabId = 'subtab-mopidy';
             _this.linkId = 'nav-mopidy';
+            _this.classInvalid = 'is-invalid';
             _this.connectionClasses = {
                 True: {
                     Icon: 'fa fa-link',
@@ -5909,21 +5910,14 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
         };
         MopidyBlock.prototype.Update = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var address, portString, port, update;
+                var address, port, update;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
+                            if (!this.Validate())
+                                return [2 /*return*/];
                             address = this.ServerAddressInput.value;
-                            portString = this.ServerPortInput.value;
-                            if (!address || address.length <= 0) {
-                                Libraries_19.default.ShowToast.Warning('Address required.');
-                                return [2 /*return*/, false];
-                            }
-                            port = parseInt(portString, 10);
-                            if (!port) {
-                                Libraries_19.default.ShowToast.Warning('Port required.');
-                                return [2 /*return*/, false];
-                            }
+                            port = parseInt(this.ServerPortInput.value, 10);
                             update = {
                                 ServerAddress: address,
                                 ServerPort: port
@@ -5951,6 +5945,46 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
                 });
             });
         };
+        MopidyBlock.prototype.Validate = function () {
+            var address = this.ServerAddressInput.value;
+            var portString = this.ServerPortInput.value;
+            var result = true;
+            // 一旦エラークラスを削除
+            if (this.ServerAddressInput.classList.contains(this.classInvalid))
+                this.ServerAddressInput.classList.remove(this.classInvalid);
+            if (this.ServerPortInput.classList.contains(this.classInvalid))
+                this.ServerPortInput.classList.remove(this.classInvalid);
+            if (!address || address.length <= 0) {
+                this.ServerAddressInput.classList.add(this.classInvalid);
+                if (result === true) {
+                    Libraries_19.default.ShowToast.Warning('Address required.');
+                    result = false;
+                }
+            }
+            if (255 < address.length) {
+                this.ServerAddressInput.classList.add(this.classInvalid);
+                if (result === true) {
+                    Libraries_19.default.ShowToast.Warning('Address too long.');
+                    result = false;
+                }
+            }
+            if (!portString || portString.length <= 0) {
+                this.ServerPortInput.classList.add(this.classInvalid);
+                if (result === true) {
+                    Libraries_19.default.ShowToast.Warning('Port required.');
+                    result = false;
+                }
+            }
+            else {
+                var port = parseInt(portString, 10);
+                if (!port) {
+                    this.ServerPortInput.classList.add(this.classInvalid);
+                    Libraries_19.default.ShowToast.Warning('Please enter a number.');
+                    result = false;
+                }
+            }
+            return result;
+        };
         MopidyBlock.prototype.SetConnectionIcon = function () {
             var wrapperClasses = this.IconWrapper.classList;
             var iconClasses = this.Icon.classList;
@@ -5965,7 +5999,7 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
         };
         MopidyBlock = __decorate([
             vue_class_component_19.default({
-                template: "<div class=\"row\">\n    <div class=\"col-12\">\n        <div class=\"card\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-wifi\" />\n                    Set Your Mopidy\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"form-row\">\n                    <div class=\"col-auto\">\n                        <div class=\"input-group\">\n                            <div class=\"input-group-prepend\">\n                                <div class=\"input-group-text\">http://</div>\n                            </div>\n                            <input type=\"text\"\n                                id=\"server_address\"\n                                maxlength=\"255\"\n                                class=\"form-control address\"\n                                placeholder=\"Server Address\"\n                                ref=\"ServerAddressInput\"\n                                @input=\"OnServerAddressInput\" />\n                            <div class=\"input-group-prepend\">\n                                <div class=\"input-group-text\">:</div>\n                            </div>\n                            <input type=\"number\"\n                                maxlength=\"5\"\n                                class=\"form-control port\"\n                                placeholder=\"Server Port\"\n                                ref=\"ServerPortInput\"\n                                @input=\"OnServerPortInput\" />\n                            <div class=\"input-group-append\">\n                                <div class=\"input-group-text\">/mopidy/</div>\n                            </div>\n                            <span class=\"connection-icon\"\n                                ref=\"IconWrapper\">\n                                <i class=\"\"\n                                    ref=\"Icon\"/>\n                            </span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"row\">\n    <div class=\"col-12\">\n        <div class=\"card\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-wifi\" />\n                    Set Your Mopidy\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"form-row\">\n                    <div class=\"col-auto\">\n                        <div class=\"input-group\">\n                            <div class=\"input-group-prepend\">\n                                <div class=\"input-group-text\">http://</div>\n                            </div>\n                            <input type=\"text\"\n                                id=\"server_address\"\n                                maxlength=\"255\"\n                                class=\"form-control address\"\n                                placeholder=\"Server Address\"\n                                autocomplete=\"off\"\n                                ref=\"ServerAddressInput\"\n                                @input=\"OnServerAddressInput\" />\n                            <div class=\"input-group-prepend\">\n                                <div class=\"input-group-text\">:</div>\n                            </div>\n                            <input type=\"number\"\n                                maxlength=\"5\"\n                                class=\"form-control port\"\n                                placeholder=\"Port\"\n                                autocomplete=\"off\"\n                                ref=\"ServerPortInput\"\n                                @input=\"OnServerPortInput\" />\n                            <div class=\"input-group-append\">\n                                <div class=\"input-group-text\">/mopidy/</div>\n                            </div>\n                            <span class=\"connection-icon\"\n                                ref=\"IconWrapper\">\n                                <i class=\"\"\n                                    ref=\"Icon\"/>\n                            </span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], MopidyBlock);
         return MopidyBlock;

@@ -18,27 +18,31 @@ import ProgressDialog from '../../Shared/Dialogs/ProgressDialog';
             </div>
             <div class="card-body">
                 <div class="form-row">
-                    <div class="col-auto">
+                    <div class="col-md-3 px-2">
                         <p>
                             Scan New Albums.<br/>
                             The data in <strong>Mopidy Itself is not affected.</strong>
                         </p>
-                        <button class="btn btn-app btn-outline-warning disabled"
-                            @click="OnScanNewButtonClicked"
-                            ref="ScanNewButton">
-                            <i class="fa fa-search-plus"></i> Scan New
-                        </button>
+                        <p class="d-flex flex-row justify-content-center">
+                            <button class="btn btn-app btn-outline-warning disabled button-database"
+                                @click="OnScanNewButtonClicked"
+                                ref="ScanNewButton">
+                                <i class="fa fa-search-plus"></i> Scan New
+                            </button>
+                        </p>
                     </div>
-                    <div class="col-auto ml-4">
+                    <div class="col-md-3 px-2">
                         <p>
-                            Delete and Refresh <strong>Mopidy.Finder's Database.</strong><br/>
+                            Delete All and Refresh.<br/>
                             The data in <strong>Mopidy Itself is not affected.</strong>
                         </p>
-                        <button class="btn btn-app btn-outline-warning disabled"
-                            @click="OnCleanupButtonClicked"
-                            ref="CleanupButton">
-                            <i class="fa fa-refresh"></i> Cleanup
-                        </button>
+                        <p class="d-flex flex-row justify-content-center">
+                            <button class="btn btn-app btn-outline-warning disabled button-database"
+                                @click="OnCleanupButtonClicked"
+                                ref="CleanupButton">
+                                <i class="fa fa-refresh"></i> Cleanup
+                            </button>
+                        </p>
                     </div>
                 </div>
             </div>

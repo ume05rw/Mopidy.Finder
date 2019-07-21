@@ -35,6 +35,7 @@ interface IIconClasses {
                                 maxlength="255"
                                 class="form-control address"
                                 placeholder="Server Address"
+                                autocomplete="off"
                                 ref="ServerAddressInput"
                                 @input="OnServerAddressInput" />
                             <div class="input-group-prepend">
@@ -43,7 +44,8 @@ interface IIconClasses {
                             <input type="number"
                                 maxlength="5"
                                 class="form-control port"
-                                placeholder="Server Port"
+                                placeholder="Port"
+                                autocomplete="off"
                                 ref="ServerPortInput"
                                 @input="OnServerPortInput" />
                             <div class="input-group-append">
@@ -67,6 +69,7 @@ export default class MopidyBlock extends ContentDetailBase {
     protected readonly tabId: string = 'subtab-mopidy';
     protected readonly linkId: string = 'nav-mopidy';
 
+    private readonly classInvalid: string = 'is-invalid';
     private lazyUpdater: DelayedOnceExecuter;
     private store: SettingsStore;
     private entity: SettingsEntity;
@@ -126,19 +129,11 @@ export default class MopidyBlock extends ContentDetailBase {
     }
 
     private async Update(): Promise<boolean> {
+        if (!this.Validate())
+            return;
+
         const address = this.ServerAddressInput.value;
-        const portString = this.ServerPortInput.value;
-
-        if (!address || address.length <= 0) {
-            Libraries.ShowToast.Warning('Address required.');
-            return false;
-        }
-
-        const port = parseInt(portString, 10);
-        if (!port) {
-            Libraries.ShowToast.Warning('Port required.');
-            return false;
-        }
+        const port = parseInt(this.ServerPortInput.value, 10);
 
         const update: ISettings = {
             ServerAddress: address,
@@ -161,6 +156,51 @@ export default class MopidyBlock extends ContentDetailBase {
         this.$emit(MopidyBlockEvents.SettingsUpdated);
 
         return this.entity.IsMopidyConnectable;
+    }
+
+    private Validate(): boolean {
+        const address = this.ServerAddressInput.value;
+        const portString = this.ServerPortInput.value;
+        let result = true;
+
+        // 一旦エラークラスを削除
+        if (this.ServerAddressInput.classList.contains(this.classInvalid))
+            this.ServerAddressInput.classList.remove(this.classInvalid);
+        if (this.ServerPortInput.classList.contains(this.classInvalid))
+            this.ServerPortInput.classList.remove(this.classInvalid);
+
+        if (!address || address.length <= 0) {
+            this.ServerAddressInput.classList.add(this.classInvalid);
+            if (result === true) {
+                Libraries.ShowToast.Warning('Address required.');
+                result = false;
+            }
+        }
+
+        if (255 < address.length) {
+            this.ServerAddressInput.classList.add(this.classInvalid);
+            if (result === true) {
+                Libraries.ShowToast.Warning('Address too long.');
+                result = false;
+            }
+        }
+
+        if (!portString || portString.length <= 0) {
+            this.ServerPortInput.classList.add(this.classInvalid);
+            if (result === true) {
+                Libraries.ShowToast.Warning('Port required.');
+                result = false;
+            }
+        } else {
+            const port = parseInt(portString, 10);
+            if (!port) {
+                this.ServerPortInput.classList.add(this.classInvalid);
+                Libraries.ShowToast.Warning('Please enter a number.');
+                result = false;
+            }
+        }
+
+        return result;
     }
 
     private SetConnectionIcon(): void {

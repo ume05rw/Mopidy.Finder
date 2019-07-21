@@ -251,7 +251,7 @@ div#root {
  * 設定
  */
 #tab-settings input.port {
-    max-width: 90px;
+    max-width: 110px;
 }
 #tab-settings .connection-icon {
     display: inline-block;
@@ -263,4 +263,8 @@ div#root {
 }
 #tab-settings .connection-icon.notconnectable {
     color: #ff3c5c;
+}
+#tab-settings .button-database {
+    width: 100px;
+    margin: 0;
 }

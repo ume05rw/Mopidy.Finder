@@ -27,7 +27,7 @@ export enum ConfirmType {
                 </template>
                 </p>
             </div>
-            <div class="modal-footer ustify-content-between">
+            <div class="modal-footer justify-content-between">
                 <button type="button"
                     class="btn btn-outline-light"
                     @click="OnClickCancel">Cancel</button>
