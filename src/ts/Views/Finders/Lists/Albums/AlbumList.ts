@@ -12,6 +12,7 @@ import Exception from '../../../../Utils/Exception';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionListBase, SelectionEvents } from '../../../Bases/SelectionListBase';
 import { default as SelectionAlbumTracks, IAddToPlaylistOrderedArgs, ICreatePlaylistOrderedArgs, IPlayOrderedArgs } from './SelectionAlbumTracks';
+import Dump from '../../../../Utils/Dump';
 
 export const AlbumListEvents = {
     PlaylistUpdated: 'PlaylistUpdated'
@@ -83,6 +84,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     }
 
     public async Initialize(): Promise<boolean> {
+        Dump.Log('Finder.AlbumList.Initialize: Start.');
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
@@ -112,6 +114,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
 
         await this.InitPlaylistList();
 
+        Dump.Log('Finder.AlbumList.Initialize: End.');
         return true;
     }
 

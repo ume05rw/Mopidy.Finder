@@ -3181,7 +3181,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Bases/SelectionListBase", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_10, Filterbox_1, SelectionListBase_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Bases/SelectionListBase", "Views/Finders/Lists/Albums/SelectionAlbumTracks", "Utils/Dump"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_10, Filterbox_1, SelectionListBase_1, SelectionAlbumTracks_1, Dump_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AlbumListEvents = {
@@ -3228,7 +3228,9 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_6.default.Log('Finder.AlbumList.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
@@ -3261,6 +3263,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             return [4 /*yield*/, this.InitPlaylistList()];
                         case 2:
                             _a.sent();
+                            Dump_6.default.Log('Finder.AlbumList.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -3503,7 +3506,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
     }(SelectionListBase_1.default));
     exports.default = AlbumList;
 });
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Bases/SelectionListBase"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, Libraries_8, ArtistStore_2, Filterbox_2, SelectionItem_3, SelectionListBase_2) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Utils/Dump", "Views/Bases/SelectionListBase", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, Libraries_8, ArtistStore_2, Dump_7, SelectionListBase_2, Filterbox_2, SelectionItem_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistList = /** @class */ (function (_super) {
@@ -3536,7 +3539,9 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_7.default.Log('Finder.ArtistList.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
@@ -3546,6 +3551,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                             });
                             Libraries_8.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
                             Libraries_8.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
+                            Dump_7.default.Log('Finder.ArtistList.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -3637,7 +3643,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
     }(SelectionListBase_2.default));
     exports.default = ArtistList;
 });
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Genres/GenreStore", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Bases/SelectionListBase"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, Libraries_9, GenreStore_2, Filterbox_3, SelectionItem_4, SelectionListBase_3) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Genres/GenreStore", "Utils/Dump", "Views/Bases/SelectionListBase", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, Libraries_9, GenreStore_2, Dump_8, SelectionListBase_3, Filterbox_3, SelectionItem_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -3669,7 +3675,9 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_8.default.Log('Finder.GenreList.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
                             // 利便性的にどうなのか、悩む。
@@ -3679,6 +3687,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                             });
                             Libraries_9.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
                             Libraries_9.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
+                            Dump_8.default.Log('Finder.GenreList.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -3745,7 +3754,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionListBase_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, Delay_3, Exception_11, IContentDetail_1, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList", "Utils/Dump"], function (require, exports, vue_class_component_9, Delay_3, Exception_11, IContentDetail_1, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1, Dump_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -3781,12 +3790,15 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_9.default.Log('Finder.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
                             this.details.push(this.GenreList);
                             this.details.push(this.ArtistList);
                             this.details.push(this.AlbumList);
+                            Dump_9.default.Log('Finder.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -3878,7 +3890,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
     }(ContentBase_1.default));
     exports.default = Finder;
 });
-define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_12, Libraries_10, IContentDetail_2) {
+define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail", "Utils/Dump"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_12, Libraries_10, IContentDetail_2, Dump_10) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HeaderBarEvents = {
@@ -3954,7 +3966,9 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_10.default.Log('HeaderBar.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
                             this.buttons.push(this.MenuGenres);
@@ -3973,6 +3987,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                             Libraries_10.default.SetTooltip(this.MenuMopidy, 'Set Mopidy');
                             Libraries_10.default.SetTooltip(this.MenuDb, 'Database');
                             Libraries_10.default.SetTooltip(this.MenuScanProgress, 'Scan Progress');
+                            Dump_10.default.Log('HeaderBar.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -5367,7 +5382,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionListBase_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_3, Exception_13) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception", "Utils/Dump"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_3, Exception_13, Dump_11) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistsEvents = {
@@ -5399,11 +5414,14 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_11.default.Log('Playlists.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
                             this.details.push(this.PlaylistList);
                             this.details.push(this.TrackList);
+                            Dump_11.default.Log('Playlists.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -6058,7 +6076,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
     }(ContentDetailBase_4.default));
     exports.default = ScanProgressBlock;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, SettingsStore_1, Exception_14, IContentDetail_4, ContentBase_3, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Dump", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, SettingsStore_1, Dump_12, Exception_14, ContentBase_3, IContentDetail_4, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SettingsEvents = {
@@ -6098,7 +6116,9 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                 var _a;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_12.default.Log('Settings.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _b.sent();
                             this.store = new SettingsStore_1.default();
@@ -6112,6 +6132,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             this.details.push(this.MopidyBlock);
                             this.details.push(this.DbBlock);
                             this.details.push(this.ScanProgressBlock);
+                            Dump_12.default.Log('Settings.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -6168,7 +6189,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ContentBase_3.default));
     exports.default = Settings;
 });
-define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_6, JsonRpcQueryableBase_4, Settings_2) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_13, JsonRpcQueryableBase_4, Settings_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -6406,7 +6427,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
                             return [3 /*break*/, 15];
                         case 14:
                             ex_1 = _a.sent();
-                            Dump_6.default.Error('Polling Error', ex_1);
+                            Dump_13.default.Error('Polling Error', ex_1);
                             return [3 /*break*/, 15];
                         case 15:
                             this._nowOnPollingProsess = false;
@@ -6806,7 +6827,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_15, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_2, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel", "Utils/Dump"], function (require, exports, vue_class_component_23, Libraries_21, Exception_15, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_2, PlayerPanel_2, Dump_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -6852,7 +6873,9 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_14.default.Log('Sidebar.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
                             Libraries_21.default.SlimScroll(this.SidebarSection, {
@@ -6909,6 +6932,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                                 var args = { Content: IContent_2.Contents.Settings };
                                 _this.$emit(TabBase_2.TabEvents.Hidden, args);
                             });
+                            Dump_14.default.Log('Sidebar.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -6988,7 +7012,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = Sidebar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Utils/Dump"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_16, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2, Dump_7) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Utils/Dump"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_16, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2, Dump_15) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7041,11 +7065,11 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Dump_7.default.Log('RootView.Initialize: Start.');
+                            Dump_15.default.Log('RootView.Initialize: Start.');
                             return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
-                            Dump_7.default.Log('RootView.Initialize: Subviews Initialized.');
+                            Dump_15.default.Log('RootView.Initialize: Subviews Initialized.');
                             Libraries_22.default.$(window).resize(this.viewport.changed(function () {
                                 if (_this.viewport.is('<=sm')) {
                                     _this.ContentToFullscreen();
@@ -7056,38 +7080,38 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                             }));
                             promises = [];
                             store = new SettingsStore_2.default();
-                            Dump_7.default.Log('RootView.Initialize: Before Query.');
+                            Dump_15.default.Log('RootView.Initialize: Before Query.');
                             return [4 /*yield*/, store.TryConnect()];
                         case 2:
                             isConnectable = _a.sent();
                             return [4 /*yield*/, store.GetDbUpdateProgress()];
                         case 3:
                             updateProgress = _a.sent();
-                            Dump_7.default.Log('RootView.Initialize: After Query.');
+                            Dump_15.default.Log('RootView.Initialize: After Query.');
                             isDbUpdating = (updateProgress.UpdateType !== 'None');
                             content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
                                 ? IContent_3.Contents.Settings
                                 : IContent_3.Contents.Finder;
-                            Dump_7.default.Log('RootView.Initialize: Set SubViews1');
+                            Dump_15.default.Log('RootView.Initialize: Set SubViews1');
                             this.Sidebar.SetNavigation(content);
                             this.isMopidyConnectable = store.Entity.IsMopidyConnectable;
                             args = {
                                 Content: content
                             };
                             this.OnContentChanged(args);
-                            Dump_7.default.Log('RootView.Initialize: Set SubViews2');
+                            Dump_15.default.Log('RootView.Initialize: Set SubViews2');
                             if (!isDbUpdating) return [3 /*break*/, 4];
                             this.Settings.ShowProgress(updateProgress);
                             return [3 /*break*/, 6];
                         case 4:
                             if (!store.Entity.IsMopidyConnectable) return [3 /*break*/, 6];
-                            Dump_7.default.Log('RootView.Initialize: Set SubViews3');
+                            Dump_15.default.Log('RootView.Initialize: Set SubViews3');
                             return [4 /*yield*/, store.ExistsData()];
                         case 5:
                             existsData = _a.sent();
                             if (!existsData)
                                 this.Settings.InitialScan();
-                            Dump_7.default.Log('RootView.Initialize: Set SubViews4');
+                            Dump_15.default.Log('RootView.Initialize: Set SubViews4');
                             _a.label = 6;
                         case 6: return [2 /*return*/, true];
                     }

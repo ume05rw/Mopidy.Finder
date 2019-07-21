@@ -6,6 +6,7 @@ import { TabEvents } from '../Bases/TabBase';
 import ViewBase from '../Bases/ViewBase';
 import { TabEvents as BsTabEvents } from '../Events/BootstrapEvents';
 import PlayerPanel from './PlayerPanel';
+import Dump from '../../Utils/Dump';
 
 export const SidebarEvents = {
     ContentOrdered: 'ContentOrdered',
@@ -101,6 +102,7 @@ export default class Sidebar extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
+        Dump.Log('Sidebar.Initialize: Start.');
         await super.Initialize();
 
         Libraries.SlimScroll(this.SidebarSection, {
@@ -162,7 +164,7 @@ export default class Sidebar extends ViewBase {
             this.$emit(TabEvents.Hidden, args);
         });
 
-
+        Dump.Log('Sidebar.Initialize: End.');
         return true;
     }
 

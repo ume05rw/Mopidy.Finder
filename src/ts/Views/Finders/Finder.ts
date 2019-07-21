@@ -9,6 +9,7 @@ import { ISelectionChangedArgs } from '../Shared/SelectionItem';
 import { AlbumListEvents, default as AlbumList } from './Lists/Albums/AlbumList';
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
+import Dump from '../../Utils/Dump';
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
@@ -50,12 +51,14 @@ export default class Finder extends ContentBase {
     }
 
     public async Initialize(): Promise<boolean> {
+        Dump.Log('Finder.Initialize: Start.');
         await super.Initialize();
 
         this.details.push(this.GenreList);
         this.details.push(this.ArtistList);
         this.details.push(this.AlbumList);
 
+        Dump.Log('Finder.Initialize: End.');
         return true;
     }
 

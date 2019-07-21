@@ -4,6 +4,7 @@ import { IContentArgs, Contents } from '../Bases/IContent';
 import Exception from '../../Utils/Exception';
 import Libraries from '../../Libraries';
 import { ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
+import Dump from '../../Utils/Dump';
 
 export const HeaderBarEvents = {
     DetailOrdered: 'DetailOrdered'
@@ -115,6 +116,7 @@ export default class HeaderBar extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
+        Dump.Log('HeaderBar.Initialize: Start.');
         await super.Initialize();
 
         this.buttons.push(this.MenuGenres);
@@ -135,6 +137,7 @@ export default class HeaderBar extends ViewBase {
         Libraries.SetTooltip(this.MenuDb, 'Database');
         Libraries.SetTooltip(this.MenuScanProgress, 'Scan Progress');
 
+        Dump.Log('HeaderBar.Initialize: End.');
         return true;
     }
 

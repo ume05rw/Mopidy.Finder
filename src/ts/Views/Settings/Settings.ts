@@ -1,9 +1,10 @@
 import Component from 'vue-class-component';
 import { default as SettingsEntity } from '../../Models/Settings/Settings';
 import { default as SettingsStore, IUpdateProgress } from '../../Models/Settings/SettingsStore';
+import Dump from '../../Utils/Dump';
 import Exception from '../../Utils/Exception';
-import { default as IContentDetail, ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
 import ContentBase from '../Bases/ContentBase';
+import { ContentDetails, default as IContentDetail, IContentDetailArgs } from '../Bases/IContentDetail';
 import DbBlock from './Blocks/DbBlock';
 import MopidyBlock from './Blocks/MopidyBlock';
 import ScanProgressBlock from './Blocks/ScanProgressBlock';
@@ -47,6 +48,7 @@ export default class Settings extends ContentBase {
     }
 
     public async Initialize(): Promise<boolean> {
+        Dump.Log('Settings.Initialize: Start.');
         await super.Initialize();
 
         this.store = new SettingsStore();
@@ -60,6 +62,7 @@ export default class Settings extends ContentBase {
         this.details.push(this.DbBlock);
         this.details.push(this.ScanProgressBlock);
 
+        Dump.Log('Settings.Initialize: End.');
         return true;
     }
 

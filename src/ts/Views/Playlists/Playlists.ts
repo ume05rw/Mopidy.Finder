@@ -8,6 +8,7 @@ import TrackList from './Lists/Tracks/TrackList';
 import Delay from '../../Utils/Delay';
 import { default as IContentDetail, ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
 import Exception from '../../Utils/Exception';
+import Dump from '../../Utils/Dump';
 
 export const PlaylistsEvents = {
     PlaylistsUpdated: 'PlaylistsUpdated'
@@ -44,11 +45,13 @@ export default class Playlists extends ContentBase {
     }
 
     public async Initialize(): Promise<boolean> {
+        Dump.Log('Playlists.Initialize: Start.');
         await super.Initialize();
 
         this.details.push(this.PlaylistList);
         this.details.push(this.TrackList);
 
+        Dump.Log('Playlists.Initialize: End.');
         return true;
     }
 

@@ -4,9 +4,10 @@ import Libraries from '../../../Libraries';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Genre from '../../../Models/Genres/Genre';
 import { default as GenreStore, IPagenateQueryArgs } from '../../../Models/Genres/GenreStore';
+import Dump from '../../../Utils/Dump';
+import SelectionListBase from '../../Bases/SelectionListBase';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
-import SelectionListBase from '../../Bases/SelectionListBase';
 
 @Component({
     template: `<div class="col-md-3">
@@ -69,6 +70,7 @@ export default class GenreList extends SelectionListBase<Genre, GenreStore> {
     }
 
     public async Initialize(): Promise<boolean> {
+        Dump.Log('Finder.GenreList.Initialize: Start.');
         await super.Initialize();
 
         // 利便性的にどうなのか、悩む。
@@ -79,6 +81,7 @@ export default class GenreList extends SelectionListBase<Genre, GenreStore> {
         Libraries.SetTooltip(this.$refs.RefreshButton as HTMLElement, 'Refresh');
         Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');
 
+        Dump.Log('Finder.GenreList.Initialize: End.');
         return true;
     }
 
