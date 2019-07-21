@@ -24,6 +24,7 @@ import Dump from '../Utils/Dump';
         @Shown="OnShown"
         @Hide="OnHide"
         @Hidden="OnHidden"
+        @Operated="OnSidebarOperated"
         ref="Sidebar" />
     <div class="content-wrapper h-100 pt-3 tab-content">
         <finder
@@ -69,36 +70,26 @@ export default class RootView extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('RootView.Initialize: Start.');
         super.Initialize();
-        Dump.Log('RootView.Initialize: Subviews Initialized.');
 
         (Libraries.$(window) as any).resize(
             this.viewport.changed((): void => {
-                if (this.viewport.is('<=sm')) {
-                    this.ContentToFullscreen();
-                } else if (this.viewport.is('>sm')) {
-                    this.ContentToColumn();
-                }
+                this.AdjustScreen();
             })
         );
 
         const promises: Promise<any>[] = [];
         const store = new SettingsStore();
 
-        Dump.Log('RootView.Initialize: Before Query.');
         // 個別にawaitした方が、複数promise配列をawait Promise.all するより早い。
         const isConnectable = await store.TryConnect();
         const updateProgress = await store.GetDbUpdateProgress();
-
-        Dump.Log('RootView.Initialize: After Query.');
 
         const isDbUpdating = (updateProgress.UpdateType !== 'None');
         const content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
             ? Contents.Settings
             : Contents.Finder;
 
-        Dump.Log('RootView.Initialize: Set SubViews1');
         this.Sidebar.SetNavigation(content);
         this.isMopidyConnectable = store.Entity.IsMopidyConnectable;
 
@@ -107,16 +98,15 @@ export default class RootView extends ViewBase {
         }
         this.OnContentChanged(args);
 
-        Dump.Log('RootView.Initialize: Set SubViews2');
         if (isDbUpdating) {
             this.Settings.ShowProgress(updateProgress);
         } else if (store.Entity.IsMopidyConnectable) {
-            Dump.Log('RootView.Initialize: Set SubViews3');
             const existsData = await store.ExistsData();
             if (!existsData)
                 this.Settings.InitialScan();
-            Dump.Log('RootView.Initialize: Set SubViews4');
         }
+
+        this.AdjustScreen();
 
         return true;
     }
@@ -193,6 +183,28 @@ export default class RootView extends ViewBase {
     }
 
     // #endregion
+
+    private AdjustScreen(): void {
+        // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
+        if (this.viewport.is('<=sm')) {
+            this.ContentToFullscreen();
+        } else if (this.viewport.is('>sm')) {
+            this.ContentToColumn();
+        }
+
+        // サイドバーは、mdサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
+        if (this.viewport.is('<=lg')) {
+            this.HeaderBar.SetSidebarClose();
+        } else if (this.viewport.is('>lg')) {
+            this.HeaderBar.SetSidebarOpen();
+        }
+    }
+
+    private OnSidebarOperated(): void {
+        if (this.viewport.is('<=lg')) {
+            this.HeaderBar.SetSidebarClose();
+        }
+    }
 
     private OnPlaylistUpdatedByFinder(): void {
         this.Playlists.RefreshPlaylist();

@@ -3941,9 +3941,20 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
             _this.title = 'Mopidy.Finder';
             _this.currentContent = null;
             _this.displayNone = 'd-none';
-            _this.buttons = [];
+            _this.active = 'active';
+            _this.allButtons = [];
+            _this.finderButtons = [];
+            _this.playlistsButtons = [];
+            _this.settingsButtons = [];
             return _this;
         }
+        Object.defineProperty(HeaderBar.prototype, "MainMenuButton", {
+            get: function () {
+                return this.$refs.MainMenuButton;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(HeaderBar.prototype, "MenuGenres", {
             get: function () {
                 return this.$refs.MenuGenres;
@@ -4002,16 +4013,25 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
         });
         HeaderBar.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var jqMainMenu;
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    this.buttons.push(this.MenuGenres);
-                    this.buttons.push(this.MenuArtists);
-                    this.buttons.push(this.MenuAlbumTracks);
-                    this.buttons.push(this.MenuPlaylists);
-                    this.buttons.push(this.MenuPlaylistTracks);
-                    this.buttons.push(this.MenuMopidy);
-                    this.buttons.push(this.MenuDb);
-                    this.buttons.push(this.MenuScanProgress);
+                    this.allButtons.push(this.MenuGenres);
+                    this.allButtons.push(this.MenuArtists);
+                    this.allButtons.push(this.MenuAlbumTracks);
+                    this.allButtons.push(this.MenuPlaylists);
+                    this.allButtons.push(this.MenuPlaylistTracks);
+                    this.allButtons.push(this.MenuMopidy);
+                    this.allButtons.push(this.MenuDb);
+                    this.allButtons.push(this.MenuScanProgress);
+                    this.finderButtons.push(this.MenuGenres);
+                    this.finderButtons.push(this.MenuArtists);
+                    this.finderButtons.push(this.MenuAlbumTracks);
+                    this.playlistsButtons.push(this.MenuPlaylists);
+                    this.playlistsButtons.push(this.MenuPlaylistTracks);
+                    this.settingsButtons.push(this.MenuMopidy);
+                    this.settingsButtons.push(this.MenuDb);
+                    this.settingsButtons.push(this.MenuScanProgress);
                     Libraries_10.default.SetTooltip(this.MenuGenres, 'Genres');
                     Libraries_10.default.SetTooltip(this.MenuArtists, 'Artists');
                     Libraries_10.default.SetTooltip(this.MenuAlbumTracks, 'Album Tracks');
@@ -4020,14 +4040,30 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     Libraries_10.default.SetTooltip(this.MenuMopidy, 'Set Mopidy');
                     Libraries_10.default.SetTooltip(this.MenuDb, 'Database');
                     Libraries_10.default.SetTooltip(this.MenuScanProgress, 'Scan Progress');
+                    this.AllButtonToHide();
+                    jqMainMenu = Libraries_10.default.$(this.MainMenuButton);
+                    this.mainMenuButton = new Libraries_10.default.AdminLte.PushMenu(jqMainMenu);
                     return [2 /*return*/, true];
                 });
             });
         };
         HeaderBar.prototype.AllButtonToHide = function () {
-            for (var i = 0; i < this.buttons.length; i++)
-                if (!this.buttons[i].classList.contains(this.displayNone))
-                    this.buttons[i].classList.add(this.displayNone);
+            for (var i = 0; i < this.allButtons.length; i++)
+                if (!this.allButtons[i].classList.contains(this.displayNone))
+                    this.allButtons[i].classList.add(this.displayNone);
+        };
+        HeaderBar.prototype.SetButtonActive = function (activeButton, buttonGroup) {
+            for (var i = 0; i < buttonGroup.length; i++) {
+                var btn = buttonGroup[i];
+                if (activeButton === btn)
+                    continue;
+                var link = btn.children.item(0);
+                if (link.classList.contains(this.active))
+                    link.classList.remove(this.active);
+            }
+            var activeLink = activeButton.children.item(0);
+            if (!activeLink.classList.contains(this.active))
+                activeLink.classList.add(this.active);
         };
         HeaderBar.prototype.SetHeader = function (args) {
             this.currentContent = args.Content;
@@ -4035,26 +4071,18 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
             this.AllButtonToHide();
             switch (this.currentContent) {
                 case IContent_1.Contents.Finder:
-                    if (this.MenuGenres.classList.contains(this.displayNone))
-                        this.MenuGenres.classList.remove(this.displayNone);
-                    if (this.MenuArtists.classList.contains(this.displayNone))
-                        this.MenuArtists.classList.remove(this.displayNone);
-                    if (this.MenuAlbumTracks.classList.contains(this.displayNone))
-                        this.MenuAlbumTracks.classList.remove(this.displayNone);
+                    this.MenuGenres.classList.remove(this.displayNone);
+                    this.MenuArtists.classList.remove(this.displayNone);
+                    this.MenuAlbumTracks.classList.remove(this.displayNone);
                     break;
                 case IContent_1.Contents.Playlists:
-                    if (this.MenuPlaylists.classList.contains(this.displayNone))
-                        this.MenuPlaylists.classList.remove(this.displayNone);
-                    if (this.MenuPlaylistTracks.classList.contains(this.displayNone))
-                        this.MenuPlaylistTracks.classList.remove(this.displayNone);
+                    this.MenuPlaylists.classList.remove(this.displayNone);
+                    this.MenuPlaylistTracks.classList.remove(this.displayNone);
                     break;
                 case IContent_1.Contents.Settings:
-                    if (this.MenuMopidy.classList.contains(this.displayNone))
-                        this.MenuMopidy.classList.remove(this.displayNone);
-                    if (this.MenuDb.classList.contains(this.displayNone))
-                        this.MenuDb.classList.remove(this.displayNone);
-                    if (this.MenuScanProgress.classList.contains(this.displayNone))
-                        this.MenuScanProgress.classList.remove(this.displayNone);
+                    this.MenuMopidy.classList.remove(this.displayNone);
+                    this.MenuDb.classList.remove(this.displayNone);
+                    this.MenuScanProgress.classList.remove(this.displayNone);
                     break;
                 default:
                     Exception_12.default.Throw('Unexpected Page.', args);
@@ -4066,6 +4094,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_2.ContentDetails.Genres
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetButtonActive(this.MenuGenres, this.finderButtons);
         };
         HeaderBar.prototype.OnArtistsClicked = function () {
             var args = {
@@ -4073,6 +4102,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_2.ContentDetails.Artists
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetButtonActive(this.MenuArtists, this.finderButtons);
         };
         HeaderBar.prototype.OnAlbumTracksClicked = function () {
             var args = {
@@ -4080,6 +4110,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_2.ContentDetails.AlbumTracks
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetButtonActive(this.MenuAlbumTracks, this.finderButtons);
         };
         HeaderBar.prototype.OnPlaylistsClicked = function () {
             var args = {
@@ -4087,6 +4118,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_2.ContentDetails.Playlists
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetButtonActive(this.MenuPlaylists, this.playlistsButtons);
         };
         HeaderBar.prototype.OnPlaylistTracksClicked = function () {
             var args = {
@@ -4094,6 +4126,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_2.ContentDetails.PlaylistTracks
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetButtonActive(this.MenuPlaylistTracks, this.playlistsButtons);
         };
         HeaderBar.prototype.OnMopidyClicked = function () {
             var args = {
@@ -4101,6 +4134,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_2.ContentDetails.SetMopidy
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetButtonActive(this.MenuMopidy, this.settingsButtons);
         };
         HeaderBar.prototype.OnDbClicked = function () {
             var args = {
@@ -4108,6 +4142,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_2.ContentDetails.Database
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetButtonActive(this.MenuDb, this.settingsButtons);
         };
         HeaderBar.prototype.OnScanProgressClicked = function () {
             var args = {
@@ -4115,10 +4150,19 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_2.ContentDetails.ScanProgress
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetButtonActive(this.MenuScanProgress, this.settingsButtons);
+        };
+        HeaderBar.prototype.SetSidebarOpen = function () {
+            if (!this.mainMenuButton.isShown())
+                this.mainMenuButton.show();
+        };
+        HeaderBar.prototype.SetSidebarClose = function () {
+            if (this.mainMenuButton.isShown())
+                this.mainMenuButton.collapse();
         };
         HeaderBar = __decorate([
             vue_class_component_10.default({
-                template: "<nav class=\"main-header navbar navbar-expand border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\" data-widget=\"pushmenu\" href=\"javascript:void(0)\">\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n        <li class=\"nav-item\">\n            <h3>{{ title }}</h3>\n        </li>\n    </ul>\n    <ul class=\"navbar-nav ml-auto\">\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuGenres\">\n            <a class=\"nav-link\"\n                @click=\"OnGenresClicked\" >\n                <i class=\"fa fa-tags\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuArtists\">\n            <a class=\"nav-link\"\n                @click=\"OnArtistsClicked\" >\n                <i class=\"fa fa-users\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuAlbumTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnAlbumTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuPlaylists\">\n            <a class=\"nav-link\"\n                @click=\"OnPlaylistsClicked\" >\n                <i class=\"fa fa-list-ul\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuPlaylistTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnPlaylistTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuMopidy\">\n            <a class=\"nav-link\"\n                @click=\"OnMopidyClicked\" >\n                <i class=\"fa fa-wifi\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuDb\">\n            <a class=\"nav-link\"\n                @click=\"OnDbClicked\" >\n                <i class=\"fa fa-database\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuScanProgress\">\n            <a class=\"nav-link\"\n                @click=\"OnScanProgressClicked\" >\n                <i class=\"fa fa-rocket\" />\n            </a>\n        </li>\n    </ul>\n</nav>"
+                template: "<nav class=\"main-header navbar navbar-expand border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\"\n                data-widget=\"pushmenu\"\n                href=\"javascript:void(0)\"\n                ref=\"MainMenuButton\" >\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n        <li class=\"nav-item\">\n            <h3>{{ title }}</h3>\n        </li>\n    </ul>\n    <ul class=\"navbar-nav ml-auto nav-pills\">\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuGenres\">\n            <a class=\"nav-link active\"\n                @click=\"OnGenresClicked\" >\n                <i class=\"fa fa-tags\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuArtists\">\n            <a class=\"nav-link\"\n                @click=\"OnArtistsClicked\" >\n                <i class=\"fa fa-users\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuAlbumTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnAlbumTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuPlaylists\">\n            <a class=\"nav-link active\"\n                @click=\"OnPlaylistsClicked\" >\n                <i class=\"fa fa-list-ul\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuPlaylistTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnPlaylistTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuMopidy\">\n            <a class=\"nav-link active\"\n                @click=\"OnMopidyClicked\" >\n                <i class=\"fa fa-wifi\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuDb\">\n            <a class=\"nav-link\"\n                @click=\"OnDbClicked\" >\n                <i class=\"fa fa-database\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuScanProgress\">\n            <a class=\"nav-link\"\n                @click=\"OnScanProgressClicked\" >\n                <i class=\"fa fa-rocket\" />\n            </a>\n        </li>\n    </ul>\n</nav>"
             })
         ], HeaderBar);
         return HeaderBar;
@@ -6703,6 +6747,9 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
 define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_20, Monitor_2, Player_1, ViewBase_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.PlayerPanelEvents = {
+        Operated: 'Operated'
+    };
     var PlayerPanel = /** @class */ (function (_super) {
         __extends(PlayerPanel, _super);
         function PlayerPanel() {
@@ -6773,15 +6820,18 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                 from: 0
             });
             this.player.SetVolume(0);
+            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         PlayerPanel.prototype.OnClickVolumeMax = function () {
             this.volumeData.update({
                 from: 100
             });
             this.player.SetVolume(100);
+            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         PlayerPanel.prototype.OnClickPrevious = function () {
             this.player.Previous();
+            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         PlayerPanel.prototype.OnClickPlayPause = function () {
             if (this.monitor.PlayerState === Monitor_2.PlayerState.Playing) {
@@ -6790,17 +6840,21 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
             else {
                 this.player.Play();
             }
+            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         PlayerPanel.prototype.OnClickNext = function () {
             this.player.Next();
+            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         PlayerPanel.prototype.OnClickShuffle = function () {
             var enabled = !this.ButtonShuffle.classList.contains(PlayerPanel_1.ClassDisabled);
             this.player.SetShuffle(!enabled);
+            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         PlayerPanel.prototype.OnClickRepeat = function () {
             var enabled = !this.ButtonRepeat.classList.contains(PlayerPanel_1.ClassDisabled);
             this.player.SetRepeat(!enabled);
+            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         var PlayerPanel_1;
         PlayerPanel.ClassDisabled = 'disabled';
@@ -6817,6 +6871,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
+        Operated: 'Operated',
         ContentOrdered: 'ContentOrdered',
         ContentChanged: 'ContentChanged',
     };
@@ -6946,6 +7001,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                 Content: IContent_2.Contents.Finder
             };
             this.$emit(exports.SidebarEvents.ContentChanged, changedArgs);
+            this.$emit(exports.SidebarEvents.Operated);
         };
         Sidebar.prototype.OnClickPlaylists = function (ev) {
             var orderedArgs = {
@@ -6961,6 +7017,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                 Content: IContent_2.Contents.Playlists
             };
             this.$emit(exports.SidebarEvents.ContentChanged, changedArgs);
+            this.$emit(exports.SidebarEvents.Operated);
         };
         Sidebar.prototype.OnClickSettings = function (ev) {
             var orderedArgs = {
@@ -6976,12 +7033,16 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                 Content: IContent_2.Contents.Settings
             };
             this.$emit(exports.SidebarEvents.ContentChanged, changedArgs);
+            this.$emit(exports.SidebarEvents.Operated);
+        };
+        Sidebar.prototype.OnOperated = function () {
+            this.$emit(exports.SidebarEvents.Operated);
         };
         var Sidebar_1;
         Sidebar.ShowTabMethod = 'show';
         Sidebar = Sidebar_1 = __decorate([
             vue_class_component_23.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-warning elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SidebarSection\">\n        <div class=\"w-100 inner-sidebar\">\n            <nav class=\"mt-2\">\n                <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-finder\"\n                            href=\"#tab-finder\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-finder\"\n                            aria-selected=\"false\"\n                            ref=\"FinderAnchor\"\n                            @click=\"OnClickFinder\" >\n                            <i class=\"fa fa-search nav-icon\" />\n                            <p>Finder</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-playlists\"\n                            href=\"#tab-playlists\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-playlists\"\n                            aria-selected=\"false\"\n                            ref=\"PlaylistsAnchor\"\n                            @click=\"OnClickPlaylists\" >\n                            <i class=\"fa fa-bookmark nav-icon\" />\n                            <p>Playlists</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-settings\"\n                            href=\"#tab-settings\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-settings\"\n                            aria-selected=\"false\"\n                            ref=\"SettingsAnchor\"\n                            @click=\"OnClickSettings\" >\n                            <i class=\"fa fa-cog nav-icon\" />\n                            <p>Settings</p>\n                        </a>\n                    </li>\n                </ul>\n            </nav>\n            <div class=\"row mt-2\">\n                <div class=\"col-12\">\n                    <player-panel ref=\"PlayerPanel\" />\n                </div>\n            </div>\n        </div>\n    </section>\n</aside>",
+                template: "<aside class=\"main-sidebar sidebar-dark-warning elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SidebarSection\">\n        <div class=\"w-100 inner-sidebar\">\n            <nav class=\"mt-2\">\n                <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-finder\"\n                            href=\"#tab-finder\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-finder\"\n                            aria-selected=\"false\"\n                            ref=\"FinderAnchor\"\n                            @click=\"OnClickFinder\" >\n                            <i class=\"fa fa-search nav-icon\" />\n                            <p>Finder</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-playlists\"\n                            href=\"#tab-playlists\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-playlists\"\n                            aria-selected=\"false\"\n                            ref=\"PlaylistsAnchor\"\n                            @click=\"OnClickPlaylists\" >\n                            <i class=\"fa fa-bookmark nav-icon\" />\n                            <p>Playlists</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-settings\"\n                            href=\"#tab-settings\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-settings\"\n                            aria-selected=\"false\"\n                            ref=\"SettingsAnchor\"\n                            @click=\"OnClickSettings\" >\n                            <i class=\"fa fa-cog nav-icon\" />\n                            <p>Settings</p>\n                        </a>\n                    </li>\n                </ul>\n            </nav>\n            <div class=\"row mt-2\">\n                <div class=\"col-12\">\n                    <player-panel\n                        ref=\"PlayerPanel\"\n                        @Operated=\"OnOperated\"/>\n                </div>\n            </div>\n        </div>\n    </section>\n</aside>",
                 components: {
                     'player-panel': PlayerPanel_2.default
                 }
@@ -6991,7 +7052,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = Sidebar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Utils/Dump"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_16, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2, Dump_9) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_16, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7044,53 +7105,42 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Dump_9.default.Log('RootView.Initialize: Start.');
                             _super.prototype.Initialize.call(this);
-                            Dump_9.default.Log('RootView.Initialize: Subviews Initialized.');
                             Libraries_22.default.$(window).resize(this.viewport.changed(function () {
-                                if (_this.viewport.is('<=sm')) {
-                                    _this.ContentToFullscreen();
-                                }
-                                else if (_this.viewport.is('>sm')) {
-                                    _this.ContentToColumn();
-                                }
+                                _this.AdjustScreen();
                             }));
                             promises = [];
                             store = new SettingsStore_2.default();
-                            Dump_9.default.Log('RootView.Initialize: Before Query.');
                             return [4 /*yield*/, store.TryConnect()];
                         case 1:
                             isConnectable = _a.sent();
                             return [4 /*yield*/, store.GetDbUpdateProgress()];
                         case 2:
                             updateProgress = _a.sent();
-                            Dump_9.default.Log('RootView.Initialize: After Query.');
                             isDbUpdating = (updateProgress.UpdateType !== 'None');
                             content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
                                 ? IContent_3.Contents.Settings
                                 : IContent_3.Contents.Finder;
-                            Dump_9.default.Log('RootView.Initialize: Set SubViews1');
                             this.Sidebar.SetNavigation(content);
                             this.isMopidyConnectable = store.Entity.IsMopidyConnectable;
                             args = {
                                 Content: content
                             };
                             this.OnContentChanged(args);
-                            Dump_9.default.Log('RootView.Initialize: Set SubViews2');
                             if (!isDbUpdating) return [3 /*break*/, 3];
                             this.Settings.ShowProgress(updateProgress);
                             return [3 /*break*/, 5];
                         case 3:
                             if (!store.Entity.IsMopidyConnectable) return [3 /*break*/, 5];
-                            Dump_9.default.Log('RootView.Initialize: Set SubViews3');
                             return [4 /*yield*/, store.ExistsData()];
                         case 4:
                             existsData = _a.sent();
                             if (!existsData)
                                 this.Settings.InitialScan();
-                            Dump_9.default.Log('RootView.Initialize: Set SubViews4');
                             _a.label = 5;
-                        case 5: return [2 /*return*/, true];
+                        case 5:
+                            this.AdjustScreen();
+                            return [2 /*return*/, true];
                     }
                 });
             });
@@ -7160,6 +7210,27 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
             }
         };
         // #endregion
+        RootView.prototype.AdjustScreen = function () {
+            // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
+            if (this.viewport.is('<=sm')) {
+                this.ContentToFullscreen();
+            }
+            else if (this.viewport.is('>sm')) {
+                this.ContentToColumn();
+            }
+            // サイドバーは、mdサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
+            if (this.viewport.is('<=lg')) {
+                this.HeaderBar.SetSidebarClose();
+            }
+            else if (this.viewport.is('>lg')) {
+                this.HeaderBar.SetSidebarOpen();
+            }
+        };
+        RootView.prototype.OnSidebarOperated = function () {
+            if (this.viewport.is('<=lg')) {
+                this.HeaderBar.SetSidebarClose();
+            }
+        };
         RootView.prototype.OnPlaylistUpdatedByFinder = function () {
             this.Playlists.RefreshPlaylist();
         };
@@ -7175,7 +7246,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
         };
         RootView = __decorate([
             vue_class_component_24.default({
-                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar\n        ref=\"HeaderBar\"\n        @DetailOrdered=\"OnDetailOrdered\" />\n    <sidebar\n        @ContentOrdered=\"OnContentOrdered\"\n        @ContentChanged=\"OnContentChanged\"\n        @Show=\"OnShow\"\n        @Shown=\"OnShown\"\n        @Hide=\"OnHide\"\n        @Hidden=\"OnHidden\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder\n            ref=\"Finder\"\n            @PlaylistUpdated=\"OnPlaylistUpdatedByFinder\" />\n        <playlists\n            ref=\"Playlists\"\n            @PlaylistsUpdated=\"OnPlaylistsUpdatedByPlaylists\" />\n        <settings\n            ref=\"Settings\"\n            @ServerFound=\"OnServerFound\"/>\n    </div>\n</div>",
+                template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar\n        ref=\"HeaderBar\"\n        @DetailOrdered=\"OnDetailOrdered\" />\n    <sidebar\n        @ContentOrdered=\"OnContentOrdered\"\n        @ContentChanged=\"OnContentChanged\"\n        @Show=\"OnShow\"\n        @Shown=\"OnShown\"\n        @Hide=\"OnHide\"\n        @Hidden=\"OnHidden\"\n        @Operated=\"OnSidebarOperated\"\n        ref=\"Sidebar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder\n            ref=\"Finder\"\n            @PlaylistUpdated=\"OnPlaylistUpdatedByFinder\" />\n        <playlists\n            ref=\"Playlists\"\n            @PlaylistsUpdated=\"OnPlaylistsUpdatedByPlaylists\" />\n        <settings\n            ref=\"Settings\"\n            @ServerFound=\"OnServerFound\"/>\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
                     'sidebar': Sidebar_2.default,

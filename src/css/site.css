@@ -60,6 +60,14 @@ div.dropdown {
 .main-header.navbar.border-bottom {
     border-bottom: 1px solid #4b545c !important;
 }
+
+/**
+ * ヘッダバー
+ */
+.main-header .navbar-nav.nav-pills .nav-link.active {
+    background-color: #f97515;
+    color: #1F2D3D;
+}
 /**
  * サイドバー等
  */

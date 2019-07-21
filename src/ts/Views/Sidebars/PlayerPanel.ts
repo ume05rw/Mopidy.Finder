@@ -4,6 +4,10 @@ import Monitor, { MonitorEvents, PlayerState } from '../../Models/Mopidies/Monit
 import Player from '../../Models/Mopidies/Player';
 import ViewBase from '../Bases/ViewBase';
 
+export const PlayerPanelEvents = {
+    Operated: 'Operated'
+};
+
 @Component({
     template: `<div class="card siderbar-control pb-10">
     <div class="card-body">
@@ -136,6 +140,7 @@ export default class PlayerPanel extends ViewBase {
             from: 0
         });
         this.player.SetVolume(0);
+        this.$emit(PlayerPanelEvents.Operated);
     }
 
     private OnClickVolumeMax(): void {
@@ -143,10 +148,12 @@ export default class PlayerPanel extends ViewBase {
             from: 100
         });
         this.player.SetVolume(100);
+        this.$emit(PlayerPanelEvents.Operated);
     }
 
     private OnClickPrevious(): void {
         this.player.Previous();
+        this.$emit(PlayerPanelEvents.Operated);
     }
 
     private OnClickPlayPause(): void {
@@ -155,19 +162,23 @@ export default class PlayerPanel extends ViewBase {
         } else {
             this.player.Play();
         }
+        this.$emit(PlayerPanelEvents.Operated);
     }
 
     private OnClickNext(): void {
         this.player.Next();
+        this.$emit(PlayerPanelEvents.Operated);
     }
 
     private OnClickShuffle(): void {
         const enabled = !this.ButtonShuffle.classList.contains(PlayerPanel.ClassDisabled);
         this.player.SetShuffle(!enabled);
+        this.$emit(PlayerPanelEvents.Operated);
     }
 
     private OnClickRepeat(): void {
         const enabled = !this.ButtonRepeat.classList.contains(PlayerPanel.ClassDisabled);
         this.player.SetRepeat(!enabled);
+        this.$emit(PlayerPanelEvents.Operated);
     }
 }

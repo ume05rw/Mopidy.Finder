@@ -22,3 +22,17 @@ export declare class Widget {
     //on(eventName: string, handler: (event: Event, extraParams?: any) => void);
     //off(eventName: string, handler?: (event: Event, extraParams?: any) => void);
 }
+
+export declare interface IPushMenuOptions {
+    autoCollapseSize?: number | false;
+    screenCollapseSize?: number;
+}
+
+export declare class PushMenu {
+    constructor(element: JQuery, options?: IPushMenuOptions);
+    show(): void;
+    collapse(): void;
+    isShown(): boolean;
+    toggle(): void;
+    autoCollapse(): void;
+}

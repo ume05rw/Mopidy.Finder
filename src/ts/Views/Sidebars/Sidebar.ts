@@ -9,6 +9,7 @@ import PlayerPanel from './PlayerPanel';
 import Dump from '../../Utils/Dump';
 
 export const SidebarEvents = {
+    Operated: 'Operated',
     ContentOrdered: 'ContentOrdered',
     ContentChanged: 'ContentChanged',
 }
@@ -70,7 +71,9 @@ export const SidebarEvents = {
             </nav>
             <div class="row mt-2">
                 <div class="col-12">
-                    <player-panel ref="PlayerPanel" />
+                    <player-panel
+                        ref="PlayerPanel"
+                        @Operated="OnOperated"/>
                 </div>
             </div>
         </div>
@@ -197,7 +200,8 @@ export default class Sidebar extends ViewBase {
         const changedArgs: IContentArgs = {
             Content: Contents.Finder
         };
-        this.$emit(SidebarEvents.ContentChanged, changedArgs)
+        this.$emit(SidebarEvents.ContentChanged, changedArgs);
+        this.$emit(SidebarEvents.Operated);
     }
 
     private OnClickPlaylists(ev: MouseEvent): void {
@@ -215,7 +219,8 @@ export default class Sidebar extends ViewBase {
         const changedArgs: IContentArgs = {
             Content: Contents.Playlists
         };
-        this.$emit(SidebarEvents.ContentChanged, changedArgs)
+        this.$emit(SidebarEvents.ContentChanged, changedArgs);
+        this.$emit(SidebarEvents.Operated);
     }
 
     private OnClickSettings(ev: MouseEvent): void {
@@ -233,6 +238,11 @@ export default class Sidebar extends ViewBase {
         const changedArgs: IContentArgs = {
             Content: Contents.Settings
         };
-        this.$emit(SidebarEvents.ContentChanged, changedArgs)
+        this.$emit(SidebarEvents.ContentChanged, changedArgs);
+        this.$emit(SidebarEvents.Operated);
+    }
+
+    private OnOperated(): void {
+        this.$emit(SidebarEvents.Operated);
     }
 }

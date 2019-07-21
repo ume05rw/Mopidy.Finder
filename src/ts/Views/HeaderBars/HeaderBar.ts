@@ -5,6 +5,7 @@ import Exception from '../../Utils/Exception';
 import Libraries from '../../Libraries';
 import { ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
 import Dump from '../../Utils/Dump';
+import * as AdminLte from 'admin-lte/dist/js/adminlte';
 
 export const HeaderBarEvents = {
     DetailOrdered: 'DetailOrdered'
@@ -14,7 +15,10 @@ export const HeaderBarEvents = {
     template: `<nav class="main-header navbar navbar-expand border-bottom">
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" href="javascript:void(0)">
+            <a class="nav-link"
+                data-widget="pushmenu"
+                href="javascript:void(0)"
+                ref="MainMenuButton" >
                 <i class="fa fa-bars" />
             </a>
         </li>
@@ -22,10 +26,10 @@ export const HeaderBarEvents = {
             <h3>{{ title }}</h3>
         </li>
     </ul>
-    <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ml-auto nav-pills">
         <li class="nav-item d-md-none"
             ref="MenuGenres">
-            <a class="nav-link"
+            <a class="nav-link active"
                 @click="OnGenresClicked" >
                 <i class="fa fa-tags" />
             </a>
@@ -46,7 +50,7 @@ export const HeaderBarEvents = {
         </li>
         <li class="nav-item d-md-none"
             ref="MenuPlaylists">
-            <a class="nav-link"
+            <a class="nav-link active"
                 @click="OnPlaylistsClicked" >
                 <i class="fa fa-list-ul" />
             </a>
@@ -61,7 +65,7 @@ export const HeaderBarEvents = {
 
         <li class="nav-item d-md-none"
             ref="MenuMopidy">
-            <a class="nav-link"
+            <a class="nav-link active"
                 @click="OnMopidyClicked" >
                 <i class="fa fa-wifi" />
             </a>
@@ -86,9 +90,19 @@ export const HeaderBarEvents = {
 export default class HeaderBar extends ViewBase {
     private title: string = 'Mopidy.Finder';
     private currentContent: Contents = null;
-
     private readonly displayNone: string = 'd-none';
-    private buttons: HTMLElement[] = [];
+    private readonly active: string = 'active';
+    private allButtons: HTMLElement[] = [];
+    private finderButtons: HTMLElement[] = [];
+    private playlistsButtons: HTMLElement[] = [];
+    private settingsButtons: HTMLElement[] = [];
+
+
+    private mainMenuButton: AdminLte.PushMenu;
+
+    private get MainMenuButton(): HTMLElement {
+        return this.$refs.MainMenuButton as HTMLElement;
+    }
 
     private get MenuGenres(): HTMLElement {
         return this.$refs.MenuGenres as HTMLElement
@@ -118,14 +132,23 @@ export default class HeaderBar extends ViewBase {
     public async Initialize(): Promise<boolean> {
         super.Initialize();
 
-        this.buttons.push(this.MenuGenres);
-        this.buttons.push(this.MenuArtists);
-        this.buttons.push(this.MenuAlbumTracks);
-        this.buttons.push(this.MenuPlaylists);
-        this.buttons.push(this.MenuPlaylistTracks);
-        this.buttons.push(this.MenuMopidy);
-        this.buttons.push(this.MenuDb);
-        this.buttons.push(this.MenuScanProgress);
+        this.allButtons.push(this.MenuGenres);
+        this.allButtons.push(this.MenuArtists);
+        this.allButtons.push(this.MenuAlbumTracks);
+        this.allButtons.push(this.MenuPlaylists);
+        this.allButtons.push(this.MenuPlaylistTracks);
+        this.allButtons.push(this.MenuMopidy);
+        this.allButtons.push(this.MenuDb);
+        this.allButtons.push(this.MenuScanProgress);
+
+        this.finderButtons.push(this.MenuGenres);
+        this.finderButtons.push(this.MenuArtists);
+        this.finderButtons.push(this.MenuAlbumTracks);
+        this.playlistsButtons.push(this.MenuPlaylists);
+        this.playlistsButtons.push(this.MenuPlaylistTracks);
+        this.settingsButtons.push(this.MenuMopidy);
+        this.settingsButtons.push(this.MenuDb);
+        this.settingsButtons.push(this.MenuScanProgress);
 
         Libraries.SetTooltip(this.MenuGenres, 'Genres');
         Libraries.SetTooltip(this.MenuArtists, 'Artists');
@@ -135,14 +158,33 @@ export default class HeaderBar extends ViewBase {
         Libraries.SetTooltip(this.MenuMopidy, 'Set Mopidy');
         Libraries.SetTooltip(this.MenuDb, 'Database');
         Libraries.SetTooltip(this.MenuScanProgress, 'Scan Progress');
+        this.AllButtonToHide();
+
+        const jqMainMenu = Libraries.$(this.MainMenuButton);
+        this.mainMenuButton = new Libraries.AdminLte.PushMenu(jqMainMenu);
 
         return true;
     }
 
     private AllButtonToHide(): void {
-        for (let i = 0; i < this.buttons.length; i++)
-            if (!this.buttons[i].classList.contains(this.displayNone))
-                this.buttons[i].classList.add(this.displayNone);
+        for (let i = 0; i < this.allButtons.length; i++)
+            if (!this.allButtons[i].classList.contains(this.displayNone))
+                this.allButtons[i].classList.add(this.displayNone);
+    }
+
+    private SetButtonActive(activeButton: HTMLElement, buttonGroup: HTMLElement[]): void {
+        for (let i = 0; i < buttonGroup.length; i++) {
+            const btn = buttonGroup[i];
+            if (activeButton === btn)
+                continue;
+            const link = btn.children.item(0) as HTMLElement;
+            if (link.classList.contains(this.active))
+                link.classList.remove(this.active);
+        }
+
+        const activeLink = activeButton.children.item(0) as HTMLElement;
+        if (!activeLink.classList.contains(this.active))
+            activeLink.classList.add(this.active);
     }
 
     public SetHeader(args: IContentArgs): void {
@@ -153,26 +195,21 @@ export default class HeaderBar extends ViewBase {
 
         switch (this.currentContent) {
             case Contents.Finder:
-                if (this.MenuGenres.classList.contains(this.displayNone))
-                    this.MenuGenres.classList.remove(this.displayNone);
-                if (this.MenuArtists.classList.contains(this.displayNone))
-                    this.MenuArtists.classList.remove(this.displayNone);
-                if (this.MenuAlbumTracks.classList.contains(this.displayNone))
-                    this.MenuAlbumTracks.classList.remove(this.displayNone);
+                this.MenuGenres.classList.remove(this.displayNone);
+                this.MenuArtists.classList.remove(this.displayNone);
+                this.MenuAlbumTracks.classList.remove(this.displayNone);
+
                 break;
             case Contents.Playlists:
-                if (this.MenuPlaylists.classList.contains(this.displayNone))
-                    this.MenuPlaylists.classList.remove(this.displayNone);
-                if (this.MenuPlaylistTracks.classList.contains(this.displayNone))
-                    this.MenuPlaylistTracks.classList.remove(this.displayNone);
+                this.MenuPlaylists.classList.remove(this.displayNone);
+                this.MenuPlaylistTracks.classList.remove(this.displayNone);
+
                 break;
             case Contents.Settings:
-                if (this.MenuMopidy.classList.contains(this.displayNone))
-                    this.MenuMopidy.classList.remove(this.displayNone);
-                if (this.MenuDb.classList.contains(this.displayNone))
-                    this.MenuDb.classList.remove(this.displayNone);
-                if (this.MenuScanProgress.classList.contains(this.displayNone))
-                    this.MenuScanProgress.classList.remove(this.displayNone);
+                this.MenuMopidy.classList.remove(this.displayNone);
+                this.MenuDb.classList.remove(this.displayNone);
+                this.MenuScanProgress.classList.remove(this.displayNone);
+
                 break;
             default:
                 Exception.Throw('Unexpected Page.', args);
@@ -185,6 +222,7 @@ export default class HeaderBar extends ViewBase {
             Detail: ContentDetails.Genres
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetButtonActive(this.MenuGenres, this.finderButtons);
     }
     private OnArtistsClicked(): void {
         const args: IContentDetailArgs = {
@@ -192,6 +230,7 @@ export default class HeaderBar extends ViewBase {
             Detail: ContentDetails.Artists
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetButtonActive(this.MenuArtists, this.finderButtons);
     }
     private OnAlbumTracksClicked(): void {
         const args: IContentDetailArgs = {
@@ -199,6 +238,7 @@ export default class HeaderBar extends ViewBase {
             Detail: ContentDetails.AlbumTracks
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetButtonActive(this.MenuAlbumTracks, this.finderButtons);
     }
     private OnPlaylistsClicked(): void {
         const args: IContentDetailArgs = {
@@ -206,6 +246,7 @@ export default class HeaderBar extends ViewBase {
             Detail: ContentDetails.Playlists
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetButtonActive(this.MenuPlaylists, this.playlistsButtons);
     }
     private OnPlaylistTracksClicked(): void {
         const args: IContentDetailArgs = {
@@ -213,6 +254,7 @@ export default class HeaderBar extends ViewBase {
             Detail: ContentDetails.PlaylistTracks
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetButtonActive(this.MenuPlaylistTracks, this.playlistsButtons);
     }
     private OnMopidyClicked(): void {
         const args: IContentDetailArgs = {
@@ -220,6 +262,7 @@ export default class HeaderBar extends ViewBase {
             Detail: ContentDetails.SetMopidy
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetButtonActive(this.MenuMopidy, this.settingsButtons);
     }
     private OnDbClicked(): void {
         const args: IContentDetailArgs = {
@@ -227,6 +270,7 @@ export default class HeaderBar extends ViewBase {
             Detail: ContentDetails.Database
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetButtonActive(this.MenuDb, this.settingsButtons);
     }
     private OnScanProgressClicked(): void {
         const args: IContentDetailArgs = {
@@ -234,5 +278,16 @@ export default class HeaderBar extends ViewBase {
             Detail: ContentDetails.ScanProgress
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetButtonActive(this.MenuScanProgress, this.settingsButtons);
     }
+
+    public SetSidebarOpen(): void {
+        if (!this.mainMenuButton.isShown())
+            this.mainMenuButton.show();
+    }
+    public SetSidebarClose(): void {
+        if (this.mainMenuButton.isShown())
+            this.mainMenuButton.collapse();
+    }
+
 }
