@@ -1,7 +1,7 @@
+import Dump from '../../Utils/Dump';
 import { default as Album, IAlbum } from '../Albums/Album';
 import { default as Artist, IArtist } from '../Artists/Artist';
 import { default as MopidyTrack } from '../Mopidies/ITrack';
-import Exception from '../../Utils/Exception';
 
 export interface ITrack {
     Id: number;
@@ -87,10 +87,10 @@ export default class Track implements ITrack {
 
     public static EnsureTrackByMopidy(entity: Track, mopidyTrack: MopidyTrack): void {
         if (!entity)
-            Exception.Dump('argument entity null');
+            Dump.Error('argument entity null');
 
         if (!mopidyTrack)
-            Exception.Dump('argument mopidyTrack null');
+            Dump.Error('argument mopidyTrack null');
 
         entity.Id = null;
         entity.Name = mopidyTrack.name || null;

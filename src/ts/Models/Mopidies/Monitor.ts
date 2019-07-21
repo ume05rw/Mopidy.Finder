@@ -1,6 +1,6 @@
+import Dump from '../../Utils/Dump';
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import ITlTrack from '../Mopidies/ITlTrack';
-import Exception from '../../Utils/Exception';
 import Settings from '../Settings/Settings';
 
 export const MonitorEvents = {
@@ -206,7 +206,7 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
 
             this.DetectChanges();
         } catch (ex) {
-            Exception.Dump('Polling Error', ex);
+            Dump.Error('Polling Error', ex);
         }
 
         this._nowOnPollingProsess = false;

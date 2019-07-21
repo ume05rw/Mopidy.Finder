@@ -10,6 +10,7 @@ import { default as HeaderBar } from './HeaderBars/HeaderBar';
 import Playlists from './Playlists/Playlists';
 import Settings from './Settings/Settings';
 import Sidebar from './Sidebars/Sidebar';
+import Dump from '../Utils/Dump';
 
 @Component({
     template: `<div class="wrapper" style="height: 100%; min-height: 100%;">
@@ -68,7 +69,9 @@ export default class RootView extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
+        Dump.Log('RootView.Initialize: Start.');
         await super.Initialize();
+        Dump.Log('RootView.Initialize: Subviews Initialized.');
 
         (Libraries.$(window) as any).resize(
             this.viewport.changed((): void => {
@@ -83,21 +86,19 @@ export default class RootView extends ViewBase {
         const promises: Promise<any>[] = [];
         const store = new SettingsStore();
 
-        let isConnectable: boolean = false;
-        let updateProgress: IUpdateProgress = null;
+        Dump.Log('RootView.Initialize: Before Query.');
+        // 個別にawaitした方が、複数promise配列をawait Promise.all するより早い。
+        const isConnectable = await store.TryConnect();
+        const updateProgress = await store.GetDbUpdateProgress();
 
-        promises.push(store.TryConnect()
-            .then((res) => { isConnectable = res; }));
-        promises.push(store.GetDbUpdateProgress()
-            .then((res) => { updateProgress = res; }));
-
-        await Promise.all(promises);
+        Dump.Log('RootView.Initialize: After Query.');
 
         const isDbUpdating = (updateProgress.UpdateType !== 'None');
         const content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
             ? Contents.Settings
             : Contents.Finder;
 
+        Dump.Log('RootView.Initialize: Set SubViews1');
         this.Sidebar.SetNavigation(content);
         this.isMopidyConnectable = store.Entity.IsMopidyConnectable;
 
@@ -106,12 +107,15 @@ export default class RootView extends ViewBase {
         }
         this.OnContentChanged(args);
 
+        Dump.Log('RootView.Initialize: Set SubViews2');
         if (isDbUpdating) {
             this.Settings.ShowProgress(updateProgress);
         } else if (store.Entity.IsMopidyConnectable) {
+            Dump.Log('RootView.Initialize: Set SubViews3');
             const existsData = await store.ExistsData();
             if (!existsData)
                 this.Settings.InitialScan();
+            Dump.Log('RootView.Initialize: Set SubViews4');
         }
 
         return true;

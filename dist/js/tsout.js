@@ -204,7 +204,7 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
             ? Mopidy.default
             : Mopidy);
         /**
-         * AdminLte
+         * AdminLTE
          */
         Libraries.AdminLte = AdminLte;
         /**
@@ -279,6 +279,72 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         return Libraries;
     }());
     exports.default = Libraries;
+});
+define("Utils/Dump", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Dump = /** @class */ (function () {
+        function Dump() {
+        }
+        Dump.Log = function (message, value) {
+            var time = Dump.GetTimestamp();
+            console.log("[" + time.TimeStamp + "]:: " + message); // eslint-disable-line
+            if (value)
+                console.log(Dump.GetDumpString(value)); // eslint-disable-line
+        };
+        Dump.Warning = function (message, value) {
+            var time = Dump.GetTimestamp();
+            console.warn("[" + time.TimeStamp + "]:: " + message); // eslint-disable-line
+            if (value)
+                console.log(Dump.GetDumpString(value)); // eslint-disable-line
+        };
+        Dump.Error = function (message, value) {
+            var dumpString = Dump.GetDumpString(value);
+            var time = Dump.GetTimestamp();
+            console.error("[" + time.TimeStamp + "]:: " + message); // eslint-disable-line
+            if (value)
+                console.log(Dump.GetDumpString(value)); // eslint-disable-line
+        };
+        Dump.GetDumpString = function (value) {
+            var type = typeof value;
+            return (type === 'object' || type === 'function' || type === 'symbol')
+                ? JSON.stringify(value, null, 4)
+                : ('' + value);
+        };
+        Dump.GetTimestamp = function () {
+            var now = new Date();
+            return {
+                Time: now,
+                TimeStamp: ('0' + now.getHours()).slice(-2) + ":" + ('0' + now.getMinutes()).slice(-2) + ":" + ('0' + now.getSeconds()).slice(-2) + "." + ('000' + now.getMilliseconds()).substr(-3)
+            };
+        };
+        return Dump;
+    }());
+    exports.default = Dump;
+});
+define("Utils/Exception", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Exception = /** @class */ (function () {
+        function Exception() {
+        }
+        Exception.Throw = function (message, data) {
+            throw new Error(Exception.CreateDump(message, data));
+        };
+        //public static Dump(message: string, data?: any): void {
+        //    console.error(Exception.CreateDump(message, data)); // eslint-disable-line
+        //}
+        Exception.CreateDump = function (message, data) {
+            if (!message)
+                message = 'Unexpexted Error';
+            return JSON.stringify({
+                Message: message,
+                Data: data
+            });
+        };
+        return Exception;
+    }());
+    exports.default = Exception;
 });
 define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "EventableBase"], function (require, exports, axios_1, qs, EventableBase_1) {
     "use strict";
@@ -454,191 +520,7 @@ define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "E
     }(EventableBase_1.default));
     exports.default = XhrQueryableBase;
 });
-define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var JsonRpcQueryableBase = /** @class */ (function (_super) {
-        __extends(JsonRpcQueryableBase, _super);
-        function JsonRpcQueryableBase() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        JsonRpcQueryableBase.prototype.QueryJsonRpc = function (params) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            params.jsonrpc = '2.0';
-                            return [4 /*yield*/, XhrQueryableBase_1.default.XhrInstance.post(JsonRpcQueryableBase.Url, params)
-                                    .catch(function (e) {
-                                    var resultData = {
-                                        jsonrpc: '2.0',
-                                        error: e
-                                    };
-                                    if (params.id)
-                                        resultData.id = params.id;
-                                    var result = {
-                                        status: 406,
-                                        statusText: 'Network Error',
-                                        config: null,
-                                        headers: null,
-                                        data: resultData
-                                    };
-                                    return result;
-                                })];
-                        case 1:
-                            response = _a.sent();
-                            result = response.data;
-                            if (params.id && !result) {
-                                // id付きにも拘らず、応答が無いとき
-                                console.error("JsonRpcError: method=" + params.method); // eslint-disable-line
-                                console.error('returns null'); // eslint-disable-line
-                            }
-                            if (result && result.error) {
-                                // 応答にerrorが含まれるとき
-                                console.error("JsonRpcError: method=" + params.method); // eslint-disable-line
-                                console.error(result); // eslint-disable-line
-                            }
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        JsonRpcQueryableBase.prototype.JsonRpcRequest = function (method, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var query, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            query = {
-                                jsonrpc: '2.0',
-                                method: method,
-                                id: JsonRpcQueryableBase.IdCounter
-                            };
-                            if (params)
-                                query.params = params;
-                            JsonRpcQueryableBase.IdCounter++;
-                            return [4 /*yield*/, this.QueryJsonRpc(query)];
-                        case 1:
-                            result = _a.sent();
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        JsonRpcQueryableBase.prototype.JsonRpcNotice = function (method, params) {
-            if (params === void 0) { params = null; }
-            return __awaiter(this, void 0, void 0, function () {
-                var query, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            query = {
-                                jsonrpc: '2.0',
-                                method: method
-                            };
-                            if (params)
-                                query.params = params;
-                            return [4 /*yield*/, this.QueryJsonRpc(query)];
-                        case 1:
-                            result = _a.sent();
-                            return [2 /*return*/, (!result || (result && !result.error))];
-                    }
-                });
-            });
-        };
-        JsonRpcQueryableBase.Url = 'JsonRpc';
-        JsonRpcQueryableBase.IdCounter = 1;
-        return JsonRpcQueryableBase;
-    }(XhrQueryableBase_1.default));
-    exports.default = JsonRpcQueryableBase;
-});
-define("Models/Settings/Settings", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Settings = /** @class */ (function () {
-        function Settings() {
-            this._serverAddress = null;
-            this._serverPort = null;
-            this._isBusy = false;
-            this._isMopidyConnectable = false;
-        }
-        Object.defineProperty(Settings, "Entity", {
-            get: function () {
-                return Settings._entity;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Settings.Apply = function (newSettings) {
-            this._entity._serverAddress = newSettings.ServerAddress;
-            this._entity._serverPort = newSettings.ServerPort;
-        };
-        Object.defineProperty(Settings.prototype, "ServerAddress", {
-            get: function () {
-                return this._serverAddress;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Settings.prototype, "ServerPort", {
-            get: function () {
-                return this._serverPort;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Settings.prototype, "IsBusy", {
-            get: function () {
-                return this._isBusy;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Settings.prototype, "IsMopidyConnectable", {
-            get: function () {
-                return this._isMopidyConnectable;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Settings.prototype.SetBusy = function (isBusy) {
-            this._isBusy = isBusy;
-        };
-        Settings.prototype.SetMopidyConnectable = function (isConnectable) {
-            this._isMopidyConnectable = isConnectable;
-        };
-        Settings._entity = new Settings();
-        return Settings;
-    }());
-    exports.default = Settings;
-});
-define("Utils/Exception", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Exception = /** @class */ (function () {
-        function Exception() {
-        }
-        Exception.Throw = function (message, data) {
-            throw new Error(Exception.CreateDump(message, data));
-        };
-        Exception.Dump = function (message, data) {
-            console.error(Exception.CreateDump(message, data)); // eslint-disable-line
-        };
-        Exception.CreateDump = function (message, data) {
-            if (!message)
-                message = 'Unexpexted Error';
-            return JSON.stringify({
-                Message: message,
-                Data: data
-            });
-        };
-        return Exception;
-    }());
-    exports.default = Exception;
-});
-define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_1, XhrQueryableBase_2) {
+define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bases/XhrQueryableBase"], function (require, exports, Libraries_1, XhrQueryableBase_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var StoreBase = /** @class */ (function (_super) {
@@ -649,157 +531,14 @@ define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bas
             return _this;
         }
         return StoreBase;
-    }(XhrQueryableBase_2.default));
+    }(XhrQueryableBase_1.default));
     exports.default = StoreBase;
 });
-define("Models/Relations/GenreAlbum", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var GenreAlbum = /** @class */ (function () {
-        function GenreAlbum() {
-            this.GenreId = null;
-            this.AlbumId = null;
-        }
-        GenreAlbum.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new GenreAlbum();
-            result.GenreId = entity.GenreId || null;
-            result.AlbumId = entity.AlbumId || null;
-            return result;
-        };
-        GenreAlbum.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = GenreAlbum.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        return GenreAlbum;
-    }());
-    exports.default = GenreAlbum;
-});
-define("Models/Relations/GenreArtist", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var GenreArtist = /** @class */ (function () {
-        function GenreArtist() {
-            this.GenreId = null;
-            this.ArtistId = null;
-        }
-        GenreArtist.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new GenreArtist();
-            result.GenreId = entity.GenreId || null;
-            result.ArtistId = entity.ArtistId || null;
-            return result;
-        };
-        GenreArtist.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = GenreArtist.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        return GenreArtist;
-    }());
-    exports.default = GenreArtist;
-});
-define("Models/Genres/Genre", ["require", "exports", "Models/Relations/GenreAlbum", "Models/Relations/GenreArtist"], function (require, exports, GenreAlbum_1, GenreArtist_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Genre = /** @class */ (function () {
-        function Genre() {
-            this.Id = null;
-            this.Name = null;
-            this.LowerName = null;
-            this.Uri = null;
-            this.GenreArtists = [];
-            this.GenreAlbums = [];
-        }
-        Genre.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Genre();
-            if (entity) {
-                result.Id = entity.Id || null;
-                result.Name = entity.Name || null;
-                result.LowerName = entity.LowerName || null;
-                result.Uri = entity.Uri || null;
-                result.GenreArtists = GenreArtist_1.default.CreateArray(entity.GenreArtists);
-                result.GenreAlbums = GenreAlbum_1.default.CreateArray(entity.GenreAlbums);
-            }
-            return result;
-        };
-        Genre.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Genre.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        return Genre;
-    }());
-    exports.default = Genre;
-});
-define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Genres/Genre", "Utils/Exception"], function (require, exports, StoreBase_1, Genre_1, Exception_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var GenreStore = /** @class */ (function (_super) {
-        __extends(GenreStore, _super);
-        function GenreStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        GenreStore.prototype.Exists = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Genre/Exists')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_1.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            return [2 /*return*/, response.Result];
-                    }
-                });
-            });
-        };
-        GenreStore.prototype.GetList = function (args) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Genre/GetPagenatedList', args)];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_1.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            result = response.Result;
-                            result.ResultList = Genre_1.default.CreateArray(result.ResultList);
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        return GenreStore;
-    }(StoreBase_1.default));
-    exports.default = GenreStore;
-});
 define("Models/Mopidies/IArtist", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Mopidies/IAlbum", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
@@ -834,7 +573,189 @@ define("Models/Relations/ArtistAlbum", ["require", "exports"], function (require
     }());
     exports.default = ArtistAlbum;
 });
-define("Models/Artists/Artist", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreArtist"], function (require, exports, ArtistAlbum_1, GenreArtist_2) {
+define("Models/Relations/GenreAlbum", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var GenreAlbum = /** @class */ (function () {
+        function GenreAlbum() {
+            this.GenreId = null;
+            this.AlbumId = null;
+        }
+        GenreAlbum.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new GenreAlbum();
+            result.GenreId = entity.GenreId || null;
+            result.AlbumId = entity.AlbumId || null;
+            return result;
+        };
+        GenreAlbum.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = GenreAlbum.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        return GenreAlbum;
+    }());
+    exports.default = GenreAlbum;
+});
+define("Models/Albums/Album", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreAlbum"], function (require, exports, ArtistAlbum_1, GenreAlbum_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Album = /** @class */ (function () {
+        function Album() {
+            this.Id = null;
+            this.Name = null;
+            this.LowerName = null;
+            this.Uri = null;
+            this.Year = null;
+            this.ImageUri = null;
+            this.ArtistAlbums = [];
+            this.GenreAlbums = [];
+        }
+        Object.defineProperty(Album, "DefaultImage", {
+            /**
+             * テストドライバー上ではlocationが存在しない。
+             */
+            get: function () {
+                return (!location)
+                    ? 'http://localhost:6680/img/nullImage.jpg'
+                    : location.protocol + "//" + location.host + "/img/nullImage.jpg";
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Album.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Album();
+            result.Id = entity.Id || null;
+            result.Name = entity.Name || null;
+            result.LowerName = entity.LowerName || null;
+            result.Uri = entity.Uri || null;
+            result.Year = entity.Year || null;
+            result.ImageUri = entity.ImageUri || null;
+            result.ArtistAlbums = ArtistAlbum_1.default.CreateArray(entity.ArtistAlbums);
+            result.GenreAlbums = GenreAlbum_1.default.CreateArray(entity.GenreAlbums);
+            return result;
+        };
+        Album.CreateFromMopidy = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Album();
+            result.Id = null;
+            result.Name = entity.name || null;
+            result.LowerName = (entity.name)
+                ? entity.name.toLowerCase()
+                : null;
+            result.Uri = entity.uri || null;
+            result.Year = (entity.date && 4 <= entity.date.length)
+                ? (4 < entity.date.length)
+                    ? parseInt(entity.date.substr(0, 4), 10)
+                    : parseInt(entity.date)
+                : null;
+            result.ImageUri = (entity.images && entity.images[0])
+                ? entity.images[0]
+                : null;
+            result.ArtistAlbums = [];
+            result.GenreAlbums = [];
+            return result;
+        };
+        Album.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Album.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Album.CreateArrayFromMopidy = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Album.CreateFromMopidy(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Album.prototype.GetImageFullUri = function () {
+            return (!this.ImageUri || this.ImageUri == '')
+                ? Album.DefaultImage
+                : location.protocol + "//" + location.host + this.ImageUri;
+        };
+        return Album;
+    }());
+    exports.default = Album;
+});
+define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase", "Utils/Exception"], function (require, exports, StoreBase_1, Exception_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AlbumStore = /** @class */ (function (_super) {
+        __extends(AlbumStore, _super);
+        function AlbumStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        AlbumStore.prototype.Exists = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Album/Exists')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_1.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        return AlbumStore;
+    }(StoreBase_1.default));
+    exports.default = AlbumStore;
+});
+define("Models/Relations/GenreArtist", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var GenreArtist = /** @class */ (function () {
+        function GenreArtist() {
+            this.GenreId = null;
+            this.ArtistId = null;
+        }
+        GenreArtist.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new GenreArtist();
+            result.GenreId = entity.GenreId || null;
+            result.ArtistId = entity.ArtistId || null;
+            return result;
+        };
+        GenreArtist.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = GenreArtist.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        return GenreArtist;
+    }());
+    exports.default = GenreArtist;
+});
+define("Models/Artists/Artist", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreArtist"], function (require, exports, ArtistAlbum_2, GenreArtist_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Artist = /** @class */ (function () {
@@ -856,8 +777,8 @@ define("Models/Artists/Artist", ["require", "exports", "Models/Relations/ArtistA
             result.LowerName = entity.LowerName || null;
             result.Uri = entity.Uri || null;
             result.ImageUri = entity.ImageUri || null;
-            result.ArtistAlbums = ArtistAlbum_1.default.CreateArray(entity.ArtistAlbums);
-            result.GenreArtists = GenreArtist_2.default.CreateArray(entity.GenreArtists);
+            result.ArtistAlbums = ArtistAlbum_2.default.CreateArray(entity.ArtistAlbums);
+            result.GenreArtists = GenreArtist_1.default.CreateArray(entity.GenreArtists);
             return result;
         };
         Artist.CreateFromMopidy = function (entity) {
@@ -945,117 +866,161 @@ define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreB
     }(StoreBase_2.default));
     exports.default = ArtistStore;
 });
-define("Models/Mopidies/IAlbum", ["require", "exports"], function (require, exports) {
+define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var JsonRpcQueryableBase = /** @class */ (function (_super) {
+        __extends(JsonRpcQueryableBase, _super);
+        function JsonRpcQueryableBase() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        JsonRpcQueryableBase.prototype.QueryJsonRpc = function (params) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            params.jsonrpc = '2.0';
+                            return [4 /*yield*/, XhrQueryableBase_2.default.XhrInstance.post(JsonRpcQueryableBase.Url, params)
+                                    .catch(function (e) {
+                                    var resultData = {
+                                        jsonrpc: '2.0',
+                                        error: e
+                                    };
+                                    if (params.id)
+                                        resultData.id = params.id;
+                                    var result = {
+                                        status: 406,
+                                        statusText: 'Network Error',
+                                        config: null,
+                                        headers: null,
+                                        data: resultData
+                                    };
+                                    return result;
+                                })];
+                        case 1:
+                            response = _a.sent();
+                            result = response.data;
+                            if (params.id && !result) {
+                                // id付きにも拘らず、応答が無いとき
+                                console.error("JsonRpcError: method=" + params.method); // eslint-disable-line
+                                console.error('returns null'); // eslint-disable-line
+                            }
+                            if (result && result.error) {
+                                // 応答にerrorが含まれるとき
+                                console.error("JsonRpcError: method=" + params.method); // eslint-disable-line
+                                console.error(result); // eslint-disable-line
+                            }
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        JsonRpcQueryableBase.prototype.JsonRpcRequest = function (method, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var query, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            query = {
+                                jsonrpc: '2.0',
+                                method: method,
+                                id: JsonRpcQueryableBase.IdCounter
+                            };
+                            if (params)
+                                query.params = params;
+                            JsonRpcQueryableBase.IdCounter++;
+                            return [4 /*yield*/, this.QueryJsonRpc(query)];
+                        case 1:
+                            result = _a.sent();
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        JsonRpcQueryableBase.prototype.JsonRpcNotice = function (method, params) {
+            if (params === void 0) { params = null; }
+            return __awaiter(this, void 0, void 0, function () {
+                var query, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            query = {
+                                jsonrpc: '2.0',
+                                method: method
+                            };
+                            if (params)
+                                query.params = params;
+                            return [4 /*yield*/, this.QueryJsonRpc(query)];
+                        case 1:
+                            result = _a.sent();
+                            return [2 /*return*/, (!result || (result && !result.error))];
+                    }
+                });
+            });
+        };
+        JsonRpcQueryableBase.Url = 'JsonRpc';
+        JsonRpcQueryableBase.IdCounter = 1;
+        return JsonRpcQueryableBase;
+    }(XhrQueryableBase_2.default));
+    exports.default = JsonRpcQueryableBase;
 });
-define("Models/Albums/Album", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreAlbum"], function (require, exports, ArtistAlbum_2, GenreAlbum_2) {
+define("Models/Genres/Genre", ["require", "exports", "Models/Relations/GenreAlbum", "Models/Relations/GenreArtist"], function (require, exports, GenreAlbum_2, GenreArtist_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var Album = /** @class */ (function () {
-        function Album() {
+    var Genre = /** @class */ (function () {
+        function Genre() {
             this.Id = null;
             this.Name = null;
             this.LowerName = null;
             this.Uri = null;
-            this.Year = null;
-            this.ImageUri = null;
-            this.ArtistAlbums = [];
+            this.GenreArtists = [];
             this.GenreAlbums = [];
         }
-        Object.defineProperty(Album, "DefaultImage", {
-            /**
-             * テストドライバー上ではlocationが存在しない。
-             */
-            get: function () {
-                return (!location)
-                    ? 'http://localhost:6680/img/nullImage.jpg'
-                    : location.protocol + "//" + location.host + "/img/nullImage.jpg";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Album.Create = function (entity) {
+        Genre.Create = function (entity) {
             if (!entity)
                 return null;
-            var result = new Album();
-            result.Id = entity.Id || null;
-            result.Name = entity.Name || null;
-            result.LowerName = entity.LowerName || null;
-            result.Uri = entity.Uri || null;
-            result.Year = entity.Year || null;
-            result.ImageUri = entity.ImageUri || null;
-            result.ArtistAlbums = ArtistAlbum_2.default.CreateArray(entity.ArtistAlbums);
-            result.GenreAlbums = GenreAlbum_2.default.CreateArray(entity.GenreAlbums);
+            var result = new Genre();
+            if (entity) {
+                result.Id = entity.Id || null;
+                result.Name = entity.Name || null;
+                result.LowerName = entity.LowerName || null;
+                result.Uri = entity.Uri || null;
+                result.GenreArtists = GenreArtist_2.default.CreateArray(entity.GenreArtists);
+                result.GenreAlbums = GenreAlbum_2.default.CreateArray(entity.GenreAlbums);
+            }
             return result;
         };
-        Album.CreateFromMopidy = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Album();
-            result.Id = null;
-            result.Name = entity.name || null;
-            result.LowerName = (entity.name)
-                ? entity.name.toLowerCase()
-                : null;
-            result.Uri = entity.uri || null;
-            result.Year = (entity.date && 4 <= entity.date.length)
-                ? (4 < entity.date.length)
-                    ? parseInt(entity.date.substr(0, 4), 10)
-                    : parseInt(entity.date)
-                : null;
-            result.ImageUri = (entity.images && entity.images[0])
-                ? entity.images[0]
-                : null;
-            result.ArtistAlbums = [];
-            result.GenreAlbums = [];
-            return result;
-        };
-        Album.CreateArray = function (entities) {
+        Genre.CreateArray = function (entities) {
             var result = [];
             if (!entities)
                 return result;
             for (var i = 0; i < entities.length; i++) {
-                var entity = Album.Create(entities[i]);
+                var entity = Genre.Create(entities[i]);
                 if (entity)
                     result.push(entity);
             }
             return result;
         };
-        Album.CreateArrayFromMopidy = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Album.CreateFromMopidy(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        Album.prototype.GetImageFullUri = function () {
-            return (!this.ImageUri || this.ImageUri == '')
-                ? Album.DefaultImage
-                : location.protocol + "//" + location.host + this.ImageUri;
-        };
-        return Album;
+        return Genre;
     }());
-    exports.default = Album;
+    exports.default = Genre;
 });
-define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase", "Utils/Exception"], function (require, exports, StoreBase_3, Exception_3) {
+define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Genres/Genre", "Utils/Exception"], function (require, exports, StoreBase_3, Genre_1, Exception_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var AlbumStore = /** @class */ (function (_super) {
-        __extends(AlbumStore, _super);
-        function AlbumStore() {
+    var GenreStore = /** @class */ (function (_super) {
+        __extends(GenreStore, _super);
+        function GenreStore() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        AlbumStore.prototype.Exists = function () {
+        GenreStore.prototype.Exists = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var response;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Album/Exists')];
+                        case 0: return [4 /*yield*/, this.QueryGet('Genre/Exists')];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
@@ -1065,11 +1030,88 @@ define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBas
                 });
             });
         };
-        return AlbumStore;
+        GenreStore.prototype.GetList = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Genre/GetPagenatedList', args)];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_3.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            result = response.Result;
+                            result.ResultList = Genre_1.default.CreateArray(result.ResultList);
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        return GenreStore;
     }(StoreBase_3.default));
-    exports.default = AlbumStore;
+    exports.default = GenreStore;
 });
-define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings", "Utils/Exception", "Models/Genres/GenreStore", "Models/Artists/ArtistStore", "Models/Albums/AlbumStore"], function (require, exports, JsonRpcQueryableBase_1, Settings_1, Exception_4, GenreStore_1, ArtistStore_1, AlbumStore_1) {
+define("Models/Settings/Settings", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Settings = /** @class */ (function () {
+        function Settings() {
+            this._serverAddress = null;
+            this._serverPort = null;
+            this._isBusy = false;
+            this._isMopidyConnectable = false;
+        }
+        Object.defineProperty(Settings, "Entity", {
+            get: function () {
+                return Settings._entity;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Settings.Apply = function (newSettings) {
+            this._entity._serverAddress = newSettings.ServerAddress;
+            this._entity._serverPort = newSettings.ServerPort;
+        };
+        Object.defineProperty(Settings.prototype, "ServerAddress", {
+            get: function () {
+                return this._serverAddress;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "ServerPort", {
+            get: function () {
+                return this._serverPort;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsBusy", {
+            get: function () {
+                return this._isBusy;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsMopidyConnectable", {
+            get: function () {
+                return this._isMopidyConnectable;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Settings.prototype.SetBusy = function (isBusy) {
+            this._isBusy = isBusy;
+        };
+        Settings.prototype.SetMopidyConnectable = function (isConnectable) {
+            this._isMopidyConnectable = isConnectable;
+        };
+        Settings._entity = new Settings();
+        return Settings;
+    }());
+    exports.default = Settings;
+});
+define("Models/Settings/SettingsStore", ["require", "exports", "Utils/Dump", "Utils/Exception", "Models/Albums/AlbumStore", "Models/Artists/ArtistStore", "Models/Bases/JsonRpcQueryableBase", "Models/Genres/GenreStore", "Models/Settings/Settings"], function (require, exports, Dump_1, Exception_4, AlbumStore_1, ArtistStore_1, JsonRpcQueryableBase_1, GenreStore_1, Settings_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var SettingsStore = /** @class */ (function (_super) {
@@ -1109,7 +1151,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
-                                Exception_4.default.Dump('SettingStore.Update: Unexpected Error.', response.Errors);
+                                Dump_1.default.Error('SettingStore.Update: Unexpected Error.', response.Errors);
                                 return [2 /*return*/, false];
                             }
                             updated = response.Result;
@@ -1128,7 +1170,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (response.error)
-                                Exception_4.default.Dump(response.error);
+                                Dump_1.default.Error('SettingStore.TryConnect: Unexpected Error.', response.error);
                             Settings_1.default.Entity.SetMopidyConnectable(!(response.error));
                             return [2 /*return*/, Settings_1.default.Entity.IsMopidyConnectable];
                     }
@@ -1165,7 +1207,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
-                                Exception_4.default.Dump('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
+                                Dump_1.default.Error('SettingsStore.GetAlbumScanProgress: Unexpected Error.', response.Errors);
                                 return [2 /*return*/, {
                                         TotalAlbumCount: -1,
                                         ScannedAlbumCount: -1
@@ -1185,7 +1227,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                Exception_4.default.Dump('SettingsStore.DbScanNew: Unexpected Error.', response.Errors);
+                                Dump_1.default.Error('SettingsStore.DbScanNew: Unexpected Error.', response.Errors);
                             return [2 /*return*/, response.Succeeded];
                     }
                 });
@@ -1200,7 +1242,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                Exception_4.default.Dump('SettingsStore.DbCleanup: Unexpected Error.', response.Errors);
+                                Dump_1.default.Error('SettingsStore.DbCleanup: Unexpected Error.', response.Errors);
                             return [2 /*return*/, response.Succeeded];
                     }
                 });
@@ -1217,7 +1259,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Models/Bases/Jso
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
-                                Exception_4.default.Dump('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
+                                Dump_1.default.Error('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
                                 return [2 /*return*/, {
                                         IsRunning: false,
                                         Succeeded: false,
@@ -1331,7 +1373,7 @@ define("Views/Bases/IContentDetail", ["require", "exports"], function (require, 
         ContentDetails[ContentDetails["ScanProgress"] = 7] = "ScanProgress";
     })(ContentDetails = exports.ContentDetails || (exports.ContentDetails = {}));
 });
-define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (require, exports, Exception_5) {
+define("Utils/Delay", ["require", "exports", "Utils/Exception", "Utils/Dump"], function (require, exports, Exception_5, Dump_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var DelayedOnceExecuter = /** @class */ (function () {
@@ -1361,13 +1403,13 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
                         if (DelayedOnceExecuter.DelayThreshold < elapsed) {
                             // Delay閾値より長い時間の間、一度も実行されていない。
                             // 無限ループの可能性がある。
-                            Exception_5.default.Dump('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
+                            Dump_2.default.Warning('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
                         }
                     }
                     if (DelayedOnceExecuter.SuppressThreshold < _this._suppressCount) {
                         // Suppress閾値より多くの回数分、実行が抑制されている。
                         // 呼び出し回数が多すぎる可能性がある。
-                        Exception_5.default.Dump('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
+                        Dump_2.default.Warning('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
                     }
                 }, DelayedOnceExecuter.MonitorInterval);
             }
@@ -1426,7 +1468,7 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception"], function (requi
                 this._callback(args);
             }
             catch (ex) {
-                Exception_5.default.Dump('Callback FAILED!!', ex);
+                Dump_2.default.Error('Callback FAILED!!', ex);
             }
             if (this._timer) {
                 clearInterval(this._timer);
@@ -1576,7 +1618,7 @@ define("Models/Mopidies/ITrack", ["require", "exports"], function (require, expo
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Tracks/Track", ["require", "exports", "Models/Albums/Album", "Models/Artists/Artist", "Utils/Exception"], function (require, exports, Album_1, Artist_2, Exception_6) {
+define("Models/Tracks/Track", ["require", "exports", "Utils/Dump", "Models/Albums/Album", "Models/Artists/Artist"], function (require, exports, Dump_3, Album_1, Artist_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Track = /** @class */ (function () {
@@ -1648,9 +1690,9 @@ define("Models/Tracks/Track", ["require", "exports", "Models/Albums/Album", "Mod
         };
         Track.EnsureTrackByMopidy = function (entity, mopidyTrack) {
             if (!entity)
-                Exception_6.default.Dump('argument entity null');
+                Dump_3.default.Error('argument entity null');
             if (!mopidyTrack)
-                Exception_6.default.Dump('argument mopidyTrack null');
+                Dump_3.default.Error('argument mopidyTrack null');
             entity.Id = null;
             entity.Name = mopidyTrack.name || null;
             entity.LowerName = (mopidyTrack.name)
@@ -1921,7 +1963,7 @@ define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, ex
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_2, Exception_7, JsonRpcQueryableBase_2, Track_3) {
+define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_2, Dump_4, JsonRpcQueryableBase_2, Track_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackStore = /** @class */ (function (_super) {
@@ -1954,7 +1996,7 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Ex
                                     continue;
                                 if ((!track.Name || !track.Length)
                                     && (!pairedTrackArray || pairedTrackArray.length <= 0)) {
-                                    Exception_7.default.Dump('TrackStore.EnsureTracks: Track Details Not Found', { track: track, pairedTrackArray: pairedTrackArray });
+                                    Dump_4.default.Error('TrackStore.EnsureTracks: Track Details Not Found', { track: track, pairedTrackArray: pairedTrackArray });
                                     continue;
                                 }
                                 mpTrack = pairList[uri][0];
@@ -1972,7 +2014,7 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Ex
     }(JsonRpcQueryableBase_2.default));
     exports.default = TrackStore;
 });
-define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_3, Exception_8, JsonRpcQueryableBase_3, Track_4, TrackStore_1, Playlist_1) {
+define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_3, Exception_6, JsonRpcQueryableBase_3, Track_4, TrackStore_1, Playlist_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlaylistStore = /** @class */ (function (_super) {
@@ -2067,7 +2109,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 2:
                             resAdd = _a.sent();
                             if (resAdd.error)
-                                Exception_8.default.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
+                                Exception_6.default.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
                             tlTracks = resAdd.result;
                             tlDictionary = Libraries_3.default.Enumerable.from(tlTracks)
                                 .toDictionary(function (e) { return e.track.uri; }, function (e2) { return e2.tlid; });
@@ -2078,7 +2120,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                                     : null;
                             }
                             if (track.TlId === null)
-                                Exception_8.default.Throw("track: " + track.Name + " not assigned TlId");
+                                Exception_6.default.Throw("track: " + track.Name + " not assigned TlId");
                             return [4 /*yield*/, this.PlayByTlId(track.TlId)];
                         case 3:
                             _a.sent();
@@ -2112,7 +2154,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_8.default.Throw('PlaylistStore.AddPlaylist: Playlist Create Failed.', response.error);
+                                Exception_6.default.Throw('PlaylistStore.AddPlaylist: Playlist Create Failed.', response.error);
                             }
                             mpPlaylist = response.result;
                             result = Playlist_1.default.CreateFromMopidy(mpPlaylist);
@@ -2132,14 +2174,14 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             playlist = _a.sent();
                             if (!playlist) {
-                                Exception_8.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Playlist Create Failed');
+                                Exception_6.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Playlist Create Failed');
                             }
                             playlist.Tracks = albumTracks.Tracks;
                             return [4 /*yield*/, this.UpdatePlayllist(playlist)];
                         case 2:
                             response = _a.sent();
                             if (response !== true) {
-                                Exception_8.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Track Update Failed.');
+                                Exception_6.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Track Update Failed.');
                             }
                             return [2 /*return*/, playlist];
                     }
@@ -2171,7 +2213,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_8.default.Throw('PlaylistStore.UpdatePlayllist: Track Update Failed.', response.error);
+                                Exception_6.default.Throw('PlaylistStore.UpdatePlayllist: Track Update Failed.', response.error);
                             }
                             return [2 /*return*/, (response.result !== null)];
                     }
@@ -2189,7 +2231,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_8.default.Throw('PlaylistStore.DeletePlaylist: Delete Failed.', response.error);
+                                Exception_6.default.Throw('PlaylistStore.DeletePlaylist: Delete Failed.', response.error);
                             }
                             return [2 /*return*/, true];
                     }
@@ -2212,7 +2254,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
     }(JsonRpcQueryableBase_3.default));
     exports.default = PlaylistStore;
 });
-define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], function (require, exports, _, Exception_9) {
+define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function (require, exports, _, Dump_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Speed;
@@ -2460,7 +2502,7 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], fun
                     this._resolver(result);
                 }
                 catch (ex) {
-                    Exception_9.default.Dump('Animated: Unexpected Error on Resolve', ex);
+                    Dump_5.default.Error('Animated.Resolve: Unexpected Error on Resolve', ex);
                 }
             }
             this._resolver = null;
@@ -2512,7 +2554,7 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Exception"], fun
     }());
     exports.default = Animate;
 });
-define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Utils/Exception", "Views/Bases/ViewBase", "Utils/Animate"], function (require, exports, Animate_1, Exception_10, ViewBase_3, Animate_2) {
+define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Utils/Exception", "Views/Bases/ViewBase", "Utils/Animate"], function (require, exports, Animate_1, Exception_7, ViewBase_3, Animate_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Animation = Animate_2.Animation;
@@ -2540,9 +2582,9 @@ define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Util
                         case 1:
                             _a.sent();
                             if (!this.AnimationIn || Animate_1.default.IsHideAnimation(this.AnimationIn))
-                                Exception_10.default.Throw('Invalid In-Animation', this.AnimationIn);
+                                Exception_7.default.Throw('Invalid In-Animation', this.AnimationIn);
                             if (!this.AnimationOut || !Animate_1.default.IsHideAnimation(this.AnimationOut))
-                                Exception_10.default.Throw('Invalid Out-Animation', this.AnimationOut);
+                                Exception_7.default.Throw('Invalid Out-Animation', this.AnimationOut);
                             this.animate = new Animate_1.default(this.$el);
                             return [2 /*return*/, true];
                     }
@@ -2870,7 +2912,7 @@ define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/View
     }(ViewBase_5.default));
     exports.default = ContentDetailBase;
 });
-define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ContentDetailBase", "Views/Shared/SelectionItem"], function (require, exports, _, Libraries_5, Exception_11, ContentDetailBase_1, SelectionItem_2) {
+define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ContentDetailBase", "Views/Shared/SelectionItem"], function (require, exports, _, Libraries_5, Exception_8, ContentDetailBase_1, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionEvents = {
@@ -2934,7 +2976,7 @@ define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Librar
                             return [3 /*break*/, 3];
                         case 2:
                             e_1 = _a.sent();
-                            Exception_11.default.Throw(null, e_1);
+                            Exception_8.default.Throw(null, e_1);
                             return [3 /*break*/, 3];
                         case 3: return [2 /*return*/, true];
                     }
@@ -2972,7 +3014,7 @@ define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Librar
     }(ContentDetailBase_1.default));
     exports.default = SelectionListBase;
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_12, ViewBase_6) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_9, ViewBase_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumTracksEvents = {
@@ -3076,7 +3118,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var playlist = Libraries_6.default.Enumerable.from(this.innerPlaylists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
-                Exception_12.default.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
+                Exception_9.default.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
             var args = {
                 Playlist: playlist,
                 Tracks: this.entity.Tracks
@@ -3087,12 +3129,12 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var tr = args.currentTarget.parentElement;
             var trackIdString = tr.getAttribute('data-trackid');
             if (!trackIdString || trackIdString === '')
-                Exception_12.default.Throw('SelectionAlbumTrack.OnRowClicked: Track-Id not found.');
+                Exception_9.default.Throw('SelectionAlbumTrack.OnRowClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
             var tracks = Libraries_6.default.Enumerable.from(this.entity.Tracks);
             var track = tracks.firstOrDefault(function (e) { return e.Id === trackId; });
             if (!track)
-                Exception_12.default.Throw('SelectionAlbumTrack.OnRowClicked: Track entity not found.');
+                Exception_9.default.Throw('SelectionAlbumTrack.OnRowClicked: Track entity not found.');
             var orderedArgs = {
                 Entity: this.entity,
                 Track: track,
@@ -3106,15 +3148,15 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var playlist = Libraries_6.default.Enumerable.from(this.innerPlaylists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
-                Exception_12.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
+                Exception_9.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
             var trackIdString = elem.getAttribute('data-trackid');
             if (!trackIdString || trackIdString === '')
-                Exception_12.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
+                Exception_9.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
             var track = Libraries_6.default.Enumerable.from(this.entity.Tracks)
                 .firstOrDefault(function (e) { return e.Id === trackId; });
             if (!track)
-                Exception_12.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
+                Exception_9.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
             var args = {
                 Playlist: playlist,
                 Tracks: [track]
@@ -3139,7 +3181,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Bases/SelectionListBase", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_13, Filterbox_1, SelectionListBase_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Bases/SelectionListBase", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_10, Filterbox_1, SelectionListBase_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AlbumListEvents = {
@@ -3277,10 +3319,10 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 2:
                             albumTracks = args.Entity;
                             if (!albumTracks)
-                                Exception_13.default.Throw('AlbumTracks Not Found', args);
+                                Exception_10.default.Throw('AlbumTracks Not Found', args);
                             track = args.Track;
                             if (!track)
-                                Exception_13.default.Throw('Track Not Found', args);
+                                Exception_10.default.Throw('Track Not Found', args);
                             isAllTracksRegistered = Libraries_7.default.Enumerable.from(albumTracks.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
@@ -3703,7 +3745,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionListBase_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, Delay_3, Exception_14, IContentDetail_1, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, vue_class_component_9, Delay_3, Exception_11, IContentDetail_1, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -3781,7 +3823,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
                     this.AlbumList.LoadIfEmpty();
                     break;
                 default:
-                    Exception_14.default.Throw('Unexpected ContentDetail');
+                    Exception_11.default.Throw('Unexpected ContentDetail');
             }
         };
         // #endregion
@@ -3836,7 +3878,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
     }(ContentBase_1.default));
     exports.default = Finder;
 });
-define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_15, Libraries_10, IContentDetail_2) {
+define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_12, Libraries_10, IContentDetail_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HeaderBarEvents = {
@@ -3969,7 +4011,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                         this.MenuScanProgress.classList.remove(this.displayNone);
                     break;
                 default:
-                    Exception_15.default.Throw('Unexpected Page.', args);
+                    Exception_12.default.Throw('Unexpected Page.', args);
             }
         };
         HeaderBar.prototype.OnGenresClicked = function () {
@@ -5325,7 +5367,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionListBase_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_3, Exception_16) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_3, Exception_13) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistsEvents = {
@@ -5395,7 +5437,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                     this.TrackList.LoadIfEmpty();
                     break;
                 default:
-                    Exception_16.default.Throw('Unexpected ContentDetail');
+                    Exception_13.default.Throw('Unexpected ContentDetail');
             }
         };
         // #endregion
@@ -5982,7 +6024,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
     }(ContentDetailBase_4.default));
     exports.default = ScanProgressBlock;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, SettingsStore_1, Exception_17, IContentDetail_4, ContentBase_3, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, SettingsStore_1, Exception_14, IContentDetail_4, ContentBase_3, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SettingsEvents = {
@@ -6062,7 +6104,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                     this.ScanProgressBlock.Show();
                     break;
                 default:
-                    Exception_17.default.Throw('Unexpected ContentDetail');
+                    Exception_14.default.Throw('Unexpected ContentDetail');
             }
         };
         // #endregion
@@ -6092,7 +6134,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ContentBase_3.default));
     exports.default = Settings;
 });
-define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Utils/Exception", "Models/Settings/Settings"], function (require, exports, JsonRpcQueryableBase_4, Exception_18, Settings_2) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_6, JsonRpcQueryableBase_4, Settings_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -6330,7 +6372,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Models/Bases/JsonRpcQu
                             return [3 /*break*/, 15];
                         case 14:
                             ex_1 = _a.sent();
-                            Exception_18.default.Dump('Polling Error', ex_1);
+                            Dump_6.default.Error('Polling Error', ex_1);
                             return [3 /*break*/, 15];
                         case 15:
                             this._nowOnPollingProsess = false;
@@ -6730,7 +6772,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_19, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_2, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_15, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_2, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -6850,7 +6892,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                     this.settingsTabAnchor.tab(Sidebar_1.ShowTabMethod);
                     break;
                 default:
-                    Exception_19.default.Throw('Unexpected Page Ordered.', page);
+                    Exception_15.default.Throw('Unexpected Page Ordered.', page);
             }
         };
         Sidebar.prototype.OnClickFinder = function (ev) {
@@ -6912,7 +6954,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = Sidebar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_20, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar", "Utils/Dump"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_16, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2, Dump_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -6964,9 +7006,12 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, _super.prototype.Initialize.call(this)];
+                        case 0:
+                            Dump_7.default.Log('RootView.Initialize: Start.');
+                            return [4 /*yield*/, _super.prototype.Initialize.call(this)];
                         case 1:
                             _a.sent();
+                            Dump_7.default.Log('RootView.Initialize: Subviews Initialized.');
                             Libraries_22.default.$(window).resize(this.viewport.changed(function () {
                                 if (_this.viewport.is('<=sm')) {
                                     _this.ContentToFullscreen();
@@ -6977,37 +7022,40 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                             }));
                             promises = [];
                             store = new SettingsStore_2.default();
-                            isConnectable = false;
-                            updateProgress = null;
-                            promises.push(store.TryConnect()
-                                .then(function (res) { isConnectable = res; }));
-                            promises.push(store.GetDbUpdateProgress()
-                                .then(function (res) { updateProgress = res; }));
-                            return [4 /*yield*/, Promise.all(promises)];
+                            Dump_7.default.Log('RootView.Initialize: Before Query.');
+                            return [4 /*yield*/, store.TryConnect()];
                         case 2:
-                            _a.sent();
+                            isConnectable = _a.sent();
+                            return [4 /*yield*/, store.GetDbUpdateProgress()];
+                        case 3:
+                            updateProgress = _a.sent();
+                            Dump_7.default.Log('RootView.Initialize: After Query.');
                             isDbUpdating = (updateProgress.UpdateType !== 'None');
                             content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
                                 ? IContent_3.Contents.Settings
                                 : IContent_3.Contents.Finder;
+                            Dump_7.default.Log('RootView.Initialize: Set SubViews1');
                             this.Sidebar.SetNavigation(content);
                             this.isMopidyConnectable = store.Entity.IsMopidyConnectable;
                             args = {
                                 Content: content
                             };
                             this.OnContentChanged(args);
-                            if (!isDbUpdating) return [3 /*break*/, 3];
+                            Dump_7.default.Log('RootView.Initialize: Set SubViews2');
+                            if (!isDbUpdating) return [3 /*break*/, 4];
                             this.Settings.ShowProgress(updateProgress);
-                            return [3 /*break*/, 5];
-                        case 3:
-                            if (!store.Entity.IsMopidyConnectable) return [3 /*break*/, 5];
-                            return [4 /*yield*/, store.ExistsData()];
+                            return [3 /*break*/, 6];
                         case 4:
+                            if (!store.Entity.IsMopidyConnectable) return [3 /*break*/, 6];
+                            Dump_7.default.Log('RootView.Initialize: Set SubViews3');
+                            return [4 /*yield*/, store.ExistsData()];
+                        case 5:
                             existsData = _a.sent();
                             if (!existsData)
                                 this.Settings.InitialScan();
-                            _a.label = 5;
-                        case 5: return [2 /*return*/, true];
+                            Dump_7.default.Log('RootView.Initialize: Set SubViews4');
+                            _a.label = 6;
+                        case 6: return [2 /*return*/, true];
                     }
                 });
             });
@@ -7039,7 +7087,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                     return this.Settings;
                     break;
                 default:
-                    Exception_20.default.Throw('Unexpected Page.', args);
+                    Exception_16.default.Throw('Unexpected Page.', args);
             }
         };
         RootView.prototype.OnContentChanged = function (args) {
@@ -7073,7 +7121,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                     this.Settings.ShowContentDetail(args);
                     break;
                 default:
-                    Exception_20.default.Throw('Unexpected Page', args);
+                    Exception_16.default.Throw('Unexpected Page', args);
             }
         };
         // #endregion

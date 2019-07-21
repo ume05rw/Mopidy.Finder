@@ -1,5 +1,5 @@
 import Libraries from '../../Libraries';
-import Exception from '../../Utils/Exception';
+import Dump from '../../Utils/Dump';
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import MopidyTrack from '../Mopidies/ITrack';
 import Track from '../Tracks/Track';
@@ -39,7 +39,7 @@ export default class TrackStore extends JsonRpcQueryableBase {
                 (!track.Name || !track.Length)
                 && (!pairedTrackArray || pairedTrackArray.length <= 0)
             ) {
-                Exception.Dump(
+                Dump.Error(
                     'TrackStore.EnsureTracks: Track Details Not Found',
                     { track, pairedTrackArray }
                 );

@@ -1,4 +1,5 @@
 import Exception from './Exception';
+import Dump from './Dump';
 
 export class DelayedOnceExecuter {
     public static MonitorInterval: number = 10000;
@@ -62,7 +63,7 @@ export class DelayedOnceExecuter {
                     if (DelayedOnceExecuter.DelayThreshold < elapsed) {
                         // Delay閾値より長い時間の間、一度も実行されていない。
                         // 無限ループの可能性がある。
-                        Exception.Dump(
+                        Dump.Warning(
                             '＊＊＊無限ループの可能性があります＊＊＊',
                             `${this.Name}: 経過時間(msec) = ` + elapsed
                         );
@@ -72,7 +73,7 @@ export class DelayedOnceExecuter {
                 if (DelayedOnceExecuter.SuppressThreshold < this._suppressCount) {
                     // Suppress閾値より多くの回数分、実行が抑制されている。
                     // 呼び出し回数が多すぎる可能性がある。
-                    Exception.Dump(
+                    Dump.Warning(
                         '＊＊＊呼び出し回数が多すぎます＊＊＊',
                         `${this.Name}: 抑制回数 = ` + this._suppressCount
                     );
@@ -117,7 +118,7 @@ export class DelayedOnceExecuter {
         try {
             this._callback(args);
         } catch (ex) {
-            Exception.Dump('Callback FAILED!!', ex);
+            Dump.Error('Callback FAILED!!', ex);
         }
 
         if (this._timer) {

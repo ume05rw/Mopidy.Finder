@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import Exception from './Exception';
+import Dump from './Dump';
 
 export enum Speed {
     Slower = 'slower',
@@ -252,7 +252,7 @@ export default class Animate {
             try {
                 this._resolver(result);
             } catch (ex) {
-                Exception.Dump('Animated: Unexpected Error on Resolve', ex);
+                Dump.Error('Animated.Resolve: Unexpected Error on Resolve', ex);
             }
         }
 

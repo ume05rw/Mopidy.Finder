@@ -22,6 +22,7 @@
     <None Remove="src\ts\Models\Tracks\TrackStore.ts" />
     <None Remove="src\ts\Utils\Animate.ts" />
     <None Remove="src\ts\Utils\Delay.ts" />
+    <None Remove="src\ts\Utils\Dump.ts" />
     <None Remove="src\ts\Utils\Exception.ts" />
     <None Remove="src\ts\Views\Bases\AnimatedBase.ts" />
     <None Remove="src\ts\Views\Bases\ContentBase.ts" />
@@ -115,6 +116,7 @@
     <TypeScriptCompile Include="src\ts\Models\Tracks\TrackStore.ts" />
     <TypeScriptCompile Include="src\ts\Utils\Animate.ts" />
     <TypeScriptCompile Include="src\ts\Utils\Delay.ts" />
+    <TypeScriptCompile Include="src\ts\Utils\Dump.ts" />
     <TypeScriptCompile Include="src\ts\Utils\Exception.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\AnimatedBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\ContentDetailBase.ts" />

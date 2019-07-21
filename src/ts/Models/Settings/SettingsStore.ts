@@ -1,9 +1,10 @@
-import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
-import { default as Settings, ISettings } from './Settings';
+import Dump from '../../Utils/Dump';
 import Exception from '../../Utils/Exception';
-import GenreStore from '../Genres/GenreStore';
-import ArtistStore from '../Artists/ArtistStore';
 import AlbumStore from '../Albums/AlbumStore';
+import ArtistStore from '../Artists/ArtistStore';
+import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
+import GenreStore from '../Genres/GenreStore';
+import { default as Settings, ISettings } from './Settings';
 
 export interface IUpdateProgress {
     UpdateType: 'None' | 'Cleanup' | 'ScanNew';
@@ -38,7 +39,7 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         const response = await this.QueryPost('Settings', settings);
 
         if (!response.Succeeded) {
-            Exception.Dump('SettingStore.Update: Unexpected Error.', response.Errors);
+            Dump.Error('SettingStore.Update: Unexpected Error.', response.Errors);
 
             return false;
         }
@@ -54,7 +55,7 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         const response = await this.JsonRpcRequest(SettingsStore.MethodGetState);
 
         if (response.error)
-            Exception.Dump(response.error);
+            Dump.Error('SettingStore.TryConnect: Unexpected Error.', response.error);
 
         Settings.Entity.SetMopidyConnectable(!(response.error));
 
@@ -92,7 +93,7 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         const response = await this.QueryGet('Settings/AlbumScanProgress');
 
         if (!response.Succeeded) {
-            Exception.Dump('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
+            Dump.Error('SettingsStore.GetAlbumScanProgress: Unexpected Error.', response.Errors);
 
             return {
                 TotalAlbumCount: -1,
@@ -107,7 +108,7 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         const response = await this.QueryPost('Settings/DbScanNew');
 
         if (!response.Succeeded)
-            Exception.Dump('SettingsStore.DbScanNew: Unexpected Error.', response.Errors);
+            Dump.Error('SettingsStore.DbScanNew: Unexpected Error.', response.Errors);
 
         return response.Succeeded;
     }
@@ -116,7 +117,7 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         const response = await this.QueryPost('Settings/DbCleanup');
 
         if (!response.Succeeded)
-            Exception.Dump('SettingsStore.DbCleanup: Unexpected Error.', response.Errors);
+            Dump.Error('SettingsStore.DbCleanup: Unexpected Error.', response.Errors);
 
         return response.Succeeded;
     }
@@ -126,7 +127,7 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         const response = await this.QueryGet('Settings/UpdateProgress');
 
         if (!response.Succeeded) {
-            Exception.Dump('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
+            Dump.Error('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
 
             return {
                 IsRunning: false,
