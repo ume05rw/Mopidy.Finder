@@ -70,7 +70,7 @@ export default class RootView extends ViewBase {
 
     public async Initialize(): Promise<boolean> {
         Dump.Log('RootView.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
         Dump.Log('RootView.Initialize: Subviews Initialized.');
 
         (Libraries.$(window) as any).resize(

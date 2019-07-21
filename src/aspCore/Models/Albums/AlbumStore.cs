@@ -4,6 +4,7 @@ using MopidyFinder.Models.Artists;
 using MopidyFinder.Models.Bases;
 using MopidyFinder.Models.Mopidies.Methods;
 using MopidyFinder.Models.Tracks;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -194,13 +195,34 @@ namespace MopidyFinder.Models.Albums
                         Track = tr
                     }
                 )
-                .Where(e => !e.Track.Any())
+                .Where(e => e.Track.Count() <= 0)
                 .Select(e => e.Album)
                 .Take(10)
                 .ToArray();
 
             if (!albums.Any())
                 return 0;
+
+            var tmpTracks = this.Dbc.Tracks
+                .Join(
+                    albums,
+                    tr => tr.AlbumId,
+                    al => al.Id,
+                    (tr, al) => new
+                    {
+                        Track = tr,
+                        Album = al
+                    }
+                )
+                .ToArray();
+
+            if (0 < tmpTracks.Length)
+            {
+                // クエリ結果取得時点では、アルバムにトラックが存在しないこと。
+                var why = albums;
+                throw new Exception("Invalid EF-Query.");
+            }
+
 
             if (cancelToken.IsCancellationRequested)
                 return -1;
@@ -223,8 +245,6 @@ namespace MopidyFinder.Models.Albums
                 return -1;
 
             var updatedAlbums = new List<Album>();
-            var addedTracks = new List<Track>();
-
             if (imageDictionary != null)
             {
                 foreach (var pair in imageDictionary)
@@ -240,12 +260,14 @@ namespace MopidyFinder.Models.Albums
                 }
             }
 
+            var addTargets = new List<Track>();
             if (mopidyTrackDictionary != null)
             {
                 // Dbcを渡してTrackStoreを生成しているが、
                 // trackStoreのメソッドではDbcを使っていない。
                 using (var trackStore = new TrackStore(this.Dbc))
                 {
+                    
                     foreach (var pair in mopidyTrackDictionary)
                     {
                         var album = albums
@@ -253,16 +275,37 @@ namespace MopidyFinder.Models.Albums
                         if (album == null)
                             continue;
 
+
                         var tracks = pair.Value
                             .Select(mt => trackStore.CreateTrack(mt))
                             .OrderBy(e => e.TrackNo)
                             .ToArray();
 
+                        var existsAlbumTrack = false;
+                        var albumTracks = new List<Track>();
                         foreach (var track in tracks)
                         {
-                            track.AlbumId = album.Id;
-                            addedTracks.Add(track);
+                            // 登録前の最終確認
+                            var exists = this.Dbc.Tracks
+                                .Where(e => e.Uri == track.Uri && e.AlbumId == album.Id)
+                                .Any();
+
+                            if (exists)
+                            {
+                                // なぜ重複しているか、確認のこと。
+                                existsAlbumTrack = true;
+                                var tmp = 1;
+                            }
+                            else
+                            {
+                                track.AlbumId = album.Id;
+                                albumTracks.Add(track);
+                            }
                         }
+
+                        // アルバム上の曲がDB上に1件もないときのみ、DBに全件書き込む。
+                        if (existsAlbumTrack == false)
+                            addTargets.AddRange(albumTracks);
                     }
                 }
             }
@@ -273,7 +316,9 @@ namespace MopidyFinder.Models.Albums
             foreach (var album in updatedAlbums)
                 this.Dbc.Entry(album).State = EntityState.Modified;
 
-            this.Dbc.Tracks.AddRange(addedTracks);
+            if (0 < addTargets.Count())
+                this.Dbc.Tracks.AddRange(addTargets);
+
             this.Dbc.SaveChanges();
 
             return albums.Length;

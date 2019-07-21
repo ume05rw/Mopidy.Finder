@@ -17,7 +17,7 @@ export default abstract class AnimatedBase extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
 
         if (!this.AnimationIn || Animate.IsHideAnimation(this.AnimationIn))
             Exception.Throw('Invalid In-Animation', this.AnimationIn);

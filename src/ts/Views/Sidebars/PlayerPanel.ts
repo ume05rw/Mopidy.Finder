@@ -85,7 +85,7 @@ export default class PlayerPanel extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
 
         this.volumeSlider = Libraries.$(this.$refs.Slider).ionRangeSlider({
             onFinish: (data): void => {

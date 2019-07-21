@@ -47,7 +47,7 @@ export default class Filterbox extends ViewBase {
 
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
 
         this.lazyUpdater = Delay.DelayedOnce((): void => {
             this.$emit(FilterboxEvents.TextUpdated);

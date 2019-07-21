@@ -136,7 +136,7 @@ export default class SelectionAlbumTracks extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
         this.innerPlaylists = this.playlists;
 
         Libraries.SetTooltip(this.AlbumPlayButton, 'Play Album');

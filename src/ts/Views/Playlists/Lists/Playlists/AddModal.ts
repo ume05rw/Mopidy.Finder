@@ -68,7 +68,7 @@ export default class AddModal extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
 
         Libraries.$(this.$el as HTMLElement).on(ModalEvents.Shown, (): void => {
             this.TextName.focus();

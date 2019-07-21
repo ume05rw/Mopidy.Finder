@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MopidyFinder.Models.Albums;
 using MopidyFinder.Models.Artists;
 using MopidyFinder.Models.Bases;
@@ -38,17 +39,25 @@ namespace MopidyFinder.Models
             var task = Task.Run(async() => {
                 while(true)
                 {
-                    var scaned = await DbMaintainer.ScanAlbum(DbMaintainer._albumScannerCanceler.Token);
-                    if (scaned <= 0)
-                        break;
+                    try
+                    {
+                        var scaned = await DbMaintainer.ScanAlbum(DbMaintainer._albumScannerCanceler.Token);
+                        if (scaned <= 0)
+                            break;
 
-                    if (DbMaintainer._albumScannerCanceler.Token.IsCancellationRequested)
-                        break;
+                        if (DbMaintainer._albumScannerCanceler.Token.IsCancellationRequested)
+                            break;
 
-                    await Task.Delay(10000, DbMaintainer._albumScannerCanceler.Token);
+                        await Task.Delay(10000, DbMaintainer._albumScannerCanceler.Token);
 
-                    if (DbMaintainer._albumScannerCanceler.Token.IsCancellationRequested)
+                        if (DbMaintainer._albumScannerCanceler.Token.IsCancellationRequested)
+                            break;
+                    }
+                    catch (Exception ex)
+                    {
                         break;
+                    }
+
                 }
 
                 DbMaintainer._isAlbumScannerRunning = false;
@@ -61,8 +70,10 @@ namespace MopidyFinder.Models
         {
             using (var serviceScope = DbMaintainer._provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
+            using (var logger = serviceScope.ServiceProvider.GetService<ILoggerFactory>())
             using (var albumStore = new AlbumStore(dbc))
             {
+                
                 return await albumStore.ScanAlbumDetail(cancelToken);
             }
         }

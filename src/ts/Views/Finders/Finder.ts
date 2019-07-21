@@ -52,7 +52,7 @@ export default class Finder extends ContentBase {
 
     public async Initialize(): Promise<boolean> {
         Dump.Log('Finder.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
 
         this.details.push(this.GenreList);
         this.details.push(this.ArtistList);

@@ -71,7 +71,7 @@ export default class SelectionTrack extends ViewBase {
         if (!this.GetIsInitialized())
             Libraries.SetTooltip(this.$refs.DeleteButton as HTMLElement, 'Delete');
 
-        await super.Initialize();
+        super.Initialize();
 
         return true;
     }

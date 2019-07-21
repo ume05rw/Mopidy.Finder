@@ -48,8 +48,7 @@ export default class Settings extends ContentBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('Settings.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
 
         this.store = new SettingsStore();
         this.entity = await this.store.Get();
@@ -62,7 +61,6 @@ export default class Settings extends ContentBase {
         this.details.push(this.DbBlock);
         this.details.push(this.ScanProgressBlock);
 
-        Dump.Log('Settings.Initialize: End.');
         return true;
     }
 

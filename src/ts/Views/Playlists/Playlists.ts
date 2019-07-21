@@ -45,13 +45,11 @@ export default class Playlists extends ContentBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('Playlists.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
 
         this.details.push(this.PlaylistList);
         this.details.push(this.TrackList);
 
-        Dump.Log('Playlists.Initialize: End.');
         return true;
     }
 

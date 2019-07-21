@@ -154,12 +154,14 @@ namespace MopidyFinder.Models.AlbumTracks
                 if (mopidyTrackDictionary == null || mopidyTrackDictionary.Count() <= 0)
                     return result;
 
-                var hasNewTracks = false;
+                var addTargets = new List<Track>();
                 foreach (var pair in mopidyTrackDictionary)
                 {
                     if (!albumDictionary.ContainsKey(pair.Key))
                         continue;
 
+                    var existsAlbumTrack = false;
+                    var albumTracks = new List<Track>();
                     var album = albumDictionary[pair.Key];
                     var artists = album.ArtistAlbums.Select(e => e.Artist).ToList();
                     var tracks = pair.Value
@@ -170,9 +172,19 @@ namespace MopidyFinder.Models.AlbumTracks
                     foreach (var track in tracks)
                     {
                         track.AlbumId = album.Id;
-                        this.Dbc.Tracks.Add(track);
-                        hasNewTracks = true;
+                        var exists = this.Dbc.Tracks
+                            .Where(e => e.Uri == track.Uri && e.AlbumId == album.Id)
+                            .Any();
+
+                        if (exists)
+                            existsAlbumTrack = true;
+                        else
+                            albumTracks.Add(track);
                     }
+
+                    // アルバム上の曲がDB上に1件もないときのみ、DBに全件書き込む。
+                    if (existsAlbumTrack == false)
+                        addTargets.AddRange(albumTracks);
 
                     result.Add(new AlbumTracks()
                     {
@@ -182,8 +194,11 @@ namespace MopidyFinder.Models.AlbumTracks
                     });
                 }
 
-                if (hasNewTracks)
+                if (0 <= addTargets.Count())
+                {
+                    this.Dbc.Tracks.AddRange(addTargets);
                     this.Dbc.SaveChanges();
+                }
 
                 return result;
             }

@@ -70,8 +70,7 @@ export default class GenreList extends SelectionListBase<Genre, GenreStore> {
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('Finder.GenreList.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
 
         // 利便性的にどうなのか、悩む。
         Libraries.SlimScroll(this.CardInnerBody, {
@@ -81,7 +80,6 @@ export default class GenreList extends SelectionListBase<Genre, GenreStore> {
         Libraries.SetTooltip(this.$refs.RefreshButton as HTMLElement, 'Refresh');
         Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');
 
-        Dump.Log('Finder.GenreList.Initialize: End.');
         return true;
     }
 

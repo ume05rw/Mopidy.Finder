@@ -152,7 +152,7 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
     }
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
 
         // ※$onの中ではプロパティ定義が参照出来ないらしい。
         // ※ハンドラメソッドをthisバインドしてもダメだった。

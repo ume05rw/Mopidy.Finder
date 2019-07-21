@@ -54,10 +54,10 @@ namespace MopidyFinder
 
             services.AddDbContext<Dbc>(options =>
             {
-                // ILoggerFactoryが取得出来ていれば、追加しておく。
-                // DBのクエリログが各種ロガーに通知されるようになる。
-                if (loggerFactory != null)
-                    options.UseLoggerFactory(loggerFactory);
+                //// ILoggerFactoryが取得出来ていれば、追加しておく。
+                //// DBのクエリログが各種ロガーに通知されるようになる。
+                //if (loggerFactory != null)
+                //    options.UseLoggerFactory(loggerFactory);
 
                 // フルパス指定が出来ない？要検証。
                 //options.UseSqlite($"Data Source=\"{Program.DbPath}\"");

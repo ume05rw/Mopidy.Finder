@@ -116,8 +116,7 @@ export default class HeaderBar extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('HeaderBar.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
 
         this.buttons.push(this.MenuGenres);
         this.buttons.push(this.MenuArtists);
@@ -137,7 +136,6 @@ export default class HeaderBar extends ViewBase {
         Libraries.SetTooltip(this.MenuDb, 'Database');
         Libraries.SetTooltip(this.MenuScanProgress, 'Scan Progress');
 
-        Dump.Log('HeaderBar.Initialize: End.');
         return true;
     }
 

@@ -102,8 +102,7 @@ export default class Sidebar extends ViewBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('Sidebar.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
 
         Libraries.SlimScroll(this.SidebarSection, {
             height: 'calc(100%)'
@@ -164,7 +163,6 @@ export default class Sidebar extends ViewBase {
             this.$emit(TabEvents.Hidden, args);
         });
 
-        Dump.Log('Sidebar.Initialize: End.');
         return true;
     }
 

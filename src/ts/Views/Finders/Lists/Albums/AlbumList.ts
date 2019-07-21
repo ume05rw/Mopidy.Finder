@@ -85,7 +85,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
 
     public async Initialize(): Promise<boolean> {
         Dump.Log('Finder.AlbumList.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
 
         // 利便性的にどうなのか、悩む。
         Libraries.SlimScroll(this.CardInnerBody, {

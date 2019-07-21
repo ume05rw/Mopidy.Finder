@@ -91,7 +91,7 @@ export default class PlaylistList extends SelectionListBase<Playlist, PlaylistSt
     }
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
 
         // 利便性的にどうなのか、悩む。
         Libraries.SlimScroll(this.CardInnerBody, {

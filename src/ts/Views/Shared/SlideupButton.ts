@@ -28,7 +28,7 @@ export default class SlideupButtom extends AnimatedBase {
     protected tooltip: string;
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
 
         if (this.hideOnInit === true)
             this.HideNow();

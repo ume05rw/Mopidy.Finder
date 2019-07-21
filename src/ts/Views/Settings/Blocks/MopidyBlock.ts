@@ -99,7 +99,7 @@ export default class MopidyBlock extends ContentDetailBase {
 
 
     public async Initialize(): Promise<boolean> {
-        await super.Initialize();
+        super.Initialize();
 
         this.Update = this.Update.bind(this);
         this.lazyUpdater = Delay.DelayedOnce(() => {

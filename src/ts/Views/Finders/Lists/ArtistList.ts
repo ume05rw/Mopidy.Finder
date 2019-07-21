@@ -73,8 +73,7 @@ export default class ArtistList extends SelectionListBase<Artist, ArtistStore> {
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('Finder.ArtistList.Initialize: Start.');
-        await super.Initialize();
+        super.Initialize();
 
         // 利便性的にどうなのか、悩む。
         Libraries.SlimScroll(this.CardInnerBody, {
@@ -85,7 +84,6 @@ export default class ArtistList extends SelectionListBase<Artist, ArtistStore> {
         Libraries.SetTooltip(this.$refs.RefreshButton as HTMLElement, 'Refresh');
         Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');
 
-        Dump.Log('Finder.ArtistList.Initialize: End.');
         return true;
     }
 
