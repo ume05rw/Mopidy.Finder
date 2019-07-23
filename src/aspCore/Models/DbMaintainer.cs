@@ -229,49 +229,7 @@ namespace MopidyFinder.Models
 
                 try
                 {
-                    this._updaters.Add(new Updater()
-                    {
-                        Phase = Phase.Cleanup,
-                        Store = null,
-                        Rate = 5
-                    });
-                    this._updaters.Add(new Updater()
-                    {
-                        Phase = Phase.Genres,
-                        Store = this._genreStore,
-                        Rate = 5
-                    });
-                    this._updaters.Add(new Updater()
-                    {
-                        Phase = Phase.Albums,
-                        Store = this._albumStore,
-                        Rate = 10
-                    });
-                    this._updaters.Add(new Updater()
-                    {
-                        Phase = Phase.Artists,
-                        Store = this._artistStore,
-                        Rate = 5
-                    });
-                    this._updaters.Add(new Updater()
-                    {
-                        Phase = Phase.ArtistAlbums,
-                        Store = this._artistAlbumStore,
-                        Rate = 45
-                    });
-                    this._updaters.Add(new Updater()
-                    {
-                        Phase = Phase.GenreAlbums,
-                        Store = this._genreAlbumStore,
-                        Rate = 20
-                    });
-                    this._updaters.Add(new Updater()
-                    {
-                        Phase = Phase.GenreArtists,
-                        Store = this._genreArtistStore,
-                        Rate = 5
-                    });
-
+                    this.CreateUpdater();
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
@@ -279,117 +237,37 @@ namespace MopidyFinder.Models
                     {
                         this._currentPhase = Phase.Cleanup;
                         this._message = "Database Cleaning.";
-                        this._dbc.GenreArtists.RemoveRange(this._dbc.GenreArtists);
-                        this._dbc.GenreAlbums.RemoveRange(this._dbc.GenreAlbums);
-                        this._dbc.ArtistAlbums.RemoveRange(this._dbc.ArtistAlbums);
-                        this._dbc.Genres.RemoveRange(this._dbc.Genres);
-                        this._dbc.Artists.RemoveRange(this._dbc.Artists);
-                        this._dbc.Albums.RemoveRange(this._dbc.Albums);
-                        this._dbc.Tracks.RemoveRange(this._dbc.Tracks);
-                        this._dbc.SaveChanges();
-
-                        var res1 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genres';");
-                        var res2 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='artists';");
-                        var res3 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='albums';");
-                        var res4 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='artist_albums';");
-                        var res5 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genre_albums';");
-                        var res6 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genre_artists';");
-                        var res7 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='tracks';");
+                        this.Cleanup();
                     }
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
-                    this._currentPhase = Phase.Genres;
-                    this._message = "Database Cleaned up. Now Scanning Genres...";
-                    var genres = await this._genreStore.Scan(this._dbc);
-                    this._message = $"{genres.Length} Genres Found. Now Adding...";
+                    string postMessage = "Database Cleaned up.";
+                    postMessage = await this.Scan<Genre>(postMessage, cancelToken);
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
-                    if (0 < genres.Length)
-                    {
-                        this._dbc.Genres.AddRange((Genre[])genres);
-                        this._dbc.SaveChanges();
-                    }
+                    postMessage = await this.Scan<Album>(postMessage, cancelToken);
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
-                    this._currentPhase = Phase.Albums;
-                    this._message = $"{genres.Length} Genres Added. Now Scanning Albums...";
-                    var albums = await this._albumStore.Scan(this._dbc);
-                    this._message = $"{albums.Length} Album Found. Now Adding...";
+                    postMessage = await this.Scan<Artist>(postMessage, cancelToken);
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
-                    if (0 < albums.Length)
-                    {
-                        this._dbc.Albums.AddRange((Album[])albums);
-                        this._dbc.SaveChanges();
-                    }
+                    postMessage = await this.Scan<ArtistAlbum>(postMessage, cancelToken);
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
-                    this._currentPhase = Phase.Artists;
-                    this._message = $"{albums.Length} Albums Added. Now Scanning Artists...";
-                    var artists = await this._artistStore.Scan(this._dbc);
-                    this._message = $"{artists.Length} Artists Found. Now Adding...";
+                    postMessage = await this.Scan<GenreAlbum>(postMessage, cancelToken);
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
-                    if (0 < artists.Length)
-                    {
-                        this._dbc.Artists.AddRange((Artist[])artists);
-                        this._dbc.SaveChanges();
-                    }
+                    postMessage = await this.Scan<GenreArtist>(postMessage, cancelToken);
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
-                    this._currentPhase = Phase.ArtistAlbums;
-                    this._message = $"{artists.Length} Artists Added. Now Scanning Artist-Album Relations...";
-                    var artistAlbums = await this._artistAlbumStore.Scan(this._dbc);
-                    this._message = $"{artistAlbums.Length} Artist-Album Relation Found. Now Adding...";
-                    if (cancelToken.IsCancellationRequested)
-                        return false;
-
-                    if (0 < artistAlbums.Length)
-                    {
-                        this._dbc.ArtistAlbums.AddRange((ArtistAlbum[])artistAlbums);
-                        this._dbc.SaveChanges();
-                    }
-                    if (cancelToken.IsCancellationRequested)
-                        return false;
-
-                    this._currentPhase = Phase.GenreAlbums;
-                    this._message = $"{artistAlbums.Length} Artist-Album Relations Added. Now Scanning Genre-Album Relations...";
-                    var genreAlbums = await this._genreAlbumStore.Scan(this._dbc);
-                    this._message = $"{genreAlbums.Length} Genre-Album Relations Found. Now Adding...";
-                    if (cancelToken.IsCancellationRequested)
-                        return false;
-
-                    if (0 < genreAlbums.Length)
-                    {
-                        this._dbc.GenreAlbums.AddRange((GenreAlbum[])genreAlbums);
-                        this._dbc.SaveChanges();
-                    }
-                    if (cancelToken.IsCancellationRequested)
-                        return false;
-
-                    this._currentPhase = Phase.GenreArtists;
-                    this._message = $"{genreAlbums.Length} Genre-Album Relations Added. Now Scanning Genre-Artist Relations...";
-                    var genreArtists = await this._genreArtistStore.Scan(this._dbc);
-                    this._message = $"{genreArtists.Length} Genre-Artist Relations Found. Now Adding...";
-                    if (cancelToken.IsCancellationRequested)
-                        return false;
-
-                    if (0 < genreArtists.Length)
-                    {
-                        this._dbc.GenreArtists.AddRange((GenreArtist[])genreArtists);
-                        this._dbc.SaveChanges();
-                    }
-                    if (cancelToken.IsCancellationRequested)
-                        return false;
-
-                    this._message = $"{genreArtists.Length} Genre-Artist Relations Added. Process Completed.";
+                    this._message = $"{postMessage} Process Completed.";
                     this._succeeded = true;
                     this._dbUpdaterCanceler.Dispose();
                     this._dbUpdaterCanceler = null;
@@ -427,6 +305,170 @@ namespace MopidyFinder.Models
                 }
             }, cancelToken);
         }
+
+        private void CreateUpdater()
+        {
+            this._updaters.Clear();
+
+            this._updaters.Add(new Updater()
+            {
+                Phase = Phase.Cleanup,
+                Store = null,
+                Rate = 5
+            });
+            this._updaters.Add(new Updater()
+            {
+                Phase = Phase.Genres,
+                Store = this._genreStore,
+                Rate = 5
+            });
+            this._updaters.Add(new Updater()
+            {
+                Phase = Phase.Albums,
+                Store = this._albumStore,
+                Rate = 10
+            });
+            this._updaters.Add(new Updater()
+            {
+                Phase = Phase.Artists,
+                Store = this._artistStore,
+                Rate = 5
+            });
+            this._updaters.Add(new Updater()
+            {
+                Phase = Phase.ArtistAlbums,
+                Store = this._artistAlbumStore,
+                Rate = 45
+            });
+            this._updaters.Add(new Updater()
+            {
+                Phase = Phase.GenreAlbums,
+                Store = this._genreAlbumStore,
+                Rate = 20
+            });
+            this._updaters.Add(new Updater()
+            {
+                Phase = Phase.GenreArtists,
+                Store = this._genreArtistStore,
+                Rate = 5
+            });
+        }
+
+        private bool Cleanup()
+        {
+            this._dbc.GenreArtists.RemoveRange(this._dbc.GenreArtists);
+            this._dbc.GenreAlbums.RemoveRange(this._dbc.GenreAlbums);
+            this._dbc.ArtistAlbums.RemoveRange(this._dbc.ArtistAlbums);
+            this._dbc.Genres.RemoveRange(this._dbc.Genres);
+            this._dbc.Artists.RemoveRange(this._dbc.Artists);
+            this._dbc.Albums.RemoveRange(this._dbc.Albums);
+            this._dbc.Tracks.RemoveRange(this._dbc.Tracks);
+            this._dbc.SaveChanges();
+
+            var res1 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genres';");
+            var res2 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='artists';");
+            var res3 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='albums';");
+            var res4 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='artist_albums';");
+            var res5 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genre_albums';");
+            var res6 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genre_artists';");
+            var res7 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='tracks';");
+
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="preProcMessage"></param>
+        /// <param name="cancelToken"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// エレガントさの欠片も無い...
+        /// もっと、こう、あるだろ！感。
+        /// </remarks>
+        private async Task<string> Scan<TEntity>(string preProcMessage, CancellationToken cancelToken) where TEntity: IEntity
+        {
+            Phase phase;
+            IMopidyScannable store = null;
+            string scanTypeMessage = null;
+            var entityType = typeof(TEntity);
+
+            if (entityType == typeof(Genre))
+            {
+                scanTypeMessage = "Genres";
+                phase = Phase.Genres;
+                store = this._genreStore;
+            }
+            else if (entityType == typeof(Album))
+            {
+                scanTypeMessage = "Albums";
+                phase = Phase.Albums;
+                store = this._albumStore;
+            }
+            else if (entityType == typeof(Artist))
+            {
+                scanTypeMessage = "Artists";
+                phase = Phase.Artists;
+                store = this._artistStore;
+            }
+            else if (entityType == typeof(ArtistAlbum))
+            {
+                scanTypeMessage = "Artist-Album Relations";
+                phase = Phase.ArtistAlbums;
+                store = this._artistAlbumStore;
+            }
+            else if (entityType == typeof(GenreAlbum))
+            {
+                scanTypeMessage = "Genre-Album Relations";
+                phase = Phase.GenreAlbums;
+                store = this._genreAlbumStore;
+            }
+            else if (entityType == typeof(GenreArtist))
+            {
+                scanTypeMessage = "Genre-Artist Relations";
+                phase = Phase.GenreArtists;
+                store = this._genreArtistStore;
+            }
+            else
+            {
+                throw new InvalidOperationException("ここには来ないはず");
+            }
+
+            if (cancelToken.IsCancellationRequested)
+                return "Process Canceled.";
+
+            this._currentPhase = phase;
+            this._message = $"{preProcMessage} Now Scanning {scanTypeMessage}...";
+            var newEntities = await store.Scan(this._dbc);
+
+            if (cancelToken.IsCancellationRequested)
+                return "Process Canceled.";
+
+            this._message = $"{newEntities.Length} {scanTypeMessage} Found. Now Adding...";
+            if (0 < newEntities.Length)
+            {
+                if (entityType == typeof(Genre))
+                    this._dbc.Genres.AddRange((Genre[])newEntities);
+                else if (entityType == typeof(Album))
+                    this._dbc.Albums.AddRange((Album[])newEntities);
+                else if (entityType == typeof(Artist))
+                    this._dbc.Artists.AddRange((Artist[])newEntities);
+                else if (entityType == typeof(ArtistAlbum))
+                    this._dbc.ArtistAlbums.AddRange((ArtistAlbum[])newEntities);
+                else if (entityType == typeof(GenreAlbum))
+                    this._dbc.GenreAlbums.AddRange((GenreAlbum[])newEntities);
+                else if (entityType == typeof(GenreArtist))
+                    this._dbc.GenreArtists.AddRange((GenreArtist[])newEntities);
+                else
+                    throw new InvalidOperationException("ここには来ないはず");
+
+                this._dbc.SaveChanges();
+            }
+
+            return $"{newEntities.Length} {scanTypeMessage} Added.";
+        }
+
         #endregion
     }
 }
