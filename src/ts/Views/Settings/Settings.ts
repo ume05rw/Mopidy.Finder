@@ -8,6 +8,7 @@ import { ContentDetails, default as IContentDetail, IContentDetailArgs } from '.
 import DbBlock from './Blocks/DbBlock';
 import MopidyBlock from './Blocks/MopidyBlock';
 import ScanProgressBlock from './Blocks/ScanProgressBlock';
+import Libraries from '../../Libraries';
 
 export const SettingsEvents = {
     ServerFound: 'ServerFound'
@@ -15,16 +16,19 @@ export const SettingsEvents = {
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
-                        id="tab-settings"
-                        role="tabpanel"
-                        aria-labelledby="nav-settings">
-    <mopidy-block
-        ref="MopidyBlock"
-        @SettingsUpdated="OnSettingsUpdated" />
-    <db-block
-        ref="DbBlock" />
-    <scan-progress-block
-        ref="ScanProgressBlock" />
+    id="tab-settings"
+    role="tabpanel"
+    aria-labelledby="nav-settings">
+    <div class="w-100 h-100"
+        ref="InnerDiv">
+        <mopidy-block
+            ref="MopidyBlock"
+            @SettingsUpdated="OnSettingsUpdated" />
+        <db-block
+            ref="DbBlock" />
+        <scan-progress-block
+            ref="ScanProgressBlock" />
+    </div>
 </section>`,
     components: {
         'mopidy-block': MopidyBlock,
@@ -37,6 +41,9 @@ export default class Settings extends ContentBase {
     private store: SettingsStore;
     private entity: SettingsEntity;
 
+    private get InnerDiv(): HTMLDivElement {
+        return this.$refs.InnerDiv as HTMLDivElement;
+    }
     private get MopidyBlock(): MopidyBlock {
         return this.$refs.MopidyBlock as MopidyBlock;
     }
@@ -52,6 +59,12 @@ export default class Settings extends ContentBase {
 
         this.store = new SettingsStore();
         this.entity = await this.store.Get();
+
+        // 利便性的にどうなのか、悩む。
+        Libraries.SlimScroll(this.InnerDiv, {
+            height: 'calc(100vh - 73px)',
+            wheelStep: 60
+        });
 
         this.MopidyBlock.SetSettings(this.store, this.entity);
         this.DbBlock.SetSettings(this.store, this.entity);

@@ -6114,7 +6114,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
     }(ContentDetailBase_4.default));
     exports.default = ScanProgressBlock;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, SettingsStore_1, Exception_15, ContentBase_3, IContentDetail_4, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock", "Libraries"], function (require, exports, vue_class_component_21, SettingsStore_1, Exception_15, ContentBase_3, IContentDetail_4, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1, Libraries_20) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SettingsEvents = {
@@ -6128,6 +6128,13 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             _this.details = [];
             return _this;
         }
+        Object.defineProperty(Settings.prototype, "InnerDiv", {
+            get: function () {
+                return this.$refs.InnerDiv;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Settings.prototype, "MopidyBlock", {
             get: function () {
                 return this.$refs.MopidyBlock;
@@ -6161,6 +6168,11 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             return [4 /*yield*/, this.store.Get()];
                         case 1:
                             _a.entity = _b.sent();
+                            // 利便性的にどうなのか、悩む。
+                            Libraries_20.default.SlimScroll(this.InnerDiv, {
+                                height: 'calc(100vh - 73px)',
+                                wheelStep: 60
+                            });
                             this.MopidyBlock.SetSettings(this.store, this.entity);
                             this.DbBlock.SetSettings(this.store, this.entity);
                             this.ScanProgressBlock.SetSettings(this.store, this.entity);
@@ -6211,7 +6223,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         };
         Settings = __decorate([
             vue_class_component_21.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-settings\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"nav-settings\">\n    <mopidy-block\n        ref=\"MopidyBlock\"\n        @SettingsUpdated=\"OnSettingsUpdated\" />\n    <db-block\n        ref=\"DbBlock\" />\n    <scan-progress-block\n        ref=\"ScanProgressBlock\" />\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n    id=\"tab-settings\"\n    role=\"tabpanel\"\n    aria-labelledby=\"nav-settings\">\n    <div class=\"w-100 h-100\"\n        ref=\"InnerDiv\">\n        <mopidy-block\n            ref=\"MopidyBlock\"\n            @SettingsUpdated=\"OnSettingsUpdated\" />\n        <db-block\n            ref=\"DbBlock\" />\n        <scan-progress-block\n            ref=\"ScanProgressBlock\" />\n    </div>\n</section>",
                 components: {
                     'mopidy-block': MopidyBlock_1.default,
                     'db-block': DbBlock_1.default,
@@ -6744,7 +6756,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_5.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_20, Monitor_2, Player_1, ViewBase_12) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_21, Monitor_2, Player_1, ViewBase_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayerPanelEvents = {
@@ -6778,7 +6790,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                 var _this = this;
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    this.volumeSlider = Libraries_20.default.$(this.$refs.Slider).ionRangeSlider({
+                    this.volumeSlider = Libraries_21.default.$(this.$refs.Slider).ionRangeSlider({
                         onFinish: function (data) {
                             // スライダー操作完了時のイベント
                             _this.player.SetVolume(data.from);
@@ -6867,7 +6879,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_16, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_22, Exception_16, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -6914,12 +6926,12 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                 var _this = this;
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    Libraries_21.default.SlimScroll(this.SidebarSection, {
+                    Libraries_22.default.SlimScroll(this.SidebarSection, {
                         height: 'calc(100%)'
                     });
-                    this.finderTabAnchor = Libraries_21.default.$(this.FinderAnchor);
-                    this.playlistsTabAnchor = Libraries_21.default.$(this.PlaylistsAnchor);
-                    this.settingsTabAnchor = Libraries_21.default.$(this.SettingsAnchor);
+                    this.finderTabAnchor = Libraries_22.default.$(this.FinderAnchor);
+                    this.playlistsTabAnchor = Libraries_22.default.$(this.PlaylistsAnchor);
+                    this.settingsTabAnchor = Libraries_22.default.$(this.SettingsAnchor);
                     this.finderTabAnchor.on(BootstrapEvents_3.TabEvents.Show, function () {
                         var args = { Content: IContent_2.Contents.Finder };
                         _this.$emit(TabBase_2.TabEvents.Show, args);
@@ -7052,7 +7064,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = Sidebar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_17, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, Libraries_23, SettingsStore_2, Exception_17, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7060,7 +7072,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
         function RootView() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.isMopidyConnectable = false;
-            _this.viewport = Libraries_22.default.ResponsiveBootstrapToolkit;
+            _this.viewport = Libraries_23.default.ResponsiveBootstrapToolkit;
             return _this;
         }
         Object.defineProperty(RootView.prototype, "Finder", {
@@ -7106,7 +7118,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                     switch (_a.label) {
                         case 0:
                             _super.prototype.Initialize.call(this);
-                            Libraries_22.default.$(window).resize(this.viewport.changed(function () {
+                            Libraries_23.default.$(window).resize(this.viewport.changed(function () {
                                 _this.AdjustScreen();
                             }));
                             promises = [];
@@ -7260,7 +7272,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
     }(ViewBase_14.default));
     exports.default = RootView;
 });
-define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_23, RootView_1) {
+define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (require, exports, Libraries_24, RootView_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -7271,7 +7283,7 @@ define("Main", ["require", "exports", "Libraries", "Views/RootView"], function (
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Libraries_23.default.Initialize();
+                            Libraries_24.default.Initialize();
                             this._view = new RootView_1.default();
                             this._view.$mount('#root');
                             return [4 /*yield*/, this._view.Initialize()];
