@@ -52,7 +52,7 @@ export interface ITrackSelectionChangedArgs extends ISelectionChangedArgs<Track>
 })
 export default class SelectionTrack extends ViewBase {
 
-    private static readonly LiClasses = 'item w-100 track-row ';
+    private static readonly LiClasses = 'item w-100 playlisttrack-row ';
 
     @Prop()
     private entity: Track;

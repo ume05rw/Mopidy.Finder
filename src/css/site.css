@@ -162,29 +162,30 @@ div.dropdown {
     width: calc(100% - 4px);
     margin-left: 1px;
 }
-.table-hover.table.tracks {
+.table.table-hover.tracks {
     table-layout: fixed;
     color: #e5dfff;
 }
-.table-hover.table.tracks tbody tr {
+.table.table-hover.tracks tr {
     transition: all 0.3s ease-in-out;
 }
-.table-hover.table.tracks tbody tr:hover {
+.table.table-hover.tracks tr:hover {
     background-color: #1f1c40;
     color: #c4c2ca;
 }
-.table-hover.tracks .tracknum {
+.table.table-hover.tracks tr .tracknum {
     width: 40px;
     text-align: right;
 }
-.table-hover.tracks .trackname {
+.table.table-hover.tracks tr .trackname {
     width: auto;
 }
-.table-hover.tracks .tracklength {
+.table.table-hover.tracks tr .tracklength {
     width: 50px;
 }
-.table-hover.tracks .trackoperation {
+.table.table-hover.tracks tr .trackoperation {
     width: 40px;
+    transition: none;
 }
 .albumtrack .card-header .card-title {
     width: calc(100% - 80px);
@@ -214,50 +215,46 @@ div.dropdown {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
-.card-body.list-scrollbox .products-list > .item.track-row {
+.card-body.list-scrollbox .products-list > .item.playlisttrack-row {
     border-radius: 0;
     border-top: 1px solid #282542;
 }
-.card-body.list-scrollbox .products-list > .item.track-row {
+.card-body.list-scrollbox .products-list > .item.playlisttrack-row {
     background-color: #32334a;
 }
-.card-body.list-scrollbox .products-list > .item.track-row:hover {
+.card-body.list-scrollbox .products-list > .item.playlisttrack-row:hover {
     background-color: #1f1c40;
     cursor: pointer;
 }
-.card-body.list-scrollbox .products-list > .item.track-row.selected {
+.card-body.list-scrollbox .products-list > .item.playlisttrack-row.selected {
     background-color: #171135;
 }
-.card-body.list-scrollbox .products-list > .item.track-row.selected:hover {
+.card-body.list-scrollbox .products-list > .item.playlisttrack-row.selected:hover {
     background-color: #171525;
 }
-.track-row.selected:hover .product-title {
+.playlisttrack-row.selected:hover .product-title {
     color: #000000;
 }
-.track-row.selected:hover .product-description {
+.playlisttrack-row.selected:hover .product-description {
     color: #f5f5f5;
 }
-.track-row.selected .product-title {
+.playlisttrack-row.selected .product-title {
     color: #ffffff;
 }
-.track-row.selected .product-description {
+.playlisttrack-row.selected .product-description {
     color: #dcdcdc;
 }
 .products-list .product-title.length {
     font-weight: 400;
 }
-.track-row,
-.track-row * {
+.playlisttrack-row,
+.playlisttrack-row * {
     transition: all 0.3s ease-in-out;
 }
-.track-row .trackoperation .dropdown {
-    transition: none;
-}
-
-.track-list.playable .editmode-buttons {
+.playlisttrack-list.playable .editmode-buttons {
     display: none;
 }
-.track-list.editable .editmode-buttons {
+.playlisttrack-list.editable .editmode-buttons {
     display: inline;
     color: #e5dfff;
 }

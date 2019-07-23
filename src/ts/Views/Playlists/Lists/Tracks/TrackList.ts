@@ -70,7 +70,7 @@ enum ListMode {
             </div>
         </div>
         <div class="card-body list-scrollbox">
-            <div class="card-inner-body track-list"
+            <div class="card-inner-body"
                 ref="CardInnerBody">
                 <ul v-bind:class="listClasses"
                     ref="TrackListUl">
@@ -105,7 +105,7 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
     protected readonly tabId: string = 'subtab-playlisttracks';
     protected readonly linkId: string = 'nav-playlisttracks';
     private static readonly PageLength: number = 20;
-    private static readonly ListBaseClasses = 'products-list product-list-in-box track-list ';
+    private static readonly ListBaseClasses = 'products-list product-list-in-box playlisttrack-list ';
 
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Track[] = [];
