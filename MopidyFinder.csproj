@@ -206,7 +206,7 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="npx webpack --config webpack.config.dev.js" />
+    <Exec Command="npm run build:devWp" />
   </Target>
 
 </Project>
