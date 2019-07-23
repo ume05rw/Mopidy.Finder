@@ -1,9 +1,6 @@
 using MopidyFinder.Models.Albums;
-using MopidyFinder.Models.Artists;
-using MopidyFinder.Models.Genres;
-using MopidyFinder.Models.Relations;
+using MopidyFinder.Models.Bases;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,7 +8,7 @@ namespace MopidyFinder.Models.Tracks
 {
     [Table("tracks")]
     [JsonObject(MemberSerialization.OptIn)]
-    public class Track
+    public class Track : IEntity
     {
         [Key]
         [JsonProperty("Id")]

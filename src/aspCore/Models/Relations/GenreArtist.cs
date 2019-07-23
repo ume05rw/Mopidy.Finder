@@ -1,4 +1,5 @@
 using MopidyFinder.Models.Artists;
+using MopidyFinder.Models.Bases;
 using MopidyFinder.Models.Genres;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ namespace MopidyFinder.Models.Relations
 {
     [Table("genre_artists")]
     [JsonObject(MemberSerialization.OptIn)]
-    public class GenreArtist
+    public class GenreArtist : IEntity
     {
         [Required]
         [JsonProperty]

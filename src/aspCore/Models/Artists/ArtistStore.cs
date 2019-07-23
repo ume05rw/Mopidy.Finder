@@ -83,29 +83,25 @@ namespace MopidyFinder.Models.Artists
             }
         }
 
-        public async Task<int> Scan()
+        public async Task<IEntity[]> Scan(Dbc dbc)
         {
             this._processLength = 0;
             this._processed = 0;
 
-            var result = await this._library.Browse(ArtistStore.QueryString);
-            var existsUris = this.Dbc.Artists.Select(e => e.Uri).ToArray();
-            var newRefs = result.Where(e => !existsUris.Contains(e.Uri));
-
-            var newEntities = newRefs.Select(e => new Artist()
-            {
-                Name = e.Name,
-                LowerName = e.Name.ToLower(),
-                Uri = e.Uri
-            }).ToArray();
+            var allRefs = await this._library.Browse(ArtistStore.QueryString);
+            var existsUris = dbc.Artists.Select(e => e.Uri).ToArray();
+            var newEntities = allRefs.Where(e => !existsUris.Contains(e.Uri))
+                .Select(e => new Artist()
+                {
+                    Name = e.Name,
+                    LowerName = e.Name.ToLower(),
+                    Uri = e.Uri
+                }).ToArray();
 
             this._processLength = newEntities.Length;
-
-            this.Dbc.Artists.AddRange(newEntities);
-
             this._processed = this._processLength;
 
-            return newEntities.Length;
+            return newEntities;
         }
 
         protected override void Dispose(bool disposing)

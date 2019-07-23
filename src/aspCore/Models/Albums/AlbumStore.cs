@@ -107,15 +107,15 @@ namespace MopidyFinder.Models.Albums
             }
         }
 
-        public async Task<int> Scan()
+        public async Task<IEntity[]> Scan(Dbc dbc)
         {
             this._processLength = 0;
             this._processed = 0;
 
             // アルバム取得
-            var albumResults = await this._library.Browse(AlbumStore.AlbumQueryString);
-            var existsUris = this.Dbc.Albums.Select(e => e.Uri).ToArray();
-            var newRefs = albumResults.Where(e => !existsUris.Contains(e.Uri)).ToArray();
+            var allRefs = await this._library.Browse(AlbumStore.AlbumQueryString);
+            var existsUris = dbc.Albums.Select(e => e.Uri).ToArray();
+            var newRefs = allRefs.Where(e => !existsUris.Contains(e.Uri)).ToArray();
 
             var newEntityDictionary = newRefs.Select(e => new Album()
             {
@@ -147,9 +147,7 @@ namespace MopidyFinder.Models.Albums
                 }
             }
 
-            this.Dbc.Albums.AddRange(newEntityDictionary.Select(e => e.Value));
-
-            return newEntityDictionary.Count();
+            return newEntityDictionary.Select(e => e.Value).ToArray();
         }
         #endregion
 

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 using MopidyFinder.Extensions;
+using NLog.Web;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -19,6 +21,11 @@ namespace MopidyFinder
 
         public static void Main(string[] args)
         {
+            // ロガーインスタンスを、Asp.NetCoreと無関係に取得する。
+            var logger = NLog.LogManager
+                .LoadConfiguration(Path.Combine(Program.CurrentPath, "nlog.config"))
+                .GetCurrentClassLogger();
+
             // サービスとして起動するか否かのフラグ
             // 引数に"--winservice"を付与して起動すると、Windowsサービスとして起動する。
             Program.IsWindowsService = args.Contains("--winservice");
@@ -47,20 +54,43 @@ namespace MopidyFinder
             // SQLiteDBファイルパス
             Program.DbPath = Path.Combine(Program.CurrentPath, "database.db");
 
-            if (Program.IsWindowsService)
+            try
             {
-                // Windowsサービスとして起動する。
-                Program.BuildWebHost(new string[] { }).RunAsCustomService();
+                logger.Debug("Start");
+
+                if (Program.IsWindowsService)
+                {
+                    // Windowsサービスとして起動する。
+                    Program.BuildWebHost(new string[] { }).RunAsCustomService();
+                }
+                else
+                {
+                    // コマンドライン起動やVSによる起動など、通常こちら。
+                    Program.BuildWebHost(new string[] { }).Run();
+                }
+
+                logger.Debug("Exit Normally");
             }
-            else
+            catch (Exception ex)
             {
-                // コマンドライン起動やVSによる起動など、通常こちら。
-                Program.BuildWebHost(new string[] { }).Run();
+                logger.Error(ex, "Exit by Exception!!!");
+            }
+            finally
+            {
+                NLog.LogManager.Shutdown();
             }
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureLogging(logging =>
+                {
+                    // NLog 以外で設定された Provider の無効化.
+                    logging.ClearProviders();
+                    // 最小ログレベルの設定.   //これがないと正常動作しない模様
+                    logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                })
+                .UseNLog()
                 .UseKestrel()
                 // ↓これは入れたらダメ。VSでステップデバッグできなくなる。
                 //.UseContentRoot(Path.Combine(Program.CurrentPath, "aspCore"))

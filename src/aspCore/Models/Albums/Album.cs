@@ -1,3 +1,4 @@
+using MopidyFinder.Models.Bases;
 using MopidyFinder.Models.Relations;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace MopidyFinder.Models.Albums
 {
     [Table("albums")]
     [JsonObject(MemberSerialization.OptIn)]
-    public class Album
+    public class Album: IEntity
     {
         [Key]
         [JsonProperty("Id")]

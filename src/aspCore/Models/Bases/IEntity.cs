@@ -5,9 +5,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Bases
 {
-    public interface IMopidyScannable
+    public interface IEntity
     {
-        Task<IEntity[]> Scan(Dbc dbc);
-        decimal ScanProgress { get; }
     }
 }

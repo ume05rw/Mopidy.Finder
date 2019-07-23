@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MopidyFinder.Models.Bases;
 using MopidyFinder.Models.Mopidies.Methods;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,15 +33,15 @@ namespace MopidyFinder.Models.Relations
             }
         }
 
-        public async Task<int> Scan()
+        public async Task<IEntity[]> Scan(Dbc dbc)
         {
             this._processLength = 0;
             this._processed = 0;
-            var added = 0;
 
-            var artists = this.Dbc.Artists.ToArray();
-            var albums = this.Dbc.Albums.ToArray();
-            var artistAlbums = this.Dbc.ArtistAlbums.ToArray();
+            var artists = dbc.Artists.ToArray();
+            var albums = dbc.Albums.ToArray();
+            var artistAlbums = dbc.ArtistAlbums.ToArray();
+            var result = new List<ArtistAlbum>();
             this._processLength = artists.Length;
 
             foreach (var artist in artists)
@@ -60,19 +61,17 @@ namespace MopidyFinder.Models.Relations
                 {
                     if (exists.All(e => e.AlbumId != albumId))
                     {
-                        this.Dbc.ArtistAlbums.Add(new ArtistAlbum()
+                        result.Add(new ArtistAlbum()
                         {
                             ArtistId = artist.Id,
                             AlbumId = albumId
                         });
-                        added++;
                     }
                 }
-
                 this._processed++;
             }
 
-            return added;
+            return result.ToArray();
         }
 
         protected override void Dispose(bool disposing)

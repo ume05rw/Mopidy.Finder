@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MopidyFinder.Models;
 using MopidyFinder.Models.Albums;
 using MopidyFinder.Models.AlbumTracks;
@@ -16,6 +17,7 @@ using MopidyFinder.Models.Relations;
 using MopidyFinder.Models.Settings;
 using MopidyFinder.Models.Tracks;
 using Newtonsoft.Json.Serialization;
+using System.Linq;
 
 namespace MopidyFinder
 {
@@ -38,8 +40,22 @@ namespace MopidyFinder
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            // 追加済みのサービスの中から、ILoggerFactoryのインスタンスを取得する。
+            ILoggerFactory loggerFactory = null;
+            var logServiceDescripter = services
+                .FirstOrDefault(s => s.ServiceType == typeof(ILoggerFactory));
+
+            var hasLoggerFactory = (logServiceDescripter != null && logServiceDescripter.ImplementationInstance != null);
+            if (logServiceDescripter != null && logServiceDescripter.ImplementationInstance != null)
+                loggerFactory = (ILoggerFactory)logServiceDescripter.ImplementationInstance;
+
             services.AddDbContext<Dbc>(options =>
             {
+                // ILoggerFactoryが取得出来ていれば、追加しておく。
+                // DBのクエリログが各種ロガーに通知されるようになる。
+                if (loggerFactory != null)
+                    options.UseLoggerFactory(loggerFactory);
+
                 // フルパス指定が出来ない？要検証。
                 //options.UseSqlite($"Data Source=\"{Program.DbPath}\"");
                 options.UseSqlite($"Data Source=database.db");
@@ -101,12 +117,11 @@ namespace MopidyFinder
             {
                 this._dbMaintainer = serviceScope.ServiceProvider.GetService<DbMaintainer>();
             }
-            this._dbMaintainer.RunAlbumScanner();
 
             // アプリケーション起動／終了をハンドルする。
             // https://stackoverflow.com/questions/41675577/where-can-i-log-an-asp-net-core-apps-start-stop-error-events
+            applicationLifetime.ApplicationStarted.Register(this.OnStarted);
             applicationLifetime.ApplicationStopping.Register(this.OnShutdown);
-
 
             if (env.IsDevelopment())
             {
@@ -126,6 +141,11 @@ namespace MopidyFinder
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        private void OnStarted()
+        {
+            this._dbMaintainer.RunAlbumScanner();
         }
 
         private void OnShutdown()

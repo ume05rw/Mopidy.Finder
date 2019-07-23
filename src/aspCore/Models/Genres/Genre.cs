@@ -1,3 +1,4 @@
+using MopidyFinder.Models.Bases;
 using MopidyFinder.Models.Relations;
 using Newtonsoft.Json;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ namespace MopidyFinder.Models.Genres
 {
     [Table("genres")]
     [JsonObject(MemberSerialization.OptIn)]
-    public class Genre
+    public class Genre : IEntity
     {
         [Key]
         [JsonProperty("Id")]

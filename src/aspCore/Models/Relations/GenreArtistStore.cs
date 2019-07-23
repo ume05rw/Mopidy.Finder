@@ -26,14 +26,14 @@ namespace MopidyFinder.Models.Relations
             }
         }
 
-        public async Task<int> Scan()
+        public async Task<IEntity[]> Scan(Dbc dbc)
         {
             this._processLength = 0;
             this._processed = 0;
 
-            var genreArtists = this.Dbc.GenreAlbums
+            var genreArtists = dbc.GenreAlbums
                 .Join(
-                    this.Dbc.ArtistAlbums,
+                    dbc.ArtistAlbums,
                     ga => ga.AlbumId,
                     aa => aa.AlbumId,
                     (ga, aa) => new
@@ -54,7 +54,7 @@ namespace MopidyFinder.Models.Relations
                 })
                 .ToArray()
                 .GroupJoin(
-                    this.Dbc.GenreArtists,
+                    dbc.GenreArtists,
                     found => new { found.GenreId, found.ArtistId },
                     exists => new { exists.GenreId, exists.ArtistId },
                     (found, exists) => new
@@ -68,12 +68,9 @@ namespace MopidyFinder.Models.Relations
                 .ToArray();
 
             this._processLength = genreArtists.Length;
-
-            this.Dbc.GenreArtists.AddRange(genreArtists);
-
             this._processed = this._processLength;
 
-            return genreArtists.Length;
+            return genreArtists;
         }
     }
 }

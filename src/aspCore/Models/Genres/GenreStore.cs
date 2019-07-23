@@ -75,27 +75,25 @@ namespace MopidyFinder.Models.Genres
             }
         }
 
-        public async Task<int> Scan()
+        public async Task<IEntity[]> Scan(Dbc dbc)
         {
             this._processLength = 0;
             this._processed = 0;
 
-            var result = await this._library.Browse(GenreStore.QueryString);
-            var existsUris = this.Dbc.Genres.Select(e => e.Uri).ToArray();
-            var newRefs = result.Where(e => !existsUris.Contains(e.Uri)).ToArray();
-            this._processLength = newRefs.Length;
+            var allRefs = await this._library.Browse(GenreStore.QueryString);
+            var existsUris = dbc.Genres.Select(e => e.Uri).ToArray();
+            var newEntities = allRefs.Where(e => !existsUris.Contains(e.Uri))
+                .Select(e => new Genre()
+                {
+                    Name = e.Name,
+                    LowerName = e.Name.ToLower(),
+                    Uri = e.Uri
+                }).ToArray();
 
-            var newEntities = newRefs.Select(e => new Genre()
-            {
-                Name = e.Name,
-                LowerName = e.Name.ToLower(),
-                Uri = e.Uri
-            }).ToArray();
-            
-            this.Dbc.Genres.AddRange(newEntities);
+            this._processLength = newEntities.Length;
             this._processed = newEntities.Length;
 
-            return newEntities.Length;
+            return newEntities;
         }
 
         protected override void Dispose(bool disposing)

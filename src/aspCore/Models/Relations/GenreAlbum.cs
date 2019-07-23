@@ -1,4 +1,5 @@
 using MopidyFinder.Models.Albums;
+using MopidyFinder.Models.Bases;
 using MopidyFinder.Models.Genres;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ namespace MopidyFinder.Models.Relations
 {
     [Table("genre_albums")]
     [JsonObject(MemberSerialization.OptIn)]
-    public class GenreAlbum
+    public class GenreAlbum : IEntity
     {
         [Required]
         [JsonProperty]
