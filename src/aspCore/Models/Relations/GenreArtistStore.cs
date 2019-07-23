@@ -31,7 +31,7 @@ namespace MopidyFinder.Models.Relations
             this._processLength = 0;
             this._processed = 0;
 
-            var genreArtists = dbc.GenreAlbums
+            var newEntities = dbc.GenreAlbums
                 .Join(
                     dbc.ArtistAlbums,
                     ga => ga.AlbumId,
@@ -67,10 +67,13 @@ namespace MopidyFinder.Models.Relations
                 .Select(e => e.found)
                 .ToArray();
 
-            this._processLength = genreArtists.Length;
+            this._processLength = newEntities.Length;
             this._processed = this._processLength;
 
-            return genreArtists;
+            if (0 < newEntities.Length)
+                dbc.GenreArtists.AddRange(newEntities);
+
+            return newEntities;
         }
     }
 }

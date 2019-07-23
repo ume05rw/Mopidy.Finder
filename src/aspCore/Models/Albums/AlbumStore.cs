@@ -147,7 +147,11 @@ namespace MopidyFinder.Models.Albums
                 }
             }
 
-            return newEntityDictionary.Select(e => e.Value).ToArray();
+            var newEntities = newEntityDictionary.Select(e => e.Value).ToArray();
+            if (0 < newEntities.Length)
+                dbc.Albums.AddRange(newEntities);
+
+            return newEntities;
         }
         #endregion
 

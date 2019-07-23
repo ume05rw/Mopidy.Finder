@@ -101,6 +101,9 @@ namespace MopidyFinder.Models.Artists
             this._processLength = newEntities.Length;
             this._processed = this._processLength;
 
+            if (0 < newEntities.Length)
+                dbc.Artists.AddRange(newEntities);
+
             return newEntities;
         }
 

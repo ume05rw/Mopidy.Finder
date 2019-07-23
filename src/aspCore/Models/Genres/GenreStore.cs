@@ -93,6 +93,9 @@ namespace MopidyFinder.Models.Genres
             this._processLength = newEntities.Length;
             this._processed = newEntities.Length;
 
+            if (0 < newEntities.Length)
+                dbc.Genres.AddRange(newEntities);
+
             return newEntities;
         }
 

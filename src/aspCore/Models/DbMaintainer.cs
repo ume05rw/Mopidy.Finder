@@ -242,7 +242,9 @@ namespace MopidyFinder.Models
                     if (cancelToken.IsCancellationRequested)
                         return false;
 
-                    string postMessage = "Database Cleaned up.";
+                    string postMessage = (updateType == UpdateType.Cleanup)
+                        ? "Database Cleaned up."
+                        : "Scan Start.";
                     postMessage = await this.Scan<Genre>(postMessage, cancelToken);
                     if (cancelToken.IsCancellationRequested)
                         return false;
@@ -447,24 +449,7 @@ namespace MopidyFinder.Models
 
             this._message = $"{newEntities.Length} {scanTypeMessage} Found. Now Adding...";
             if (0 < newEntities.Length)
-            {
-                if (entityType == typeof(Genre))
-                    this._dbc.Genres.AddRange((Genre[])newEntities);
-                else if (entityType == typeof(Album))
-                    this._dbc.Albums.AddRange((Album[])newEntities);
-                else if (entityType == typeof(Artist))
-                    this._dbc.Artists.AddRange((Artist[])newEntities);
-                else if (entityType == typeof(ArtistAlbum))
-                    this._dbc.ArtistAlbums.AddRange((ArtistAlbum[])newEntities);
-                else if (entityType == typeof(GenreAlbum))
-                    this._dbc.GenreAlbums.AddRange((GenreAlbum[])newEntities);
-                else if (entityType == typeof(GenreArtist))
-                    this._dbc.GenreArtists.AddRange((GenreArtist[])newEntities);
-                else
-                    throw new InvalidOperationException("ここには来ないはず");
-
                 this._dbc.SaveChanges();
-            }
 
             return $"{newEntities.Length} {scanTypeMessage} Added.";
         }

@@ -41,7 +41,7 @@ namespace MopidyFinder.Models.Relations
             var genres = dbc.Genres.ToArray();
             var albums = dbc.Albums.ToArray();
             var genreAlbums = dbc.GenreAlbums.ToArray();
-            var result = new List<GenreAlbum>();
+            var newEntities = new List<GenreAlbum>();
             this._processLength = genres.Length;
 
             foreach (var genre in genres)
@@ -61,7 +61,7 @@ namespace MopidyFinder.Models.Relations
                 {
                     if (exists.All(e => e.AlbumId != albumId))
                     {
-                        result.Add(new GenreAlbum()
+                        newEntities.Add(new GenreAlbum()
                         {
                             GenreId = genre.Id,
                             AlbumId = albumId
@@ -71,7 +71,10 @@ namespace MopidyFinder.Models.Relations
                 this._processed++;
             }
 
-            return result.ToArray();
+            if (0 < newEntities.Count())
+                dbc.GenreAlbums.AddRange(newEntities);
+
+            return newEntities.ToArray();
         }
 
         protected override void Dispose(bool disposing)
