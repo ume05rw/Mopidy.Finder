@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MopidyFinder.Models.Bases;
 using MopidyFinder.Models.Mopidies.Methods;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,8 +16,14 @@ namespace MopidyFinder.Models.Genres
 
         private const string QueryString = "local:directory?type=genre";
 
-        public GenreStore([FromServices] Dbc dbc) : base(dbc)
+        private Library _library;
+
+        public GenreStore(
+            [FromServices] Dbc dbc,
+            [FromServices] Library library
+        ) : base(dbc)
         {
+            this._library = library;
         }
 
         public Genre Get(int genreId)
@@ -75,7 +80,7 @@ namespace MopidyFinder.Models.Genres
             this._processLength = 0;
             this._processed = 0;
 
-            var result = await Library.Browse(GenreStore.QueryString);
+            var result = await this._library.Browse(GenreStore.QueryString);
             var existsUris = this.Dbc.Genres.Select(e => e.Uri).ToArray();
             var newRefs = result.Where(e => !existsUris.Contains(e.Uri)).ToArray();
             this._processLength = newRefs.Length;
@@ -91,6 +96,16 @@ namespace MopidyFinder.Models.Genres
             this._processed = newEntities.Length;
 
             return newEntities.Length;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this._library = null;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

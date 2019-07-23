@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MopidyFinder.Models.Artists;
 using MopidyFinder.Models.Bases;
 using MopidyFinder.Models.Mopidies.Methods;
 using MopidyFinder.Models.Tracks;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,12 +18,18 @@ namespace MopidyFinder.Models.Albums
 
         //private readonly int AlbumPageLength = 10;
 
-        public AlbumStore([FromServices] Dbc dbc) : base(dbc)
-        {
-        }
+        private Library _library;
+        private TrackStore _trackStore;
 
-        public Album Get(int genreId)
-            => this.Dbc.GetAlbumQuery().FirstOrDefault(e => e.Id == genreId);
+        public AlbumStore(
+            [FromServices] Dbc dbc,
+            [FromServices] Library library,
+            [FromServices] TrackStore trackStore
+        ) : base(dbc)
+        {
+            this._library = library;
+            this._trackStore = trackStore;
+        }
 
         public async Task<bool> CompleteAlbumInfo(List<AlbumTracks.AlbumTracks> albumTracksList)
         {
@@ -49,7 +53,7 @@ namespace MopidyFinder.Models.Albums
                 return false;
 
             var hasUpdated = false;
-            var imageDictionary = await Library.GetImages(targetDictionary.Keys.ToArray());
+            var imageDictionary = await this._library.GetImages(targetDictionary.Keys.ToArray());
 
             foreach (var pair in imageDictionary)
             {
@@ -109,7 +113,7 @@ namespace MopidyFinder.Models.Albums
             this._processed = 0;
 
             // アルバム取得
-            var albumResults = await Library.Browse(AlbumStore.AlbumQueryString);
+            var albumResults = await this._library.Browse(AlbumStore.AlbumQueryString);
             var existsUris = this.Dbc.Albums.Select(e => e.Uri).ToArray();
             var newRefs = albumResults.Where(e => !existsUris.Contains(e.Uri)).ToArray();
 
@@ -123,14 +127,14 @@ namespace MopidyFinder.Models.Albums
             this._processLength = newEntityDictionary.Count();
 
             // 年度別アルバムを取得して割り当て
-            var yearResults = await Library.Browse(AlbumStore.YearQueryString);
+            var yearResults = await this._library.Browse(AlbumStore.YearQueryString);
             foreach (var row in yearResults)
             {
                 var year = default(int);
                 if (!int.TryParse(row.Name, out year))
                     continue;
 
-                var yearAlbums = await Library.Browse(row.Uri);
+                var yearAlbums = await this._library.Browse(row.Uri);
 
                 foreach (var ya in yearAlbums)
                 {
@@ -232,14 +236,14 @@ namespace MopidyFinder.Models.Albums
                 .Where(e => string.IsNullOrEmpty(e.ImageUri))
                 .Select(e => e.Uri)
                 .ToArray();
-            var imageDictionary = await Library.GetImages(noImageAlbumUris);
+            var imageDictionary = await this._library.GetImages(noImageAlbumUris);
 
             if (cancelToken.IsCancellationRequested)
                 return -1;
 
             // トラックを取得
             var albumUris = albums.Select(e => e.Uri).ToArray();
-            var mopidyTrackDictionary = await Library.Lookup(albumUris);
+            var mopidyTrackDictionary = await this._library.Lookup(albumUris);
 
             if (cancelToken.IsCancellationRequested)
                 return -1;
@@ -265,48 +269,44 @@ namespace MopidyFinder.Models.Albums
             {
                 // Dbcを渡してTrackStoreを生成しているが、
                 // trackStoreのメソッドではDbcを使っていない。
-                using (var trackStore = new TrackStore(this.Dbc))
+                foreach (var pair in mopidyTrackDictionary)
                 {
-                    
-                    foreach (var pair in mopidyTrackDictionary)
+                    var album = albums
+                        .FirstOrDefault(e => e.Uri == pair.Key);
+                    if (album == null)
+                        continue;
+
+
+                    var tracks = pair.Value
+                        .Select(mt => this._trackStore.CreateTrack(mt))
+                        .OrderBy(e => e.TrackNo)
+                        .ToArray();
+
+                    var existsAlbumTrack = false;
+                    var albumTracks = new List<Track>();
+                    foreach (var track in tracks)
                     {
-                        var album = albums
-                            .FirstOrDefault(e => e.Uri == pair.Key);
-                        if (album == null)
-                            continue;
+                        // 登録前の最終確認
+                        var exists = this.Dbc.Tracks
+                            .Where(e => e.Uri == track.Uri && e.AlbumId == album.Id)
+                            .Any();
 
-
-                        var tracks = pair.Value
-                            .Select(mt => trackStore.CreateTrack(mt))
-                            .OrderBy(e => e.TrackNo)
-                            .ToArray();
-
-                        var existsAlbumTrack = false;
-                        var albumTracks = new List<Track>();
-                        foreach (var track in tracks)
+                        if (exists)
                         {
-                            // 登録前の最終確認
-                            var exists = this.Dbc.Tracks
-                                .Where(e => e.Uri == track.Uri && e.AlbumId == album.Id)
-                                .Any();
-
-                            if (exists)
-                            {
-                                // なぜ重複しているか、確認のこと。
-                                existsAlbumTrack = true;
-                                var tmp = 1;
-                            }
-                            else
-                            {
-                                track.AlbumId = album.Id;
-                                albumTracks.Add(track);
-                            }
+                            // なぜ重複しているか、確認のこと。
+                            existsAlbumTrack = true;
+                            var tmp = 1;
                         }
-
-                        // アルバム上の曲がDB上に1件もないときのみ、DBに全件書き込む。
-                        if (existsAlbumTrack == false)
-                            addTargets.AddRange(albumTracks);
+                        else
+                        {
+                            track.AlbumId = album.Id;
+                            albumTracks.Add(track);
+                        }
                     }
+
+                    // アルバム上の曲がDB上に1件もないときのみ、DBに全件書き込む。
+                    if (existsAlbumTrack == false)
+                        addTargets.AddRange(albumTracks);
                 }
             }
 
@@ -324,5 +324,17 @@ namespace MopidyFinder.Models.Albums
             return albums.Length;
         }
         #endregion
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!this.IsDisposed && disposing)
+            {
+                this._library = null;
+                this._trackStore.Dispose();
+                this._trackStore = null;
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }

@@ -44,15 +44,13 @@ namespace MopidyFinder.Models
             => this.Tracks
                 .Include(e => e.Album);
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="options"></param>
+
+        // 特に何の処理もしないが、コンストラクタが必要らしい。
         public Dbc(DbContextOptions<Dbc> options)
             : base(options)
         {
-            Xb.Util.Out("Dbc.Constructor");
         }
+
 
         #region "EfDefinitions"
 
@@ -137,7 +135,16 @@ namespace MopidyFinder.Models
 
         public override void Dispose()
         {
-            Xb.Util.Out("Dbc.Dispose");
+            this.Albums = null;
+            this.Genres = null;
+            this.Artists = null;
+            this.Tracks = null;
+            this.ArtistAlbums = null;
+            this.GenreAlbums = null;
+            this.GenreArtists = null;
+            this.Settings = null;
+            this.Jobs = null;
+
             base.Dispose();
         }
     }

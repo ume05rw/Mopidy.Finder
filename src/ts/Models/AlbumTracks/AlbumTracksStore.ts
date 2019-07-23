@@ -1,6 +1,7 @@
 import { default as StoreBase, IPagenatedResult } from '../Bases/StoreBase';
 import { default as AlbumTracks, IAlbumTracks } from './AlbumTracks';
 import Track from '../Tracks/Track';
+import Exception from '../../Utils/Exception';
 
 export interface IPagenateQueryArgs {
     GenreIds: number[];
@@ -15,7 +16,7 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
         const response = await this.QueryGet('AlbumTracks/GetPagenatedList', args);
 
         if (!response.Succeeded)
-            throw new Error('Unexpected Error on ApiQuery');
+            Exception.Throw('Unexpected Error on ApiQuery', response.Errors);
         
         const result = response.Result as IPagenatedResult<AlbumTracks>;
         result.ResultList = AlbumTracks.CreateArray(result.ResultList);
@@ -24,10 +25,10 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
     }
 
     public async PlayAlbumByTrack(track: Track): Promise<AlbumTracks> {
-        const response = await this.QueryPost('Player/PlayAlbumByTrack', track);
+        const response = await this.QueryPost('Player/PlayAlbumByTrackId', track.Id);
 
         if (!response.Succeeded)
-            throw new Error('Unexpected Error on ApiQuery');
+            Exception.Throw('Unexpected Error on ApiQuery', response.Errors);
 
         const result = AlbumTracks.Create(response.Result as IAlbumTracks);
 
@@ -38,7 +39,7 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
         const response = await this.QueryPost('Player/PlayAlbumByTlId', tlId);
 
         if (!response.Succeeded)
-            throw new Error('Unexpected Error on ApiQuery');
+            Exception.Throw('Unexpected Error on ApiQuery', response.Errors);
 
         return response.Result as boolean;
     }
@@ -47,7 +48,7 @@ export default class AlbumTracksStore extends StoreBase<AlbumTracks> {
         const response = await this.QueryPost('Player/ClearList');
 
         if (!response.Succeeded)
-            throw new Error('Unexpected Error on ApiQuery');
+            Exception.Throw('Unexpected Error on ApiQuery', response.Errors);
 
         return response.Result as boolean;
     }

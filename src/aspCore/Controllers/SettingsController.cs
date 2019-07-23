@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using MopidyFinder.Models;
 using MopidyFinder.Models.Settings;
 using MopidyFinder.Models.Xhrs;
-using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -32,39 +31,39 @@ namespace MopidyFinder.Controllers
         }
 
         [HttpGet("AlbumScanProgress")]
-        public XhrResponse GetAlbumScanProgress()
+        public XhrResponse GetAlbumScanProgress([FromServices] DbMaintainer dbMaintainer)
         {
-            var result = DbMaintainer.GetAlbumScanProgress();
+            var result = dbMaintainer.GetAlbumScanProgress();
 
             return XhrResponseFactory.CreateSucceeded(result);
         }
 
         [HttpGet("UpdateProgress")]
-        public XhrResponse GetUpdateProgress()
+        public XhrResponse GetUpdateProgress([FromServices] DbMaintainer dbMaintainer)
         {
-            var result = DbMaintainer.Instance.GetProgress();
+            var result = dbMaintainer.GetDbUpdateProgress();
 
             return XhrResponseFactory.CreateSucceeded(result);
         }
 
         [HttpPost("DbScanNew")]
-        public XhrResponse DbScanNew()
+        public XhrResponse DbScanNew([FromServices] DbMaintainer dbMaintainer)
         {
-            if (DbMaintainer.Instance.IsRunning)
+            if (dbMaintainer.IsDbUpdateRunning)
                 return XhrResponseFactory.CreateError("Already Updating.");
 
-            var task = DbMaintainer.Instance.Update(DbMaintainer.UpdateType.ScanNew);
+            var task = dbMaintainer.Update(DbMaintainer.UpdateType.ScanNew);
 
             return XhrResponseFactory.CreateSucceeded(true);
         }
 
         [HttpPost("DbCleanup")]
-        public XhrResponse DbCleanup()
+        public XhrResponse DbCleanup([FromServices] DbMaintainer dbMaintainer)
         {
-            if (DbMaintainer.Instance.IsRunning)
+            if (dbMaintainer.IsDbUpdateRunning)
                 return XhrResponseFactory.CreateError("Already Refreshing.");
 
-            var task = DbMaintainer.Instance.Update(DbMaintainer.UpdateType.Cleanup);
+            var task = dbMaintainer.Update(DbMaintainer.UpdateType.Cleanup);
 
             return XhrResponseFactory.CreateSucceeded(true);
         }

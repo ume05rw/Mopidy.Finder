@@ -8,8 +8,14 @@ namespace MopidyFinder.Models.Relations
 {
     public class GenreAlbumStore : StoreBase<GenreAlbum>, IMopidyScannable
     {
-        public GenreAlbumStore([FromServices] Dbc dbc) : base(dbc)
+        private Library _library;
+
+        public GenreAlbumStore(
+            [FromServices] Dbc dbc,
+            [FromServices] Library library
+        ) : base(dbc)
         {
+            this._library = library;
         }
 
         private decimal _processLength = 0;
@@ -40,7 +46,7 @@ namespace MopidyFinder.Models.Relations
 
             foreach (var genre in genres)
             {
-                var refs = await Library.Browse(genre.Uri);
+                var refs = await this._library.Browse(genre.Uri);
                 var albumUris = refs.Select(e => e.GetAlbumUri()).ToArray();
                 var albumIds = albums
                     .Where(e => albumUris.Contains(e.Uri))
@@ -68,6 +74,16 @@ namespace MopidyFinder.Models.Relations
             }
 
             return added;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this._library = null;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

@@ -13,8 +13,17 @@ namespace MopidyFinder.Models.Tracks
 {
     public class TrackStore : StoreBase<Track>
     {
-        public TrackStore([FromServices] Dbc dbc) : base(dbc)
+        private Tracklist _tracklist;
+        private Playback _playback;
+
+        public TrackStore(
+            [FromServices] Dbc dbc,
+            [FromServices] Tracklist tracklist,
+            [FromServices] Playback playback
+        ) : base(dbc)
         {
+            this._tracklist = tracklist;
+            this._playback = playback;
         }
 
         private Track Create(Mopidies.Track mopidyTrack)
@@ -51,11 +60,11 @@ namespace MopidyFinder.Models.Tracks
             => this.Create(mopidyTlTrack);
 
         public Task<bool> ClearList()
-            => Tracklist.Clear();
+            => this._tracklist.Clear();
 
         public async Task<List<Track>> SetListByUris(string[] uris)
         {
-            var tlTracks = await Tracklist.Add(uris);
+            var tlTracks = await this._tracklist.Add(uris);
             var result = tlTracks
                 .Select(mtt => this.Create(mtt))
                 .ToList();
@@ -65,7 +74,7 @@ namespace MopidyFinder.Models.Tracks
 
         public async Task<List<Track>> GetList()
         {
-            var tlTracks = await Tracklist.GetTlTracks();
+            var tlTracks = await this._tracklist.GetTlTracks();
             var result = tlTracks
                 .Select(mtt => this.Create(mtt))
                 .ToList();
@@ -75,10 +84,21 @@ namespace MopidyFinder.Models.Tracks
 
         public async Task<Track> GetCurrentTrack()
         {
-            var tlTrack = await Playback.GetCurrentTlTrack();
+            var tlTrack = await this._playback.GetCurrentTlTrack();
             return (tlTrack == null)
                 ? null
                 : this.Create(tlTrack);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this._playback = null;
+                this._tracklist = null;
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

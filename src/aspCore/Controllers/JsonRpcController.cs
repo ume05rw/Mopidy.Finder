@@ -17,7 +17,10 @@ namespace MopidyFinder.Controllers
     {
         // GET: /<controller>/
         [HttpPost()]
-        public async Task<JsonRpcResult> Index([FromBody] JsonRpcParamsQuery values)
+        public async Task<JsonRpcResult> Index(
+            [FromServices] Query query,
+            [FromBody] JsonRpcParamsQuery values
+        )
         {
             // APIクエリ用パラメータセットを宣言する。
             var request = JsonRpcFactory.CreateQuery(values);
@@ -27,7 +30,7 @@ namespace MopidyFinder.Controllers
 
             try
             {
-                var response = await Query.Exec(request);
+                var response = await query.Exec(request);
 
                 // クエリ後
                 if (!hasId)

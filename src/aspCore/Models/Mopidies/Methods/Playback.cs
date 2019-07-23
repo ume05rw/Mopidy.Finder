@@ -1,14 +1,12 @@
+using Microsoft.AspNetCore.Mvc;
 using MopidyFinder.Models.JsonRpcs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Mopidies.Methods
 {
-    public static class Playback
+    public class Playback
     {
         private const string MethodGetCurrentTlTrack = "core.playback.get_current_tl_track";
         private const string MethodGetState = "core.playback.get_state";
@@ -35,11 +33,18 @@ namespace MopidyFinder.Models.Mopidies.Methods
             public int TimePosition;
         }
 
-        public static async Task<TlTrack> GetCurrentTlTrack()
+        private readonly Query _query;
+
+        public Playback([FromServices] Query query)
+        {
+            this._query = query;
+        }
+
+        public async Task<TlTrack> GetCurrentTlTrack()
         {
             var request = JsonRpcFactory.CreateRequest(Playback.MethodGetCurrentTlTrack);
 
-            var response = await Query.Exec(request);
+            var response = await this._query.Exec(request);
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。
@@ -48,11 +53,11 @@ namespace MopidyFinder.Models.Mopidies.Methods
                 : JObject.FromObject(response.Result).ToObject<TlTrack>();
         }
 
-        public static async Task<string> GetState()
+        public async Task<string> GetState()
         {
             var request = JsonRpcFactory.CreateRequest(Playback.MethodGetState);
 
-            var response = await Query.Exec(request);
+            var response = await this._query.Exec(request);
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。
@@ -61,68 +66,68 @@ namespace MopidyFinder.Models.Mopidies.Methods
             return result;
         }
 
-        public static async Task<bool> Play(int tlId)
+        public async Task<bool> Play(int tlId)
         {
             var notice = JsonRpcFactory.CreateNotice(Playback.MethodPlay, new ArgsTlId()
             {
                 TlId = tlId
             });
 
-            var response = await Query.Exec(notice);
+            var response = await this._query.Exec(notice);
 
             return true;
         }
 
-        public static async Task<bool> Resume()
+        public async Task<bool> Resume()
         {
             var notice = JsonRpcFactory.CreateNotice(Playback.MethodResume);
 
-            var response = await Query.Exec(notice);
+            var response = await this._query.Exec(notice);
 
             return true;
         }
 
-        public static async Task<bool> Pause()
+        public async Task<bool> Pause()
         {
             var notice = JsonRpcFactory.CreateNotice(Playback.MethodPause);
 
-            var response = await Query.Exec(notice);
+            var response = await this._query.Exec(notice);
 
             return true;
         }
 
-        public static async Task<bool> Stop()
+        public async Task<bool> Stop()
         {
             var notice = JsonRpcFactory.CreateNotice(Playback.MethodStop);
 
-            var response = await Query.Exec(notice);
+            var response = await this._query.Exec(notice);
 
             return true;
         }
 
-        public static async Task<bool> Next()
+        public async Task<bool> Next()
         {
             var notice = JsonRpcFactory.CreateNotice(Playback.MethodNext);
 
-            var response = await Query.Exec(notice);
+            var response = await this._query.Exec(notice);
 
             return true;
         }
 
-        public static async Task<bool> Previous()
+        public async Task<bool> Previous()
         {
             var notice = JsonRpcFactory.CreateNotice(Playback.MethodPrevious);
 
-            var response = await Query.Exec(notice);
+            var response = await this._query.Exec(notice);
 
             return true;
         }
 
-        public static async Task<int> GetTimePosition()
+        public async Task<int> GetTimePosition()
         {
             var request = JsonRpcFactory.CreateRequest(Playback.MethodGetTimePosition);
 
-            var response = await Query.Exec(request);
+            var response = await this._query.Exec(request);
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。
@@ -131,14 +136,14 @@ namespace MopidyFinder.Models.Mopidies.Methods
             return result;
         }
 
-        public static async Task<bool> Seek(int timePosition)
+        public async Task<bool> Seek(int timePosition)
         {
             var request = JsonRpcFactory.CreateRequest(Playback.MethodSeek, new ArgsTimePosition()
             {
                 TimePosition = timePosition
             });
 
-            var response = await Query.Exec(request);
+            var response = await this._query.Exec(request);
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。

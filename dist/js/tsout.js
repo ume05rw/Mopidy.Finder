@@ -1842,7 +1842,7 @@ define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "Models/Albums/A
     }());
     exports.default = AlbumTracks;
 });
-define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bases/StoreBase", "Models/AlbumTracks/AlbumTracks"], function (require, exports, StoreBase_4, AlbumTracks_1) {
+define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bases/StoreBase", "Models/AlbumTracks/AlbumTracks", "Utils/Exception"], function (require, exports, StoreBase_4, AlbumTracks_1, Exception_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var AlbumTracksStore = /** @class */ (function (_super) {
@@ -1859,7 +1859,7 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                throw new Error('Unexpected Error on ApiQuery');
+                                Exception_6.default.Throw('Unexpected Error on ApiQuery', response.Errors);
                             result = response.Result;
                             result.ResultList = AlbumTracks_1.default.CreateArray(result.ResultList);
                             return [2 /*return*/, result];
@@ -1872,11 +1872,11 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
                 var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Player/PlayAlbumByTrack', track)];
+                        case 0: return [4 /*yield*/, this.QueryPost('Player/PlayAlbumByTrackId', track.Id)];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                throw new Error('Unexpected Error on ApiQuery');
+                                Exception_6.default.Throw('Unexpected Error on ApiQuery', response.Errors);
                             result = AlbumTracks_1.default.Create(response.Result);
                             return [2 /*return*/, result];
                     }
@@ -1892,7 +1892,7 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                throw new Error('Unexpected Error on ApiQuery');
+                                Exception_6.default.Throw('Unexpected Error on ApiQuery', response.Errors);
                             return [2 /*return*/, response.Result];
                     }
                 });
@@ -1907,7 +1907,7 @@ define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bas
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded)
-                                throw new Error('Unexpected Error on ApiQuery');
+                                Exception_6.default.Throw('Unexpected Error on ApiQuery', response.Errors);
                             return [2 /*return*/, response.Result];
                     }
                 });
@@ -2022,7 +2022,7 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Du
     }(JsonRpcQueryableBase_2.default));
     exports.default = TrackStore;
 });
-define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_3, Exception_6, JsonRpcQueryableBase_3, Track_4, TrackStore_1, Playlist_1) {
+define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_3, Exception_7, JsonRpcQueryableBase_3, Track_4, TrackStore_1, Playlist_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlaylistStore = /** @class */ (function (_super) {
@@ -2117,7 +2117,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 2:
                             resAdd = _a.sent();
                             if (resAdd.error)
-                                Exception_6.default.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
+                                Exception_7.default.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
                             tlTracks = resAdd.result;
                             tlDictionary = Libraries_3.default.Enumerable.from(tlTracks)
                                 .toDictionary(function (e) { return e.track.uri; }, function (e2) { return e2.tlid; });
@@ -2128,7 +2128,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                                     : null;
                             }
                             if (track.TlId === null)
-                                Exception_6.default.Throw("track: " + track.Name + " not assigned TlId");
+                                Exception_7.default.Throw("track: " + track.Name + " not assigned TlId");
                             return [4 /*yield*/, this.PlayByTlId(track.TlId)];
                         case 3:
                             _a.sent();
@@ -2162,7 +2162,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_6.default.Throw('PlaylistStore.AddPlaylist: Playlist Create Failed.', response.error);
+                                Exception_7.default.Throw('PlaylistStore.AddPlaylist: Playlist Create Failed.', response.error);
                             }
                             mpPlaylist = response.result;
                             result = Playlist_1.default.CreateFromMopidy(mpPlaylist);
@@ -2182,14 +2182,14 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             playlist = _a.sent();
                             if (!playlist) {
-                                Exception_6.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Playlist Create Failed');
+                                Exception_7.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Playlist Create Failed');
                             }
                             playlist.Tracks = albumTracks.Tracks;
                             return [4 /*yield*/, this.UpdatePlayllist(playlist)];
                         case 2:
                             response = _a.sent();
                             if (response !== true) {
-                                Exception_6.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Track Update Failed.');
+                                Exception_7.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Track Update Failed.');
                             }
                             return [2 /*return*/, playlist];
                     }
@@ -2245,7 +2245,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_6.default.Throw('PlaylistStore.UpdatePlayllist: Track Update Failed.', response.error);
+                                Exception_7.default.Throw('PlaylistStore.UpdatePlayllist: Track Update Failed.', response.error);
                             }
                             return [2 /*return*/, (response.result !== null)];
                     }
@@ -2263,7 +2263,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_6.default.Throw('PlaylistStore.DeletePlaylist: Delete Failed.', response.error);
+                                Exception_7.default.Throw('PlaylistStore.DeletePlaylist: Delete Failed.', response.error);
                             }
                             return [2 /*return*/, true];
                     }
@@ -2586,7 +2586,7 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function
     }());
     exports.default = Animate;
 });
-define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Utils/Exception", "Views/Bases/ViewBase", "Utils/Animate"], function (require, exports, Animate_1, Exception_7, ViewBase_3, Animate_2) {
+define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Utils/Exception", "Views/Bases/ViewBase", "Utils/Animate"], function (require, exports, Animate_1, Exception_8, ViewBase_3, Animate_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Animation = Animate_2.Animation;
@@ -2611,9 +2611,9 @@ define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Util
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
                     if (!this.AnimationIn || Animate_1.default.IsHideAnimation(this.AnimationIn))
-                        Exception_7.default.Throw('Invalid In-Animation', this.AnimationIn);
+                        Exception_8.default.Throw('Invalid In-Animation', this.AnimationIn);
                     if (!this.AnimationOut || !Animate_1.default.IsHideAnimation(this.AnimationOut))
-                        Exception_7.default.Throw('Invalid Out-Animation', this.AnimationOut);
+                        Exception_8.default.Throw('Invalid Out-Animation', this.AnimationOut);
                     this.animate = new Animate_1.default(this.$el);
                     return [2 /*return*/, true];
                 });
@@ -2932,7 +2932,7 @@ define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/View
     }(ViewBase_5.default));
     exports.default = ContentDetailBase;
 });
-define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ContentDetailBase", "Views/Shared/SelectionItem"], function (require, exports, _, Libraries_5, Exception_8, ContentDetailBase_1, SelectionItem_2) {
+define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ContentDetailBase", "Views/Shared/SelectionItem"], function (require, exports, _, Libraries_5, Exception_9, ContentDetailBase_1, SelectionItem_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionEvents = {
@@ -2996,7 +2996,7 @@ define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Librar
                             return [3 /*break*/, 3];
                         case 2:
                             e_1 = _a.sent();
-                            Exception_8.default.Throw(null, e_1);
+                            Exception_9.default.Throw(null, e_1);
                             return [3 /*break*/, 3];
                         case 3: return [2 /*return*/, true];
                     }
@@ -3056,7 +3056,7 @@ define("Views/Events/BootstrapEvents", ["require", "exports"], function (require
         Hidden: 'hidden.bs.dropdown'
     };
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_9, ViewBase_6, BootstrapEvents_1) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_10, ViewBase_6, BootstrapEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumTracksEvents = {
@@ -3183,7 +3183,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var playlist = Libraries_6.default.Enumerable.from(this.innerPlaylists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
-                Exception_9.default.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
+                Exception_10.default.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
             var args = {
                 Playlist: playlist,
                 Tracks: this.entity.Tracks
@@ -3194,12 +3194,12 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var tr = args.currentTarget.parentElement;
             var trackIdString = tr.getAttribute('data-trackid');
             if (!trackIdString || trackIdString === '')
-                Exception_9.default.Throw('SelectionAlbumTrack.OnRowClicked: Track-Id not found.');
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
             var tracks = Libraries_6.default.Enumerable.from(this.entity.Tracks);
             var track = tracks.firstOrDefault(function (e) { return e.Id === trackId; });
             if (!track)
-                Exception_9.default.Throw('SelectionAlbumTrack.OnRowClicked: Track entity not found.');
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowClicked: Track entity not found.');
             var orderedArgs = {
                 Entity: this.entity,
                 Track: track,
@@ -3214,15 +3214,15 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var playlist = Libraries_6.default.Enumerable.from(this.innerPlaylists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
-                Exception_9.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
             var trackIdString = Libraries_6.default.$(elem).parents('tr.track-row').attr('data-trackid');
             if (!trackIdString || trackIdString === '')
-                Exception_9.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
             var track = Libraries_6.default.Enumerable.from(this.entity.Tracks)
                 .firstOrDefault(function (e) { return e.Id === trackId; });
             if (!track)
-                Exception_9.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
             var args = {
                 Playlist: playlist,
                 Tracks: [track]
@@ -3247,7 +3247,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Bases/SelectionListBase", "Views/Finders/Lists/Albums/SelectionAlbumTracks", "Utils/Dump"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_10, Filterbox_1, SelectionListBase_1, SelectionAlbumTracks_1, Dump_6) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Shared/Filterboxes/Filterbox", "Views/Bases/SelectionListBase", "Views/Finders/Lists/Albums/SelectionAlbumTracks", "Utils/Dump"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_11, Filterbox_1, SelectionListBase_1, SelectionAlbumTracks_1, Dump_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AlbumListEvents = {
@@ -3386,10 +3386,10 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 2:
                             albumTracks = args.Entity;
                             if (!albumTracks)
-                                Exception_10.default.Throw('AlbumTracks Not Found', args);
+                                Exception_11.default.Throw('AlbumTracks Not Found', args);
                             track = args.Track;
                             if (!track)
-                                Exception_10.default.Throw('Track Not Found', args);
+                                Exception_11.default.Throw('Track Not Found', args);
                             isAllTracksRegistered = Libraries_7.default.Enumerable.from(albumTracks.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
@@ -3797,7 +3797,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionListBase_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList", "Utils/Dump"], function (require, exports, vue_class_component_9, Delay_3, Exception_11, IContentDetail_1, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1, Dump_7) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList", "Utils/Dump"], function (require, exports, vue_class_component_9, Delay_3, Exception_12, IContentDetail_1, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1, Dump_7) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Finder = /** @class */ (function (_super) {
@@ -3873,7 +3873,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
                     this.AlbumList.LoadIfEmpty();
                     break;
                 default:
-                    Exception_11.default.Throw('Unexpected ContentDetail');
+                    Exception_12.default.Throw('Unexpected ContentDetail');
             }
         };
         // #endregion
@@ -3928,7 +3928,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
     }(ContentBase_1.default));
     exports.default = Finder;
 });
-define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_12, Libraries_10, IContentDetail_2) {
+define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_13, Libraries_10, IContentDetail_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HeaderBarEvents = {
@@ -4085,7 +4085,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     this.MenuScanProgress.classList.remove(this.displayNone);
                     break;
                 default:
-                    Exception_12.default.Throw('Unexpected Page.', args);
+                    Exception_13.default.Throw('Unexpected Page.', args);
             }
         };
         HeaderBar.prototype.OnGenresClicked = function () {
@@ -5431,7 +5431,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionListBase_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_3, Exception_13) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_3, Exception_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistsEvents = {
@@ -5497,7 +5497,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                     this.TrackList.LoadIfEmpty();
                     break;
                 default:
-                    Exception_13.default.Throw('Unexpected ContentDetail');
+                    Exception_14.default.Throw('Unexpected ContentDetail');
             }
         };
         // #endregion
@@ -6114,7 +6114,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
     }(ContentDetailBase_4.default));
     exports.default = ScanProgressBlock;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, SettingsStore_1, Exception_14, ContentBase_3, IContentDetail_4, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, SettingsStore_1, Exception_15, ContentBase_3, IContentDetail_4, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SettingsEvents = {
@@ -6193,7 +6193,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                     this.ScanProgressBlock.Show();
                     break;
                 default:
-                    Exception_14.default.Throw('Unexpected ContentDetail');
+                    Exception_15.default.Throw('Unexpected ContentDetail');
             }
         };
         // #endregion
@@ -6867,7 +6867,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_15, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_21, Exception_16, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SidebarEvents = {
@@ -6984,7 +6984,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
                     this.settingsTabAnchor.tab(Sidebar_1.ShowTabMethod);
                     break;
                 default:
-                    Exception_15.default.Throw('Unexpected Page Ordered.', page);
+                    Exception_16.default.Throw('Unexpected Page Ordered.', page);
             }
         };
         Sidebar.prototype.OnClickFinder = function (ev) {
@@ -7052,7 +7052,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = Sidebar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_16, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, Libraries_22, SettingsStore_2, Exception_17, IContent_3, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, Sidebar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7172,7 +7172,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                     return this.Settings;
                     break;
                 default:
-                    Exception_16.default.Throw('Unexpected Page.', args);
+                    Exception_17.default.Throw('Unexpected Page.', args);
             }
         };
         RootView.prototype.OnContentChanged = function (args) {
@@ -7206,7 +7206,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Librarie
                     this.Settings.ShowContentDetail(args);
                     break;
                 default:
-                    Exception_16.default.Throw('Unexpected Page', args);
+                    Exception_17.default.Throw('Unexpected Page', args);
             }
         };
         // #endregion

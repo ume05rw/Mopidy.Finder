@@ -21,9 +21,23 @@ namespace MopidyFinder.Models.AlbumTracks
             public int? Page { get; set; }
         }
 
+        private Library _library;
+        private Playback _playback;
+        private TrackStore _trackStore;
+        private AlbumStore _albumStore;
 
-        public AlbumTracksStore([FromServices] Dbc dbc) : base(dbc)
+        public AlbumTracksStore(
+            [FromServices] Dbc dbc,
+            [FromServices] Library library,
+            [FromServices] Playback playback,
+            [FromServices] TrackStore trackStore,
+            [FromServices] AlbumStore albumStore
+        ) : base(dbc)
         {
+            this._library = library;
+            this._playback = playback;
+            this._trackStore = trackStore;
+            this._albumStore = albumStore;
         }
 
         protected new int PageLength = 10;
@@ -78,29 +92,27 @@ namespace MopidyFinder.Models.AlbumTracks
         private async Task<List<AlbumTracks>> GetList(List<Album> albums)
         {
             var result = new List<AlbumTracks>();
-            using (var albumStore = new AlbumStore(this.Dbc))
+
+            var tmpList = this.GetListFromCache(albums);
+
+            var cached = tmpList.Select(e => e.Album.Id).ToArray();
+            var remainings = albums
+                .Where(e => !cached.Contains(e.Id))
+                .Select(e => e.Id)
+                .ToArray();
+
+            if (0 < remainings.Length)
+                tmpList.AddRange(await this.GetListFromMopidy(remainings, albums));
+
+            // 渡し値アルバムID順に並べ替え
+            foreach (var album in albums)
             {
-                var tmpList = this.GetListFromCache(albums);
-
-                var cached = tmpList.Select(e => e.Album.Id).ToArray();
-                var remainings = albums
-                    .Where(e => !cached.Contains(e.Id))
-                    .Select(e => e.Id)
-                    .ToArray();
-
-                if (0 < remainings.Length)
-                    tmpList.AddRange(await this.GetListFromMopidy(remainings, albums));
-
-                // 渡し値アルバムID順に並べ替え
-                foreach (var album in albums)
-                {
-                    var at = tmpList.FirstOrDefault(e => e.Album.Id == album.Id);
-                    if (at != null)
-                        result.Add(at);
-                }
-
-                await albumStore.CompleteAlbumInfo(result);
+                var at = tmpList.FirstOrDefault(e => e.Album.Id == album.Id);
+                if (at != null)
+                    result.Add(at);
             }
+
+            await this._albumStore.CompleteAlbumInfo(result);
 
             return result;
         }
@@ -141,113 +153,128 @@ namespace MopidyFinder.Models.AlbumTracks
             List<Album> allAlbums
         )
         {
-            using (var trackStore = new TrackStore(this.Dbc))
-            {
-                var result = new List<AlbumTracks>();
+            var result = new List<AlbumTracks>();
 
-                var albumDictionary = allAlbums
-                    .Where(e => pickedAlbumIds.Contains(e.Id))
-                    .ToDictionary(e => e.Uri);
+            var albumDictionary = allAlbums
+                .Where(e => pickedAlbumIds.Contains(e.Id))
+                .ToDictionary(e => e.Uri);
 
-                var mopidyTrackDictionary = await Library.Lookup(albumDictionary.Keys.ToArray());
+            var mopidyTrackDictionary = await this._library.Lookup(albumDictionary.Keys.ToArray());
 
-                if (mopidyTrackDictionary == null || mopidyTrackDictionary.Count() <= 0)
-                    return result;
-
-                var addTargets = new List<Track>();
-                foreach (var pair in mopidyTrackDictionary)
-                {
-                    if (!albumDictionary.ContainsKey(pair.Key))
-                        continue;
-
-                    var existsAlbumTrack = false;
-                    var albumTracks = new List<Track>();
-                    var album = albumDictionary[pair.Key];
-                    var artists = album.ArtistAlbums.Select(e => e.Artist).ToList();
-                    var tracks = pair.Value
-                            .Select(mt => trackStore.CreateTrack(mt))
-                            .OrderBy(e => e.TrackNo)
-                            .ToList();
-
-                    foreach (var track in tracks)
-                    {
-                        track.AlbumId = album.Id;
-                        var exists = this.Dbc.Tracks
-                            .Where(e => e.Uri == track.Uri && e.AlbumId == album.Id)
-                            .Any();
-
-                        if (exists)
-                            existsAlbumTrack = true;
-                        else
-                            albumTracks.Add(track);
-                    }
-
-                    // アルバム上の曲がDB上に1件もないときのみ、DBに全件書き込む。
-                    if (existsAlbumTrack == false)
-                        addTargets.AddRange(albumTracks);
-
-                    result.Add(new AlbumTracks()
-                    {
-                        Album = album,
-                        Artists = artists,
-                        Tracks = tracks
-                    });
-                }
-
-                if (0 <= addTargets.Count())
-                {
-                    this.Dbc.Tracks.AddRange(addTargets);
-                    this.Dbc.SaveChanges();
-                }
-
+            if (mopidyTrackDictionary == null || mopidyTrackDictionary.Count() <= 0)
                 return result;
+
+            var addTargets = new List<Track>();
+            foreach (var pair in mopidyTrackDictionary)
+            {
+                if (!albumDictionary.ContainsKey(pair.Key))
+                    continue;
+
+                var existsAlbumTrack = false;
+                var albumTracks = new List<Track>();
+                var album = albumDictionary[pair.Key];
+                var artists = album.ArtistAlbums.Select(e => e.Artist).ToList();
+                var tracks = pair.Value
+                        .Select(mt => this._trackStore.CreateTrack(mt))
+                        .OrderBy(e => e.TrackNo)
+                        .ToList();
+
+                foreach (var track in tracks)
+                {
+                    track.AlbumId = album.Id;
+                    var exists = this.Dbc.Tracks
+                        .Where(e => e.Uri == track.Uri && e.AlbumId == album.Id)
+                        .Any();
+
+                    if (exists)
+                        existsAlbumTrack = true;
+                    else
+                        albumTracks.Add(track);
+                }
+
+                // アルバム上の曲がDB上に1件もないときのみ、DBに全件書き込む。
+                if (existsAlbumTrack == false)
+                    addTargets.AddRange(albumTracks);
+
+                result.Add(new AlbumTracks()
+                {
+                    Album = album,
+                    Artists = artists,
+                    Tracks = tracks
+                });
             }
+
+            if (0 <= addTargets.Count())
+            {
+                this.Dbc.Tracks.AddRange(addTargets);
+                this.Dbc.SaveChanges();
+            }
+
+            return result;
+            
         }
 
-        public async Task<AlbumTracks> PlayAlbum(Track track)
+        public async Task<AlbumTracks> PlayAlbumByTrackId(int trackId)
         {
-            using (var trackStore = new TrackStore(this.Dbc))
+            var track = this.Dbc.Tracks.FirstOrDefault(e => e.Id == trackId);
+            if (track == null)
+                return null;
+
+            
+            var targetTrack = this.Dbc.Tracks
+                .Include(e => e.Album)
+                .ThenInclude(e2 => e2.ArtistAlbums)
+                .ThenInclude(e3 => e3.Artist)
+                .First(e => e.Id == track.Id);
+
+            var tracks = this.Dbc.Tracks
+                .Where(e => e.AlbumId == targetTrack.AlbumId)
+                .OrderBy(e => e.DiscNo)
+                .ThenBy(e => e.TrackNo)
+                .ToArray();
+
+            var exists = await this._trackStore.GetList();
+
+            var remainingUris = tracks
+                .Where(e => exists.All(e2 => e2.Uri != e.Uri))
+                .Select(e => e.Uri)
+                .ToArray();
+
+            if (0 < remainingUris.Length)
             {
-                var targetTrack = this.Dbc.Tracks
-                    .Include(e => e.Album)
-                    .ThenInclude(e2 => e2.ArtistAlbums)
-                    .ThenInclude(e3 => e3.Artist)
-                    .First(e => e.Id == track.Id);
-
-                var tracks = this.Dbc.Tracks
-                    .Where(e => e.AlbumId == targetTrack.AlbumId)
-                    .OrderBy(e => e.DiscNo)
-                    .ThenBy(e => e.TrackNo)
-                    .ToArray();
-
-                var exists = await trackStore.GetList();
-
-                var remainingUris = tracks
-                    .Where(e => exists.All(e2 => e2.Uri != e.Uri))
-                    .Select(e => e.Uri)
-                    .ToArray();
-
-                if (0 < remainingUris.Length)
-                {
-                    var added = await trackStore.SetListByUris(remainingUris);
-                    exists.AddRange(added);
-                }
-
-                foreach (var t in tracks)
-                    t.TlId = exists.First(e => e.Uri == t.Uri).TlId;
-
-                var targetTlId = tracks.First(e => e.Id == track.Id).TlId;
-                await Playback.Play((int)targetTlId);
-
-                var result = new AlbumTracks()
-                {
-                    Album = targetTrack.Album,
-                    Artists = targetTrack.Album.ArtistAlbums.Select(e => e.Artist).ToList(),
-                    Tracks = tracks.ToList()
-                };
-
-                return result;
+                var added = await this._trackStore.SetListByUris(remainingUris);
+                exists.AddRange(added);
             }
+
+            foreach (var t in tracks)
+                t.TlId = exists.First(e => e.Uri == t.Uri).TlId;
+
+            var targetTlId = tracks.First(e => e.Id == track.Id).TlId;
+            await this._playback.Play((int)targetTlId);
+
+            var result = new AlbumTracks()
+            {
+                Album = targetTrack.Album,
+                Artists = targetTrack.Album.ArtistAlbums.Select(e => e.Artist).ToList(),
+                Tracks = tracks.ToList()
+            };
+
+            return result;
+            
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!this.IsDisposed && disposing)
+            {
+                this._library = null;
+                this._playback = null;
+                this._trackStore.Dispose();
+                this._trackStore = null;
+                this._albumStore.Dispose();
+                this._albumStore = null;
+            }
+            base.Dispose(disposing);
         }
     }
 }

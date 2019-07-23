@@ -29,5 +29,14 @@ namespace MopidyFinder.Models.Bases
         protected PagenagedStoreBase(Dbc dbc) : base(dbc)
         {
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.PageLength = 0;
+            }
+            base.Dispose(disposing);
+        }
     }
 }

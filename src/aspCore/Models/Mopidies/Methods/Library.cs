@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using MopidyFinder.Models.JsonRpcs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Mopidies.Methods
 {
-    public static class Library
+    public class Library
     {
         private const string MethodBrowse = "core.library.browse";
         private const string MethodSearch = "core.library.search";
@@ -29,14 +30,21 @@ namespace MopidyFinder.Models.Mopidies.Methods
             public string[] Uris;
         }
 
-        public static async Task<List<Ref>> Browse(string uri)
+        private readonly Query _query;
+
+        public Library([FromServices] Query query)
+        {
+            this._query = query;
+        }
+
+        public async Task<List<Ref>> Browse(string uri)
         {
             var request = JsonRpcFactory.CreateRequest(Library.MethodBrowse, new ArgsUri()
             {
                 Uri = uri
             });
 
-            var response = await Query.Exec(request);
+            var response = await this._query.Exec(request);
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。
@@ -45,14 +53,14 @@ namespace MopidyFinder.Models.Mopidies.Methods
             return result;
         }
 
-        public static async Task<Dictionary<string, List<Track>>> Lookup(string[] uris)
+        public async Task<Dictionary<string, List<Track>>> Lookup(string[] uris)
         {
             var request = JsonRpcFactory.CreateRequest(Library.MethodLookup, new ArgsUris()
             {
                 Uris = uris
             });
 
-            var response = await Query.Exec(request);
+            var response = await this._query.Exec(request);
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。
@@ -61,14 +69,14 @@ namespace MopidyFinder.Models.Mopidies.Methods
             return result;
         }
 
-        public static async Task<Image> GetImage(string albumUri)
+        public async Task<Image> GetImage(string albumUri)
         {
             var request = JsonRpcFactory.CreateRequest(Library.MethodGetImages, new ArgsUris()
             {
                 Uris = new string[] { albumUri }
             });
 
-            var response = await Query.Exec(request);
+            var response = await this._query.Exec(request);
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。
@@ -80,14 +88,14 @@ namespace MopidyFinder.Models.Mopidies.Methods
             return images.First().Value.First();
         }
 
-        public static async Task<Dictionary<string, Image>> GetImages(string[] uris)
+        public async Task<Dictionary<string, Image>> GetImages(string[] uris)
         {
             var request = JsonRpcFactory.CreateRequest(Library.MethodGetImages, new ArgsUris()
             {
                 Uris = uris
             });
 
-            var response = await Query.Exec(request);
+            var response = await this._query.Exec(request);
 
             // 戻り値の型は、[ JObject | JArray | JValue | null ] のどれか。
             // 型が違うとパースエラーになる。

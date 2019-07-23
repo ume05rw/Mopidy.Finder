@@ -19,8 +19,14 @@ namespace MopidyFinder.Models.Artists
 
         private const string QueryString = "local:directory?type=artist";
 
-        public ArtistStore([FromServices] Dbc dbc) : base(dbc)
+        private Library _library;
+
+        public ArtistStore(
+            [FromServices] Dbc dbc,
+            [FromServices] Library library
+        ) : base(dbc)
         {
+            this._library = library;
         }
 
         public Artist Get(int artistId)
@@ -82,7 +88,7 @@ namespace MopidyFinder.Models.Artists
             this._processLength = 0;
             this._processed = 0;
 
-            var result = await Library.Browse(ArtistStore.QueryString);
+            var result = await this._library.Browse(ArtistStore.QueryString);
             var existsUris = this.Dbc.Artists.Select(e => e.Uri).ToArray();
             var newRefs = result.Where(e => !existsUris.Contains(e.Uri));
 
@@ -100,6 +106,15 @@ namespace MopidyFinder.Models.Artists
             this._processed = this._processLength;
 
             return newEntities.Length;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!this.IsDisposed && disposing)
+            {
+                this._library = null;
+            }
+            base.Dispose(disposing);
         }
     }
 }

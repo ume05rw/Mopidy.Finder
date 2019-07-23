@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MopidyFinder.Models.Tracks;
-using MopidyFinder.Models;
-using MopidyFinder.Models.Mopidies.Methods;
-using MopidyFinder.Models.Xhrs;
 using MopidyFinder.Models.AlbumTracks;
+using MopidyFinder.Models.Mopidies.Methods;
+using MopidyFinder.Models.Tracks;
+using MopidyFinder.Models.Xhrs;
+using System;
+using System.Threading.Tasks;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,20 +17,20 @@ namespace MopidyFinder.Controllers
         [HttpPost("PlayAlbumByTlId")]
         public async Task<XhrResponse> PlayAlbumByTrack(
             [FromBody] int tlId,
-            [FromServices] AlbumTracksStore store
+            [FromServices] Playback playback
         )
         {
-            var result = await Playback.Play(tlId);
+            var result = await playback.Play(tlId);
             return XhrResponseFactory.CreateSucceeded(result);
         }
 
-        [HttpPost("PlayAlbumByTrack")]
-        public async Task<XhrResponse> PlayAlbumByTrack(
-            [FromBody] Track track,
+        [HttpPost("PlayAlbumByTrackId")]
+        public async Task<XhrResponse> PlayAlbumByTrackId(
+            [FromBody] int TrackId,
             [FromServices] AlbumTracksStore store
         )
         {
-            var result = await store.PlayAlbum(track);
+            var result = await store.PlayAlbumByTrackId(TrackId);
             return XhrResponseFactory.CreateSucceeded(result);
         }
 
@@ -49,11 +46,11 @@ namespace MopidyFinder.Controllers
         }
 
         [HttpGet("GetState")]
-        public async Task<XhrResponse> GetState()
+        public async Task<XhrResponse> GetState([FromServices] Playback playback)
         {
             try
             {
-                var result = await Playback.GetState();
+                var result = await playback.GetState();
                 return XhrResponseFactory.CreateSucceeded(result);
             }
             catch (Exception ex)
@@ -80,14 +77,15 @@ namespace MopidyFinder.Controllers
 
         [HttpGet("Play/{tlId?}")]
         public async Task<XhrResponse> Play(
-            [FromRoute] int? tlId
+            [FromRoute] int? tlId,
+            [FromServices] Playback playback
         )
         {
             try
             {
                 var result = (tlId != null)
-                    ? await Playback.Play((int)tlId)
-                    : await Playback.Resume();
+                    ? await playback.Play((int)tlId)
+                    : await playback.Resume();
 
                 return XhrResponseFactory.CreateSucceeded();
             }
@@ -98,11 +96,11 @@ namespace MopidyFinder.Controllers
         }
 
         [HttpGet("Pause")]
-        public async Task<XhrResponse> Pause()
+        public async Task<XhrResponse> Pause([FromServices] Playback playback)
         {
             try
             {
-                await Playback.Pause();
+                await playback.Pause();
                 return XhrResponseFactory.CreateSucceeded();
             }
             catch (Exception ex)
@@ -112,11 +110,11 @@ namespace MopidyFinder.Controllers
         }
 
         [HttpGet("Next")]
-        public async Task<XhrResponse> Next()
+        public async Task<XhrResponse> Next([FromServices] Playback playback)
         {
             try
             {
-                await Playback.Next();
+                await playback.Next();
                 return XhrResponseFactory.CreateSucceeded();
             }
             catch (Exception ex)
@@ -126,11 +124,11 @@ namespace MopidyFinder.Controllers
         }
 
         [HttpGet("Previous")]
-        public async Task<XhrResponse> Previous()
+        public async Task<XhrResponse> Previous([FromServices] Playback playback)
         {
             try
             {
-                await Playback.Previous();
+                await playback.Previous();
                 return XhrResponseFactory.CreateSucceeded();
             }
             catch (Exception ex)

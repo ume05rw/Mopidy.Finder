@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc;
 using MopidyFinder.Models.JsonRpcs;
 using MopidyFinder.Models.Settings;
 using Newtonsoft.Json;
@@ -10,39 +10,14 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models.Mopidies.Methods
 {
-    public static class Query
+    public class Query
     {
-        private static IServiceProvider Provider = null;
-        private static Settings.Settings _settings = null;
+        private readonly Settings.Settings _settings = null;
 
-        public static void SetServiceProvider(IServiceProvider provider)
+        public Query([FromServices] SettingsStore store)
         {
-            Query.Provider = provider;
+            this._settings = store.Entity;
         }
-
-        public static void ReleaseServiceProvider()
-        {
-            Query.Provider = null;
-        }
-
-        private static Settings.Settings Settings
-        {
-            get
-            {
-                if (Query._settings == null)
-                {
-                    using (var serviceScope = Query.Provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
-                    using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
-                    using (var store = new SettingsStore(dbc))
-                    {
-                        Query._settings = store.Entity;
-                    }
-                }
-
-                return Query._settings;
-            }
-        }
-
 
         /// <summary>
         /// 
@@ -53,9 +28,9 @@ namespace MopidyFinder.Models.Mopidies.Methods
         /// ここでの戻り値[JsonRpcParamsResponse]は直接通信で返すものではない。
         /// 通信応答を返す際に、ここの応答をJsonRpcFactory.CreateResultで整形して返す。
         /// </remarks>
-        public static async Task<JsonRpcParamsResponse> Exec(JsonRpcQuery request)
+        public async Task<JsonRpcParamsResponse> Exec(JsonRpcQuery request)
         {
-            var url = Query.Settings.RpcUri;
+            var url = this._settings.RpcUri;
 
             HttpResponseMessage message;
             var client = new HttpClient();

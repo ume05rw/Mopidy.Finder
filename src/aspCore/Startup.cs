@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using MopidyFinder.Models;
 using MopidyFinder.Models.Albums;
 using MopidyFinder.Models.AlbumTracks;
@@ -16,35 +15,22 @@ using MopidyFinder.Models.Mopidies.Methods;
 using MopidyFinder.Models.Relations;
 using MopidyFinder.Models.Settings;
 using MopidyFinder.Models.Tracks;
-using MopidyFinder.Models.WebSockets;
 using Newtonsoft.Json.Serialization;
-using System.Linq;
 
 namespace MopidyFinder
 {
     public class Startup
     {
-        private static WebSocketStore _webSocketStore;
+        public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.Configuration = configuration;
         }
-
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // 追加済みのサービスの中から、ILoggerFactoryのインスタンスを取得する。
-            ILoggerFactory loggerFactory = null;
-            var logServiceDescripter = services
-                .FirstOrDefault(s => s.ServiceType == typeof(ILoggerFactory));
-
-            var hasLoggerFactory = (logServiceDescripter != null && logServiceDescripter.ImplementationInstance != null);
-            if (logServiceDescripter != null && logServiceDescripter.ImplementationInstance != null)
-                loggerFactory = (ILoggerFactory)logServiceDescripter.ImplementationInstance;
-
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -54,11 +40,6 @@ namespace MopidyFinder
 
             services.AddDbContext<Dbc>(options =>
             {
-                //// ILoggerFactoryが取得出来ていれば、追加しておく。
-                //// DBのクエリログが各種ロガーに通知されるようになる。
-                //if (loggerFactory != null)
-                //    options.UseLoggerFactory(loggerFactory);
-
                 // フルパス指定が出来ない？要検証。
                 //options.UseSqlite($"Data Source=\"{Program.DbPath}\"");
                 options.UseSqlite($"Data Source=database.db");
@@ -98,8 +79,16 @@ namespace MopidyFinder
                 .AddTransient<AlbumTracksStore, AlbumTracksStore>()
                 .AddTransient<TrackStore, TrackStore>()
                 .AddTransient<SettingsStore, SettingsStore>()
-                .AddTransient<JobStore, JobStore>();
+                .AddTransient<JobStore, JobStore>()
+                .AddSingleton<Query, Query>()
+                .AddSingleton<Playback, Playback>()
+                .AddSingleton<Library, Library>()
+                .AddSingleton<Tracklist, Tracklist>()
+                .AddSingleton<DbMaintainer, DbMaintainer>();
         }
+
+
+        private DbMaintainer _dbMaintainer;
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
@@ -108,10 +97,11 @@ namespace MopidyFinder
             IHostingEnvironment env
         )
         {
-            Query.SetServiceProvider(app.ApplicationServices);
-            JobStore.SetServiceProvider(app.ApplicationServices);
-            DbMaintainer.SetServiceProvider(app.ApplicationServices);
-            DbMaintainer.RunAlbumScanner();
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                this._dbMaintainer = serviceScope.ServiceProvider.GetService<DbMaintainer>();
+            }
+            this._dbMaintainer.RunAlbumScanner();
 
             // アプリケーション起動／終了をハンドルする。
             // https://stackoverflow.com/questions/41675577/where-can-i-log-an-asp-net-core-apps-start-stop-error-events
@@ -130,25 +120,6 @@ namespace MopidyFinder
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            //// WebSocketお試し実装、ダメだった。--->
-            //if (Startup._webSocketStore == null)
-            //    Startup._webSocketStore = new WebSocketStore();
-            //var options = new WebSocketOptions { ReceiveBufferSize = 8192 };
-            //app.UseWebSockets(options);
-            //app.Use(async (context, next) =>
-            //{
-            //    if (context.WebSockets.IsWebSocketRequest)
-            //    {
-            //        var socket = await context.WebSockets.AcceptWebSocketAsync();
-            //        Startup._webSocketStore.Add(socket);
-            //    }
-            //    else
-            //    {
-            //        await next();
-            //    }
-            //});
-            // <---
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
@@ -159,13 +130,9 @@ namespace MopidyFinder
 
         private void OnShutdown()
         {
-            Query.ReleaseServiceProvider();
-            JobStore.ReleaseServiceProvider();
-
-            DbMaintainer.StopAllTasks()
+            this._dbMaintainer.StopAllTasks()
                 .GetAwaiter()
                 .GetResult();
-            DbMaintainer.ReleaseServiceProvider();
         }
     }
 }

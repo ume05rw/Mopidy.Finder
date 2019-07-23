@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -15,42 +16,63 @@ namespace MopidyFinder.Models
 {
     public class DbMaintainer
     {
-        #region "Resident Task"
-        private static IServiceProvider _provider = null;
-        private static bool _isAlbumScannerRunning = false;
-        private static CancellationTokenSource _albumScannerCanceler = null;
-        private static CancellationTokenSource _dbUpdateCanceler = null;
+        private Dbc _dbc;
+        private GenreStore _genreStore;
+        private ArtistStore _artistStore;
+        private AlbumStore _albumStore;
+        private ArtistAlbumStore _artistAlbumStore;
+        private GenreAlbumStore _genreAlbumStore;
+        private GenreArtistStore _genreArtistStore;
 
-        public static bool IsAlbumScannerRunning => DbMaintainer._isAlbumScannerRunning;
-
-        public static void SetServiceProvider(IServiceProvider provider)
+        public DbMaintainer(
+            [FromServices] Dbc dbc,
+            [FromServices] GenreStore genreStore,
+            [FromServices] ArtistStore artistStore,
+            [FromServices] AlbumStore albumStore,
+            [FromServices] ArtistAlbumStore artistAlbumStore,
+            [FromServices] GenreAlbumStore genreAlbumStore,
+            [FromServices] GenreArtistStore genreArtistStore
+        )
         {
-            DbMaintainer._provider = provider;
+            this._dbc = dbc;
+            this._genreStore = genreStore;
+            this._artistStore = artistStore;
+            this._albumStore = albumStore;
+            this._artistAlbumStore = artistAlbumStore;
+            this._genreAlbumStore = genreAlbumStore;
+            this._genreArtistStore = genreArtistStore;
         }
 
-        public static void RunAlbumScanner()
+        #region "Resident Task"
+        private bool _isAlbumScannerRunning = false;
+        private CancellationTokenSource _albumScannerCanceler = null;
+
+        public bool IsAlbumScannerRunning => this._isAlbumScannerRunning;
+
+
+        public void RunAlbumScanner()
         {
-            if (DbMaintainer._isAlbumScannerRunning)
+            if (this._isAlbumScannerRunning)
                 return;
 
-            DbMaintainer._isAlbumScannerRunning = true;
-            DbMaintainer._albumScannerCanceler = new CancellationTokenSource();
+            this._isAlbumScannerRunning = true;
+            this._albumScannerCanceler = new CancellationTokenSource();
             
             var task = Task.Run(async() => {
                 while(true)
                 {
                     try
                     {
-                        var scaned = await DbMaintainer.ScanAlbum(DbMaintainer._albumScannerCanceler.Token);
+                        var scaned = await this._albumStore.ScanAlbumDetail(this._albumScannerCanceler.Token);
                         if (scaned <= 0)
                             break;
 
-                        if (DbMaintainer._albumScannerCanceler.Token.IsCancellationRequested)
+                        if (this._albumScannerCanceler.Token.IsCancellationRequested)
                             break;
 
-                        await Task.Delay(10000, DbMaintainer._albumScannerCanceler.Token);
+                        await Task.Delay(10000, this._albumScannerCanceler.Token);
 
-                        if (DbMaintainer._albumScannerCanceler.Token.IsCancellationRequested)
+                        if (this._albumScannerCanceler.Token.IsCancellationRequested)
                             break;
                     }
                     catch (Exception ex)
@@ -60,70 +82,46 @@ namespace MopidyFinder.Models
 
                 }
 
-                DbMaintainer._isAlbumScannerRunning = false;
-                DbMaintainer._albumScannerCanceler = null;
+                this._isAlbumScannerRunning = false;
+                this._albumScannerCanceler = null;
 
-            }, DbMaintainer._albumScannerCanceler.Token);
+            }, this._albumScannerCanceler.Token);
         }
 
-        private async static Task<int> ScanAlbum(CancellationToken cancelToken)
+        public AlbumStore.AlbumScanProgress GetAlbumScanProgress()
         {
-            using (var serviceScope = DbMaintainer._provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
-            using (var logger = serviceScope.ServiceProvider.GetService<ILoggerFactory>())
-            using (var albumStore = new AlbumStore(dbc))
-            {
-                
-                return await albumStore.ScanAlbumDetail(cancelToken);
-            }
+            return this._albumStore.GetAlbumScanProgress();
         }
 
-
-        public static AlbumStore.AlbumScanProgress GetAlbumScanProgress()
+        public async Task<bool> StopAlbumScanner()
         {
-            using (var serviceScope = DbMaintainer._provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
-            using (var albumStore = new AlbumStore(dbc))
-            {
-                return albumStore.GetAlbumScanProgress();
-            }
-        }
+            this._albumScannerCanceler?.Cancel();
 
-
-        public static void ReleaseServiceProvider()
-        {
-            DbMaintainer._provider = null;
-        }
-
-        public static async Task<bool> StopAlbumScanner()
-        {
-            DbMaintainer._albumScannerCanceler?.Cancel();
-
-            while(DbMaintainer._isAlbumScannerRunning)
+            while(this._isAlbumScannerRunning)
             {
                 await Task.Delay(1000);
             }
 
-            DbMaintainer._albumScannerCanceler = null;
+            this._albumScannerCanceler = null;
 
             return true;
         }
 
-        public static async Task<bool> StopAllTasks()
+        public async Task<bool> StopAllTasks()
         {
-            DbMaintainer._albumScannerCanceler?.Cancel();
-            DbMaintainer._dbUpdateCanceler?.Cancel();
+            this._albumScannerCanceler?.Cancel();
+            this._dbUpdaterCanceler?.Cancel();
 
             while (
-                DbMaintainer._isAlbumScannerRunning
-                || !DbMaintainer.Instance.GetProgress().IsRunning
+                this._isAlbumScannerRunning
+                || !this.GetDbUpdateProgress().IsRunning
             )
             {
                 await Task.Delay(1000);
             }
 
-            DbMaintainer._albumScannerCanceler = null;
-            DbMaintainer._dbUpdateCanceler = null;
+            this._albumScannerCanceler = null;
+            this._dbUpdaterCanceler = null;
 
             return true;
         }
@@ -165,20 +163,18 @@ namespace MopidyFinder.Models
             public decimal Progress { get; set; } = 0;
             public string Message { get; set; } = "No-Status";
         }
-        
-        private static DbMaintainer _instance = new DbMaintainer();
-        public static DbMaintainer Instance => DbMaintainer._instance;
 
+        private CancellationTokenSource _dbUpdaterCanceler = null;
         private UpdateType _updateType = UpdateType.None;
         private Phase _currentPhase = Phase.None;
-        private bool _isRunning = false;
+        private bool _isDbUpdateRunning = false;
         private bool _succeeded = false;
         private string _message = "";
         private List<Updater> _updaters = new List<Updater>();
 
-        public bool IsRunning => this._isRunning;
+        public bool IsDbUpdateRunning => this._isDbUpdateRunning;
 
-        public UpdateProgress GetProgress()
+        public UpdateProgress GetDbUpdateProgress()
         {
             var result = new UpdateProgress();
             if (this._updateType == UpdateType.None)
@@ -197,7 +193,7 @@ namespace MopidyFinder.Models
             }
             
             result.Message = this._message;
-            result.IsRunning = this._isRunning;
+            result.IsRunning = this._isDbUpdateRunning;
             result.Succeeded = this._succeeded;
 
             Updater currentUpdater = null;
@@ -222,194 +218,184 @@ namespace MopidyFinder.Models
             if (updateType == UpdateType.None)
                 throw new ArgumentException("Invalid UpdateType: None");
 
-            DbMaintainer._dbUpdateCanceler = new CancellationTokenSource();
-            var cancelToken = DbMaintainer._dbUpdateCanceler.Token;
+            this._dbUpdaterCanceler = new CancellationTokenSource();
+            var cancelToken = this._dbUpdaterCanceler.Token;
 
             // 実行中フラグは先行して同期的に変更しておく。
-            this._isRunning = true;
+            this._isDbUpdateRunning = true;
             this._updateType = updateType;
             this._updaters.Clear();
             // ↑ここまでは同期的に実行する。
 
             return await Task.Run(async () => {
-                if (DbMaintainer.IsAlbumScannerRunning)
-                    await DbMaintainer.StopAlbumScanner();
+                if (this.IsAlbumScannerRunning)
+                    await this.StopAlbumScanner();
 
-                using (var serviceScope = DbMaintainer._provider.GetRequiredService<IServiceScopeFactory>().CreateScope())
-                using (var dbc = serviceScope.ServiceProvider.GetService<Dbc>())
-                using (var genreStore = new GenreStore(dbc))
-                using (var albumStore = new AlbumStore(dbc))
-                using (var artistStore = new ArtistStore(dbc))
-                using (var artistAlbumStore = new ArtistAlbumStore(dbc))
-                using (var genreAlbumStore = new GenreAlbumStore(dbc))
-                using (var genreArtistStore = new GenreArtistStore(dbc))
+                try
                 {
-                    try
+                    this._updaters.Add(new Updater()
                     {
-                        this._updaters.Add(new Updater()
-                        {
-                            Phase = Phase.Cleanup,
-                            Store = null,
-                            Rate = 5
-                        });
-                        this._updaters.Add(new Updater()
-                        {
-                            Phase = Phase.Genres,
-                            Store = genreStore,
-                            Rate = 5
-                        });
-                        this._updaters.Add(new Updater()
-                        {
-                            Phase = Phase.Albums,
-                            Store = albumStore,
-                            Rate = 10
-                        });
-                        this._updaters.Add(new Updater()
-                        {
-                            Phase = Phase.Artists,
-                            Store = artistStore,
-                            Rate = 5
-                        });
-                        this._updaters.Add(new Updater()
-                        {
-                            Phase = Phase.ArtistAlbums,
-                            Store = artistAlbumStore,
-                            Rate = 45
-                        });
-                        this._updaters.Add(new Updater()
-                        {
-                            Phase = Phase.GenreAlbums,
-                            Store = genreAlbumStore,
-                            Rate = 20
-                        });
-                        this._updaters.Add(new Updater()
-                        {
-                            Phase = Phase.GenreArtists,
-                            Store = genreArtistStore,
-                            Rate = 5
-                        });
-
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-
-                        if (updateType == UpdateType.Cleanup)
-                        {
-                            this._currentPhase = Phase.Cleanup;
-                            this._message = "Database Cleaning.";
-                            dbc.GenreArtists.RemoveRange(dbc.GenreArtists);
-                            dbc.GenreAlbums.RemoveRange(dbc.GenreAlbums);
-                            dbc.ArtistAlbums.RemoveRange(dbc.ArtistAlbums);
-                            dbc.Genres.RemoveRange(dbc.Genres);
-                            dbc.Artists.RemoveRange(dbc.Artists);
-                            dbc.Albums.RemoveRange(dbc.Albums);
-                            dbc.Tracks.RemoveRange(dbc.Tracks);
-                            dbc.SaveChanges();
-
-                            var res1 = dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genres';");
-                            var res2 = dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='artists';");
-                            var res3 = dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='albums';");
-                            var res4 = dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='artist_albums';");
-                            var res5 = dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genre_albums';");
-                            var res6 = dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genre_artists';");
-                            var res7 = dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='tracks';");
-                        }
-
-                        this._currentPhase = Phase.Genres;
-                        this._message = "Database Cleaned up. Now Scanning Genres...";
-                        var genreCount = await genreStore.Scan();
-                        this._message = $"{genreCount} Genres Found. Now Adding...";
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-                        dbc.SaveChanges();
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-
-                        this._currentPhase = Phase.Albums;
-                        this._message = $"{genreCount} Genres Added. Now Scanning Albums...";
-                        var albumCount = await albumStore.Scan();
-                        this._message = $"{albumCount} Album Found. Now Adding...";
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-                        dbc.SaveChanges();
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-
-                        this._currentPhase = Phase.Artists;
-                        this._message = $"{albumCount} Albums Added. Now Scanning Artists...";
-                        var artistCount = await artistStore.Scan();
-                        this._message = $"{artistCount} Artists Found. Now Adding...";
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-                        dbc.SaveChanges();
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-
-                        this._currentPhase = Phase.ArtistAlbums;
-                        this._message = $"{artistCount} Artists Added. Now Scanning Artist-Album Relations...";
-                        var artistAlbumCount = await artistAlbumStore.Scan();
-                        this._message = $"{artistAlbumCount} Artist-Album Relation Found. Now Adding...";
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-                        dbc.SaveChanges();
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-
-                        this._currentPhase = Phase.GenreAlbums;
-                        this._message = $"{artistAlbumCount} Artist-Album Relations Added. Now Scanning Genre-Album Relations...";
-                        var genreAlbumCount = await genreAlbumStore.Scan();
-                        this._message = $"{genreAlbumCount} Genre-Album Relations Found. Now Adding...";
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-                        dbc.SaveChanges();
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-
-                        this._currentPhase = Phase.GenreArtists;
-                        this._message = $"{genreAlbumCount} Genre-Album Relations Added. Now Scanning Genre-Artist Relations...";
-                        var genreArtistCount = await genreArtistStore.Scan();
-                        this._message = $"{genreArtistCount} Genre-Artist Relations Found. Now Adding...";
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-                        dbc.SaveChanges();
-                        if (cancelToken.IsCancellationRequested)
-                            return false;
-
-                        this._message = $"{genreArtistCount} Genre-Artist Relations Added. Process Completed.";
-                        this._isRunning = false;
-                        this._succeeded = true;
-
-                        if (!DbMaintainer.IsAlbumScannerRunning)
-                            DbMaintainer.RunAlbumScanner();
-
-                        // 完了状態を60秒維持したあと、状態を初期化する。
-                        await Task.Delay(60000);
-
-                        this._updaters.Clear();
-                        this._updateType = UpdateType.None;
-                        this._currentPhase = Phase.None;
-                        this._message = "";
-                        this._isRunning = false;
-                        this._succeeded = false;
-
-                        return true;
-                    }
-                    catch (Exception ex)
+                        Phase = Phase.Cleanup,
+                        Store = null,
+                        Rate = 5
+                    });
+                    this._updaters.Add(new Updater()
                     {
-                        this._isRunning = false;
-                        this._succeeded = false;
-                        this._message = $"Unexpected Error: {ex.Message}";
+                        Phase = Phase.Genres,
+                        Store = this._genreStore,
+                        Rate = 5
+                    });
+                    this._updaters.Add(new Updater()
+                    {
+                        Phase = Phase.Albums,
+                        Store = this._albumStore,
+                        Rate = 10
+                    });
+                    this._updaters.Add(new Updater()
+                    {
+                        Phase = Phase.Artists,
+                        Store = this._artistStore,
+                        Rate = 5
+                    });
+                    this._updaters.Add(new Updater()
+                    {
+                        Phase = Phase.ArtistAlbums,
+                        Store = this._artistAlbumStore,
+                        Rate = 45
+                    });
+                    this._updaters.Add(new Updater()
+                    {
+                        Phase = Phase.GenreAlbums,
+                        Store = this._genreAlbumStore,
+                        Rate = 20
+                    });
+                    this._updaters.Add(new Updater()
+                    {
+                        Phase = Phase.GenreArtists,
+                        Store = this._genreArtistStore,
+                        Rate = 5
+                    });
 
-                        await Task.Delay(60000);
-
-                        this._updaters.Clear();
-                        this._updateType = UpdateType.None;
-                        this._currentPhase = Phase.None;
-                        this._message = "";
-                        this._isRunning = false;
-                        this._succeeded = false;
-
+                    if (cancelToken.IsCancellationRequested)
                         return false;
+
+                    if (updateType == UpdateType.Cleanup)
+                    {
+                        this._currentPhase = Phase.Cleanup;
+                        this._message = "Database Cleaning.";
+                        this._dbc.GenreArtists.RemoveRange(this._dbc.GenreArtists);
+                        this._dbc.GenreAlbums.RemoveRange(this._dbc.GenreAlbums);
+                        this._dbc.ArtistAlbums.RemoveRange(this._dbc.ArtistAlbums);
+                        this._dbc.Genres.RemoveRange(this._dbc.Genres);
+                        this._dbc.Artists.RemoveRange(this._dbc.Artists);
+                        this._dbc.Albums.RemoveRange(this._dbc.Albums);
+                        this._dbc.Tracks.RemoveRange(this._dbc.Tracks);
+                        this._dbc.SaveChanges();
+
+                        var res1 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genres';");
+                        var res2 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='artists';");
+                        var res3 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='albums';");
+                        var res4 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='artist_albums';");
+                        var res5 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genre_albums';");
+                        var res6 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='genre_artists';");
+                        var res7 = this._dbc.Database.ExecuteSqlCommand($"DELETE from sqlite_sequence where name='tracks';");
                     }
+
+                    this._currentPhase = Phase.Genres;
+                    this._message = "Database Cleaned up. Now Scanning Genres...";
+                    var genreCount = await this._genreStore.Scan();
+                    this._message = $"{genreCount} Genres Found. Now Adding...";
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+                    this._dbc.SaveChanges();
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+
+                    this._currentPhase = Phase.Albums;
+                    this._message = $"{genreCount} Genres Added. Now Scanning Albums...";
+                    var albumCount = await this._albumStore.Scan();
+                    this._message = $"{albumCount} Album Found. Now Adding...";
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+                    this._dbc.SaveChanges();
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+
+                    this._currentPhase = Phase.Artists;
+                    this._message = $"{albumCount} Albums Added. Now Scanning Artists...";
+                    var artistCount = await this._artistStore.Scan();
+                    this._message = $"{artistCount} Artists Found. Now Adding...";
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+                    this._dbc.SaveChanges();
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+
+                    this._currentPhase = Phase.ArtistAlbums;
+                    this._message = $"{artistCount} Artists Added. Now Scanning Artist-Album Relations...";
+                    var artistAlbumCount = await this._artistAlbumStore.Scan();
+                    this._message = $"{artistAlbumCount} Artist-Album Relation Found. Now Adding...";
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+                    this._dbc.SaveChanges();
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+
+                    this._currentPhase = Phase.GenreAlbums;
+                    this._message = $"{artistAlbumCount} Artist-Album Relations Added. Now Scanning Genre-Album Relations...";
+                    var genreAlbumCount = await this._genreAlbumStore.Scan();
+                    this._message = $"{genreAlbumCount} Genre-Album Relations Found. Now Adding...";
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+                    this._dbc.SaveChanges();
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+
+                    this._currentPhase = Phase.GenreArtists;
+                    this._message = $"{genreAlbumCount} Genre-Album Relations Added. Now Scanning Genre-Artist Relations...";
+                    var genreArtistCount = await this._genreArtistStore.Scan();
+                    this._message = $"{genreArtistCount} Genre-Artist Relations Found. Now Adding...";
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+                    this._dbc.SaveChanges();
+                    if (cancelToken.IsCancellationRequested)
+                        return false;
+
+                    this._message = $"{genreArtistCount} Genre-Artist Relations Added. Process Completed.";
+                    this._isDbUpdateRunning = false;
+                    this._succeeded = true;
+
+                    if (!this.IsAlbumScannerRunning)
+                        this.RunAlbumScanner();
+
+                    // 完了状態を60秒維持したあと、状態を初期化する。
+                    await Task.Delay(60000);
+
+                    this._updaters.Clear();
+                    this._updateType = UpdateType.None;
+                    this._currentPhase = Phase.None;
+                    this._message = "";
+                    this._isDbUpdateRunning = false;
+                    this._succeeded = false;
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    this._isDbUpdateRunning = false;
+                    this._succeeded = false;
+                    this._message = $"Unexpected Error: {ex.Message}";
+
+                    await Task.Delay(60000);
+
+                    this._updaters.Clear();
+                    this._updateType = UpdateType.None;
+                    this._currentPhase = Phase.None;
+                    this._message = "";
+                    this._isDbUpdateRunning = false;
+                    this._succeeded = false;
+
+                    return false;
                 }
             }, cancelToken);
         }

@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using MopidyFinder.Models.AlbumTracks;
-using MopidyFinder.Models.Mopidies.Methods;
-using MopidyFinder.Models.Tracks;
 using MopidyFinder.Models.Xhrs;
 using System.Threading.Tasks;
 
