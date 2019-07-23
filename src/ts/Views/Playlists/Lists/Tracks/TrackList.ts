@@ -83,7 +83,7 @@ enum ListMode {
                     </template>
                     <infinite-loading
                         @infinite="OnInfinite"
-                        force-use-infinite-wrapper=".card-inner-body.track-list"
+                        force-use-infinite-wrapper=".playlisttrack-list"
                         ref="InfiniteLoading" />
                 </ul>
             </div>
