@@ -33,50 +33,52 @@ namespace MopidyFinder.Models.Mopidies.Methods
             var url = this._settings.RpcUri;
 
             HttpResponseMessage message;
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json")
-            );
-            client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
-            client.Timeout = TimeSpan.FromMilliseconds(500000); // 500秒
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json")
+                );
+                client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
+                client.Timeout = TimeSpan.FromMilliseconds(500000); // 500秒
 
-            try
-            {
-                var sendJson = JsonConvert.SerializeObject(request);
-                var content = new StringContent(sendJson, Encoding.UTF8, "application/json");
-                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                message = await client.PostAsync(url, content);
-            }
-            catch (Exception ex)
-            {
-                var response = new JsonRpcParamsResponse()
-                {
-                    Error = ex
-                };
-                var id = default(int?);
                 try
                 {
-                    id = ((JsonRpcQueryRequest)request).Id;
+                    var sendJson = JsonConvert.SerializeObject(request);
+                    var content = new StringContent(sendJson, Encoding.UTF8, "application/json");
+                    content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    message = await client.PostAsync(url, content);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    var response = new JsonRpcParamsResponse()
+                    {
+                        Error = ex
+                    };
+                    var id = default(int?);
+                    try
+                    {
+                        id = ((JsonRpcQueryRequest)request).Id;
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    return response;
                 }
 
-                return response;
-            }
+                var json = await message.Content.ReadAsStringAsync();
 
-            var json = await message.Content.ReadAsStringAsync();
-
-            if (json == null || string.IsNullOrEmpty(json))
-            {
-                // 通知の時は応答JSON自体が無いことがある。
-                return null;
-            }
-            else
-            {
-                var response = JsonConvert.DeserializeObject<JsonRpcParamsResponse>(json);
-                return response;
+                if (json == null || string.IsNullOrEmpty(json))
+                {
+                    // 通知の時は応答JSON自体が無いことがある。
+                    return null;
+                }
+                else
+                {
+                    var response = JsonConvert.DeserializeObject<JsonRpcParamsResponse>(json);
+                    return response;
+                }
             }
         }
     }

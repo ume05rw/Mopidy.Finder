@@ -24,23 +24,25 @@ namespace MopidyFinder.Controllers
             var url = $"{store.Entity.ImageUri}/{fileName}";
 
             HttpResponseMessage message;
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
-
-            try
+            using (var client = new HttpClient())
             {
-                message = await client.GetAsync(url);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            var bytes = await message.Content.ReadAsByteArrayAsync();
-            var stream = new MemoryStream(bytes);
-            var type = message.Content.Headers.ContentType.ToString();
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("User-Agent", ".NET Foundation Repository Reporter");
 
-            return new FileStreamResult(stream, type);
+                try
+                {
+                    message = await client.GetAsync(url);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                var bytes = await message.Content.ReadAsByteArrayAsync();
+                var stream = new MemoryStream(bytes);
+                var type = message.Content.Headers.ContentType.ToString();
+
+                return new FileStreamResult(stream, type);
+            }
         }
     }
 }
