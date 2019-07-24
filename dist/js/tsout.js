@@ -4559,7 +4559,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                     });
                     this.swipeDetector.on(HammerEvents_4.SwipeEvents.Left, function () {
                         var args = {
-                            Content: IContent_5.Contents.Finder,
+                            Content: IContent_5.Contents.Playlists,
                             ContentDetail: IContentDetail_7.ContentDetails.PlaylistTracks,
                             Direction: IContentDetail_7.SwipeDirection.Left
                         };
@@ -4567,7 +4567,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                     });
                     this.swipeDetector.on(HammerEvents_4.SwipeEvents.Right, function () {
                         var args = {
-                            Content: IContent_5.Contents.Finder,
+                            Content: IContent_5.Contents.Playlists,
                             ContentDetail: null,
                             Direction: IContentDetail_7.SwipeDirection.Right
                         };
@@ -5939,7 +5939,7 @@ define("Views/Settings/Blocks/DbBlock", ["require", "exports", "vue-class-compon
                     });
                     this.swipeDetector.on(HammerEvents_6.SwipeEvents.Left, function () {
                         var args = {
-                            Content: IContent_7.Contents.Finder,
+                            Content: IContent_7.Contents.Settings,
                             ContentDetail: IContentDetail_10.ContentDetails.ScanProgress,
                             Direction: IContentDetail_10.SwipeDirection.Left
                         };
@@ -5947,7 +5947,7 @@ define("Views/Settings/Blocks/DbBlock", ["require", "exports", "vue-class-compon
                     });
                     this.swipeDetector.on(HammerEvents_6.SwipeEvents.Right, function () {
                         var args = {
-                            Content: IContent_7.Contents.Finder,
+                            Content: IContent_7.Contents.Settings,
                             ContentDetail: IContentDetail_10.ContentDetails.SetMopidy,
                             Direction: IContentDetail_10.SwipeDirection.Right
                         };
@@ -6268,7 +6268,7 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
                     });
                     this.swipeDetector.on(HammerEvents_7.SwipeEvents.Left, function () {
                         var args = {
-                            Content: IContent_8.Contents.Finder,
+                            Content: IContent_8.Contents.Settings,
                             ContentDetail: IContentDetail_11.ContentDetails.Database,
                             Direction: IContentDetail_11.SwipeDirection.Left
                         };
@@ -6276,7 +6276,7 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
                     });
                     this.swipeDetector.on(HammerEvents_7.SwipeEvents.Right, function () {
                         var args = {
-                            Content: IContent_8.Contents.Finder,
+                            Content: IContent_8.Contents.Settings,
                             ContentDetail: null,
                             Direction: IContentDetail_11.SwipeDirection.Right
                         };
@@ -6433,7 +6433,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
                     });
                     this.swipeDetector.on(HammerEvents_8.SwipeEvents.Left, function () {
                         var args = {
-                            Content: IContent_9.Contents.Finder,
+                            Content: IContent_9.Contents.Settings,
                             ContentDetail: null,
                             Direction: IContentDetail_12.SwipeDirection.Left
                         };
@@ -6441,7 +6441,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
                     });
                     this.swipeDetector.on(HammerEvents_8.SwipeEvents.Right, function () {
                         var args = {
-                            Content: IContent_9.Contents.Finder,
+                            Content: IContent_9.Contents.Settings,
                             ContentDetail: IContentDetail_12.ContentDetails.Database,
                             Direction: IContentDetail_12.SwipeDirection.Right
                         };
@@ -7654,6 +7654,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                 if (!_this._isFullscreen)
                     return;
                 if (args.Direction === IContentDetail_14.SwipeDirection.Right && args.ContentDetail === null) {
+                    _this._headerBar.SetSideBarOpen();
                 }
                 else if (args.ContentDetail) {
                     var detailArgs = {
@@ -7667,6 +7668,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                 if (!_this._isFullscreen)
                     return;
                 if (args.Direction === IContentDetail_14.SwipeDirection.Right && args.ContentDetail === null) {
+                    _this._headerBar.SetSideBarOpen();
                 }
                 else if (args.ContentDetail) {
                     var detailArgs = {

@@ -66,6 +66,7 @@ export default class ContentController {
                 return;
 
             if (args.Direction === SwipeDirection.Right && args.ContentDetail === null) {
+                this._headerBar.SetSideBarOpen();
             } else if (args.ContentDetail) {
                 const detailArgs: IContentDetailArgs = {
                     Content: Contents.Playlists,
@@ -79,6 +80,7 @@ export default class ContentController {
                 return;
 
             if (args.Direction === SwipeDirection.Right && args.ContentDetail === null) {
+                this._headerBar.SetSideBarOpen();
             } else if (args.ContentDetail) {
                 const detailArgs: IContentDetailArgs = {
                     Content: Contents.Settings,

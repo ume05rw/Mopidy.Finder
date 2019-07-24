@@ -68,7 +68,7 @@ export default class ScanProgressBlock extends ContentDetailBase {
         });
         this.swipeDetector.on(SwipeEvents.Left, () => {
             const args: IContentSwipeArgs = {
-                Content: Contents.Finder,
+                Content: Contents.Settings,
                 ContentDetail: null,
                 Direction: SwipeDirection.Left
             };
@@ -77,7 +77,7 @@ export default class ScanProgressBlock extends ContentDetailBase {
 
         this.swipeDetector.on(SwipeEvents.Right, () => {
             const args: IContentSwipeArgs = {
-                Content: Contents.Finder,
+                Content: Contents.Settings,
                 ContentDetail: ContentDetails.Database,
                 Direction: SwipeDirection.Right
             };
