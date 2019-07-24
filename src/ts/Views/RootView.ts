@@ -1,46 +1,29 @@
 import Component from 'vue-class-component';
-import Libraries from '../Libraries';
-import { default as SettingsStore, IUpdateProgress } from '../Models/Settings/SettingsStore';
-import Exception from '../Utils/Exception';
-import { default as IContent, Contents, IContentArgs, IContentOrderedArgs } from './Bases/IContent';
-import { IContentDetailArgs } from './Bases/IContentDetail';
 import ViewBase from './Bases/ViewBase';
 import Finder from './Finders/Finder';
-import { default as HeaderBar } from './HeaderBars/HeaderBar';
+import HeaderBar from './HeaderBars/HeaderBar';
 import Playlists from './Playlists/Playlists';
 import Settings from './Settings/Settings';
-import Sidebar from './Sidebars/Sidebar';
-import Dump from '../Utils/Dump';
+import SideBar from './SideBars/SideBar';
 
 @Component({
     template: `<div class="wrapper" style="height: 100%; min-height: 100%;">
     <header-bar
-        ref="HeaderBar"
-        @DetailOrdered="OnDetailOrdered" />
+        ref="HeaderBar" />
     <sidebar
-        @ContentOrdered="OnContentOrdered"
-        @ContentChanged="OnContentChanged"
-        @Show="OnShow"
-        @Shown="OnShown"
-        @Hide="OnHide"
-        @Hidden="OnHidden"
-        @Operated="OnSidebarOperated"
-        ref="Sidebar" />
+        ref="SideBar" />
     <div class="content-wrapper h-100 pt-3 tab-content">
         <finder
-            ref="Finder"
-            @PlaylistUpdated="OnPlaylistUpdatedByFinder" />
+            ref="Finder" />
         <playlists
-            ref="Playlists"
-            @PlaylistsUpdated="OnPlaylistsUpdatedByPlaylists" />
+            ref="Playlists" />
         <settings
-            ref="Settings"
-            @ServerFound="OnServerFound"/>
+            ref="Settings" />
     </div>
 </div>`,
     components: {
         'header-bar': HeaderBar,
-        'sidebar': Sidebar,
+        'sidebar': SideBar,
         'finder': Finder,
         'playlists': Playlists,
         'settings': Settings
@@ -48,177 +31,25 @@ import Dump from '../Utils/Dump';
 })
 export default class RootView extends ViewBase {
 
-    private get Finder(): Finder {
+    public get HeaderBar(): HeaderBar {
+        return this.$refs.HeaderBar as HeaderBar;
+    }
+    public get SideBar(): SideBar {
+        return this.$refs.SideBar as SideBar;
+    }
+    public get Finder(): Finder {
         return this.$refs.Finder as Finder;
     }
-    private get Playlists(): Playlists {
+    public get Playlists(): Playlists {
         return this.$refs.Playlists as Playlists;
     }
-    private get Settings(): Settings {
+    public get Settings(): Settings {
         return this.$refs.Settings as Settings;
-    }
-    private get Sidebar(): Sidebar {
-        return this.$refs.Sidebar as Sidebar;
-    }
-
-    private isMopidyConnectable: boolean = false;
-    private activeContent: IContent;
-    private viewport = Libraries.ResponsiveBootstrapToolkit;
-
-    private get HeaderBar(): HeaderBar {
-        return this.$refs.HeaderBar as HeaderBar;
     }
 
     public async Initialize(): Promise<boolean> {
-        super.Initialize();
-
-        (Libraries.$(window) as any).resize(
-            this.viewport.changed((): void => {
-                this.AdjustScreen();
-            })
-        );
-
-        const promises: Promise<any>[] = [];
-        const store = new SettingsStore();
-
-        // 個別にawaitした方が、複数promise配列をawait Promise.all するより早い。
-        const isConnectable = await store.TryConnect();
-        const updateProgress = await store.GetDbUpdateProgress();
-
-        const isDbUpdating = (updateProgress.UpdateType !== 'None');
-        const content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
-            ? Contents.Settings
-            : Contents.Finder;
-
-        this.Sidebar.SetNavigation(content);
-        this.isMopidyConnectable = store.Entity.IsMopidyConnectable;
-
-        const args: IContentArgs = {
-            Content: content
-        }
-        this.OnContentChanged(args);
-
-        if (isDbUpdating) {
-            this.Settings.ShowProgress(updateProgress);
-        } else if (store.Entity.IsMopidyConnectable) {
-            const existsData = await store.ExistsData();
-            if (!existsData)
-                this.Settings.InitialScan();
-        }
-
-        this.AdjustScreen();
+        await super.Initialize();
 
         return true;
-    }
-
-    // #region "ナビゲーション単位の表示制御"
-    private ContentToFullscreen(): void {
-        this.Finder.SetSubViewToFulscreen();
-        this.Playlists.SetSubViewToFulscreen();
-        this.Settings.SetSubViewToFulscreen();
-    }
-    private ContentToColumn(): void {
-        this.Finder.SetSubviewToColumn();
-        this.Playlists.SetSubviewToColumn();
-        this.Settings.SetSubviewToColumn();
-    }
-
-    private OnContentOrdered(args: IContentOrderedArgs): void {
-        if (this.activeContent)
-            args.Permitted = this.activeContent.GetIsPermitLeave();
-    }
-
-    private GetContentView(args: IContentArgs): IContent {
-        switch (args.Content) {
-            case Contents.Finder:
-                return this.Finder;
-                break;
-            case Contents.Playlists:
-                return this.Playlists;
-                break;
-            case Contents.Settings:
-                return this.Settings;
-                break;
-            default:
-                Exception.Throw('Unexpected Page.', args);
-        }
-    }
-
-    private OnContentChanged(args: IContentArgs): void {
-        this.activeContent = this.GetContentView(args);
-        this.activeContent.InitContent();
-        this.HeaderBar.SetHeader(args);
-    }
-
-    private OnShow(args: IContentArgs): void {
-        this.GetContentView(args).OnShow();
-    }
-    private OnShown(args: IContentArgs): void {
-        this.GetContentView(args).OnShown();
-    }
-    private OnHide(args: IContentArgs): void {
-        this.GetContentView(args).OnHide();
-    }
-    private OnHidden(args: IContentArgs): void {
-        this.GetContentView(args).OnHidden();
-    }
-    // #endregion
-
-    // #region "詳細機能ごとの表示制御"
-
-    private OnDetailOrdered(args: IContentDetailArgs): void {
-        switch (args.Content) {
-            case Contents.Finder:
-                this.Finder.ShowContentDetail(args);
-                break;
-            case Contents.Playlists:
-                this.Playlists.ShowContentDetail(args);
-                break;
-            case Contents.Settings:
-                this.Settings.ShowContentDetail(args);
-                break;
-            default:
-                Exception.Throw('Unexpected Page', args);
-        }
-    }
-
-    // #endregion
-
-    private AdjustScreen(): void {
-        // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
-        if (this.viewport.is('<=sm')) {
-            this.ContentToFullscreen();
-        } else if (this.viewport.is('>sm')) {
-            this.ContentToColumn();
-        }
-
-        // サイドバーは、mdサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
-        if (this.viewport.is('<=lg')) {
-            this.HeaderBar.SetSidebarClose();
-        } else if (this.viewport.is('>lg')) {
-            this.HeaderBar.SetSidebarOpen();
-        }
-    }
-
-    private OnSidebarOperated(): void {
-        if (this.viewport.is('<=lg')) {
-            this.HeaderBar.SetSidebarClose();
-        }
-    }
-
-    private OnPlaylistUpdatedByFinder(): void {
-        this.Playlists.RefreshPlaylist();
-    }
-
-    private OnPlaylistsUpdatedByPlaylists(): void {
-        this.Finder.RefreshPlaylist();
-    }
-
-    private OnServerFound(): void {
-        if (!this.isMopidyConnectable) {
-            this.Finder.ForceRefresh();
-            this.Playlists.RefreshPlaylist();
-            this.isMopidyConnectable = true;
-        }
     }
 }

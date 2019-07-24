@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
 import Exception from '../../Utils/Exception';
@@ -6,13 +7,22 @@ import { TabEvents } from '../Bases/TabBase';
 import ViewBase from '../Bases/ViewBase';
 import { TabEvents as BsTabEvents } from '../Events/BootstrapEvents';
 import PlayerPanel from './PlayerPanel';
-import Dump from '../../Utils/Dump';
 
-export const SidebarEvents = {
+export interface ITabEventRecievedArgs extends IContentArgs {
+    Event: string;
+}
+
+export const SideBarEvents = {
     Operated: 'Operated',
     ContentOrdered: 'ContentOrdered',
-    ContentChanged: 'ContentChanged',
-}
+    TabEventRecieved: 'TabEventRecieved'
+};
+
+export const NavigationAriaControls = {
+    Finder: 'tab-finder',
+    Playlists: 'tab-playlists',
+    Settings: 'tab-settings'
+};
 
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-warning elevation-4">
@@ -21,7 +31,7 @@ export const SidebarEvents = {
     </div>
     <section
         class="sidebar"
-        ref="SidebarSection">
+        ref="SideBarSection">
         <div class="w-100 inner-sidebar">
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" role="tablist">
@@ -33,8 +43,8 @@ export const SidebarEvents = {
                             data-toggle="tab"
                             aria-controls="tab-finder"
                             aria-selected="false"
-                            ref="FinderAnchor"
-                            @click="OnClickFinder" >
+                            ref="NavigationFinder"
+                            @click="OnNavigationClicked" >
                             <i class="fa fa-search nav-icon" />
                             <p>Finder</p>
                         </a>
@@ -47,8 +57,8 @@ export const SidebarEvents = {
                             data-toggle="tab"
                             aria-controls="tab-playlists"
                             aria-selected="false"
-                            ref="PlaylistsAnchor"
-                            @click="OnClickPlaylists" >
+                            ref="NavigationPlaylists"
+                            @click="OnNavigationClicked" >
                             <i class="fa fa-bookmark nav-icon" />
                             <p>Playlists</p>
                         </a>
@@ -61,8 +71,8 @@ export const SidebarEvents = {
                             data-toggle="tab"
                             aria-controls="tab-settings"
                             aria-selected="false"
-                            ref="SettingsAnchor"
-                            @click="OnClickSettings" >
+                            ref="NavigationSettings"
+                            @click="OnNavigationClicked" >
                             <i class="fa fa-cog nav-icon" />
                             <p>Settings</p>
                         </a>
@@ -83,166 +93,127 @@ export const SidebarEvents = {
         'player-panel': PlayerPanel
     }
 })
-export default class Sidebar extends ViewBase {
+export default class SideBar extends ViewBase {
 
     private static readonly ShowTabMethod = 'show';
 
-    private finderTabAnchor: JQuery;
-    private playlistsTabAnchor: JQuery;
-    private settingsTabAnchor: JQuery;
+    private navigationAnchors: JQuery;
 
-    private get SidebarSection(): HTMLTableSectionElement {
-        return this.$refs.SidebarSection as HTMLTableSectionElement;
+    private get SideBarSection(): HTMLTableSectionElement {
+        return this.$refs.SideBarSection as HTMLTableSectionElement;
     }
-    private get FinderAnchor(): HTMLAnchorElement {
-        return this.$refs.FinderAnchor as HTMLAnchorElement;
+    public get NavigationFinder(): HTMLAnchorElement {
+        return this.$refs.NavigationFinder as HTMLAnchorElement;
     }
-    private get PlaylistsAnchor(): HTMLAnchorElement {
-        return this.$refs.PlaylistsAnchor as HTMLAnchorElement;
+    public get NavigationPlaylists(): HTMLAnchorElement {
+        return this.$refs.NavigationPlaylists as HTMLAnchorElement;
     }
-    private get SettingsAnchor(): HTMLAnchorElement {
-        return this.$refs.SettingsAnchor as HTMLAnchorElement;
+    public get NavigationSettings(): HTMLAnchorElement {
+        return this.$refs.NavigationSettings as HTMLAnchorElement;
     }
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
 
-        Libraries.SlimScroll(this.SidebarSection, {
+        Libraries.SlimScroll(this.SideBarSection, {
             height: 'calc(100%)'
         });
 
-        this.finderTabAnchor = Libraries.$(this.FinderAnchor);
-        this.playlistsTabAnchor = Libraries.$(this.PlaylistsAnchor);
-        this.settingsTabAnchor = Libraries.$(this.SettingsAnchor);
+        this.navigationAnchors = Libraries.$([
+            this.NavigationFinder,
+            this.NavigationPlaylists,
+            this.NavigationSettings
+        ]);
 
-        this.finderTabAnchor.on(BsTabEvents.Show, () => {
-            const args: IContentArgs = { Content: Contents.Finder };
-            this.$emit(TabEvents.Show, args);
+        this.navigationAnchors.on(BsTabEvents.Show, (args: Event) => {
+            this.EmitTabEvent(TabEvents.Show, args);
         });
-        this.finderTabAnchor.on(BsTabEvents.Shown, () => {
-            const args: IContentArgs = { Content: Contents.Finder };
-            this.$emit(TabEvents.Shown, args);
+        this.navigationAnchors.on(BsTabEvents.Shown, (args: Event) => {
+            this.EmitTabEvent(TabEvents.Shown, args);
         });
-        this.finderTabAnchor.on(BsTabEvents.Hide, () => {
-            const args: IContentArgs = { Content: Contents.Finder };
-            this.$emit(TabEvents.Hide, args);
+        this.navigationAnchors.on(BsTabEvents.Hide, (args: Event) => {
+            this.EmitTabEvent(TabEvents.Hide, args);
         });
-        this.finderTabAnchor.on(BsTabEvents.Hidden, () => {
-            const args: IContentArgs = { Content: Contents.Finder };
-            this.$emit(TabEvents.Hidden, args);
-        });
-
-        this.playlistsTabAnchor.on(BsTabEvents.Show, () => {
-            const args: IContentArgs = { Content: Contents.Playlists };
-            this.$emit(TabEvents.Show, args);
-        });
-        this.playlistsTabAnchor.on(BsTabEvents.Shown, () => {
-            const args: IContentArgs = { Content: Contents.Playlists };
-            this.$emit(TabEvents.Shown, args);
-        });
-        this.playlistsTabAnchor.on(BsTabEvents.Hide, () => {
-            const args: IContentArgs = { Content: Contents.Playlists };
-            this.$emit(TabEvents.Hide, args);
-        });
-        this.playlistsTabAnchor.on(BsTabEvents.Hidden, () => {
-            const args: IContentArgs = { Content: Contents.Playlists };
-            this.$emit(TabEvents.Hidden, args);
-        });
-
-        this.settingsTabAnchor.on(BsTabEvents.Show, () => {
-            const args: IContentArgs = { Content: Contents.Settings };
-            this.$emit(TabEvents.Show, args);
-        });
-        this.settingsTabAnchor.on(BsTabEvents.Shown, () => {
-            const args: IContentArgs = { Content: Contents.Settings };
-            this.$emit(TabEvents.Shown, args);
-        });
-        this.settingsTabAnchor.on(BsTabEvents.Hide, () => {
-            const args: IContentArgs = { Content: Contents.Settings };
-            this.$emit(TabEvents.Hide, args);
-        });
-        this.settingsTabAnchor.on(BsTabEvents.Hidden, () => {
-            const args: IContentArgs = { Content: Contents.Settings };
-            this.$emit(TabEvents.Hidden, args);
+        this.navigationAnchors.on(BsTabEvents.Hidden, (args: Event) => {
+            this.EmitTabEvent(TabEvents.Hidden, args);
         });
 
         return true;
     }
 
-    public SetNavigation(page: Contents): void {
-        switch (page) {
-            case Contents.Finder:
-                this.finderTabAnchor.tab(Sidebar.ShowTabMethod);
+    private EmitTabEvent(eventName: string, args: Event): void {
+        const anchor = args.currentTarget as HTMLAnchorElement;
+        const naviTypeString = anchor.getAttribute('aria-controls');
+
+        let content: Contents;
+        switch (naviTypeString) {
+            case NavigationAriaControls.Finder:
+                content = Contents.Finder;
                 break;
-            case Contents.Playlists:
-                this.playlistsTabAnchor.tab(Sidebar.ShowTabMethod);
+            case NavigationAriaControls.Playlists:
+                content = Contents.Playlists;
                 break;
-            case Contents.Settings:
-                this.settingsTabAnchor.tab(Sidebar.ShowTabMethod);
+            case NavigationAriaControls.Settings:
+                content = Contents.Settings;
                 break;
             default:
-                Exception.Throw('Unexpected Page Ordered.', page);
+                Exception.Throw('Unexpected Tab Kind', naviTypeString);
         }
+
+        const emitArgs: ITabEventRecievedArgs = {
+            Event: eventName,
+            Content: content
+        };
+        this.$emit(SideBarEvents.TabEventRecieved, emitArgs);
     }
 
-    private OnClickFinder(ev: MouseEvent): void {
-        const orderedArgs: IContentOrderedArgs = {
-            Content: Contents.Finder,
-            Permitted: true
-        };
-        this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
+    private OnNavigationClicked(args: MouseEvent): void {
+        const anchor = args.currentTarget as HTMLAnchorElement;
+        const naviTypeString = anchor.getAttribute('aria-controls');
 
-        if (!orderedArgs.Permitted) {
-            ev.preventDefault();
-            ev.stopPropagation();
+        // クリックイベントではコンテンツを変更しない。
+        args.preventDefault();
+        args.stopPropagation();
+
+        let content: Contents;
+        switch (naviTypeString) {
+            case NavigationAriaControls.Finder:
+                content = Contents.Finder;
+                break;
+            case NavigationAriaControls.Playlists:
+                content = Contents.Playlists;
+                break;
+            case NavigationAriaControls.Settings:
+                content = Contents.Settings;
+                break;
+            default:
+                Exception.Throw('Unexpected Tab Kind', naviTypeString);
         }
 
-        const changedArgs: IContentArgs = {
-            Content: Contents.Finder
+        const orderedArgs: IContentOrderedArgs = {
+            Content: content,
+            Permitted: true
         };
-        this.$emit(SidebarEvents.ContentChanged, changedArgs);
-        this.$emit(SidebarEvents.Operated);
+        this.$emit(SideBarEvents.ContentOrdered, orderedArgs);
     }
 
-    private OnClickPlaylists(ev: MouseEvent): void {
-        const orderedArgs: IContentOrderedArgs = {
-            Content: Contents.Playlists,
-            Permitted: true
-        };
-        this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
-
-        if (!orderedArgs.Permitted) {
-            ev.preventDefault();
-            ev.stopPropagation();
+    public SetNavigation(content: Contents): void {
+        switch (content) {
+            case Contents.Finder:
+                Libraries.$(this.NavigationFinder).tab(SideBar.ShowTabMethod);
+                break;
+            case Contents.Playlists:
+                Libraries.$(this.NavigationPlaylists).tab(SideBar.ShowTabMethod);
+                break;
+            case Contents.Settings:
+                Libraries.$(this.NavigationSettings).tab(SideBar.ShowTabMethod);
+                break;
+            default:
+                Exception.Throw('Unexpected Content Ordered.', content);
         }
-
-        const changedArgs: IContentArgs = {
-            Content: Contents.Playlists
-        };
-        this.$emit(SidebarEvents.ContentChanged, changedArgs);
-        this.$emit(SidebarEvents.Operated);
-    }
-
-    private OnClickSettings(ev: MouseEvent): void {
-        const orderedArgs: IContentOrderedArgs = {
-            Content: Contents.Settings,
-            Permitted: true
-        };
-        this.$emit(SidebarEvents.ContentOrdered, orderedArgs);
-
-        if (!orderedArgs.Permitted) {
-            ev.preventDefault();
-            ev.stopPropagation();
-        }
-
-        const changedArgs: IContentArgs = {
-            Content: Contents.Settings
-        };
-        this.$emit(SidebarEvents.ContentChanged, changedArgs);
-        this.$emit(SidebarEvents.Operated);
     }
 
     private OnOperated(): void {
-        this.$emit(SidebarEvents.Operated);
+        this.$emit(SideBarEvents.Operated);
     }
 }

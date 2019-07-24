@@ -4,7 +4,6 @@ import { IContentArgs, Contents } from '../Bases/IContent';
 import Exception from '../../Utils/Exception';
 import Libraries from '../../Libraries';
 import { ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
-import Dump from '../../Utils/Dump';
 import * as AdminLte from 'admin-lte/dist/js/adminlte';
 
 export const HeaderBarEvents = {
@@ -281,11 +280,11 @@ export default class HeaderBar extends ViewBase {
         this.SetButtonActive(this.MenuScanProgress, this.settingsButtons);
     }
 
-    public SetSidebarOpen(): void {
+    public SetSideBarOpen(): void {
         if (!this.mainMenuButton.isShown())
             this.mainMenuButton.show();
     }
-    public SetSidebarClose(): void {
+    public SetSideBarClose(): void {
         if (this.mainMenuButton.isShown())
             this.mainMenuButton.collapse();
     }

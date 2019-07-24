@@ -1,4 +1,5 @@
 import { ITab } from './TabBase';
+import { IContentDetailArgs } from './IContentDetail';
 
 export enum Contents {
     Finder = 'Finder',
@@ -15,6 +16,7 @@ export interface IContentOrderedArgs extends IContentArgs {
 export default interface IContent extends ITab {
     GetIsPermitLeave(): boolean;
     InitContent(): void;
-    SetSubViewToFulscreen(isNowSelected: boolean): void;
+    SetSubViewToFulscreen(): void;
     SetSubviewToColumn(): void;
+    ShowContentDetail(args: IContentDetailArgs): void;
 }

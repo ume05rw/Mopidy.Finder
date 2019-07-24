@@ -10,6 +10,9 @@ import { AlbumListEvents, default as AlbumList } from './Lists/Albums/AlbumList'
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
 import Dump from '../../Utils/Dump';
+import * as _ from 'lodash';
+
+export const FinderEvents = _.extend({}, AlbumListEvents);
 
 @Component({
     template: `<section class="content h-100 tab-pane fade"
@@ -100,7 +103,7 @@ export default class Finder extends ContentBase {
     // #endregion
 
     private OnPlaylistUpdated(): void {
-        this.$emit(AlbumListEvents.PlaylistUpdated);
+        this.$emit(FinderEvents.PlaylistUpdated);
     }
 
     private OnGenreSelectionChanged(args: ISelectionChangedArgs<Genre>): void {

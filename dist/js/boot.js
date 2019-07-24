@@ -157,7 +157,12 @@ define('mopidy', ["exports"], function (exports) {
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = window.__globals['mopidy'];
 });
-
+// hammerjs
+define('hammerjs', ["exports"], function (exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = window.__globals['hammerjs'];
+});
 
 /**
  * --------------------------------------------------

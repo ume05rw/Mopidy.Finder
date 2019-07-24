@@ -21,6 +21,7 @@
     "devDependencies": {
         "@types/bootstrap": "^4.3.1",
         "@types/chai": "^4.1.7",
+        "@types/hammerjs": "^2.0.36",
         "@types/jquery": "^3.3.30",
         "@types/lodash": "^4.14.134",
         "@types/mocha": "^5.2.7",
@@ -46,6 +47,7 @@
         "axios": "^0.19.0",
         "es6-promise": "^4.2.8",
         "font-awesome": "^4.7.0",
+        "hammerjs": "^2.0.8",
         "jquery": "^3.4.1",
         "linq": "3.1.1",
         "lodash": "^4.17.11",

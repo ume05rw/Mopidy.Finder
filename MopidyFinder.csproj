@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <None Remove="src\Main.ts" />
+    <None Remove="src\ts\Controllers\ContentController.ts" />
+    <None Remove="src\ts\Controllers\NavigationController.ts" />
+    <None Remove="src\ts\Controllers\RootController.ts" />
     <None Remove="src\ts\Models\Albums\AlbumStore.ts" />
     <None Remove="src\ts\Models\Mopidies\IAlbum.ts" />
     <None Remove="src\ts\Models\Mopidies\IArtist.ts" />
@@ -66,8 +69,8 @@
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
     <None Remove="src\ts\Views\Shared\SelectionListBase.ts" />
     <None Remove="src\ts\Views\Shared\SlideupButton.ts" />
-    <None Remove="src\ts\Views\Sidebars\PlayerPanel.ts" />
-    <None Remove="src\ts\Views\Sidebars\Sidebar.ts" />
+    <None Remove="src\ts\Views\SideBars\PlayerPanel.ts" />
+    <None Remove="src\ts\Views\SideBars\Sidebar.ts" />
     <None Remove="tests\Models\Artist.test.ts" />
     <None Remove="tests\Models\ArtistAlbum.test.ts" />
     <None Remove="tests\Models\Genre.test.ts" />
@@ -101,6 +104,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <TypeScriptCompile Include="src\ts\Controllers\ContentController.ts" />
+    <TypeScriptCompile Include="src\ts\Controllers\NavigationController.ts" />
+    <TypeScriptCompile Include="src\ts\Controllers\RootController.ts" />
     <TypeScriptCompile Include="src\ts\Models\Albums\AlbumStore.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\IAlbum.ts" />
     <TypeScriptCompile Include="src\ts\Models\Mopidies\IArtist.ts" />
@@ -168,8 +174,8 @@
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionItem.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\SelectionListBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SlideupButton.ts" />
-    <TypeScriptCompile Include="src\ts\Views\Sidebars\PlayerPanel.ts" />
-    <TypeScriptCompile Include="src\ts\Views\Sidebars\Sidebar.ts" />
+    <TypeScriptCompile Include="src\ts\Views\SideBars\PlayerPanel.ts" />
+    <TypeScriptCompile Include="src\ts\Views\SideBars\SideBar.ts" />
     <TypeScriptCompile Include="tests\Models\Album.test.ts" />
     <TypeScriptCompile Include="tests\Models\Artist.test.ts" />
     <TypeScriptCompile Include="tests\Models\ArtistAlbum.test.ts" />

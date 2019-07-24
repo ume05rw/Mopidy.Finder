@@ -100,6 +100,13 @@ export default class Libraries {
         : Mopidy) as typeof Mopidy;
 
     /**
+     * Hammer
+     */
+    public static readonly Hammer = (((Hammer as any).default)
+        ? (Hammer as any).default
+        : Hammer) as typeof Hammer;
+
+    /**
      * AdminLTE
      */
     public static readonly AdminLte = AdminLte;

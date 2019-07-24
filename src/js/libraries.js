@@ -35,6 +35,7 @@ import * as qs from 'qs';
 import * as Enumerable from 'linq';
 import Sortable from 'sortablejs/modular/sortable.complete.esm';
 import * as Mopidy from 'mopidy'; //結局使わなかった。
+import * as Hammer from 'hammerjs';
 
 /**
  * --------------------------------------------------
@@ -71,6 +72,7 @@ window.__globals = {
     'linq': Enumerable,
     'sortablejs/modular/sortable.complete.esm': Sortable,
     'mopidy': Mopidy,
+    'hammerjs': Hammer,
 
     // --------------------------------------------------
     // Vue本体とプラグイン
