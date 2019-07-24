@@ -3,7 +3,7 @@ import Artist from '../../Models/Artists/Artist';
 import Genre from '../../Models/Genres/Genre';
 import Delay from '../../Utils/Delay';
 import Exception from '../../Utils/Exception';
-import { default as IContentDetail, ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
+import { default as IContentDetail, ContentDetails, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
 import ContentBase from '../Bases/ContentBase';
 import { ISelectionChangedArgs } from '../Shared/SelectionItem';
 import { AlbumListEvents, default as AlbumList } from './Lists/Albums/AlbumList';
@@ -23,14 +23,17 @@ export const FinderEvents = _.extend({}, AlbumListEvents);
         <genre-list
             ref="GenreList"
             @SelectionChanged="OnGenreSelectionChanged"
-            @Refreshed="OnGenreRefreshed" />
+            @Refreshed="OnGenreRefreshed"
+            @Swiped="OnSwiped" />
         <artist-list
             ref="ArtistList"
             @SelectionChanged="OnArtistSelectionChanged"
-            @Refreshed="OnArtistRefreshed" />
+            @Refreshed="OnArtistRefreshed"
+            @Swiped="OnSwiped" />
         <album-list
             ref="AlbumList"
-            @PlaylistUpdated="OnPlaylistUpdated"/>
+            @PlaylistUpdated="OnPlaylistUpdated"
+            @Swiped="OnSwiped" />
     </div>
 </section>`,
     components: {
@@ -99,6 +102,9 @@ export default class Finder extends ContentBase {
             default:
                 Exception.Throw('Unexpected ContentDetail');
         }
+    }
+    protected OnSwiped(args: IContentSwipeArgs): void {
+        super.OnSwiped(args);
     }
     // #endregion
 

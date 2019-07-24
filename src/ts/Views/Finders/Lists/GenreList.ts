@@ -4,8 +4,10 @@ import Libraries from '../../../Libraries';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
 import Genre from '../../../Models/Genres/Genre';
 import { default as GenreStore, IPagenateQueryArgs } from '../../../Models/Genres/GenreStore';
-import Dump from '../../../Utils/Dump';
+import { Contents } from '../../Bases/IContent';
+import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../Bases/IContentDetail';
 import SelectionListBase from '../../Bases/SelectionListBase';
+import { SwipeEvents } from '../../Events/HammerEvents';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
 
@@ -62,6 +64,7 @@ export default class GenreList extends SelectionListBase<Genre, GenreStore> {
     protected readonly linkId: string = 'nav-genres';
     protected store: GenreStore = new GenreStore();
     protected entities: Genre[] = [];
+    private swipeDetector: HammerManager;
 
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
@@ -69,6 +72,28 @@ export default class GenreList extends SelectionListBase<Genre, GenreStore> {
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
+
+        this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
+        this.swipeDetector.get('swipe').set({
+            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        });
+        this.swipeDetector.on(SwipeEvents.Left, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.Genres,
+                Direction: SwipeDirection.Left
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        this.swipeDetector.on(SwipeEvents.Right, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.Genres,
+                Direction: SwipeDirection.Right
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);            
+        });
 
         //// 利便性的にどうなのか、悩む。
         //Libraries.SlimScroll(this.CardInnerBody, {

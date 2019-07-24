@@ -3,6 +3,9 @@ import Libraries from '../../../Libraries';
 import { default as SettingsEntity } from '../../../Models/Settings/Settings';
 import { default as SettingsStore, IUpdateProgress } from '../../../Models/Settings/SettingsStore';
 import ContentDetailBase from '../../Bases/ContentDetailBase';
+import { Contents } from '../../Bases/IContent';
+import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../Bases/IContentDetail';
+import { SwipeEvents } from '../../Events/HammerEvents';
 import { ConfirmType, default as ConfirmDialog } from '../../Shared/Dialogs/ConfirmDialog';
 import ProgressDialog from '../../Shared/Dialogs/ProgressDialog';
 
@@ -69,6 +72,7 @@ export default class DbBlock extends ContentDetailBase {
     private timer: number = null;
     private nowPolling: boolean = false;
     private readonly disabled = 'disabled';
+    private swipeDetector: HammerManager;
 
     private get ScanNewButton(): HTMLButtonElement {
         return this.$refs.ScanNewButton as HTMLButtonElement;
@@ -82,6 +86,34 @@ export default class DbBlock extends ContentDetailBase {
     }
     private get ProgressDialog(): ProgressDialog {
         return this.$refs.ProgressDialog as ProgressDialog;
+    }
+
+    public async Initialize(): Promise<boolean> {
+        super.Initialize();
+
+        this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
+        this.swipeDetector.get('swipe').set({
+            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        });
+        this.swipeDetector.on(SwipeEvents.Left, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.Database,
+                Direction: SwipeDirection.Left
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        this.swipeDetector.on(SwipeEvents.Right, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.Database,
+                Direction: SwipeDirection.Right
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        return true;
     }
 
     public SetSettings(store: SettingsStore, entity: SettingsEntity): void {

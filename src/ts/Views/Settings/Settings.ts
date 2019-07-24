@@ -4,7 +4,7 @@ import { default as SettingsStore, IUpdateProgress } from '../../Models/Settings
 import Dump from '../../Utils/Dump';
 import Exception from '../../Utils/Exception';
 import ContentBase from '../Bases/ContentBase';
-import { ContentDetails, default as IContentDetail, IContentDetailArgs } from '../Bases/IContentDetail';
+import { ContentDetails, default as IContentDetail, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
 import DbBlock from './Blocks/DbBlock';
 import MopidyBlock from './Blocks/MopidyBlock';
 import ScanProgressBlock from './Blocks/ScanProgressBlock';
@@ -23,11 +23,14 @@ export const SettingsEvents = {
         ref="InnerDiv">
         <mopidy-block
             ref="MopidyBlock"
-            @SettingsUpdated="OnSettingsUpdated" />
+            @SettingsUpdated="OnSettingsUpdated"
+            @Swiped="OnSwiped" />
         <db-block
-            ref="DbBlock" />
+            ref="DbBlock"
+            @Swiped="OnSwiped" />
         <scan-progress-block
-            ref="ScanProgressBlock" />
+            ref="ScanProgressBlock"
+            @Swiped="OnSwiped" />
     </div>
 </section>`,
     components: {
@@ -102,6 +105,9 @@ export default class Settings extends ContentBase {
             default:
                 Exception.Throw('Unexpected ContentDetail');
         }
+    }
+    protected OnSwiped(args: IContentSwipeArgs): void {
+        super.OnSwiped(args);
     }
     // #endregion
 

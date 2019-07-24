@@ -1,6 +1,7 @@
 import { default as TabBase } from './TabBase';
 import IContent from './IContent';
-import { default as IContentDetail, IContentDetailArgs } from './IContentDetail';
+import { default as IContentDetail, IContentDetailArgs, IContentSwipeArgs, ContentDetailEvents } from './IContentDetail';
+
 
 export default abstract class ContentBase extends TabBase implements IContent {
     protected abstract details: IContentDetail[];
@@ -28,6 +29,10 @@ export default abstract class ContentBase extends TabBase implements IContent {
             const detail = this.details[i];
             detail.Hide();
         }
+    }
+
+    protected OnSwiped(args: IContentSwipeArgs): void {
+        this.$emit(ContentDetailEvents.Swiped, args);
     }
 
     public abstract ShowContentDetail(args: IContentDetailArgs): void;

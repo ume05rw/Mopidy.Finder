@@ -46,6 +46,7 @@
     <None Remove="src\ts\Models\Tracks\Track.ts" />
     <None Remove="src\ts\Views\Bases\ViewBase.ts" />
     <None Remove="src\ts\Views\Events\BootstrapEvents.ts" />
+    <None Remove="src\ts\Views\Events\HammerEvents.ts" />
     <None Remove="src\ts\Views\Finders\AlbumList.ts" />
     <None Remove="src\ts\Views\Finders\ArtistList.ts" />
     <None Remove="src\ts\Views\Finders\Finder.ts" />
@@ -150,6 +151,7 @@
     <TypeScriptCompile Include="src\ts\Models\Tracks\Track.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\ViewBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Events\BootstrapEvents.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Events\HammerEvents.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\ArtistList.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Finder.ts" />
     <TypeScriptCompile Include="src\ts\Views\Finders\Lists\GenreList.ts" />

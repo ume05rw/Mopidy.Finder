@@ -6,7 +6,7 @@ import { ISelectionChangedArgs, ISelectionOrderedArgs } from '../Shared/Selectio
 import PlaylistList from './Lists/Playlists/PlaylistList';
 import TrackList from './Lists/Tracks/TrackList';
 import Delay from '../../Utils/Delay';
-import { default as IContentDetail, ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
+import { default as IContentDetail, ContentDetails, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
 import Exception from '../../Utils/Exception';
 import Dump from '../../Utils/Dump';
 
@@ -23,11 +23,13 @@ export const PlaylistsEvents = {
         <playlist-list
             ref="PlaylistList"
             @SelectionOrdered="OnPlaylistsSelectionOrdered"
-            @SelectionChanged="OnPlaylistsSelectionChanged" />
+            @SelectionChanged="OnPlaylistsSelectionChanged"
+            @Swiped="OnSwiped" />
         <track-list
             ref="TrackList"
             @PlaylistDeleted="OnPlaylistDeleted"
-            @PlaylistUpdated="OnPlaylistUpdated" />
+            @PlaylistUpdated="OnPlaylistUpdated"
+            @Swiped="OnSwiped" />
     </div>
 </section>`,
     components: {
@@ -85,6 +87,9 @@ export default class Playlists extends ContentBase {
             default:
                 Exception.Throw('Unexpected ContentDetail');
         }
+    }
+    protected OnSwiped(args: IContentSwipeArgs): void {
+        super.OnSwiped(args);
     }
     // #endregion
 

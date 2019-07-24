@@ -5,11 +5,14 @@ import Libraries from '../../../../Libraries';
 import { IPagenatedResult } from '../../../../Models/Bases/StoreBase';
 import Playlist from '../../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
+import Delay from '../../../../Utils/Delay';
+import { Contents } from '../../../Bases/IContent';
+import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../../Bases/IContentDetail';
+import { default as SelectionListBase } from '../../../Bases/SelectionListBase';
+import { SwipeEvents } from '../../../Events/HammerEvents';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs, ISelectionOrderedArgs } from '../../../Shared/SelectionItem';
-import { default as SelectionListBase } from '../../../Bases/SelectionListBase';
 import AddModal from './AddModal';
-import Delay from '../../../../Utils/Delay';
 
 export const PlaylistListEvents = {
     AnimationEnd: 'animationend',
@@ -77,6 +80,7 @@ export default class PlaylistList extends SelectionListBase<Playlist, PlaylistSt
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Playlist[] = [];
     protected allEntities: Playlist[] = [];
+    private swipeDetector: HammerManager;
 
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
@@ -90,6 +94,28 @@ export default class PlaylistList extends SelectionListBase<Playlist, PlaylistSt
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
+
+        this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
+        this.swipeDetector.get('swipe').set({
+            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        });
+        this.swipeDetector.on(SwipeEvents.Left, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.Playlists,
+                Direction: SwipeDirection.Left
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        this.swipeDetector.on(SwipeEvents.Right, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.Playlists,
+                Direction: SwipeDirection.Right
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
 
         Libraries.SetTooltip(this.$refs.ButtonAdd as HTMLElement, 'Add Playlist');
         Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');

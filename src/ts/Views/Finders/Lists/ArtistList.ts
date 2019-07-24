@@ -5,8 +5,10 @@ import Libraries from '../../../Libraries';
 import Artist from '../../../Models/Artists/Artist';
 import { default as ArtistStore, IPagenateQueryArgs } from '../../../Models/Artists/ArtistStore';
 import { IPagenatedResult } from '../../../Models/Bases/StoreBase';
-import Dump from '../../../Utils/Dump';
+import { Contents } from '../../Bases/IContent';
+import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../Bases/IContentDetail';
 import SelectionListBase from '../../Bases/SelectionListBase';
+import { SwipeEvents } from '../../Events/HammerEvents';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
 
@@ -66,6 +68,7 @@ export default class ArtistList extends SelectionListBase<Artist, ArtistStore> {
     protected store: ArtistStore = new ArtistStore();
     protected entities: Artist[] = [];
     private genreIds: number[] = [];
+    private swipeDetector: HammerManager;
 
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
@@ -73,6 +76,28 @@ export default class ArtistList extends SelectionListBase<Artist, ArtistStore> {
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
+
+        this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
+        this.swipeDetector.get('swipe').set({
+            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        });
+        this.swipeDetector.on(SwipeEvents.Left, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.Artists,
+                Direction: SwipeDirection.Left
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        this.swipeDetector.on(SwipeEvents.Right, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.Artists,
+                Direction: SwipeDirection.Right
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
 
         Libraries.SetTooltip(this.$refs.RefreshButton as HTMLElement, 'Refresh');
         Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');

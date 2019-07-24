@@ -8,11 +8,14 @@ import { IPagenatedResult } from '../../../../Models/Bases/StoreBase';
 import Playlist from '../../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Delay from '../../../../Utils/Delay';
-import Exception from '../../../../Utils/Exception';
-import Filterbox from '../../../Shared/Filterboxes/Filterbox';
-import { default as SelectionListBase, SelectionEvents } from '../../../Bases/SelectionListBase';
-import { default as SelectionAlbumTracks, IAddToPlaylistOrderedArgs, ICreatePlaylistOrderedArgs, IPlayOrderedArgs } from './SelectionAlbumTracks';
 import Dump from '../../../../Utils/Dump';
+import Exception from '../../../../Utils/Exception';
+import { Contents } from '../../../Bases/IContent';
+import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../../Bases/IContentDetail';
+import { default as SelectionListBase, SelectionEvents } from '../../../Bases/SelectionListBase';
+import { SwipeEvents } from '../../../Events/HammerEvents';
+import Filterbox from '../../../Shared/Filterboxes/Filterbox';
+import { default as SelectionAlbumTracks, IAddToPlaylistOrderedArgs, ICreatePlaylistOrderedArgs, IPlayOrderedArgs } from './SelectionAlbumTracks';
 
 export const AlbumListEvents = {
     PlaylistUpdated: 'PlaylistUpdated'
@@ -73,6 +76,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     private genreIds: number[] = [];
     private artistIds: number[] = [];
     private playlists: Playlist[] = [];
+    private swipeDetector: HammerManager;
 
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
@@ -84,6 +88,28 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     public async Initialize(): Promise<boolean> {
         Dump.Log('Finder.AlbumList.Initialize: Start.');
         super.Initialize();
+
+        this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
+        this.swipeDetector.get('swipe').set({
+            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        });
+        this.swipeDetector.on(SwipeEvents.Left, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.AlbumTracks,
+                Direction: SwipeDirection.Left
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        this.swipeDetector.on(SwipeEvents.Right, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.AlbumTracks,
+                Direction: SwipeDirection.Right
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
 
         // ※$onの中ではプロパティ定義が参照出来ないらしい。
         // ※ハンドラメソッドをthisバインドしてもダメだった。

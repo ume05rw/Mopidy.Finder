@@ -86,14 +86,14 @@ export default class NavigationController {
         // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
         if (this._viewport.is('<=sm')) {
             this._content.ContentToFullscreen();
-        } else if (this._viewport.is('>sm')) {
+        } else {
             this._content.ContentToColumn();
         }
 
         // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
         if (this._viewport.is('<=lg')) {
             this._headerBar.SetSideBarClose();
-        } else if (this._viewport.is('>lg')) {
+        } else {
             this._headerBar.SetSideBarOpen();
         }
     }

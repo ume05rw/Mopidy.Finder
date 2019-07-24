@@ -20,3 +20,4 @@ export default interface IContent extends ITab {
     SetDetailToColumn(): void;
     ShowContentDetail(args: IContentDetailArgs): void;
 }
+

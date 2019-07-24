@@ -1,7 +1,11 @@
 import Component from 'vue-class-component';
+import Libraries from '../../../Libraries';
 import { default as SettingsEntity } from '../../../Models/Settings/Settings';
 import { default as SettingsStore } from '../../../Models/Settings/SettingsStore';
 import ContentDetailBase from '../../Bases/ContentDetailBase';
+import { Contents } from '../../Bases/IContent';
+import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../Bases/IContentDetail';
+import { SwipeEvents } from '../../Events/HammerEvents';
 
 @Component({
     template: `<div class="row">
@@ -49,9 +53,38 @@ export default class ScanProgressBlock extends ContentDetailBase {
     private scanedAlbumCount: number = 0;
     private store: SettingsStore;
     private entity: SettingsEntity;
+    private swipeDetector: HammerManager;
 
     private get AlbumScanProgressBar(): HTMLDivElement {
         return this.$refs.AlbumScanProgressBar as HTMLDivElement;
+    }
+
+    public async Initialize(): Promise<boolean> {
+        super.Initialize();
+
+        this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
+        this.swipeDetector.get('swipe').set({
+            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        });
+        this.swipeDetector.on(SwipeEvents.Left, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.ScanProgress,
+                Direction: SwipeDirection.Left
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        this.swipeDetector.on(SwipeEvents.Right, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.ScanProgress,
+                Direction: SwipeDirection.Right
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        return true;
     }
 
     public SetSettings(store: SettingsStore, entity: SettingsEntity): void {

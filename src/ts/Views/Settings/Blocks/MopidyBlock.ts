@@ -4,6 +4,9 @@ import { default as SettingsEntity, ISettings } from '../../../Models/Settings/S
 import { default as SettingsStore } from '../../../Models/Settings/SettingsStore';
 import { default as Delay, DelayedOnceExecuter } from '../../../Utils/Delay';
 import ContentDetailBase from '../../Bases/ContentDetailBase';
+import { Contents } from '../../Bases/IContent';
+import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../Bases/IContentDetail';
+import { SwipeEvents } from '../../Events/HammerEvents';
 
 export const MopidyBlockEvents = {
     SettingsUpdated: 'SettingsUpdated'
@@ -73,6 +76,7 @@ export default class MopidyBlock extends ContentDetailBase {
     private lazyUpdater: DelayedOnceExecuter;
     private store: SettingsStore;
     private entity: SettingsEntity;
+    private swipeDetector: HammerManager;
     private connectionClasses: { True: IIconClasses, False: IIconClasses } = {
         True: {
             Icon: 'fa fa-link',
@@ -100,6 +104,28 @@ export default class MopidyBlock extends ContentDetailBase {
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
+
+        this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
+        this.swipeDetector.get('swipe').set({
+            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        });
+        this.swipeDetector.on(SwipeEvents.Left, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.SetMopidy,
+                Direction: SwipeDirection.Left
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        this.swipeDetector.on(SwipeEvents.Right, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.SetMopidy,
+                Direction: SwipeDirection.Right
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
 
         this.Update = this.Update.bind(this);
         this.lazyUpdater = Delay.DelayedOnce(() => {

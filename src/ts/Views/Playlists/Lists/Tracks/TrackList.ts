@@ -9,8 +9,11 @@ import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Track from '../../../../Models/Tracks/Track';
 import { Animation, default as Animate, Speed } from '../../../../Utils/Animate';
 import Delay from '../../../../Utils/Delay';
-import Filterbox from '../../../Shared/Filterboxes/Filterbox';
+import { Contents } from '../../../Bases/IContent';
+import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../../Bases/IContentDetail';
 import { default as SelectionListBase, SelectionEvents } from '../../../Bases/SelectionListBase';
+import { SwipeEvents } from '../../../Events/HammerEvents';
+import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import SlideupButton from '../../../Shared/SlideupButton';
 import { default as SelectionTrack, ITrackDeleteOrderedArgs, ITrackSelectionChangedArgs } from './SelectionTrack';
 import UpdateDialog from './UpdateDialog';
@@ -117,6 +120,7 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
     private titleH3Animate: Animate;
     private titleInputAnimate: Animate;
     private sortable: Sortable = null;
+    private swipeDetector: HammerManager;
 
     private get TitleH3(): HTMLHeadingElement {
         return this.$refs.TitleH3 as HTMLHeadingElement;
@@ -151,6 +155,28 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
+
+        this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
+        this.swipeDetector.get('swipe').set({
+            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        });
+        this.swipeDetector.on(SwipeEvents.Left, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.PlaylistTracks,
+                Direction: SwipeDirection.Left
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
+
+        this.swipeDetector.on(SwipeEvents.Right, () => {
+            const args: IContentSwipeArgs = {
+                Content: Contents.Finder,
+                ContentDetail: ContentDetails.PlaylistTracks,
+                Direction: SwipeDirection.Right
+            };
+            this.$emit(ContentDetailEvents.Swiped, args);
+        });
 
         // ※$onの中ではプロパティ定義が参照出来ないらしい。
         // ※ハンドラメソッドをthisバインドしてもダメだった。
