@@ -145,10 +145,24 @@ div.dropdown {
 .card-tools .text-filter {
     width: 120px;
 }
-.card-body.list-scrollbox {
+
+.card-body.listbox {
     /* 57, 64, 49 **/
     height: calc(100vh - 140px);
-    overflow-y: hidden;
+}
+.outer-scrollbox {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.inner-scrollbox {
+    margin: 0;
+    padding: 0;
+    width: calc(100% + 17px);
+    height: 100%;
+    overflow-y: scroll;
 }
 .card-inner-body {
     width: 100%;
@@ -216,21 +230,21 @@ div.dropdown {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
-.card-body.list-scrollbox .products-list > .item.playlisttrack-row {
+.card-body.listbox .products-list > .item.playlisttrack-row {
     border-radius: 0;
     border-top: 1px solid #282542;
 }
-.card-body.list-scrollbox .products-list > .item.playlisttrack-row {
+.card-body.listbox .products-list > .item.playlisttrack-row {
     background-color: #32334a;
 }
-.card-body.list-scrollbox .products-list > .item.playlisttrack-row:hover {
+.card-body.listbox .products-list > .item.playlisttrack-row:hover {
     background-color: #1f1c40;
     cursor: pointer;
 }
-.card-body.list-scrollbox .products-list > .item.playlisttrack-row.selected {
+.card-body.listbox .products-list > .item.playlisttrack-row.selected {
     background-color: #171135;
 }
-.card-body.list-scrollbox .products-list > .item.playlisttrack-row.selected:hover {
+.card-body.listbox .products-list > .item.playlisttrack-row.selected:hover {
     background-color: #171525;
 }
 .playlisttrack-row.selected:hover .product-title {
@@ -252,10 +266,10 @@ div.dropdown {
 .playlisttrack-row * {
     transition: all 0.3s ease-in-out;
 }
-.playlisttrack-list.playable .editmode-buttons {
+.product-list-in-box.playable .editmode-buttons {
     display: none;
 }
-.playlisttrack-list.editable .editmode-buttons {
+.product-list-in-box.editable .editmode-buttons {
     display: inline;
     color: #e5dfff;
 }

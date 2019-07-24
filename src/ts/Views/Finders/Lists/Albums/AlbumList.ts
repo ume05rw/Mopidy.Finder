@@ -33,24 +33,25 @@ export const AlbumListEvents = {
                     @TextUpdated="Refresh()"/>
             </div>
         </div>
-        <div class="card-body list-scrollbox">
-            <div class="card-inner-body album-list"
-                ref="CardInnerBody">
-                <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
-                    <template v-for="entity in entities">
-                        <selection-album-tracks
-                            v-bind:playlists="playlists"
-                            ref="Items"
-                            v-bind:entity="entity"
-                            @PlayOrdered="OnPlayOrdered"
-                            @CreatePlaylistOrdered="OnCreatePlaylistOrdered"
-                            @AddToPlaylistOrdered="OnAddToPlaylistOrdered" />
-                    </template>
-                    <infinite-loading
-                        @infinite="OnInfinite"
-                        force-use-infinite-wrapper=".card-inner-body.album-list"
-                        ref="InfiniteLoading" />
-                </ul>
+        <div class="card-body listbox">
+            <div class="outer-scrollbox">
+                <div class="inner-scrollbox album-list">
+                    <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
+                        <template v-for="entity in entities">
+                            <selection-album-tracks
+                                v-bind:playlists="playlists"
+                                ref="Items"
+                                v-bind:entity="entity"
+                                @PlayOrdered="OnPlayOrdered"
+                                @CreatePlaylistOrdered="OnCreatePlaylistOrdered"
+                                @AddToPlaylistOrdered="OnAddToPlaylistOrdered" />
+                        </template>
+                        <infinite-loading
+                            @infinite="OnInfinite"
+                            force-use-infinite-wrapper=".inner-scrollbox.album-list"
+                            ref="InfiniteLoading" />
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -79,19 +80,10 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     private get Items(): SelectionAlbumTracks[] {
         return this.$refs.Items as SelectionAlbumTracks[];
     }
-    private get CardInnerBody(): HTMLDivElement {
-        return this.$refs.CardInnerBody as HTMLDivElement;
-    }
 
     public async Initialize(): Promise<boolean> {
         Dump.Log('Finder.AlbumList.Initialize: Start.');
         super.Initialize();
-
-        // 利便性的にどうなのか、悩む。
-        Libraries.SlimScroll(this.CardInnerBody, {
-            height: 'calc(100vh - 200px)',
-            wheelStep: 20
-        });
 
         // ※$onの中ではプロパティ定義が参照出来ないらしい。
         // ※ハンドラメソッドをthisバインドしてもダメだった。

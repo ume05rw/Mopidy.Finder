@@ -3282,13 +3282,6 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(AlbumList.prototype, "CardInnerBody", {
-            get: function () {
-                return this.$refs.CardInnerBody;
-            },
-            enumerable: true,
-            configurable: true
-        });
         AlbumList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
@@ -3297,11 +3290,6 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 0:
                             Dump_6.default.Log('Finder.AlbumList.Initialize: Start.');
                             _super.prototype.Initialize.call(this);
-                            // 利便性的にどうなのか、悩む。
-                            Libraries_7.default.SlimScroll(this.CardInnerBody, {
-                                height: 'calc(100vh - 200px)',
-                                wheelStep: 20
-                            });
                             // ※$onの中ではプロパティ定義が参照出来ないらしい。
                             // ※ハンドラメソッドをthisバインドしてもダメだった。
                             // ※やむなく、$refsを直接キャストする。
@@ -3551,7 +3539,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList = __decorate([
             vue_class_component_6.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-music\" />\n                Album Tracks\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body album-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-album-tracks\n                            v-bind:playlists=\"playlists\"\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @PlayOrdered=\"OnPlayOrdered\"\n                            @CreatePlaylistOrdered=\"OnCreatePlaylistOrdered\"\n                            @AddToPlaylistOrdered=\"OnAddToPlaylistOrdered\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.album-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-music\" />\n                Album Tracks\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox album-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                            <selection-album-tracks\n                                v-bind:playlists=\"playlists\"\n                                ref=\"Items\"\n                                v-bind:entity=\"entity\"\n                                @PlayOrdered=\"OnPlayOrdered\"\n                                @CreatePlaylistOrdered=\"OnCreatePlaylistOrdered\"\n                                @AddToPlaylistOrdered=\"OnAddToPlaylistOrdered\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.album-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_1.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
@@ -3585,22 +3573,10 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ArtistList.prototype, "CardInnerBody", {
-            get: function () {
-                return this.$refs.CardInnerBody;
-            },
-            enumerable: true,
-            configurable: true
-        });
         ArtistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    // 利便性的にどうなのか、悩む。
-                    Libraries_8.default.SlimScroll(this.CardInnerBody, {
-                        height: 'calc(100vh - 200px)',
-                        wheelStep: 60
-                    });
                     Libraries_8.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
                     Libraries_8.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                     return [2 /*return*/, true];
@@ -3681,7 +3657,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-users\" />\n                Artists\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body artist-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.artist-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-users\" />\n                Artists\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox artist-list\"\n                    ref=\"CardInnerBody\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.artist-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_2.default,
                     'selection-item': SelectionItem_3.default,
@@ -3714,22 +3690,15 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(GenreList.prototype, "CardInnerBody", {
-            get: function () {
-                return this.$refs.CardInnerBody;
-            },
-            enumerable: true,
-            configurable: true
-        });
         GenreList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    // 利便性的にどうなのか、悩む。
-                    Libraries_9.default.SlimScroll(this.CardInnerBody, {
-                        height: 'calc(100vh - 200px)',
-                        wheelStep: 60
-                    });
+                    //// 利便性的にどうなのか、悩む。
+                    //Libraries.SlimScroll(this.CardInnerBody, {
+                    //    height: 'calc(100vh - 200px)',
+                    //    wheelStep: 60
+                    //});
                     Libraries_9.default.SetTooltip(this.$refs.RefreshButton, 'Refresh');
                     Libraries_9.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                     return [2 /*return*/, true];
@@ -3785,7 +3754,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         };
         GenreList = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-tags\" />\n                Genres\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body genre-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.genre-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-tags\" />\n                Genres\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox genre-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                            <selection-item\n                                ref=\"Items\"\n                                v-bind:entity=\"entity\"\n                                @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.genre-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_3.default,
                     'selection-item': SelectionItem_4.default,
@@ -4297,22 +4266,10 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(PlaylistList.prototype, "CardInnerBody", {
-            get: function () {
-                return this.$refs.CardInnerBody;
-            },
-            enumerable: true,
-            configurable: true
-        });
         PlaylistList.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    // 利便性的にどうなのか、悩む。
-                    Libraries_12.default.SlimScroll(this.CardInnerBody, {
-                        height: 'calc(100vh - 200px)',
-                        wheelStep: 60
-                    });
                     Libraries_12.default.SetTooltip(this.$refs.ButtonAdd, 'Add Playlist');
                     Libraries_12.default.SetTooltip(this.$refs.ButtonCollaplse, 'Shrink/Expand');
                     this.RefreshPlaylist();
@@ -4439,7 +4396,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         PlaylistList.PageLength = 30;
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_12.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-list-ul\" />\n                Playlists\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body playlist-list\"\n                ref=\"CardInnerBody\">\n                <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                    <template v-for=\"entity in entities\">\n                    <selection-item\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionOrdered=\"OnSelectionOrdered\"\n                        @SelectionChanged=\"OnSelectionChanged\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".card-inner-body.playlist-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
+                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-list-ul\" />\n                Playlists\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox playlist-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionOrdered=\"OnSelectionOrdered\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.playlist-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_4.default,
                     'selection-item': SelectionItem_5.default,
@@ -4789,13 +4746,6 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(TrackList.prototype, "CardInnerBody", {
-            get: function () {
-                return this.$refs.CardInnerBody;
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(TrackList.prototype, "TrackListUl", {
             get: function () {
                 return this.$refs.TrackListUl;
@@ -4842,11 +4792,6 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             }
                         });
                     }); });
-                    // 利便性的にどうなのか、悩む。
-                    Libraries_15.default.SlimScroll(this.CardInnerBody, {
-                        height: 'calc(100vh - 200px)',
-                        wheelStep: 60
-                    });
                     this.titleH3Animate = new Animate_4.default(this.TitleH3);
                     this.titleInputAnimate = new Animate_4.default(this.TitleInput);
                     return [2 /*return*/, true];
@@ -5414,10 +5359,10 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         };
         var TrackList_1;
         TrackList.PageLength = 20;
-        TrackList.ListBaseClasses = 'products-list product-list-in-box playlisttrack-list ';
+        TrackList.ListBaseClasses = 'products-list product-list-in-box ';
         TrackList = TrackList_1 = __decorate([
             vue_class_component_15.default({
-                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                <i class=\"fa fa-music\" />\n                Playlist Tracks\n            </h3>\n            <input type=\"text\" class=\"form-control form-control-sm d-none title-input\"\n                maxlength=\"40\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body list-scrollbox\">\n            <div class=\"card-inner-body\"\n                ref=\"CardInnerBody\">\n                <ul v-bind:class=\"listClasses\"\n                    ref=\"TrackListUl\">\n                    <template v-for=\"entity in entities\">\n                    <selection-track\n                        ref=\"Items\"\n                        v-bind:entity=\"entity\"\n                        @SelectionChanged=\"OnSelectionChanged\"\n                        @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                    </template>\n                    <infinite-loading\n                        @infinite=\"OnInfinite\"\n                        force-use-infinite-wrapper=\".playlisttrack-list\"\n                        ref=\"InfiniteLoading\" />\n                </ul>\n            </div>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
+                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                <i class=\"fa fa-music\" />\n                Playlist Tracks\n            </h3>\n            <input type=\"text\" class=\"form-control form-control-sm d-none title-input\"\n                maxlength=\"40\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox playlisttrack-list\">\n                    <ul v-bind:class=\"listClasses\"\n                        ref=\"TrackListUl\">\n                        <template v-for=\"entity in entities\">\n                        <selection-track\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\"\n                            @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.playlisttrack-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
                     'slideup-button': SlideupButton_2.default,

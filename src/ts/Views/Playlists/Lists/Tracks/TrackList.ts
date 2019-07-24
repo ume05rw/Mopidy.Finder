@@ -69,23 +69,24 @@ enum ListMode {
                     @Clicked="OnClickEndEdit" />
             </div>
         </div>
-        <div class="card-body list-scrollbox">
-            <div class="card-inner-body"
-                ref="CardInnerBody">
-                <ul v-bind:class="listClasses"
-                    ref="TrackListUl">
-                    <template v-for="entity in entities">
-                    <selection-track
-                        ref="Items"
-                        v-bind:entity="entity"
-                        @SelectionChanged="OnSelectionChanged"
-                        @DeleteOrdered="OnDeleteRowOrdered" />
-                    </template>
-                    <infinite-loading
-                        @infinite="OnInfinite"
-                        force-use-infinite-wrapper=".playlisttrack-list"
-                        ref="InfiniteLoading" />
-                </ul>
+        <div class="card-body listbox">
+            <div class="outer-scrollbox">
+                <div class="inner-scrollbox playlisttrack-list">
+                    <ul v-bind:class="listClasses"
+                        ref="TrackListUl">
+                        <template v-for="entity in entities">
+                        <selection-track
+                            ref="Items"
+                            v-bind:entity="entity"
+                            @SelectionChanged="OnSelectionChanged"
+                            @DeleteOrdered="OnDeleteRowOrdered" />
+                        </template>
+                        <infinite-loading
+                            @infinite="OnInfinite"
+                            force-use-infinite-wrapper=".inner-scrollbox.playlisttrack-list"
+                            ref="InfiniteLoading" />
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -105,7 +106,7 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
     protected readonly tabId: string = 'subtab-playlisttracks';
     protected readonly linkId: string = 'nav-playlisttracks';
     private static readonly PageLength: number = 20;
-    private static readonly ListBaseClasses = 'products-list product-list-in-box playlisttrack-list ';
+    private static readonly ListBaseClasses = 'products-list product-list-in-box ';
 
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Track[] = [];
@@ -138,9 +139,6 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
     private get EndEditButton(): SlideupButton {
         return this.$refs.EndEditButton as SlideupButton;
     }
-    private get CardInnerBody(): HTMLDivElement {
-        return this.$refs.CardInnerBody as HTMLDivElement;
-    }
     private get TrackListUl(): HTMLUListElement {
         return this.$refs.TrackListUl as HTMLUListElement;
     }
@@ -170,11 +168,6 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
             return true;
         });
 
-        // 利便性的にどうなのか、悩む。
-        Libraries.SlimScroll(this.CardInnerBody, {
-            height: 'calc(100vh - 200px)',
-            wheelStep: 60
-        });
         this.titleH3Animate = new Animate(this.TitleH3);
         this.titleInputAnimate = new Animate(this.TitleInput);
 

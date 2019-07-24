@@ -37,22 +37,23 @@ export const PlaylistListEvents = {
                 </button>
             </div>
         </div>
-        <div class="card-body list-scrollbox">
-            <div class="card-inner-body playlist-list"
-                ref="CardInnerBody">
-                <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
-                    <template v-for="entity in entities">
-                    <selection-item
-                        ref="Items"
-                        v-bind:entity="entity"
-                        @SelectionOrdered="OnSelectionOrdered"
-                        @SelectionChanged="OnSelectionChanged" />
-                    </template>
-                    <infinite-loading
-                        @infinite="OnInfinite"
-                        force-use-infinite-wrapper=".card-inner-body.playlist-list"
-                        ref="InfiniteLoading" />
-                </ul>
+        <div class="card-body listbox">
+            <div class="outer-scrollbox">
+                <div class="inner-scrollbox playlist-list">
+                    <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
+                        <template v-for="entity in entities">
+                        <selection-item
+                            ref="Items"
+                            v-bind:entity="entity"
+                            @SelectionOrdered="OnSelectionOrdered"
+                            @SelectionChanged="OnSelectionChanged" />
+                        </template>
+                        <infinite-loading
+                            @infinite="OnInfinite"
+                            force-use-infinite-wrapper=".inner-scrollbox.playlist-list"
+                            ref="InfiniteLoading" />
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -86,18 +87,10 @@ export default class PlaylistList extends SelectionListBase<Playlist, PlaylistSt
     private get AddModal(): AddModal {
         return this.$refs.AddModal as AddModal;
     }
-    private get CardInnerBody(): HTMLDivElement {
-        return this.$refs.CardInnerBody as HTMLDivElement;
-    }
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
 
-        // 利便性的にどうなのか、悩む。
-        Libraries.SlimScroll(this.CardInnerBody, {
-            height: 'calc(100vh - 200px)',
-            wheelStep: 60
-        });
         Libraries.SetTooltip(this.$refs.ButtonAdd as HTMLElement, 'Add Playlist');
         Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');
 

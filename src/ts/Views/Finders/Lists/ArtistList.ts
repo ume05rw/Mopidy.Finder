@@ -32,21 +32,23 @@ import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/Se
                 </button>
             </div>
         </div>
-        <div class="card-body list-scrollbox">
-            <div class="card-inner-body artist-list"
-                ref="CardInnerBody">
-                <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
-                    <template v-for="entity in entities">
-                    <selection-item
-                        ref="Items"
-                        v-bind:entity="entity"
-                        @SelectionChanged="OnSelectionChanged" />
-                    </template>
-                    <infinite-loading
-                        @infinite="OnInfinite"
-                        force-use-infinite-wrapper=".card-inner-body.artist-list"
-                        ref="InfiniteLoading" />
-                </ul>
+        <div class="card-body listbox">
+            <div class="outer-scrollbox">
+                <div class="inner-scrollbox artist-list"
+                    ref="CardInnerBody">
+                    <ul class="nav nav-pills h-100 d-flex flex-column flex-nowrap">
+                        <template v-for="entity in entities">
+                        <selection-item
+                            ref="Items"
+                            v-bind:entity="entity"
+                            @SelectionChanged="OnSelectionChanged" />
+                        </template>
+                        <infinite-loading
+                            @infinite="OnInfinite"
+                            force-use-infinite-wrapper=".inner-scrollbox.artist-list"
+                            ref="InfiniteLoading" />
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -68,18 +70,9 @@ export default class ArtistList extends SelectionListBase<Artist, ArtistStore> {
     private get Filterbox(): Filterbox {
         return this.$refs.Filterbox as Filterbox;
     }
-    private get CardInnerBody(): HTMLDivElement {
-        return this.$refs.CardInnerBody as HTMLDivElement;
-    }
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
-
-        // 利便性的にどうなのか、悩む。
-        Libraries.SlimScroll(this.CardInnerBody, {
-            height: 'calc(100vh - 200px)',
-            wheelStep: 60
-        });
 
         Libraries.SetTooltip(this.$refs.RefreshButton as HTMLElement, 'Refresh');
         Libraries.SetTooltip(this.$refs.ButtonCollaplse as HTMLElement, 'Shrink/Expand');
