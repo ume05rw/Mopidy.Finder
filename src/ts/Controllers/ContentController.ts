@@ -1,5 +1,6 @@
+import { IUpdateProgress } from '../Models/Settings/SettingsStore';
 import Exception from '../Utils/Exception';
-import { Contents, default as IContent } from '../Views/Bases/IContent';
+import { Contents, default as IContent, IContentArgs } from '../Views/Bases/IContent';
 import { IContentDetailArgs } from '../Views/Bases/IContentDetail';
 import { TabEvents } from '../Views/Bases/TabBase';
 import { default as Finder, FinderEvents } from '../Views/Finders/Finder';
@@ -7,11 +8,12 @@ import { default as HeaderBar, HeaderBarEvents } from '../Views/HeaderBars/Heade
 import { default as Playlists, PlaylistsEvents } from '../Views/Playlists/Playlists';
 import RootView from '../Views/RootView';
 import { default as Settings, SettingsEvents } from '../Views/Settings/Settings';
-import { ITabEventRecievedArgs } from '../Views/SideBars/SideBar';
+import { default as SideBar, ITabEventRecievedArgs } from '../Views/SideBars/SideBar';
 
 export default class ContentController {
 
     private _headerBar: HeaderBar = null;
+    private _sideBar: SideBar = null;
     private _finder: Finder = null;
     private _playlists: Playlists = null;
     private _settings: Settings = null;
@@ -21,6 +23,7 @@ export default class ContentController {
 
     public constructor(rootView: RootView) {
         this._headerBar = rootView.HeaderBar;
+        this._sideBar = rootView.SideBar;
         this._finder = rootView.Finder;
         this._playlists = rootView.Playlists;
         this._settings = rootView.Settings;
@@ -77,8 +80,20 @@ export default class ContentController {
     }
 
     public SetCurrentContent(content: Contents): void {
+        this._sideBar.SetNavigation(content);
+        const headerArgs: IContentArgs = {
+            Content: content
+        };
+        this._headerBar.SetHeader(headerArgs);
+
         this._currentContent = this.GetContent(content);
         this._currentContent.InitContent();
+    }
+
+    public GetIsPermitLeave(): boolean {
+        return (!this._currentContent)
+            ? true
+            : this._currentContent.GetIsPermitLeave();
     }
 
     public ContentToFullscreen(): void {
@@ -88,5 +103,19 @@ export default class ContentController {
     public ContentToColumn(): void {
         for (let i = 0; i < this._allContents.length; i++)
             this._allContents[i].SetSubviewToColumn();
+    }
+
+    public ShowSettingsDbProgress(updateProgress: IUpdateProgress): void {
+        if (this._currentContent !== this._settings)
+            this.SetCurrentContent(Contents.Settings);
+
+        this._settings.ShowProgress(updateProgress);
+    }
+
+    public ShowSettingsInitialScan(): void {
+        if (this._currentContent !== this._settings)
+            this.SetCurrentContent(Contents.Settings);
+
+        this._settings.InitialScan();
     }
 }

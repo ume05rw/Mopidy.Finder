@@ -7066,12 +7066,14 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
         function ContentController(rootView) {
             var _this = this;
             this._headerBar = null;
+            this._sideBar = null;
             this._finder = null;
             this._playlists = null;
             this._settings = null;
             this._currentContent = null;
             this._allContents = [];
             this._headerBar = rootView.HeaderBar;
+            this._sideBar = rootView.SideBar;
             this._finder = rootView.Finder;
             this._playlists = rootView.Playlists;
             this._settings = rootView.Settings;
@@ -7123,8 +7125,18 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
             }
         };
         ContentController.prototype.SetCurrentContent = function (content) {
+            this._sideBar.SetNavigation(content);
+            var headerArgs = {
+                Content: content
+            };
+            this._headerBar.SetHeader(headerArgs);
             this._currentContent = this.GetContent(content);
             this._currentContent.InitContent();
+        };
+        ContentController.prototype.GetIsPermitLeave = function () {
+            return (!this._currentContent)
+                ? true
+                : this._currentContent.GetIsPermitLeave();
         };
         ContentController.prototype.ContentToFullscreen = function () {
             for (var i = 0; i < this._allContents.length; i++)
@@ -7133,6 +7145,16 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
         ContentController.prototype.ContentToColumn = function () {
             for (var i = 0; i < this._allContents.length; i++)
                 this._allContents[i].SetSubviewToColumn();
+        };
+        ContentController.prototype.ShowSettingsDbProgress = function (updateProgress) {
+            if (this._currentContent !== this._settings)
+                this.SetCurrentContent(IContent_3.Contents.Settings);
+            this._settings.ShowProgress(updateProgress);
+        };
+        ContentController.prototype.ShowSettingsInitialScan = function () {
+            if (this._currentContent !== this._settings)
+                this.SetCurrentContent(IContent_3.Contents.Settings);
+            this._settings.InitialScan();
         };
         return ContentController;
     }());
@@ -7147,29 +7169,18 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             this._content = null;
             this._headerBar = null;
             this._sideBar = null;
-            this._finder = null;
-            this._playlists = null;
-            this._settings = null;
-            this._currentContent = null;
-            this._allContents = [];
             this._viewport = Libraries_23.default.ResponsiveBootstrapToolkit;
             this._content = contentController;
             this._headerBar = rootView.HeaderBar;
             this._sideBar = rootView.SideBar;
-            this._finder = rootView.Finder;
-            this._playlists = rootView.Playlists;
-            this._settings = rootView.Settings;
-            this._allContents.push(this._finder);
-            this._allContents.push(this._playlists);
-            this._allContents.push(this._settings);
             Libraries_23.default.$(window).resize(this._viewport.changed(function () {
                 _this.AdjustScreen();
             }));
             this._sideBar.$on(SideBar_3.SideBarEvents.ContentOrdered, function (args) {
                 // カレント画面の移動に支障がある場合は移動しない。
-                if ((_this._currentContent) && !_this._currentContent.GetIsPermitLeave())
+                if (!_this._content.GetIsPermitLeave())
                     return;
-                _this.SetCurrentContent(args.Content);
+                _this._content.SetCurrentContent(args.Content);
             });
             // Bootstrap-Tabイベントのプロキシ
             this._sideBar.$on(SideBar_3.SideBarEvents.TabEventRecieved, function (args) {
@@ -7181,9 +7192,9 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                 }
             });
             this.AdjustScreen();
-            this.InitNavigation();
+            this.InitialNavigation();
         }
-        NavigationController.prototype.InitNavigation = function () {
+        NavigationController.prototype.InitialNavigation = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var store, isConnectable, updateProgress, isDbUpdating, content, existsData;
                 return __generator(this, function (_a) {
@@ -7200,9 +7211,9 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                             content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
                                 ? IContent_4.Contents.Settings
                                 : IContent_4.Contents.Finder;
-                            this.SetCurrentContent(content);
+                            this._content.SetCurrentContent(content);
                             if (!isDbUpdating) return [3 /*break*/, 3];
-                            this._settings.ShowProgress(updateProgress);
+                            this._content.ShowSettingsDbProgress(updateProgress);
                             return [3 /*break*/, 5];
                         case 3:
                             if (!store.Entity.IsMopidyConnectable) return [3 /*break*/, 5];
@@ -7210,20 +7221,12 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                         case 4:
                             existsData = _a.sent();
                             if (!existsData)
-                                this._settings.InitialScan();
+                                this._content.ShowSettingsInitialScan();
                             _a.label = 5;
                         case 5: return [2 /*return*/, true];
                     }
                 });
             });
-        };
-        NavigationController.prototype.SetCurrentContent = function (content) {
-            this._sideBar.SetNavigation(content);
-            this._content.SetCurrentContent(content);
-            var headerArgs = {
-                Content: content
-            };
-            this._headerBar.SetHeader(headerArgs);
         };
         NavigationController.prototype.AdjustScreen = function () {
             // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
