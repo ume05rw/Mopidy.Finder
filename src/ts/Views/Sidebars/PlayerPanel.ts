@@ -123,10 +123,16 @@ export default class PlayerPanel extends ViewBase {
                 this.ButtonRepeat.classList.add(PlayerPanel.ClassDisabled);
         });
 
+        return true;
+    }
+
+    public StartMonitor(): void {
         // ポーリング一時停止するときは、ここをコメントアウト
         this.monitor.StartPolling();
+    }
 
-        return true;
+    public StopMonitor(): void {
+        this.monitor.StopPolling();
     }
 
     private GetPlayPauseIconClass(): string {

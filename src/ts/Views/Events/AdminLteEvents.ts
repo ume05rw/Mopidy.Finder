@@ -5,3 +5,8 @@ export const WidgetEvents = {
     Minimized: 'minimized.lte.widget',
     Removed: 'removed.lte.widget'
 };
+
+export const PushMenuEvents = {
+    Collapsed: 'collapsed.lte.pushmenu',
+    Shown: 'shown.lte.pushmenu'
+};

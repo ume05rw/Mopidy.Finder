@@ -129,10 +129,11 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
     public StartPolling(): void {
         if (this._timer !== null)
             this.StopPolling();
-            
+
+        this.Update();
+
         this._timer = setInterval((): void => {
-            if (!this._nowOnPollingProsess)
-                this.Polling();
+            this.Update();
         }, Monitor.PollingMsec);
     }
 
@@ -146,9 +147,10 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
         this._timer = null;
     }
 
-    private async Polling(): Promise<boolean> {
+    private async Update(): Promise<boolean> {
         if (
-            this._settingsEntity.IsBusy
+            this._nowOnPollingProsess
+            || this._settingsEntity.IsBusy
             || !this._settingsEntity.IsMopidyConnectable
         ) {
             return;

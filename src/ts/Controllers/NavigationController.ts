@@ -1,7 +1,7 @@
 import Libraries from '../Libraries';
 import SettingsStore from '../Models/Settings/SettingsStore';
 import { Contents, IContentOrderedArgs } from '../Views/Bases/IContent';
-import { default as HeaderBar } from '../Views/HeaderBars/HeaderBar';
+import { default as HeaderBar, HeaderBarEvents } from '../Views/HeaderBars/HeaderBar';
 import RootView from '../Views/RootView';
 import { default as SideBar, ITabEventRecievedArgs, SideBarEvents } from '../Views/SideBars/SideBar';
 import ContentController from './ContentController';
@@ -24,6 +24,13 @@ export default class NavigationController {
             })
         );
 
+        this._headerBar.$on(HeaderBarEvents.SideBarShown, () => {
+            this._sideBar.OnShown();
+        });
+        this._headerBar.$on(HeaderBarEvents.SideBarCollapsed, () => {
+            this._sideBar.OnCollapsed();
+        });
+
         this._sideBar.$on(SideBarEvents.ContentOrdered, (args: IContentOrderedArgs) => {
             // カレント画面の移動に支障がある場合は移動しない。
             args.Permitted = this._content.CanLeave();
@@ -43,6 +50,9 @@ export default class NavigationController {
         });
 
         this.AdjustScreen();
+        (this._headerBar.GetIsSideBarVisible())
+            ? this._sideBar.OnShown()
+            : this._sideBar.OnCollapsed();
 
         this.InitialNavigation();
     }

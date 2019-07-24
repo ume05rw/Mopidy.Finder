@@ -111,6 +111,9 @@ export default class SideBar extends ViewBase {
     public get NavigationSettings(): HTMLAnchorElement {
         return this.$refs.NavigationSettings as HTMLAnchorElement;
     }
+    private get PlayerPanel(): PlayerPanel {
+        return this.$refs.PlayerPanel as PlayerPanel;
+    }
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
@@ -218,5 +221,13 @@ export default class SideBar extends ViewBase {
 
     private OnOperated(): void {
         this.$emit(SideBarEvents.Operated);
+    }
+
+    public OnShown(): void {
+        this.PlayerPanel.StartMonitor();
+    }
+
+    public OnCollapsed(): void {
+        this.PlayerPanel.StopMonitor();
     }
 }

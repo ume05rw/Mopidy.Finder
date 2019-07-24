@@ -5,9 +5,12 @@ import Exception from '../../Utils/Exception';
 import Libraries from '../../Libraries';
 import { ContentDetails, IContentDetailArgs } from '../Bases/IContentDetail';
 import * as AdminLte from 'admin-lte/dist/js/adminlte';
+import { PushMenuEvents } from '../Events/AdminLteEvents';
 
 export const HeaderBarEvents = {
-    DetailOrdered: 'DetailOrdered'
+    DetailOrdered: 'DetailOrdered',
+    SideBarShown: 'SideBarShown',
+    SideBarCollapsed: 'SideBarCollapsed'
 };
 
 @Component({
@@ -96,7 +99,7 @@ export default class HeaderBar extends ViewBase {
     private playlistsButtons: HTMLElement[] = [];
     private settingsButtons: HTMLElement[] = [];
 
-
+    private jqMainManuButton: JQuery;
     private mainMenuButton: AdminLte.PushMenu;
 
     private get MainMenuButton(): HTMLElement {
@@ -159,8 +162,14 @@ export default class HeaderBar extends ViewBase {
         Libraries.SetTooltip(this.MenuScanProgress, 'Scan Progress');
         this.AllButtonToHide();
 
-        const jqMainMenu = Libraries.$(this.MainMenuButton);
-        this.mainMenuButton = new Libraries.AdminLte.PushMenu(jqMainMenu);
+        this.jqMainManuButton = Libraries.$(this.MainMenuButton);
+        this.mainMenuButton = new Libraries.AdminLte.PushMenu(this.jqMainManuButton);
+        this.jqMainManuButton.on(PushMenuEvents.Shown, () => {
+            this.$emit(HeaderBarEvents.SideBarShown);
+        });
+        this.jqMainManuButton.on(PushMenuEvents.Collapsed, () => {
+            this.$emit(HeaderBarEvents.SideBarCollapsed);
+        });
 
         return true;
     }
@@ -280,13 +289,17 @@ export default class HeaderBar extends ViewBase {
         this.SetButtonActive(this.MenuScanProgress, this.settingsButtons);
     }
 
+    public GetIsSideBarVisible(): boolean {
+        return this.mainMenuButton.isShown();
+    }
+
     public SetSideBarOpen(): void {
         if (!this.mainMenuButton.isShown())
             this.mainMenuButton.show();
     }
+
     public SetSideBarClose(): void {
         if (this.mainMenuButton.isShown())
             this.mainMenuButton.collapse();
     }
-
 }

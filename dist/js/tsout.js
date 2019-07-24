@@ -3651,11 +3651,28 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
     }(ContentBase_1.default));
     exports.default = Finder;
 });
-define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_11, Libraries_10, IContentDetail_2) {
+define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.WidgetEvents = {
+        Expanded: 'expanded.lte.widget',
+        Collapsed: 'collapsed.lte.widget',
+        Maximized: 'maximized.lte.widget',
+        Minimized: 'minimized.lte.widget',
+        Removed: 'removed.lte.widget'
+    };
+    exports.PushMenuEvents = {
+        Collapsed: 'collapsed.lte.pushmenu',
+        Shown: 'shown.lte.pushmenu'
+    };
+});
+define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail", "Views/Events/AdminLteEvents"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_1, Exception_11, Libraries_10, IContentDetail_2, AdminLteEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HeaderBarEvents = {
-        DetailOrdered: 'DetailOrdered'
+        DetailOrdered: 'DetailOrdered',
+        SideBarShown: 'SideBarShown',
+        SideBarCollapsed: 'SideBarCollapsed'
     };
     var HeaderBar = /** @class */ (function (_super) {
         __extends(HeaderBar, _super);
@@ -3736,7 +3753,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
         });
         HeaderBar.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var jqMainMenu;
+                var _this = this;
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
                     this.allButtons.push(this.MenuGenres);
@@ -3764,8 +3781,14 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     Libraries_10.default.SetTooltip(this.MenuDb, 'Database');
                     Libraries_10.default.SetTooltip(this.MenuScanProgress, 'Scan Progress');
                     this.AllButtonToHide();
-                    jqMainMenu = Libraries_10.default.$(this.MainMenuButton);
-                    this.mainMenuButton = new Libraries_10.default.AdminLte.PushMenu(jqMainMenu);
+                    this.jqMainManuButton = Libraries_10.default.$(this.MainMenuButton);
+                    this.mainMenuButton = new Libraries_10.default.AdminLte.PushMenu(this.jqMainManuButton);
+                    this.jqMainManuButton.on(AdminLteEvents_1.PushMenuEvents.Shown, function () {
+                        _this.$emit(exports.HeaderBarEvents.SideBarShown);
+                    });
+                    this.jqMainManuButton.on(AdminLteEvents_1.PushMenuEvents.Collapsed, function () {
+                        _this.$emit(exports.HeaderBarEvents.SideBarCollapsed);
+                    });
                     return [2 /*return*/, true];
                 });
             });
@@ -3874,6 +3897,9 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
             this.SetButtonActive(this.MenuScanProgress, this.settingsButtons);
+        };
+        HeaderBar.prototype.GetIsSideBarVisible = function () {
+            return this.mainMenuButton.isShown();
         };
         HeaderBar.prototype.SetSideBarOpen = function () {
             if (!this.mainMenuButton.isShown())
@@ -6335,9 +6361,9 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
             var _this = this;
             if (this._timer !== null)
                 this.StopPolling();
+            this.Update();
             this._timer = setInterval(function () {
-                if (!_this._nowOnPollingProsess)
-                    _this.Polling();
+                _this.Update();
             }, Monitor.PollingMsec);
         };
         Monitor.prototype.StopPolling = function () {
@@ -6349,13 +6375,14 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
             }
             this._timer = null;
         };
-        Monitor.prototype.Polling = function () {
+        Monitor.prototype.Update = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var resState, resTrack, tlTrack, resTs, resVol, resRandom, resRepeat, ex_1;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (this._settingsEntity.IsBusy
+                            if (this._nowOnPollingProsess
+                                || this._settingsEntity.IsBusy
                                 || !this._settingsEntity.IsMopidyConnectable) {
                                 return [2 /*return*/];
                             }
@@ -6768,11 +6795,16 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                         else if (!_this.monitor.IsRepeat && enabled)
                             _this.ButtonRepeat.classList.add(PlayerPanel_1.ClassDisabled);
                     });
-                    // ポーリング一時停止するときは、ここをコメントアウト
-                    this.monitor.StartPolling();
                     return [2 /*return*/, true];
                 });
             });
+        };
+        PlayerPanel.prototype.StartMonitor = function () {
+            // ポーリング一時停止するときは、ここをコメントアウト
+            this.monitor.StartPolling();
+        };
+        PlayerPanel.prototype.StopMonitor = function () {
+            this.monitor.StopPolling();
         };
         PlayerPanel.prototype.GetPlayPauseIconClass = function () {
             return (this.monitor.PlayerState === Monitor_2.PlayerState.Playing)
@@ -6878,6 +6910,13 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(SideBar.prototype, "PlayerPanel", {
+            get: function () {
+                return this.$refs.PlayerPanel;
+            },
+            enumerable: true,
+            configurable: true
+        });
         SideBar.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
@@ -6975,6 +7014,12 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
         };
         SideBar.prototype.OnOperated = function () {
             this.$emit(exports.SideBarEvents.Operated);
+        };
+        SideBar.prototype.OnShown = function () {
+            this.PlayerPanel.StartMonitor();
+        };
+        SideBar.prototype.OnCollapsed = function () {
+            this.PlayerPanel.StopMonitor();
         };
         var SideBar_1;
         SideBar.ShowTabMethod = 'show';
@@ -7162,7 +7207,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
     }());
     exports.default = ContentController;
 });
-define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/Sidebars/Sidebar"], function (require, exports, Libraries_23, SettingsStore_2, IContent_4, SideBar_3) {
+define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/Sidebars/Sidebar"], function (require, exports, Libraries_23, SettingsStore_2, IContent_4, HeaderBar_3, SideBar_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var NavigationController = /** @class */ (function () {
@@ -7178,6 +7223,12 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             Libraries_23.default.$(window).resize(this._viewport.changed(function () {
                 _this.AdjustScreen();
             }));
+            this._headerBar.$on(HeaderBar_3.HeaderBarEvents.SideBarShown, function () {
+                _this._sideBar.OnShown();
+            });
+            this._headerBar.$on(HeaderBar_3.HeaderBarEvents.SideBarCollapsed, function () {
+                _this._sideBar.OnCollapsed();
+            });
             this._sideBar.$on(SideBar_3.SideBarEvents.ContentOrdered, function (args) {
                 // カレント画面の移動に支障がある場合は移動しない。
                 args.Permitted = _this._content.CanLeave();
@@ -7194,6 +7245,9 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                     _this._headerBar.SetSideBarClose();
             });
             this.AdjustScreen();
+            (this._headerBar.GetIsSideBarVisible())
+                ? this._sideBar.OnShown()
+                : this._sideBar.OnCollapsed();
             this.InitialNavigation();
         }
         NavigationController.prototype.InitialNavigation = function () {
@@ -7297,16 +7351,5 @@ define("Main", ["require", "exports", "Libraries", "Controllers/RootController"]
         return Main;
     }());
     var main = (new Main()).Init(); // eslint-disable-line
-});
-define("Views/Events/AdminLteEvents", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.WidgetEvents = {
-        Expanded: 'expanded.lte.widget',
-        Collapsed: 'collapsed.lte.widget',
-        Maximized: 'maximized.lte.widget',
-        Minimized: 'minimized.lte.widget',
-        Removed: 'removed.lte.widget'
-    };
 });
 //# sourceMappingURL=tsout.js.map
