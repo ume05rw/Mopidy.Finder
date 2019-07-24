@@ -6238,10 +6238,10 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
             _this._playerState = PlayerState.Paused;
             _this._tlId = null;
             _this._isPlaying = false;
-            _this._trackName = '';
+            _this._trackName = '--';
             _this._trackLength = 0;
             _this._trackProgress = 0;
-            _this._artistName = '';
+            _this._artistName = '--';
             _this._year = null;
             _this._imageUri = null;
             _this._volume = 0;
@@ -6251,10 +6251,10 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
                 TlId: null,
                 PlayerState: PlayerState.Paused,
                 IsPlaying: false,
-                TrackName: '',
+                TrackName: '--',
                 TrackLength: 0,
                 TrackProgress: 0,
-                ArtistName: '',
+                ArtistName: '--',
                 ImageUri: null,
                 Year: 0,
                 Volume: 0,
@@ -6562,7 +6562,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
         Monitor.prototype.Dispose = function () {
             clearInterval(this._timer);
         };
-        Monitor.PollingMsec = 2000;
+        Monitor.PollingMsec = 3000;
         Monitor.Methods = {
             GetState: 'core.playback.get_state',
             GetCurrentTlTrack: 'core.playback.get_current_tl_track',
@@ -6735,7 +6735,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_5.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_21, Monitor_2, Player_1, ViewBase_12) {
+define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_21, Monitor_2, Player_1, ViewBase_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayerPanelEvents = {
@@ -6747,6 +6747,9 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.player = new Player_1.default();
             _this.monitor = _this.player.Monitor;
+            _this.imageFullUri = _this.monitor.ImageFullUri;
+            _this.trackName = '--';
+            _this.trackDetail = '--';
             return _this;
         }
         PlayerPanel_1 = PlayerPanel;
@@ -6776,6 +6779,13 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                         }
                     });
                     this.volumeData = this.volumeSlider.data('ionRangeSlider');
+                    this.monitor.AddEventListener(Monitor_2.MonitorEvents.TrackChanged, function () {
+                        _this.imageFullUri = _this.monitor.ImageFullUri;
+                        _this.trackName = _this.monitor.TrackName;
+                        _this.trackDetail = (_this.monitor.ArtistName) + ((_this.monitor.Year)
+                            ? '(' + _this.monitor.Year + ')'
+                            : '');
+                    });
                     this.monitor.AddEventListener(Monitor_2.MonitorEvents.VolumeChanged, function () {
                         _this.volumeData.update({
                             from: _this.monitor.Volume
@@ -6812,58 +6822,139 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
                 : 'fa fa-play';
         };
         PlayerPanel.prototype.OnClickVolumeMin = function () {
-            this.volumeData.update({
-                from: 0
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.volumeData.update({
+                                from: 0
+                            });
+                            this.$emit(exports.PlayerPanelEvents.Operated);
+                            return [4 /*yield*/, this.player.SetVolume(0)];
+                        case 1:
+                            _a.sent();
+                            this.monitor.Update();
+                            return [2 /*return*/, true];
+                    }
+                });
             });
-            this.player.SetVolume(0);
-            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         PlayerPanel.prototype.OnClickVolumeMax = function () {
-            this.volumeData.update({
-                from: 100
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.volumeData.update({
+                                from: 100
+                            });
+                            this.$emit(exports.PlayerPanelEvents.Operated);
+                            return [4 /*yield*/, this.player.SetVolume(100)];
+                        case 1:
+                            _a.sent();
+                            this.monitor.Update();
+                            return [2 /*return*/, true];
+                    }
+                });
             });
-            this.player.SetVolume(100);
-            this.$emit(exports.PlayerPanelEvents.Operated);
         };
         PlayerPanel.prototype.OnClickPrevious = function () {
-            this.player.Previous();
-            this.$emit(exports.PlayerPanelEvents.Operated);
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.$emit(exports.PlayerPanelEvents.Operated);
+                            return [4 /*yield*/, this.player.Previous()];
+                        case 1:
+                            _a.sent();
+                            this.monitor.Update();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         PlayerPanel.prototype.OnClickPlayPause = function () {
-            if (this.monitor.PlayerState === Monitor_2.PlayerState.Playing) {
-                this.player.Pause();
-            }
-            else {
-                this.player.Play();
-            }
-            this.$emit(exports.PlayerPanelEvents.Operated);
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.$emit(exports.PlayerPanelEvents.Operated);
+                            if (!(this.monitor.PlayerState === Monitor_2.PlayerState.Playing)) return [3 /*break*/, 2];
+                            return [4 /*yield*/, this.player.Pause()];
+                        case 1:
+                            _a.sent();
+                            return [3 /*break*/, 4];
+                        case 2: return [4 /*yield*/, this.player.Play()];
+                        case 3:
+                            _a.sent();
+                            _a.label = 4;
+                        case 4:
+                            this.monitor.Update();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         PlayerPanel.prototype.OnClickNext = function () {
-            this.player.Next();
-            this.$emit(exports.PlayerPanelEvents.Operated);
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.$emit(exports.PlayerPanelEvents.Operated);
+                            return [4 /*yield*/, this.player.Next()];
+                        case 1:
+                            _a.sent();
+                            this.monitor.Update();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         PlayerPanel.prototype.OnClickShuffle = function () {
-            var enabled = !this.ButtonShuffle.classList.contains(PlayerPanel_1.ClassDisabled);
-            this.player.SetShuffle(!enabled);
-            this.$emit(exports.PlayerPanelEvents.Operated);
+            return __awaiter(this, void 0, void 0, function () {
+                var enabled;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.$emit(exports.PlayerPanelEvents.Operated);
+                            enabled = !this.ButtonShuffle.classList.contains(PlayerPanel_1.ClassDisabled);
+                            return [4 /*yield*/, this.player.SetShuffle(!enabled)];
+                        case 1:
+                            _a.sent();
+                            this.monitor.Update();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         PlayerPanel.prototype.OnClickRepeat = function () {
-            var enabled = !this.ButtonRepeat.classList.contains(PlayerPanel_1.ClassDisabled);
-            this.player.SetRepeat(!enabled);
-            this.$emit(exports.PlayerPanelEvents.Operated);
+            return __awaiter(this, void 0, void 0, function () {
+                var enabled;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.$emit(exports.PlayerPanelEvents.Operated);
+                            enabled = !this.ButtonRepeat.classList.contains(PlayerPanel_1.ClassDisabled);
+                            return [4 /*yield*/, this.player.SetRepeat(!enabled)];
+                        case 1:
+                            _a.sent();
+                            this.monitor.Update();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         var PlayerPanel_1;
         PlayerPanel.ClassDisabled = 'disabled';
         PlayerPanel = PlayerPanel_1 = __decorate([
             vue_class_component_22.default({
-                template: "<div class=\"card siderbar-control pb-10\">\n    <div class=\"card-body\">\n        <img v-bind:src=\"monitor.ImageFullUri\" class=\"albumart\" />\n        <h6 class=\"card-title\">{{ monitor.TrackName }}</h6>\n        <span>{{ monitor.ArtistName }}{{ (monitor.Year) ? '(' + monitor.Year + ')' : '' }}</span>\n        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickPrevious\">\n                <i class=\"fa fa-fast-backward\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickPlayPause\">\n                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickNext\">\n                <i class=\"fa fa-fast-forward\" />\n            </button>\n        </div>\n\n        <div class=\"btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-warning disabled\"\n                ref=\"ButtonShuffle\"\n                @click=\"OnClickShuffle\">\n                <i class=\"fa fa fa-random\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning disabled\"\n                ref=\"ButtonRepeat\"\n                @click=\"OnClickRepeat\" >\n                <i class=\"fa fa-retweet\" />\n            </button>\n        </div>\n\n        <div class=\"row volume-box w-100 mt-2\">\n            <div class=\"col-1 volume-button volume-min\">\n                <a @click=\"OnClickVolumeMin\">\n                    <i class=\"fa fa-volume-off\" />\n                </a>\n            </div>\n            <div class=\"col-10\">\n                <input type=\"text\"\n                    data-type=\"single\"\n                    data-min=\"0\"\n                    data-max=\"100\"\n                    data-from=\"100\"\n                    data-grid=\"true\"\n                    data-hide-min-max=\"true\"\n                    ref=\"Slider\" />\n            </div>\n            <div class=\"col-1 volume-button volume-max\">\n                <a @click=\"OnClickVolumeMax\">\n                    <i class=\"fa fa-volume-up\" />\n                </a>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"card siderbar-control pb-10\">\n    <div class=\"card-body\">\n        <img v-bind:src=\"imageFullUri\" class=\"albumart\" />\n        <h6 class=\"card-title\">{{ trackName }}</h6>\n        <span>{{ trackDetail }}</span>\n        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickPrevious\">\n                <i class=\"fa fa-fast-backward\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickPlayPause\">\n                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickNext\">\n                <i class=\"fa fa-fast-forward\" />\n            </button>\n        </div>\n\n        <div class=\"btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-warning disabled\"\n                ref=\"ButtonShuffle\"\n                @click=\"OnClickShuffle\">\n                <i class=\"fa fa fa-random\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning disabled\"\n                ref=\"ButtonRepeat\"\n                @click=\"OnClickRepeat\" >\n                <i class=\"fa fa-retweet\" />\n            </button>\n        </div>\n\n        <div class=\"row volume-box w-100 mt-2\">\n            <div class=\"col-1 volume-button volume-min\">\n                <a @click=\"OnClickVolumeMin\">\n                    <i class=\"fa fa-volume-off\" />\n                </a>\n            </div>\n            <div class=\"col-10\">\n                <input type=\"text\"\n                    data-type=\"single\"\n                    data-min=\"0\"\n                    data-max=\"100\"\n                    data-from=\"100\"\n                    data-grid=\"true\"\n                    data-hide-min-max=\"true\"\n                    ref=\"Slider\" />\n            </div>\n            <div class=\"col-1 volume-button volume-max\">\n                <a @click=\"OnClickVolumeMax\">\n                    <i class=\"fa fa-volume-up\" />\n                </a>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], PlayerPanel);
         return PlayerPanel;
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_22, Exception_16, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
+define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/SideBars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_22, Exception_16, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SideBarEvents = {
@@ -7035,7 +7126,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = SideBar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, SideBar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/SideBars/SideBar"], function (require, exports, vue_class_component_24, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, SideBar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7207,7 +7298,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
     }());
     exports.default = ContentController;
 });
-define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/Sidebars/Sidebar"], function (require, exports, Libraries_23, SettingsStore_2, IContent_4, HeaderBar_3, SideBar_3) {
+define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/SideBars/SideBar"], function (require, exports, Libraries_23, SettingsStore_2, IContent_4, HeaderBar_3, SideBar_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var NavigationController = /** @class */ (function () {

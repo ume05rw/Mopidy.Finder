@@ -11,9 +11,9 @@ export const PlayerPanelEvents = {
 @Component({
     template: `<div class="card siderbar-control pb-10">
     <div class="card-body">
-        <img v-bind:src="monitor.ImageFullUri" class="albumart" />
-        <h6 class="card-title">{{ monitor.TrackName }}</h6>
-        <span>{{ monitor.ArtistName }}{{ (monitor.Year) ? '(' + monitor.Year + ')' : '' }}</span>
+        <img v-bind:src="imageFullUri" class="albumart" />
+        <h6 class="card-title">{{ trackName }}</h6>
+        <span>{{ trackDetail }}</span>
         <div class="player-box btn-group btn-group-sm w-100 mt-2" role="group">
             <button type="button"
                 class="btn btn-warning"
@@ -79,6 +79,9 @@ export default class PlayerPanel extends ViewBase {
     private volumeData: any;
     private player: Player = new Player();
     private monitor: Monitor = this.player.Monitor;
+    private imageFullUri: string = this.monitor.ImageFullUri;
+    private trackName: string = '--';
+    private trackDetail: string = '--';
 
     private get ButtonShuffle(): HTMLButtonElement {
         return this.$refs.ButtonShuffle as HTMLButtonElement;
@@ -98,6 +101,14 @@ export default class PlayerPanel extends ViewBase {
             }
         });
         this.volumeData = this.volumeSlider.data('ionRangeSlider');
+
+        this.monitor.AddEventListener(MonitorEvents.TrackChanged, (): void => {
+            this.imageFullUri = this.monitor.ImageFullUri;
+            this.trackName = this.monitor.TrackName;
+            this.trackDetail = (this.monitor.ArtistName) + ((this.monitor.Year)
+                ? '(' + this.monitor.Year + ')'
+                : '');
+        });
 
         this.monitor.AddEventListener(MonitorEvents.VolumeChanged, (): void => {
             this.volumeData.update({
@@ -141,50 +152,71 @@ export default class PlayerPanel extends ViewBase {
             : 'fa fa-play';
     }
 
-    private OnClickVolumeMin(): void {
+    private async OnClickVolumeMin(): Promise<boolean> {
         this.volumeData.update({
             from: 0
         });
-        this.player.SetVolume(0);
         this.$emit(PlayerPanelEvents.Operated);
+        await this.player.SetVolume(0);
+        this.monitor.Update();
+
+        return true;
     }
 
-    private OnClickVolumeMax(): void {
+    private async OnClickVolumeMax(): Promise<boolean> {
         this.volumeData.update({
             from: 100
         });
-        this.player.SetVolume(100);
         this.$emit(PlayerPanelEvents.Operated);
+        await this.player.SetVolume(100);
+        this.monitor.Update();
+
+        return true;
     }
 
-    private OnClickPrevious(): void {
-        this.player.Previous();
+    private async OnClickPrevious(): Promise<boolean> {
         this.$emit(PlayerPanelEvents.Operated);
+        await this.player.Previous();
+        this.monitor.Update();
+
+        return true;
     }
 
-    private OnClickPlayPause(): void {
+    private async OnClickPlayPause(): Promise<boolean> {
+        this.$emit(PlayerPanelEvents.Operated);
         if (this.monitor.PlayerState === PlayerState.Playing) {
-            this.player.Pause();
+            await this.player.Pause();
         } else {
-            this.player.Play();
+            await this.player.Play();
         }
-        this.$emit(PlayerPanelEvents.Operated);
+        this.monitor.Update();
+
+        return true;
     }
 
-    private OnClickNext(): void {
-        this.player.Next();
+    private async OnClickNext(): Promise<boolean> {
         this.$emit(PlayerPanelEvents.Operated);
+        await this.player.Next();
+        this.monitor.Update();
+
+        return true;
     }
 
-    private OnClickShuffle(): void {
+    private async OnClickShuffle(): Promise<boolean> {
+        this.$emit(PlayerPanelEvents.Operated);
         const enabled = !this.ButtonShuffle.classList.contains(PlayerPanel.ClassDisabled);
-        this.player.SetShuffle(!enabled);
-        this.$emit(PlayerPanelEvents.Operated);
+        await this.player.SetShuffle(!enabled);
+        this.monitor.Update();
+
+        return true;
     }
 
-    private OnClickRepeat(): void {
-        const enabled = !this.ButtonRepeat.classList.contains(PlayerPanel.ClassDisabled);
-        this.player.SetRepeat(!enabled);
+    private async OnClickRepeat(): Promise<boolean> {
         this.$emit(PlayerPanelEvents.Operated);
+        const enabled = !this.ButtonRepeat.classList.contains(PlayerPanel.ClassDisabled);
+        await this.player.SetRepeat(!enabled);
+        this.monitor.Update();
+
+        return true;
     }
 }

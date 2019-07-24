@@ -35,7 +35,7 @@ export interface IStatus {
 
 export default class Monitor extends JsonRpcQueryableBase implements IStatus {
 
-    private static readonly PollingMsec = 2000;
+    private static readonly PollingMsec = 3000;
 
     private static readonly Methods = {
         GetState: 'core.playback.get_state',
@@ -51,10 +51,10 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
     private _playerState: PlayerState = PlayerState.Paused;
     private _tlId: number = null;
     private _isPlaying: boolean = false;
-    private _trackName: string = '';
+    private _trackName: string = '--';
     private _trackLength: number = 0;
     private _trackProgress: number = 0;
-    private _artistName: string = '';
+    private _artistName: string = '--';
     private _year: number = null;
     private _imageUri: string = null;
     private _volume: number = 0;
@@ -66,10 +66,10 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
         TlId: null,
         PlayerState: PlayerState.Paused,
         IsPlaying: false,
-        TrackName: '',
+        TrackName: '--',
         TrackLength: 0,
         TrackProgress: 0,
-        ArtistName: '',
+        ArtistName: '--',
         ImageUri: null,
         Year: 0,
         Volume: 0,
@@ -147,7 +147,7 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
         this._timer = null;
     }
 
-    private async Update(): Promise<boolean> {
+    public async Update(): Promise<boolean> {
         if (
             this._nowOnPollingProsess
             || this._settingsEntity.IsBusy
