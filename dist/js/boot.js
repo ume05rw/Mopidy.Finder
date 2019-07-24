@@ -151,12 +151,6 @@ define('sortablejs/modular/sortable.complete.esm', ["exports"], function (export
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = window.__globals['sortablejs/modular/sortable.complete.esm'];
 });
-// mopidy
-define('mopidy', ["exports"], function (exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = window.__globals['mopidy'];
-});
 // hammerjs
 define('hammerjs', ["exports"], function (exports) {
     "use strict";

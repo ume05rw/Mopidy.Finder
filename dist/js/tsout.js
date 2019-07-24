@@ -1156,7 +1156,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Utils/Dump", "Ut
     }(JsonRpcQueryableBase_1.default));
     exports.default = SettingsStore;
 });
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "admin-lte/dist/js/adminlte", "linq", "mopidy", "hammerjs", "admin-lte/plugins/sweetalert2/sweetalert2", "vue", "Models/Settings/SettingsStore", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "../css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, AdminLte, Enumerable, Mopidy, Hammer, sweetalert2_1, vue_1, SettingsStore_1) {
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "admin-lte/dist/js/adminlte", "linq", "hammerjs", "admin-lte/plugins/sweetalert2/sweetalert2", "vue", "Models/Settings/SettingsStore", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "../css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, AdminLte, Enumerable, Hammer, sweetalert2_1, vue_1, SettingsStore_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     // SweetAlert2 は個別読み込みOK.
@@ -1224,12 +1224,6 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         Libraries.ResponsiveBootstrapToolkit = ((ResponsiveBootstrapToolkit.default)
             ? ResponsiveBootstrapToolkit.default
             : ResponsiveBootstrapToolkit);
-        /**
-         * Mopidy
-         */
-        Libraries.Mopidy = ((Mopidy.default)
-            ? Mopidy.default
-            : Mopidy);
         /**
          * Hammer
          */

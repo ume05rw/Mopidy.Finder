@@ -33,7 +33,6 @@ import 'jquery-slimscroll';
  * --------------------------------------------------
  */
 import * as Enumerable from 'linq';
-import * as Mopidy from 'mopidy';
 import * as Hammer from 'hammerjs';
 import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
 import Vue from 'vue';
@@ -93,13 +92,6 @@ export default class Libraries {
     public static readonly ResponsiveBootstrapToolkit = (((ResponsiveBootstrapToolkit as any).default)
         ? (ResponsiveBootstrapToolkit as any).default
         : ResponsiveBootstrapToolkit) as typeof ResponsiveBootstrapToolkit;
-
-    /**
-     * Mopidy
-     */
-    public static readonly Mopidy = (((Mopidy as any).default)
-        ? (Mopidy as any).default
-        : Mopidy) as typeof Mopidy;
 
     /**
      * Hammer
