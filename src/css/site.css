@@ -160,7 +160,7 @@ div.dropdown {
 .inner-scrollbox {
     margin: 0;
     padding: 0;
-    width: calc(100% + 17px);
+    width: calc(100% + 18px);
     height: 100%;
     overflow-y: scroll;
 }
