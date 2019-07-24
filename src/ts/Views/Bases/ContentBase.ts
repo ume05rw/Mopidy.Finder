@@ -8,7 +8,7 @@ export default abstract class ContentBase extends TabBase implements IContent {
     public abstract GetIsPermitLeave(): boolean;
     public abstract InitContent(): void;
 
-    public SetSubViewToFulscreen(): void {
+    public SetDetailToFulscreen(): void {
         for (let i = 0; i < this.details.length; i++) {
             const detail = this.details[i];
             (i === 0)
@@ -16,7 +16,7 @@ export default abstract class ContentBase extends TabBase implements IContent {
                 : detail.Hide();
         }
     }
-    public SetSubviewToColumn(): void {
+    public SetDetailToColumn(): void {
         for (let i = 0; i < this.details.length; i++) {
             const detail = this.details[i];
             detail.Show();

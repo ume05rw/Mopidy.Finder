@@ -90,7 +90,7 @@ export default class ContentController {
         this._currentContent.InitContent();
     }
 
-    public GetIsPermitLeave(): boolean {
+    public CanLeave(): boolean {
         return (!this._currentContent)
             ? true
             : this._currentContent.GetIsPermitLeave();
@@ -98,11 +98,11 @@ export default class ContentController {
 
     public ContentToFullscreen(): void {
         for (let i = 0; i < this._allContents.length; i++)
-            this._allContents[i].SetSubViewToFulscreen();
+            this._allContents[i].SetDetailToFulscreen();
     }
     public ContentToColumn(): void {
         for (let i = 0; i < this._allContents.length; i++)
-            this._allContents[i].SetSubviewToColumn();
+            this._allContents[i].SetDetailToColumn();
     }
 
     public ShowSettingsDbProgress(updateProgress: IUpdateProgress): void {

@@ -805,7 +805,7 @@ define("Views/Bases/ContentBase", ["require", "exports", "Views/Bases/TabBase"],
         function ContentBase() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        ContentBase.prototype.SetSubViewToFulscreen = function () {
+        ContentBase.prototype.SetDetailToFulscreen = function () {
             for (var i = 0; i < this.details.length; i++) {
                 var detail = this.details[i];
                 (i === 0)
@@ -813,7 +813,7 @@ define("Views/Bases/ContentBase", ["require", "exports", "Views/Bases/TabBase"],
                     : detail.Hide();
             }
         };
-        ContentBase.prototype.SetSubviewToColumn = function () {
+        ContentBase.prototype.SetDetailToColumn = function () {
             for (var i = 0; i < this.details.length; i++) {
                 var detail = this.details[i];
                 detail.Show();
@@ -6708,7 +6708,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_5.default));
     exports.default = Player;
 });
-define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_21, Monitor_2, Player_1, ViewBase_12) {
+define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_21, Monitor_2, Player_1, ViewBase_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayerPanelEvents = {
@@ -6831,7 +6831,7 @@ define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/SideBars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_22, Exception_16, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
+define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_22, Exception_16, IContent_2, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SideBarEvents = {
@@ -6955,6 +6955,8 @@ define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "
                 Permitted: true
             };
             this.$emit(exports.SideBarEvents.ContentOrdered, orderedArgs);
+            if (orderedArgs.Permitted === true)
+                this.$emit(exports.SideBarEvents.Operated);
         };
         SideBar.prototype.SetNavigation = function (content) {
             switch (content) {
@@ -6988,7 +6990,7 @@ define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = SideBar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/SideBars/SideBar"], function (require, exports, vue_class_component_24, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, SideBar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, SideBar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7133,18 +7135,18 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
             this._currentContent = this.GetContent(content);
             this._currentContent.InitContent();
         };
-        ContentController.prototype.GetIsPermitLeave = function () {
+        ContentController.prototype.CanLeave = function () {
             return (!this._currentContent)
                 ? true
                 : this._currentContent.GetIsPermitLeave();
         };
         ContentController.prototype.ContentToFullscreen = function () {
             for (var i = 0; i < this._allContents.length; i++)
-                this._allContents[i].SetSubViewToFulscreen();
+                this._allContents[i].SetDetailToFulscreen();
         };
         ContentController.prototype.ContentToColumn = function () {
             for (var i = 0; i < this._allContents.length; i++)
-                this._allContents[i].SetSubviewToColumn();
+                this._allContents[i].SetDetailToColumn();
         };
         ContentController.prototype.ShowSettingsDbProgress = function (updateProgress) {
             if (this._currentContent !== this._settings)
@@ -7160,7 +7162,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
     }());
     exports.default = ContentController;
 });
-define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/SideBars/SideBar"], function (require, exports, Libraries_23, SettingsStore_2, IContent_4, SideBar_3) {
+define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/Sidebars/Sidebar"], function (require, exports, Libraries_23, SettingsStore_2, IContent_4, SideBar_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var NavigationController = /** @class */ (function () {
@@ -7178,7 +7180,8 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             }));
             this._sideBar.$on(SideBar_3.SideBarEvents.ContentOrdered, function (args) {
                 // カレント画面の移動に支障がある場合は移動しない。
-                if (!_this._content.GetIsPermitLeave())
+                args.Permitted = _this._content.CanLeave();
+                if (!args.Permitted)
                     return;
                 _this._content.SetCurrentContent(args.Content);
             });
@@ -7187,9 +7190,8 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                 _this._content.EmitTabEvent(args);
             });
             this._sideBar.$on(SideBar_3.SideBarEvents.Operated, function () {
-                if (_this._viewport.is('<=lg')) {
+                if (_this._viewport.is('<=lg'))
                     _this._headerBar.SetSideBarClose();
-                }
             });
             this.AdjustScreen();
             this.InitialNavigation();
@@ -7236,7 +7238,7 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             else if (this._viewport.is('>sm')) {
                 this._content.ContentToColumn();
             }
-            // サイドバーは、mdサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
+            // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
             if (this._viewport.is('<=lg')) {
                 this._headerBar.SetSideBarClose();
             }

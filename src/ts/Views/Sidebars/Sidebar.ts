@@ -195,6 +195,9 @@ export default class SideBar extends ViewBase {
             Permitted: true
         };
         this.$emit(SideBarEvents.ContentOrdered, orderedArgs);
+
+        if (orderedArgs.Permitted === true)
+            this.$emit(SideBarEvents.Operated);
     }
 
     public SetNavigation(content: Contents): void {

@@ -16,7 +16,7 @@ export interface IContentOrderedArgs extends IContentArgs {
 export default interface IContent extends ITab {
     GetIsPermitLeave(): boolean;
     InitContent(): void;
-    SetSubViewToFulscreen(): void;
-    SetSubviewToColumn(): void;
+    SetDetailToFulscreen(): void;
+    SetDetailToColumn(): void;
     ShowContentDetail(args: IContentDetailArgs): void;
 }

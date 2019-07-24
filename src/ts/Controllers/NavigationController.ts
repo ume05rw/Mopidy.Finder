@@ -26,7 +26,8 @@ export default class NavigationController {
 
         this._sideBar.$on(SideBarEvents.ContentOrdered, (args: IContentOrderedArgs) => {
             // カレント画面の移動に支障がある場合は移動しない。
-            if (!this._content.GetIsPermitLeave())
+            args.Permitted = this._content.CanLeave();
+            if (!args.Permitted)
                 return;
 
             this._content.SetCurrentContent(args.Content);
@@ -37,9 +38,8 @@ export default class NavigationController {
         });
 
         this._sideBar.$on(SideBarEvents.Operated, () => {
-            if (this._viewport.is('<=lg')) {
+            if (this._viewport.is('<=lg'))
                 this._headerBar.SetSideBarClose();
-            }
         });
 
         this.AdjustScreen();
@@ -80,7 +80,7 @@ export default class NavigationController {
             this._content.ContentToColumn();
         }
 
-        // サイドバーは、mdサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
+        // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
         if (this._viewport.is('<=lg')) {
             this._headerBar.SetSideBarClose();
         } else if (this._viewport.is('>lg')) {
