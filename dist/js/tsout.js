@@ -150,424 +150,6 @@ define("EventableBase", ["require", "exports", "lodash"], function (require, exp
     }());
     exports.default = EventableBase;
 });
-define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "admin-lte/dist/js/adminlte", "linq", "mopidy", "hammerjs", "admin-lte/plugins/sweetalert2/sweetalert2", "vue", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "../css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, AdminLte, Enumerable, Mopidy, Hammer, sweetalert2_1, vue_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    // SweetAlert2 は個別読み込みOK.
-    //import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
-    /**
-     * VS開発時のステップデバッグ環境を維持するため、開発環境ではAMD形式で
-     * ライブラリをexportしている。
-     * AMD形式では、単一名かつdefault-export無しのライブラリがexport出来ないため、
-     * 強制的にdefault-exportしている。
-     * プロダクションビルドでは書いた通りで動くため、その差分を吸収するためのロジック。
-     */
-    var Libraries = /** @class */ (function () {
-        function Libraries() {
-        }
-        /* eslint-enable @typescript-eslint/indent */
-        Libraries.GetElement = function (arg) {
-            return (arg instanceof vue_1.default)
-                ? arg.$el
-                : arg;
-        };
-        Libraries.Initialize = function () {
-            // ResponsiveBootstrapToolkitをbootstrap4に対応させる
-            // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
-            Libraries.ResponsiveBootstrapToolkit.use('bs4', {
-                'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
-                'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
-                'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
-                'lg': Libraries.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
-                'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
-            });
-        };
-        /**
-         * linq.js
-         * ※バージョンは3.1.1に固定する。最新版の型定義がes5に対応しなくなったため。
-         */
-        Libraries.Enumerable = ((Enumerable.default)
-            ? Enumerable.default
-            : Enumerable);
-        /**
-         * JQuery: Admin-LTE, Bootsrapが依存している。
-         */
-        Libraries.jQuery = ((jQuery.default)
-            ? jQuery.default
-            : jQuery);
-        Libraries.$ = Libraries.jQuery;
-        Libraries.JQueryEventBinds = {
-            On: function (element, eventName, handler) {
-                var elem = Libraries.GetElement(element);
-                Libraries.$(elem).on(eventName, handler);
-            },
-            Off: function (element, eventName, handler) {
-                var elem = Libraries.GetElement(element);
-                Libraries.$(elem).off(eventName, handler);
-            },
-            OffAll: function (element, eventName) {
-                var elem = Libraries.GetElement(element);
-                Libraries.$(elem).off(eventName);
-            }
-        };
-        /**
-         * Bootstrap Toolkit
-         * 画面サイズ切替判定で使用
-         */
-        Libraries.ResponsiveBootstrapToolkit = ((ResponsiveBootstrapToolkit.default)
-            ? ResponsiveBootstrapToolkit.default
-            : ResponsiveBootstrapToolkit);
-        /**
-         * Mopidy
-         */
-        Libraries.Mopidy = ((Mopidy.default)
-            ? Mopidy.default
-            : Mopidy);
-        /**
-         * Hammer
-         */
-        Libraries.Hammer = ((Hammer.default)
-            ? Hammer.default
-            : Hammer);
-        /**
-         * AdminLTE
-         */
-        Libraries.AdminLte = AdminLte;
-        /**
-         * SlimScroll (on JQuery)
-         */
-        /* eslint-disable @typescript-eslint/indent */
-        Libraries.SlimScroll = function (element, opstions) {
-            Libraries.$(element).slimScroll(opstions);
-        };
-        /* eslint-enable @typescript-eslint/indent */
-        /**
-         * Popper (on JQuery)
-         */
-        /* eslint-disable @typescript-eslint/indent */
-        Libraries.SetTooltip = function (element, message) {
-            Libraries.$(element).tooltip({
-                placement: 'top',
-                title: message,
-                trigger: 'hover',
-                delay: {
-                    show: 1000,
-                    hide: 100
-                }
-            });
-        };
-        /* eslint-enable @typescript-eslint/indent */
-        /**
-         * SweetAlert2 - Toast
-         *
-         * type: 'success' | 'error' | 'warning' | 'info' | 'question'
-         * ex) Toast.fire({ type: 'success', title: 'any message here.' });
-         */
-        Libraries.Toast = sweetalert2_1.default.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000
-        });
-        /* eslint-disable @typescript-eslint/indent */
-        Libraries.InnerShowToast = function (toastType, message) {
-            Libraries.Toast.fire({
-                type: toastType,
-                title: message
-            });
-        };
-        /**
-         * SweerAlert2のToast表示メソッド
-         * 型定義が冗長なのはなんとかならんのか
-         */
-        Libraries.ShowToast = {
-            Success: function (message) { return Libraries.InnerShowToast('success', message); },
-            Info: function (message) { return Libraries.InnerShowToast('info', message); },
-            Question: function (message) { return Libraries.InnerShowToast('question', message); },
-            Warning: function (message) { return Libraries.InnerShowToast('warning', message); },
-            Error: function (message) { return Libraries.InnerShowToast('error', message); }
-        };
-        Libraries.Modal = {
-            Show: function (arg) {
-                var elem = Libraries.GetElement(arg);
-                Libraries.$(elem).modal('show');
-            },
-            Hide: function (arg) {
-                var elem = Libraries.GetElement(arg);
-                Libraries.$(elem).modal('hide');
-            }
-        };
-        return Libraries;
-    }());
-    exports.default = Libraries;
-});
-define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function (require, exports, _, vue_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ViewBase = /** @class */ (function (_super) {
-        __extends(ViewBase, _super);
-        function ViewBase(options) {
-            var _this = _super.call(this, options) || this;
-            _this.initialized = false;
-            return _this;
-        }
-        ViewBase.prototype.Initialize = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    if (this.initialized)
-                        return [2 /*return*/, true];
-                    _.each(this.$children, function (view) {
-                        if (view instanceof ViewBase) {
-                            try {
-                                view.Initialize();
-                            }
-                            catch (e) {
-                                console.error('Initialize Error');
-                                console.error(e);
-                            }
-                        }
-                    });
-                    this.initialized = true;
-                    return [2 /*return*/, true];
-                });
-            });
-        };
-        ViewBase.prototype.GetIsInitialized = function () {
-            return this.initialized;
-        };
-        return ViewBase;
-    }(vue_2.default));
-    exports.default = ViewBase;
-});
-define("Models/Mopidies/IArtist", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Relations/ArtistAlbum", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ArtistAlbum = /** @class */ (function () {
-        function ArtistAlbum() {
-            this.ArtistId = null;
-            this.AlbumId = null;
-        }
-        ArtistAlbum.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new ArtistAlbum();
-            result.ArtistId = entity.ArtistId || null;
-            result.AlbumId = entity.AlbumId || null;
-            return result;
-        };
-        ArtistAlbum.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = ArtistAlbum.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        return ArtistAlbum;
-    }());
-    exports.default = ArtistAlbum;
-});
-define("Models/Relations/GenreArtist", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var GenreArtist = /** @class */ (function () {
-        function GenreArtist() {
-            this.GenreId = null;
-            this.ArtistId = null;
-        }
-        GenreArtist.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new GenreArtist();
-            result.GenreId = entity.GenreId || null;
-            result.ArtistId = entity.ArtistId || null;
-            return result;
-        };
-        GenreArtist.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = GenreArtist.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        return GenreArtist;
-    }());
-    exports.default = GenreArtist;
-});
-define("Models/Artists/Artist", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreArtist"], function (require, exports, ArtistAlbum_1, GenreArtist_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Artist = /** @class */ (function () {
-        function Artist() {
-            this.Id = null;
-            this.Name = null;
-            this.LowerName = null;
-            this.Uri = null;
-            this.ImageUri = null;
-            this.ArtistAlbums = [];
-            this.GenreArtists = [];
-        }
-        Artist.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Artist();
-            result.Id = entity.Id || null;
-            result.Name = entity.Name || null;
-            result.LowerName = entity.LowerName || null;
-            result.Uri = entity.Uri || null;
-            result.ImageUri = entity.ImageUri || null;
-            result.ArtistAlbums = ArtistAlbum_1.default.CreateArray(entity.ArtistAlbums);
-            result.GenreArtists = GenreArtist_1.default.CreateArray(entity.GenreArtists);
-            return result;
-        };
-        Artist.CreateFromMopidy = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Artist();
-            result.Id = null;
-            result.Name = entity.name || null;
-            result.LowerName = (entity.name)
-                ? entity.name.toLowerCase()
-                : null;
-            result.Uri = entity.uri || null;
-            result.ImageUri = null;
-            result.ArtistAlbums = [];
-            result.GenreArtists = [];
-            return result;
-        };
-        Artist.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Artist.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        Artist.CreateArrayFromMopidy = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Artist.CreateFromMopidy(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        return Artist;
-    }());
-    exports.default = Artist;
-});
-define("Models/Relations/GenreAlbum", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var GenreAlbum = /** @class */ (function () {
-        function GenreAlbum() {
-            this.GenreId = null;
-            this.AlbumId = null;
-        }
-        GenreAlbum.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new GenreAlbum();
-            result.GenreId = entity.GenreId || null;
-            result.AlbumId = entity.AlbumId || null;
-            return result;
-        };
-        GenreAlbum.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = GenreAlbum.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        return GenreAlbum;
-    }());
-    exports.default = GenreAlbum;
-});
-define("Models/Genres/Genre", ["require", "exports", "Models/Relations/GenreAlbum", "Models/Relations/GenreArtist"], function (require, exports, GenreAlbum_1, GenreArtist_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Genre = /** @class */ (function () {
-        function Genre() {
-            this.Id = null;
-            this.Name = null;
-            this.LowerName = null;
-            this.Uri = null;
-            this.GenreArtists = [];
-            this.GenreAlbums = [];
-        }
-        Genre.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Genre();
-            if (entity) {
-                result.Id = entity.Id || null;
-                result.Name = entity.Name || null;
-                result.LowerName = entity.LowerName || null;
-                result.Uri = entity.Uri || null;
-                result.GenreArtists = GenreArtist_2.default.CreateArray(entity.GenreArtists);
-                result.GenreAlbums = GenreAlbum_1.default.CreateArray(entity.GenreAlbums);
-            }
-            return result;
-        };
-        Genre.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Genre.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        return Genre;
-    }());
-    exports.default = Genre;
-});
-define("Utils/Exception", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Exception = /** @class */ (function () {
-        function Exception() {
-        }
-        Exception.Throw = function (message, data) {
-            throw new Error(Exception.CreateDump(message, data));
-        };
-        //public static Dump(message: string, data?: any): void {
-        //    console.error(Exception.CreateDump(message, data)); // eslint-disable-line
-        //}
-        Exception.CreateDump = function (message, data) {
-            if (!message)
-                message = 'Unexpexted Error';
-            return JSON.stringify({
-                Message: message,
-                Data: data
-            });
-        };
-        return Exception;
-    }());
-    exports.default = Exception;
-});
 define("Utils/Dump", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -610,628 +192,29 @@ define("Utils/Dump", ["require", "exports"], function (require, exports) {
     }());
     exports.default = Dump;
 });
-define("Utils/Delay", ["require", "exports", "Utils/Exception", "Utils/Dump"], function (require, exports, Exception_1, Dump_1) {
+define("Utils/Exception", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var DelayedOnceExecuter = /** @class */ (function () {
-        function DelayedOnceExecuter(callback, delay, timeout, isMonitor) {
-            var _this = this;
-            if (delay === void 0) { delay = 100; }
-            if (timeout === void 0) { timeout = -1; }
-            if (isMonitor === void 0) { isMonitor = false; }
-            this.Name = '';
-            this._callback = callback;
-            this._delay = delay;
-            this._timeout = timeout;
-            this._startTime = null;
-            this._timer = null;
-            this._isActive = false;
-            this._suppressCount = 0;
-            this._timeoutExecStartTime = null;
-            if (isMonitor) {
-                setInterval(function () {
-                    if (!_this._isActive)
-                        return;
-                    if (_this._startTime || _this._timeoutExecStartTime) {
-                        var now = new Date();
-                        var elapsed = (_this._timeoutExecStartTime)
-                            ? now.getTime() - _this._timeoutExecStartTime.getTime()
-                            : now.getTime() - _this._startTime.getTime();
-                        if (DelayedOnceExecuter.DelayThreshold < elapsed) {
-                            // Delay閾値より長い時間の間、一度も実行されていない。
-                            // 無限ループの可能性がある。
-                            Dump_1.default.Warning('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
-                        }
-                    }
-                    if (DelayedOnceExecuter.SuppressThreshold < _this._suppressCount) {
-                        // Suppress閾値より多くの回数分、実行が抑制されている。
-                        // 呼び出し回数が多すぎる可能性がある。
-                        Dump_1.default.Warning('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
-                    }
-                }, DelayedOnceExecuter.MonitorInterval);
-            }
+    var Exception = /** @class */ (function () {
+        function Exception() {
         }
-        Object.defineProperty(DelayedOnceExecuter.prototype, "Delay", {
-            get: function () {
-                return this._delay;
-            },
-            set: function (value) {
-                this._delay = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(DelayedOnceExecuter.prototype, "Timeout", {
-            get: function () {
-                return this._timeout;
-            },
-            set: function (value) {
-                this._timeout = value;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        DelayedOnceExecuter.prototype.Exec = function (args) {
-            var _this = this;
-            this._isActive = true;
-            if (this._timer === null) {
-                // これから開始するとき
-                this._startTime = new Date();
-                this._suppressCount = 0;
-            }
-            else {
-                // 既に開始中のとき
-                clearInterval(this._timer);
-                this._timer = null;
-                this._suppressCount++;
-            }
-            var now = new Date();
-            var elapsed = (now.getTime() - this._startTime.getTime());
-            if (0 < this._timeout && elapsed > this._timeout) {
-                // タイムアウト実行が連続するときの、最初の開始時間を保持しておく。
-                if (this._timeoutExecStartTime === null)
-                    this._timeoutExecStartTime = this._startTime;
-                this.InnerExec(args);
-            }
-            else {
-                this._timer = setTimeout(function () {
-                    _this._timeoutExecStartTime = null;
-                    _this.InnerExec(args);
-                }, this._delay);
-            }
+        Exception.Throw = function (message, data) {
+            throw new Error(Exception.CreateDump(message, data));
         };
-        DelayedOnceExecuter.prototype.InnerExec = function (args) {
-            try {
-                this._callback(args);
-            }
-            catch (ex) {
-                Dump_1.default.Error('Callback FAILED!!', ex);
-            }
-            if (this._timer) {
-                clearInterval(this._timer);
-                this._timer = null;
-            }
-            this._startTime = null;
-            this._suppressCount = 0;
-            this._isActive = false;
-        };
-        DelayedOnceExecuter.MonitorInterval = 10000;
-        DelayedOnceExecuter.DelayThreshold = 3000;
-        DelayedOnceExecuter.SuppressThreshold = 100;
-        return DelayedOnceExecuter;
-    }());
-    exports.DelayedOnceExecuter = DelayedOnceExecuter;
-    var Delay = /** @class */ (function () {
-        function Delay() {
-        }
-        Delay.Wait = function (msec) {
-            return new Promise(function (resolve) {
-                window.setTimeout(function () {
-                    try {
-                        resolve(true);
-                    }
-                    catch (ex) {
-                        Exception_1.default.Throw('Delay Exception.', ex);
-                    }
-                }, msec);
+        //public static Dump(message: string, data?: any): void {
+        //    console.error(Exception.CreateDump(message, data)); // eslint-disable-line
+        //}
+        Exception.CreateDump = function (message, data) {
+            if (!message)
+                message = 'Unexpexted Error';
+            return JSON.stringify({
+                Message: message,
+                Data: data
             });
         };
-        Delay.DelayedOnce = function (callback, delay, timeout, isMonitor) {
-            if (delay === void 0) { delay = 100; }
-            if (timeout === void 0) { timeout = -1; }
-            if (isMonitor === void 0) { isMonitor = false; }
-            return new DelayedOnceExecuter(callback, delay, timeout, isMonitor);
-        };
-        return Delay;
+        return Exception;
     }());
-    exports.default = Delay;
-});
-define("Views/Bases/TabBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.TabEvents = {
-        Show: 'Show',
-        Shown: 'Shown',
-        Hide: 'Hide',
-        Hidden: 'Hidden',
-    };
-    var TabBase = /** @class */ (function (_super) {
-        __extends(TabBase, _super);
-        function TabBase() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        TabBase.prototype.OnShow = function () {
-        };
-        TabBase.prototype.OnShown = function () {
-        };
-        TabBase.prototype.OnHide = function () {
-        };
-        TabBase.prototype.OnHidden = function () {
-        };
-        return TabBase;
-    }(ViewBase_1.default));
-    exports.default = TabBase;
-});
-define("Views/Bases/IContent", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Contents;
-    (function (Contents) {
-        Contents["Finder"] = "Finder";
-        Contents["Playlists"] = "Playlists";
-        Contents["Settings"] = "Settings";
-    })(Contents = exports.Contents || (exports.Contents = {}));
-});
-define("Views/Bases/IContentDetail", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ContentDetails;
-    (function (ContentDetails) {
-        ContentDetails["Genres"] = "Genres";
-        ContentDetails["Artists"] = "Artists";
-        ContentDetails["AlbumTracks"] = "AlbumTracks";
-        ContentDetails["Playlists"] = "Playlists";
-        ContentDetails["PlaylistTracks"] = "PlaylistTracks";
-        ContentDetails["SetMopidy"] = "SetMopidy";
-        ContentDetails["Database"] = "Database";
-        ContentDetails["ScanProgress"] = "ScanProgress";
-    })(ContentDetails = exports.ContentDetails || (exports.ContentDetails = {}));
-    var SwipeDirection;
-    (function (SwipeDirection) {
-        SwipeDirection[SwipeDirection["Left"] = 0] = "Left";
-        SwipeDirection[SwipeDirection["Right"] = 1] = "Right";
-        SwipeDirection[SwipeDirection["Up"] = 2] = "Up";
-        SwipeDirection[SwipeDirection["Down"] = 3] = "Down";
-    })(SwipeDirection = exports.SwipeDirection || (exports.SwipeDirection = {}));
-    ;
-    exports.ContentDetailEvents = {
-        Swiped: 'Swiped'
-    };
-});
-define("Views/Bases/ContentBase", ["require", "exports", "Views/Bases/TabBase", "Views/Bases/IContentDetail"], function (require, exports, TabBase_1, IContentDetail_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ContentBase = /** @class */ (function (_super) {
-        __extends(ContentBase, _super);
-        function ContentBase() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        ContentBase.prototype.SetDetailToFulscreen = function () {
-            for (var i = 0; i < this.details.length; i++) {
-                var detail = this.details[i];
-                (i === 0)
-                    ? detail.Show()
-                    : detail.Hide();
-            }
-        };
-        ContentBase.prototype.SetDetailToColumn = function () {
-            for (var i = 0; i < this.details.length; i++) {
-                var detail = this.details[i];
-                detail.Show();
-            }
-        };
-        ContentBase.prototype.HideAllDetails = function () {
-            for (var i = 0; i < this.details.length; i++) {
-                var detail = this.details[i];
-                detail.Hide();
-            }
-        };
-        ContentBase.prototype.OnSwiped = function (args) {
-            this.$emit(IContentDetail_1.ContentDetailEvents.Swiped, args);
-        };
-        return ContentBase;
-    }(TabBase_1.default));
-    exports.default = ContentBase;
-});
-define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_1, vue_property_decorator_1, ViewBase_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SelectionItemEvents = {
-        SelectionOrdered: 'SelectionOrdered',
-        SelectionChanged: 'SelectionChanged'
-    };
-    var SelectionItem = /** @class */ (function (_super) {
-        __extends(SelectionItem, _super);
-        function SelectionItem() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.selected = false;
-            return _this;
-        }
-        SelectionItem_1 = SelectionItem;
-        Object.defineProperty(SelectionItem.prototype, "Li", {
-            get: function () {
-                return this.$refs.Li;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        SelectionItem.prototype.OnClick = function () {
-            var orderedArgs = {
-                Entity: this.entity,
-                Selected: !this.selected,
-                Permitted: true
-            };
-            this.$emit(exports.SelectionItemEvents.SelectionOrdered, orderedArgs);
-            if (orderedArgs.Permitted !== true)
-                return;
-            this.SetSelected(!this.selected);
-        };
-        SelectionItem.prototype.SetSelected = function (selected) {
-            this.selected = selected;
-            this.SetClassBySelection();
-            var changedArgs = {
-                Entity: this.entity,
-                Selected: this.selected
-            };
-            this.$emit(exports.SelectionItemEvents.SelectionChanged, changedArgs);
-        };
-        SelectionItem.prototype.SetClassBySelection = function () {
-            if (this.selected) {
-                if (!this.Li.classList.contains(SelectionItem_1.SelectedColor))
-                    this.Li.classList.add(SelectionItem_1.SelectedColor);
-            }
-            else {
-                if (this.Li.classList.contains(SelectionItem_1.SelectedColor))
-                    this.Li.classList.remove(SelectionItem_1.SelectedColor);
-            }
-        };
-        SelectionItem.prototype.GetSelected = function () {
-            return this.selected;
-        };
-        SelectionItem.prototype.GetEntity = function () {
-            return this.entity;
-        };
-        var SelectionItem_1;
-        SelectionItem.SelectedColor = 'selected';
-        __decorate([
-            vue_property_decorator_1.Prop(),
-            __metadata("design:type", Object)
-        ], SelectionItem.prototype, "entity", void 0);
-        SelectionItem = SelectionItem_1 = __decorate([
-            vue_class_component_1.default({
-                template: "<li class=\"nav-item\"\n                   ref=\"Li\" >\n    <span class=\"d-block w-100 text-nowrap text-truncate\"\n       @click=\"OnClick\" >\n        {{ (entity.Name == ' ') ? '[blank]' : entity.Name }}\n    </span>\n</li>"
-            })
-        ], SelectionItem);
-        return SelectionItem;
-    }(ViewBase_2.default));
-    exports.default = SelectionItem;
-});
-define("Models/Mopidies/IAlbum", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Albums/Album", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreAlbum"], function (require, exports, ArtistAlbum_2, GenreAlbum_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Album = /** @class */ (function () {
-        function Album() {
-            this.Id = null;
-            this.Name = null;
-            this.LowerName = null;
-            this.Uri = null;
-            this.Year = null;
-            this.ImageUri = null;
-            this.ArtistAlbums = [];
-            this.GenreAlbums = [];
-        }
-        Object.defineProperty(Album, "DefaultImage", {
-            /**
-             * テストドライバー上ではlocationが存在しない。
-             */
-            get: function () {
-                return (!location)
-                    ? 'http://localhost:6680/img/nullImage.jpg'
-                    : location.protocol + "//" + location.host + "/img/nullImage.jpg";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Album.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Album();
-            result.Id = entity.Id || null;
-            result.Name = entity.Name || null;
-            result.LowerName = entity.LowerName || null;
-            result.Uri = entity.Uri || null;
-            result.Year = entity.Year || null;
-            result.ImageUri = entity.ImageUri || null;
-            result.ArtistAlbums = ArtistAlbum_2.default.CreateArray(entity.ArtistAlbums);
-            result.GenreAlbums = GenreAlbum_2.default.CreateArray(entity.GenreAlbums);
-            return result;
-        };
-        Album.CreateFromMopidy = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Album();
-            result.Id = null;
-            result.Name = entity.name || null;
-            result.LowerName = (entity.name)
-                ? entity.name.toLowerCase()
-                : null;
-            result.Uri = entity.uri || null;
-            result.Year = (entity.date && 4 <= entity.date.length)
-                ? (4 < entity.date.length)
-                    ? parseInt(entity.date.substr(0, 4), 10)
-                    : parseInt(entity.date)
-                : null;
-            result.ImageUri = (entity.images && entity.images[0])
-                ? entity.images[0]
-                : null;
-            result.ArtistAlbums = [];
-            result.GenreAlbums = [];
-            return result;
-        };
-        Album.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Album.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        Album.CreateArrayFromMopidy = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Album.CreateFromMopidy(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        Album.prototype.GetImageFullUri = function () {
-            return (!this.ImageUri || this.ImageUri == '')
-                ? Album.DefaultImage
-                : location.protocol + "//" + location.host + this.ImageUri;
-        };
-        return Album;
-    }());
-    exports.default = Album;
-});
-define("Models/Mopidies/ITrack", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Tracks/Track", ["require", "exports", "Utils/Dump", "Models/Albums/Album", "Models/Artists/Artist"], function (require, exports, Dump_2, Album_1, Artist_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Track = /** @class */ (function () {
-        function Track() {
-            this.Id = null;
-            this.Name = null;
-            this.LowerName = null;
-            this.Uri = null;
-            this.TlId = null;
-            this.DiscNo = null;
-            this.TrackNo = null;
-            this.Date = null;
-            this.Comment = null;
-            this.Length = null;
-            this.BitRate = null;
-            this.LastModified = null;
-            this.Album = null;
-            this.Artists = [];
-        }
-        Track.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Track();
-            result.Id = entity.Id || null;
-            result.Name = entity.Name || null;
-            result.LowerName = entity.LowerName || null;
-            result.Uri = entity.Uri || null;
-            result.TlId = entity.TlId || null;
-            result.DiscNo = entity.DiscNo || null;
-            result.TrackNo = entity.TrackNo || null;
-            result.Date = entity.Date || null;
-            result.Comment = entity.Comment || null;
-            result.Length = entity.Length || null;
-            result.BitRate = entity.BitRate || null;
-            result.LastModified = entity.LastModified || null;
-            result.Album = Album_1.default.Create(entity.Album);
-            result.Artists = Artist_1.default.CreateArray(entity.Artists);
-            // JSONがアホほどでかくなるのでやめる
-            //result.Genre = Genre.Create(entity.Genre);
-            //result.Composers = Artist.CreateArray(entity.Composers);
-            //result.Performers = Artist.CreateArray(entity.Performers);
-            return result;
-        };
-        Track.CreateFromMopidy = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Track();
-            result.Id = null;
-            result.Name = entity.name || null;
-            result.LowerName = (entity.name)
-                ? entity.name.toLowerCase()
-                : null;
-            result.Uri = entity.uri || null;
-            result.TlId = null;
-            result.DiscNo = entity.disc_no || null;
-            result.TrackNo = entity.track_no || null;
-            result.Date = entity.date || null;
-            result.Comment = entity.comment || null;
-            result.Length = entity.length || null;
-            result.BitRate = entity.bitrate || null;
-            result.LastModified = entity.last_modified || null;
-            result.Album = Album_1.default.CreateFromMopidy(entity.album);
-            result.Artists = Artist_1.default.CreateArrayFromMopidy(entity.artists);
-            // JSONがアホほどでかくなるのでやめる
-            //result.Genre = Genre.Create(entity.Genre);
-            //result.Composers = Artist.CreateArray(entity.Composers);
-            //result.Performers = Artist.CreateArray(entity.Performers);
-            return result;
-        };
-        Track.EnsureTrackByMopidy = function (entity, mopidyTrack) {
-            if (!entity)
-                Dump_2.default.Error('argument entity null');
-            if (!mopidyTrack)
-                Dump_2.default.Error('argument mopidyTrack null');
-            entity.Id = null;
-            entity.Name = mopidyTrack.name || null;
-            entity.LowerName = (mopidyTrack.name)
-                ? mopidyTrack.name.toLowerCase()
-                : null;
-            entity.Uri = mopidyTrack.uri || null;
-            entity.TlId = null;
-            entity.DiscNo = mopidyTrack.disc_no || null;
-            entity.TrackNo = mopidyTrack.track_no || null;
-            entity.Date = mopidyTrack.date || null;
-            entity.Comment = mopidyTrack.comment || null;
-            entity.Length = mopidyTrack.length || null;
-            entity.BitRate = mopidyTrack.bitrate || null;
-            entity.LastModified = mopidyTrack.last_modified || null;
-            entity.Album = Album_1.default.CreateFromMopidy(mopidyTrack.album);
-            entity.Artists = Artist_1.default.CreateArrayFromMopidy(mopidyTrack.artists);
-        };
-        Track.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Track.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        Track.CreateArrayFromMopidy = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = Track.CreateFromMopidy(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        //public Genre: Genre;
-        //public Composers: Artist[];
-        //public Performers: Artist[];
-        Track.prototype.GetTimeString = function () {
-            if (!this.Length)
-                return '--:--';
-            var minute = Math.floor(this.Length / 60000);
-            var second = Math.floor((this.Length % 60000) / 1000);
-            var minuteStr = ('00' + minute.toString()).slice(-2);
-            var secondStr = ('00' + second.toString()).slice(-2);
-            return minuteStr + ':' + secondStr;
-        };
-        /**
-         * ※Uri以外のプロパティが取得出来ないトラックがある。
-         */
-        Track.prototype.GetDisplayName = function () {
-            if (this.Name && this.Name !== '')
-                return this.Name;
-            var uriParts = this.Uri.split('/');
-            if (uriParts.length <= 0)
-                return '--';
-            return uriParts[uriParts.length - 1];
-        };
-        Track.prototype.GetYear = function () {
-            if (!this.Date || this.Date.length < 1)
-                return null;
-            return (4 < this.Date.length)
-                ? parseInt(this.Date.substr(0, 4), 10)
-                : parseInt(this.Date, 10);
-        };
-        Track.prototype.GetFormattedYearString = function () {
-            var year = this.GetYear();
-            return (!year)
-                ? ''
-                : '(' + year.toString() + ')';
-        };
-        Track.prototype.GetAlbumName = function () {
-            return (this.Album && this.Album.Name)
-                ? this.Album.Name
-                : '--';
-        };
-        Track.prototype.GetFormattedArtistsName = function () {
-            return (!this.Artists || this.Artists.length <= 0)
-                ? '--'
-                : (this.Artists.length === 1)
-                    ? this.Artists[0].Name
-                    : (this.Artists[0].Name + ' and more...');
-        };
-        Track.prototype.GetAlbumImageFullUri = function () {
-            return (!this.Album)
-                ? Album_1.default.DefaultImage
-                : this.Album.GetImageFullUri();
-        };
-        return Track;
-    }());
-    exports.default = Track;
-});
-define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "Models/Albums/Album", "Models/Artists/Artist", "Models/Tracks/Track"], function (require, exports, Album_2, Artist_2, Track_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var AlbumTracks = /** @class */ (function () {
-        function AlbumTracks() {
-            this.Album = null;
-            this.Artists = [];
-            this.Tracks = [];
-        }
-        AlbumTracks.Create = function (entity) {
-            if (!entity)
-                return null;
-            var result = new AlbumTracks();
-            result.Album = Album_2.default.Create(entity.Album);
-            result.Artists = Artist_2.default.CreateArray(entity.Artists);
-            result.Tracks = Track_1.default.CreateArray(entity.Tracks);
-            for (var i = 0; i < result.Tracks.length; i++) {
-                var track = result.Tracks[i];
-                track.Album = result.Album;
-                track.Artists = result.Artists;
-            }
-            return result;
-        };
-        AlbumTracks.CreateArray = function (entities) {
-            var result = [];
-            if (!entities)
-                return result;
-            for (var i = 0; i < entities.length; i++) {
-                var entity = AlbumTracks.Create(entities[i]);
-                if (entity)
-                    result.push(entity);
-            }
-            return result;
-        };
-        AlbumTracks.prototype.GetArtistName = function () {
-            if (this.Artists.length <= 0)
-                return '';
-            if (this.Artists.length === 1)
-                return this.Artists[0].Name;
-            return this.Artists[0].Name + ' and more...';
-        };
-        return AlbumTracks;
-    }());
-    exports.default = AlbumTracks;
+    exports.default = Exception;
 });
 define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "EventableBase"], function (require, exports, axios_1, qs, EventableBase_1) {
     "use strict";
@@ -1421,130 +404,337 @@ define("Models/Bases/StoreBase", ["require", "exports", "Libraries", "Models/Bas
     }(XhrQueryableBase_1.default));
     exports.default = StoreBase;
 });
-define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bases/StoreBase", "Models/AlbumTracks/AlbumTracks", "Utils/Exception"], function (require, exports, StoreBase_1, AlbumTracks_1, Exception_2) {
+define("Models/Mopidies/IArtist", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var AlbumTracksStore = /** @class */ (function (_super) {
-        __extends(AlbumTracksStore, _super);
-        function AlbumTracksStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
+});
+define("Models/Mopidies/IAlbum", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Relations/ArtistAlbum", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ArtistAlbum = /** @class */ (function () {
+        function ArtistAlbum() {
+            this.ArtistId = null;
+            this.AlbumId = null;
         }
-        AlbumTracksStore.prototype.GetList = function (args) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('AlbumTracks/GetPagenatedList', args)];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_2.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            result = response.Result;
-                            result.ResultList = AlbumTracks_1.default.CreateArray(result.ResultList);
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        AlbumTracksStore.prototype.PlayAlbumByTrack = function (track) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Player/PlayAlbumByTrackId', track.Id)];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_2.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            result = AlbumTracks_1.default.Create(response.Result);
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        AlbumTracksStore.prototype.PlayAlbumByTlId = function (tlId) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Player/PlayAlbumByTlId', tlId)];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_2.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            return [2 /*return*/, response.Result];
-                    }
-                });
-            });
-        };
-        AlbumTracksStore.prototype.ClearList = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Player/ClearList')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_2.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            return [2 /*return*/, response.Result];
-                    }
-                });
-            });
-        };
-        return AlbumTracksStore;
-    }(StoreBase_1.default));
-    exports.default = AlbumTracksStore;
-});
-define("Models/Mopidies/IRef", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Mopidies/IPlaylist", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
-define("Models/Playlists/Playlist", ["require", "exports", "Models/Tracks/Track"], function (require, exports, Track_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Playlist = /** @class */ (function () {
-        function Playlist() {
-            this.Name = null;
-            this.Uri = null;
-            this.Tracks = [];
-        }
-        Playlist.CreateFromRef = function (entity) {
+        ArtistAlbum.Create = function (entity) {
             if (!entity)
                 return null;
-            var result = new Playlist();
-            result.Name = entity.name || null;
-            result.Uri = entity.uri || null;
-            result.Tracks = [];
+            var result = new ArtistAlbum();
+            result.ArtistId = entity.ArtistId || null;
+            result.AlbumId = entity.AlbumId || null;
             return result;
         };
-        Playlist.CreateFromMopidy = function (entity) {
-            if (!entity)
-                return null;
-            var result = new Playlist();
-            result.Name = entity.name || null;
-            result.Uri = entity.uri || null;
-            result.Tracks = Track_2.default.CreateArrayFromMopidy(entity.tracks);
-            return result;
-        };
-        Playlist.CreateArrayFromRefs = function (entities) {
+        ArtistAlbum.CreateArray = function (entities) {
             var result = [];
+            if (!entities)
+                return result;
             for (var i = 0; i < entities.length; i++) {
-                var entity = Playlist.CreateFromRef(entities[i]);
+                var entity = ArtistAlbum.Create(entities[i]);
                 if (entity)
                     result.push(entity);
             }
             return result;
         };
-        Playlist.MinNameLength = 1;
-        Playlist.MaxNameLength = 40;
-        return Playlist;
+        return ArtistAlbum;
     }());
-    exports.default = Playlist;
+    exports.default = ArtistAlbum;
+});
+define("Models/Relations/GenreAlbum", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var GenreAlbum = /** @class */ (function () {
+        function GenreAlbum() {
+            this.GenreId = null;
+            this.AlbumId = null;
+        }
+        GenreAlbum.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new GenreAlbum();
+            result.GenreId = entity.GenreId || null;
+            result.AlbumId = entity.AlbumId || null;
+            return result;
+        };
+        GenreAlbum.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = GenreAlbum.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        return GenreAlbum;
+    }());
+    exports.default = GenreAlbum;
+});
+define("Models/Albums/Album", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreAlbum"], function (require, exports, ArtistAlbum_1, GenreAlbum_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Album = /** @class */ (function () {
+        function Album() {
+            this.Id = null;
+            this.Name = null;
+            this.LowerName = null;
+            this.Uri = null;
+            this.Year = null;
+            this.ImageUri = null;
+            this.ArtistAlbums = [];
+            this.GenreAlbums = [];
+        }
+        Object.defineProperty(Album, "DefaultImage", {
+            /**
+             * テストドライバー上ではlocationが存在しない。
+             */
+            get: function () {
+                return (!location)
+                    ? 'http://localhost:6680/img/nullImage.jpg'
+                    : location.protocol + "//" + location.host + "/img/nullImage.jpg";
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Album.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Album();
+            result.Id = entity.Id || null;
+            result.Name = entity.Name || null;
+            result.LowerName = entity.LowerName || null;
+            result.Uri = entity.Uri || null;
+            result.Year = entity.Year || null;
+            result.ImageUri = entity.ImageUri || null;
+            result.ArtistAlbums = ArtistAlbum_1.default.CreateArray(entity.ArtistAlbums);
+            result.GenreAlbums = GenreAlbum_1.default.CreateArray(entity.GenreAlbums);
+            return result;
+        };
+        Album.CreateFromMopidy = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Album();
+            result.Id = null;
+            result.Name = entity.name || null;
+            result.LowerName = (entity.name)
+                ? entity.name.toLowerCase()
+                : null;
+            result.Uri = entity.uri || null;
+            result.Year = (entity.date && 4 <= entity.date.length)
+                ? (4 < entity.date.length)
+                    ? parseInt(entity.date.substr(0, 4), 10)
+                    : parseInt(entity.date)
+                : null;
+            result.ImageUri = (entity.images && entity.images[0])
+                ? entity.images[0]
+                : null;
+            result.ArtistAlbums = [];
+            result.GenreAlbums = [];
+            return result;
+        };
+        Album.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Album.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Album.CreateArrayFromMopidy = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Album.CreateFromMopidy(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Album.prototype.GetImageFullUri = function () {
+            return (!this.ImageUri || this.ImageUri == '')
+                ? Album.DefaultImage
+                : location.protocol + "//" + location.host + this.ImageUri;
+        };
+        return Album;
+    }());
+    exports.default = Album;
+});
+define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase", "Utils/Exception"], function (require, exports, StoreBase_1, Exception_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AlbumStore = /** @class */ (function (_super) {
+        __extends(AlbumStore, _super);
+        function AlbumStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        AlbumStore.prototype.Exists = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Album/Exists')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_1.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        return AlbumStore;
+    }(StoreBase_1.default));
+    exports.default = AlbumStore;
+});
+define("Models/Relations/GenreArtist", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var GenreArtist = /** @class */ (function () {
+        function GenreArtist() {
+            this.GenreId = null;
+            this.ArtistId = null;
+        }
+        GenreArtist.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new GenreArtist();
+            result.GenreId = entity.GenreId || null;
+            result.ArtistId = entity.ArtistId || null;
+            return result;
+        };
+        GenreArtist.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = GenreArtist.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        return GenreArtist;
+    }());
+    exports.default = GenreArtist;
+});
+define("Models/Artists/Artist", ["require", "exports", "Models/Relations/ArtistAlbum", "Models/Relations/GenreArtist"], function (require, exports, ArtistAlbum_2, GenreArtist_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Artist = /** @class */ (function () {
+        function Artist() {
+            this.Id = null;
+            this.Name = null;
+            this.LowerName = null;
+            this.Uri = null;
+            this.ImageUri = null;
+            this.ArtistAlbums = [];
+            this.GenreArtists = [];
+        }
+        Artist.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Artist();
+            result.Id = entity.Id || null;
+            result.Name = entity.Name || null;
+            result.LowerName = entity.LowerName || null;
+            result.Uri = entity.Uri || null;
+            result.ImageUri = entity.ImageUri || null;
+            result.ArtistAlbums = ArtistAlbum_2.default.CreateArray(entity.ArtistAlbums);
+            result.GenreArtists = GenreArtist_1.default.CreateArray(entity.GenreArtists);
+            return result;
+        };
+        Artist.CreateFromMopidy = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Artist();
+            result.Id = null;
+            result.Name = entity.name || null;
+            result.LowerName = (entity.name)
+                ? entity.name.toLowerCase()
+                : null;
+            result.Uri = entity.uri || null;
+            result.ImageUri = null;
+            result.ArtistAlbums = [];
+            result.GenreArtists = [];
+            return result;
+        };
+        Artist.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Artist.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Artist.CreateArrayFromMopidy = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Artist.CreateFromMopidy(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        return Artist;
+    }());
+    exports.default = Artist;
+});
+define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Artists/Artist", "Utils/Exception"], function (require, exports, StoreBase_2, Artist_1, Exception_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ArtistStore = /** @class */ (function (_super) {
+        __extends(ArtistStore, _super);
+        function ArtistStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ArtistStore.prototype.Exists = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Artist/Exists')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_2.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        ArtistStore.prototype.GetList = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Artist/GetPagenatedList', args)];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_2.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            result = response.Result;
+                            result.ResultList = Artist_1.default.CreateArray(result.ResultList);
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        return ArtistStore;
+    }(StoreBase_2.default));
+    exports.default = ArtistStore;
 });
 define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases/XhrQueryableBase"], function (require, exports, XhrQueryableBase_2) {
     "use strict";
@@ -1646,11 +836,1219 @@ define("Models/Bases/JsonRpcQueryableBase", ["require", "exports", "Models/Bases
     }(XhrQueryableBase_2.default));
     exports.default = JsonRpcQueryableBase;
 });
+define("Models/Genres/Genre", ["require", "exports", "Models/Relations/GenreAlbum", "Models/Relations/GenreArtist"], function (require, exports, GenreAlbum_2, GenreArtist_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Genre = /** @class */ (function () {
+        function Genre() {
+            this.Id = null;
+            this.Name = null;
+            this.LowerName = null;
+            this.Uri = null;
+            this.GenreArtists = [];
+            this.GenreAlbums = [];
+        }
+        Genre.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Genre();
+            if (entity) {
+                result.Id = entity.Id || null;
+                result.Name = entity.Name || null;
+                result.LowerName = entity.LowerName || null;
+                result.Uri = entity.Uri || null;
+                result.GenreArtists = GenreArtist_2.default.CreateArray(entity.GenreArtists);
+                result.GenreAlbums = GenreAlbum_2.default.CreateArray(entity.GenreAlbums);
+            }
+            return result;
+        };
+        Genre.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Genre.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        return Genre;
+    }());
+    exports.default = Genre;
+});
+define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Genres/Genre", "Utils/Exception"], function (require, exports, StoreBase_3, Genre_1, Exception_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var GenreStore = /** @class */ (function (_super) {
+        __extends(GenreStore, _super);
+        function GenreStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        GenreStore.prototype.Exists = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Genre/Exists')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_3.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        GenreStore.prototype.GetList = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Genre/GetPagenatedList', args)];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_3.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            result = response.Result;
+                            result.ResultList = Genre_1.default.CreateArray(result.ResultList);
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        return GenreStore;
+    }(StoreBase_3.default));
+    exports.default = GenreStore;
+});
+define("Models/Settings/Settings", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Settings = /** @class */ (function () {
+        function Settings() {
+            this._serverAddress = null;
+            this._serverPort = null;
+            this._isBusy = false;
+            this._isMopidyConnectable = false;
+            this._isTouchScreen = false;
+            this._isTouchScreen = !(!window.ontouchstart);
+        }
+        Object.defineProperty(Settings, "Entity", {
+            get: function () {
+                return Settings._entity;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Settings.Apply = function (newSettings) {
+            this._entity._serverAddress = newSettings.ServerAddress;
+            this._entity._serverPort = newSettings.ServerPort;
+        };
+        Object.defineProperty(Settings.prototype, "ServerAddress", {
+            get: function () {
+                return this._serverAddress;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "ServerPort", {
+            get: function () {
+                return this._serverPort;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsBusy", {
+            get: function () {
+                return this._isBusy;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsMopidyConnectable", {
+            get: function () {
+                return this._isMopidyConnectable;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsTouchScreen", {
+            get: function () {
+                return this._isTouchScreen;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Settings.prototype.SetBusy = function (isBusy) {
+            this._isBusy = isBusy;
+        };
+        Settings.prototype.SetMopidyConnectable = function (isConnectable) {
+            this._isMopidyConnectable = isConnectable;
+        };
+        Settings._entity = new Settings();
+        return Settings;
+    }());
+    exports.default = Settings;
+});
+define("Models/Settings/SettingsStore", ["require", "exports", "Utils/Dump", "Utils/Exception", "Models/Albums/AlbumStore", "Models/Artists/ArtistStore", "Models/Bases/JsonRpcQueryableBase", "Models/Genres/GenreStore", "Models/Settings/Settings"], function (require, exports, Dump_1, Exception_4, AlbumStore_1, ArtistStore_1, JsonRpcQueryableBase_1, GenreStore_1, Settings_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var SettingsStore = /** @class */ (function (_super) {
+        __extends(SettingsStore, _super);
+        function SettingsStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(SettingsStore.prototype, "Entity", {
+            get: function () {
+                return Settings_1.default.Entity;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        SettingsStore.prototype.Get = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Settings')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_4.default.Throw('SettingStore.Get: Unexpected Error.', response.Errors);
+                            Settings_1.default.Apply(response.Result);
+                            return [2 /*return*/, Settings_1.default.Entity];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.Update = function (settings) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, updated;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Settings', settings)];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                Dump_1.default.Error('SettingStore.Update: Unexpected Error.', response.Errors);
+                                return [2 /*return*/, false];
+                            }
+                            updated = response.Result;
+                            Settings_1.default.Apply(updated);
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.TryConnect = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.JsonRpcRequest(SettingsStore.MethodGetState)];
+                        case 1:
+                            response = _a.sent();
+                            if (response.error)
+                                Dump_1.default.Error('SettingStore.TryConnect: Unexpected Error.', response.error);
+                            Settings_1.default.Entity.SetMopidyConnectable(!(response.error));
+                            return [2 /*return*/, Settings_1.default.Entity.IsMopidyConnectable];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.ExistsData = function () {
+            var genreStore = new GenreStore_1.default();
+            var artistStore = new ArtistStore_1.default();
+            var albumStore = new AlbumStore_1.default();
+            var existsGenres = false;
+            var existsArtists = false;
+            var existsAlbums = false;
+            var promises = [];
+            promises.push(genreStore.Exists().then(function (res) { existsGenres = res; }));
+            promises.push(artistStore.Exists().then(function (res) { existsArtists = res; }));
+            promises.push(albumStore.Exists().then(function (res) { existsAlbums = res; }));
+            // なぜか、Promise.all をawait した後で各bool値を比較しようとすると
+            // "常にfalseになるぞ"警告が出る。
+            // Promiseをまだきちんと理解してない...？
+            return Promise.all(promises)
+                .then(function () {
+                return (existsGenres === true
+                    && existsArtists === true
+                    && existsAlbums === true);
+            });
+        };
+        SettingsStore.prototype.GetAlbumScanProgress = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('Settings/AlbumScanProgress')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                Dump_1.default.Error('SettingsStore.GetAlbumScanProgress: Unexpected Error.', response.Errors);
+                                return [2 /*return*/, {
+                                        TotalAlbumCount: -1,
+                                        ScannedAlbumCount: -1
+                                    }];
+                            }
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.DbScanNew = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Settings/DbScanNew')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Dump_1.default.Error('SettingsStore.DbScanNew: Unexpected Error.', response.Errors);
+                            return [2 /*return*/, response.Succeeded];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.DbCleanup = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Settings/DbCleanup')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Dump_1.default.Error('SettingsStore.DbCleanup: Unexpected Error.', response.Errors);
+                            return [2 /*return*/, response.Succeeded];
+                    }
+                });
+            });
+        };
+        SettingsStore.prototype.GetDbUpdateProgress = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var a, response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            a = 1;
+                            return [4 /*yield*/, this.QueryGet('Settings/UpdateProgress')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded) {
+                                Dump_1.default.Error('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
+                                return [2 /*return*/, {
+                                        IsRunning: false,
+                                        Succeeded: false,
+                                        Progress: 0,
+                                        Message: 'Unexpected Error'
+                                    }];
+                            }
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        SettingsStore.MethodGetState = 'core.playback.get_state';
+        return SettingsStore;
+    }(JsonRpcQueryableBase_1.default));
+    exports.default = SettingsStore;
+});
+define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bootstrap-toolkit", "admin-lte/dist/js/adminlte", "linq", "mopidy", "hammerjs", "admin-lte/plugins/sweetalert2/sweetalert2", "vue", "Models/Settings/SettingsStore", "animate.css/animate.css", "font-awesome/css/font-awesome.css", "../css/adminlte.css", "admin-lte/plugins/ion-rangeslider/css/ion.rangeSlider.css", "admin-lte/plugins/sweetalert2/sweetalert2.css", "../css/bootstrap4-neon-glow.css", "../css/site.css", "admin-lte/plugins/bootstrap/js/bootstrap.bundle", "admin-lte/plugins/ion-rangeslider/js/ion.rangeSlider", "jquery-slimscroll"], function (require, exports, jQuery, ResponsiveBootstrapToolkit, AdminLte, Enumerable, Mopidy, Hammer, sweetalert2_1, vue_1, SettingsStore_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    // SweetAlert2 は個別読み込みOK.
+    //import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
+    /**
+     * VS開発時のステップデバッグ環境を維持するため、開発環境ではAMD形式で
+     * ライブラリをexportしている。
+     * AMD形式では、単一名かつdefault-export無しのライブラリがexport出来ないため、
+     * 強制的にdefault-exportしている。
+     * プロダクションビルドでは書いた通りで動くため、その差分を吸収するためのロジック。
+     */
+    var Libraries = /** @class */ (function () {
+        function Libraries() {
+        }
+        /* eslint-enable @typescript-eslint/indent */
+        Libraries.GetElement = function (arg) {
+            return (arg instanceof vue_1.default)
+                ? arg.$el
+                : arg;
+        };
+        Libraries.Initialize = function () {
+            Libraries.SettingsStore = new SettingsStore_1.default();
+            // ResponsiveBootstrapToolkitをbootstrap4に対応させる
+            // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
+            Libraries.ResponsiveBootstrapToolkit.use('bs4', {
+                'xs': Libraries.$('<div class="d-xs-block d-sm-none d-md-none d-lg-none d-xl-none"></div>'),
+                'sm': Libraries.$('<div class="d-none d-sm-block d-md-none d-lg-none d-xl-none"></div>'),
+                'md': Libraries.$('<div class="d-none d-md-block d-sm-none d-lg-none d-xl-none"></div>'),
+                'lg': Libraries.$('<div class="d-none d-lg-block d-sm-none d-md-none d-xl-none"></div>'),
+                'xl': Libraries.$('<div class="d-none d-xl-block d-sm-none d-md-none d-lg-none"></div>')
+            });
+        };
+        /**
+         * linq.js
+         * ※バージョンは3.1.1に固定する。最新版の型定義がes5に対応しなくなったため。
+         */
+        Libraries.Enumerable = ((Enumerable.default)
+            ? Enumerable.default
+            : Enumerable);
+        /**
+         * JQuery: Admin-LTE, Bootsrapが依存している。
+         */
+        Libraries.jQuery = ((jQuery.default)
+            ? jQuery.default
+            : jQuery);
+        Libraries.$ = Libraries.jQuery;
+        Libraries.JQueryEventBinds = {
+            On: function (element, eventName, handler) {
+                var elem = Libraries.GetElement(element);
+                Libraries.$(elem).on(eventName, handler);
+            },
+            Off: function (element, eventName, handler) {
+                var elem = Libraries.GetElement(element);
+                Libraries.$(elem).off(eventName, handler);
+            },
+            OffAll: function (element, eventName) {
+                var elem = Libraries.GetElement(element);
+                Libraries.$(elem).off(eventName);
+            }
+        };
+        /**
+         * Bootstrap Toolkit
+         * 画面サイズ切替判定で使用
+         */
+        Libraries.ResponsiveBootstrapToolkit = ((ResponsiveBootstrapToolkit.default)
+            ? ResponsiveBootstrapToolkit.default
+            : ResponsiveBootstrapToolkit);
+        /**
+         * Mopidy
+         */
+        Libraries.Mopidy = ((Mopidy.default)
+            ? Mopidy.default
+            : Mopidy);
+        /**
+         * Hammer
+         */
+        Libraries.Hammer = ((Hammer.default)
+            ? Hammer.default
+            : Hammer);
+        /**
+         * AdminLTE
+         */
+        Libraries.AdminLte = AdminLte;
+        /**
+         * SlimScroll (on JQuery)
+         */
+        /* eslint-disable @typescript-eslint/indent */
+        Libraries.SlimScroll = function (element, opstions) {
+            Libraries.$(element).slimScroll(opstions);
+        };
+        /* eslint-enable @typescript-eslint/indent */
+        /**
+         * Popper (on JQuery)
+         */
+        /* eslint-disable @typescript-eslint/indent */
+        Libraries.SetTooltip = function (element, message) {
+            // タッチスクリーンの場合はツールティップを作らない。
+            // 自動で非表示化出来そうなら戻す。
+            if (Libraries.SettingsStore.Entity.IsTouchScreen)
+                return;
+            Libraries.$(element).tooltip({
+                placement: 'top',
+                title: message,
+                trigger: 'hover',
+                delay: {
+                    show: 1000,
+                    hide: 100
+                }
+            });
+        };
+        /* eslint-enable @typescript-eslint/indent */
+        /**
+         * SweetAlert2 - Toast
+         *
+         * type: 'success' | 'error' | 'warning' | 'info' | 'question'
+         * ex) Toast.fire({ type: 'success', title: 'any message here.' });
+         */
+        Libraries.Toast = sweetalert2_1.default.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        /* eslint-disable @typescript-eslint/indent */
+        Libraries.InnerShowToast = function (toastType, message) {
+            Libraries.Toast.fire({
+                type: toastType,
+                title: message
+            });
+        };
+        /**
+         * SweerAlert2のToast表示メソッド
+         * 型定義が冗長なのはなんとかならんのか
+         */
+        Libraries.ShowToast = {
+            Success: function (message) { return Libraries.InnerShowToast('success', message); },
+            Info: function (message) { return Libraries.InnerShowToast('info', message); },
+            Question: function (message) { return Libraries.InnerShowToast('question', message); },
+            Warning: function (message) { return Libraries.InnerShowToast('warning', message); },
+            Error: function (message) { return Libraries.InnerShowToast('error', message); }
+        };
+        Libraries.Modal = {
+            Show: function (arg) {
+                var elem = Libraries.GetElement(arg);
+                Libraries.$(elem).modal('show');
+            },
+            Hide: function (arg) {
+                var elem = Libraries.GetElement(arg);
+                Libraries.$(elem).modal('hide');
+            }
+        };
+        Libraries.SettingsStore = null;
+        return Libraries;
+    }());
+    exports.default = Libraries;
+});
+define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function (require, exports, _, vue_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ViewBase = /** @class */ (function (_super) {
+        __extends(ViewBase, _super);
+        function ViewBase(options) {
+            var _this = _super.call(this, options) || this;
+            _this.initialized = false;
+            return _this;
+        }
+        ViewBase.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    if (this.initialized)
+                        return [2 /*return*/, true];
+                    _.each(this.$children, function (view) {
+                        if (view instanceof ViewBase) {
+                            try {
+                                view.Initialize();
+                            }
+                            catch (e) {
+                                console.error('Initialize Error');
+                                console.error(e);
+                            }
+                        }
+                    });
+                    this.initialized = true;
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        ViewBase.prototype.GetIsInitialized = function () {
+            return this.initialized;
+        };
+        return ViewBase;
+    }(vue_2.default));
+    exports.default = ViewBase;
+});
+define("Utils/Delay", ["require", "exports", "Utils/Exception", "Utils/Dump"], function (require, exports, Exception_5, Dump_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var DelayedOnceExecuter = /** @class */ (function () {
+        function DelayedOnceExecuter(callback, delay, timeout, isMonitor) {
+            var _this = this;
+            if (delay === void 0) { delay = 100; }
+            if (timeout === void 0) { timeout = -1; }
+            if (isMonitor === void 0) { isMonitor = false; }
+            this.Name = '';
+            this._callback = callback;
+            this._delay = delay;
+            this._timeout = timeout;
+            this._startTime = null;
+            this._timer = null;
+            this._isActive = false;
+            this._suppressCount = 0;
+            this._timeoutExecStartTime = null;
+            if (isMonitor) {
+                setInterval(function () {
+                    if (!_this._isActive)
+                        return;
+                    if (_this._startTime || _this._timeoutExecStartTime) {
+                        var now = new Date();
+                        var elapsed = (_this._timeoutExecStartTime)
+                            ? now.getTime() - _this._timeoutExecStartTime.getTime()
+                            : now.getTime() - _this._startTime.getTime();
+                        if (DelayedOnceExecuter.DelayThreshold < elapsed) {
+                            // Delay閾値より長い時間の間、一度も実行されていない。
+                            // 無限ループの可能性がある。
+                            Dump_2.default.Warning('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
+                        }
+                    }
+                    if (DelayedOnceExecuter.SuppressThreshold < _this._suppressCount) {
+                        // Suppress閾値より多くの回数分、実行が抑制されている。
+                        // 呼び出し回数が多すぎる可能性がある。
+                        Dump_2.default.Warning('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
+                    }
+                }, DelayedOnceExecuter.MonitorInterval);
+            }
+        }
+        Object.defineProperty(DelayedOnceExecuter.prototype, "Delay", {
+            get: function () {
+                return this._delay;
+            },
+            set: function (value) {
+                this._delay = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(DelayedOnceExecuter.prototype, "Timeout", {
+            get: function () {
+                return this._timeout;
+            },
+            set: function (value) {
+                this._timeout = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        DelayedOnceExecuter.prototype.Exec = function (args) {
+            var _this = this;
+            this._isActive = true;
+            if (this._timer === null) {
+                // これから開始するとき
+                this._startTime = new Date();
+                this._suppressCount = 0;
+            }
+            else {
+                // 既に開始中のとき
+                clearInterval(this._timer);
+                this._timer = null;
+                this._suppressCount++;
+            }
+            var now = new Date();
+            var elapsed = (now.getTime() - this._startTime.getTime());
+            if (0 < this._timeout && elapsed > this._timeout) {
+                // タイムアウト実行が連続するときの、最初の開始時間を保持しておく。
+                if (this._timeoutExecStartTime === null)
+                    this._timeoutExecStartTime = this._startTime;
+                this.InnerExec(args);
+            }
+            else {
+                this._timer = setTimeout(function () {
+                    _this._timeoutExecStartTime = null;
+                    _this.InnerExec(args);
+                }, this._delay);
+            }
+        };
+        DelayedOnceExecuter.prototype.InnerExec = function (args) {
+            try {
+                this._callback(args);
+            }
+            catch (ex) {
+                Dump_2.default.Error('Callback FAILED!!', ex);
+            }
+            if (this._timer) {
+                clearInterval(this._timer);
+                this._timer = null;
+            }
+            this._startTime = null;
+            this._suppressCount = 0;
+            this._isActive = false;
+        };
+        DelayedOnceExecuter.MonitorInterval = 10000;
+        DelayedOnceExecuter.DelayThreshold = 3000;
+        DelayedOnceExecuter.SuppressThreshold = 100;
+        return DelayedOnceExecuter;
+    }());
+    exports.DelayedOnceExecuter = DelayedOnceExecuter;
+    var Delay = /** @class */ (function () {
+        function Delay() {
+        }
+        Delay.Wait = function (msec) {
+            return new Promise(function (resolve) {
+                window.setTimeout(function () {
+                    try {
+                        resolve(true);
+                    }
+                    catch (ex) {
+                        Exception_5.default.Throw('Delay Exception.', ex);
+                    }
+                }, msec);
+            });
+        };
+        Delay.DelayedOnce = function (callback, delay, timeout, isMonitor) {
+            if (delay === void 0) { delay = 100; }
+            if (timeout === void 0) { timeout = -1; }
+            if (isMonitor === void 0) { isMonitor = false; }
+            return new DelayedOnceExecuter(callback, delay, timeout, isMonitor);
+        };
+        return Delay;
+    }());
+    exports.default = Delay;
+});
+define("Views/Bases/TabBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.TabEvents = {
+        Show: 'Show',
+        Shown: 'Shown',
+        Hide: 'Hide',
+        Hidden: 'Hidden',
+    };
+    var TabBase = /** @class */ (function (_super) {
+        __extends(TabBase, _super);
+        function TabBase() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        TabBase.prototype.OnShow = function () {
+        };
+        TabBase.prototype.OnShown = function () {
+        };
+        TabBase.prototype.OnHide = function () {
+        };
+        TabBase.prototype.OnHidden = function () {
+        };
+        return TabBase;
+    }(ViewBase_1.default));
+    exports.default = TabBase;
+});
+define("Views/Bases/IContent", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Contents;
+    (function (Contents) {
+        Contents["Finder"] = "Finder";
+        Contents["Playlists"] = "Playlists";
+        Contents["Settings"] = "Settings";
+    })(Contents = exports.Contents || (exports.Contents = {}));
+});
+define("Views/Bases/IContentDetail", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ContentDetails;
+    (function (ContentDetails) {
+        ContentDetails["Genres"] = "Genres";
+        ContentDetails["Artists"] = "Artists";
+        ContentDetails["AlbumTracks"] = "AlbumTracks";
+        ContentDetails["Playlists"] = "Playlists";
+        ContentDetails["PlaylistTracks"] = "PlaylistTracks";
+        ContentDetails["SetMopidy"] = "SetMopidy";
+        ContentDetails["Database"] = "Database";
+        ContentDetails["ScanProgress"] = "ScanProgress";
+    })(ContentDetails = exports.ContentDetails || (exports.ContentDetails = {}));
+    var SwipeDirection;
+    (function (SwipeDirection) {
+        SwipeDirection[SwipeDirection["Left"] = 0] = "Left";
+        SwipeDirection[SwipeDirection["Right"] = 1] = "Right";
+        SwipeDirection[SwipeDirection["Up"] = 2] = "Up";
+        SwipeDirection[SwipeDirection["Down"] = 3] = "Down";
+    })(SwipeDirection = exports.SwipeDirection || (exports.SwipeDirection = {}));
+    ;
+    exports.ContentDetailEvents = {
+        Swiped: 'Swiped'
+    };
+});
+define("Views/Bases/ContentBase", ["require", "exports", "Views/Bases/TabBase", "Views/Bases/IContentDetail", "lodash"], function (require, exports, TabBase_1, IContentDetail_1, _) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ContentBase = /** @class */ (function (_super) {
+        __extends(ContentBase, _super);
+        function ContentBase() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        ContentBase.prototype.SetDetailToFulscreen = function () {
+            this.detailWrapperElement.setAttribute('style', ContentBase.PositionRelative);
+            for (var i = 0; i < this.details.length; i++) {
+                var detail = this.details[i];
+                detail.ToPositionAbsolute();
+                (i === 0)
+                    ? detail.ToVisible()
+                    : detail.ToHide();
+            }
+        };
+        ContentBase.prototype.SetDetailToColumn = function () {
+            this.detailWrapperElement.setAttribute('style', ContentBase.PositionStatic);
+            for (var i = 0; i < this.details.length; i++) {
+                var detail = this.details[i];
+                detail.ToPositionStatic();
+                detail.ToVisible();
+            }
+        };
+        ContentBase.prototype.HideAllDetails = function () {
+            for (var i = 0; i < this.details.length; i++) {
+                var detail = this.details[i];
+                detail.ToHide();
+            }
+        };
+        ContentBase.prototype.OnSwiped = function (args) {
+            this.$emit(IContentDetail_1.ContentDetailEvents.Swiped, args);
+        };
+        ContentBase.prototype.ShowContentDetail = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                var newDetail, currentIndex, newIndex, promises;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            newDetail = this.GetContentDetail(args.Detail);
+                            currentIndex = _.indexOf(this.details, this.currentDetail);
+                            newIndex = _.indexOf(this.details, newDetail);
+                            promises = [];
+                            if (currentIndex === newIndex) {
+                                // 新UIと指定UIが同じ
+                                if (!newDetail.GetIsVisible())
+                                    promises.push(newDetail.SlideInRight());
+                            }
+                            else if (currentIndex <= newIndex) {
+                                // 新UIが後にある
+                                this.HideAllDetails();
+                                promises.push(newDetail.SlideInRight());
+                                promises.push(this.currentDetail.SlideOutLeft());
+                            }
+                            else {
+                                // 新UIが前にある
+                                this.HideAllDetails();
+                                promises.push(newDetail.SlideInLeft());
+                                promises.push(this.currentDetail.SlideOutRight());
+                            }
+                            return [4 /*yield*/, Promise.all(promises)];
+                        case 1:
+                            _a.sent();
+                            this.currentDetail = newDetail;
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ContentBase.PositionStatic = 'position: static;';
+        ContentBase.PositionRelative = 'position: relative;';
+        return ContentBase;
+    }(TabBase_1.default));
+    exports.default = ContentBase;
+});
+define("Views/Shared/SelectionItem", ["require", "exports", "vue-class-component", "vue-property-decorator", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_1, vue_property_decorator_1, ViewBase_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.SelectionItemEvents = {
+        SelectionOrdered: 'SelectionOrdered',
+        SelectionChanged: 'SelectionChanged'
+    };
+    var SelectionItem = /** @class */ (function (_super) {
+        __extends(SelectionItem, _super);
+        function SelectionItem() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.selected = false;
+            return _this;
+        }
+        SelectionItem_1 = SelectionItem;
+        Object.defineProperty(SelectionItem.prototype, "Li", {
+            get: function () {
+                return this.$refs.Li;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        SelectionItem.prototype.OnClick = function () {
+            var orderedArgs = {
+                Entity: this.entity,
+                Selected: !this.selected,
+                Permitted: true
+            };
+            this.$emit(exports.SelectionItemEvents.SelectionOrdered, orderedArgs);
+            if (orderedArgs.Permitted !== true)
+                return;
+            this.SetSelected(!this.selected);
+        };
+        SelectionItem.prototype.SetSelected = function (selected) {
+            this.selected = selected;
+            this.SetClassBySelection();
+            var changedArgs = {
+                Entity: this.entity,
+                Selected: this.selected
+            };
+            this.$emit(exports.SelectionItemEvents.SelectionChanged, changedArgs);
+        };
+        SelectionItem.prototype.SetClassBySelection = function () {
+            if (this.selected) {
+                if (!this.Li.classList.contains(SelectionItem_1.SelectedColor))
+                    this.Li.classList.add(SelectionItem_1.SelectedColor);
+            }
+            else {
+                if (this.Li.classList.contains(SelectionItem_1.SelectedColor))
+                    this.Li.classList.remove(SelectionItem_1.SelectedColor);
+            }
+        };
+        SelectionItem.prototype.GetSelected = function () {
+            return this.selected;
+        };
+        SelectionItem.prototype.GetEntity = function () {
+            return this.entity;
+        };
+        var SelectionItem_1;
+        SelectionItem.SelectedColor = 'selected';
+        __decorate([
+            vue_property_decorator_1.Prop(),
+            __metadata("design:type", Object)
+        ], SelectionItem.prototype, "entity", void 0);
+        SelectionItem = SelectionItem_1 = __decorate([
+            vue_class_component_1.default({
+                template: "<li class=\"nav-item\"\n                   ref=\"Li\" >\n    <span class=\"d-block w-100 text-nowrap text-truncate\"\n       @click=\"OnClick\" >\n        {{ (entity.Name == ' ') ? '[blank]' : entity.Name }}\n    </span>\n</li>"
+            })
+        ], SelectionItem);
+        return SelectionItem;
+    }(ViewBase_2.default));
+    exports.default = SelectionItem;
+});
+define("Models/Mopidies/ITrack", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Tracks/Track", ["require", "exports", "Utils/Dump", "Models/Albums/Album", "Models/Artists/Artist"], function (require, exports, Dump_3, Album_1, Artist_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Track = /** @class */ (function () {
+        function Track() {
+            this.Id = null;
+            this.Name = null;
+            this.LowerName = null;
+            this.Uri = null;
+            this.TlId = null;
+            this.DiscNo = null;
+            this.TrackNo = null;
+            this.Date = null;
+            this.Comment = null;
+            this.Length = null;
+            this.BitRate = null;
+            this.LastModified = null;
+            this.Album = null;
+            this.Artists = [];
+        }
+        Track.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Track();
+            result.Id = entity.Id || null;
+            result.Name = entity.Name || null;
+            result.LowerName = entity.LowerName || null;
+            result.Uri = entity.Uri || null;
+            result.TlId = entity.TlId || null;
+            result.DiscNo = entity.DiscNo || null;
+            result.TrackNo = entity.TrackNo || null;
+            result.Date = entity.Date || null;
+            result.Comment = entity.Comment || null;
+            result.Length = entity.Length || null;
+            result.BitRate = entity.BitRate || null;
+            result.LastModified = entity.LastModified || null;
+            result.Album = Album_1.default.Create(entity.Album);
+            result.Artists = Artist_2.default.CreateArray(entity.Artists);
+            // JSONがアホほどでかくなるのでやめる
+            //result.Genre = Genre.Create(entity.Genre);
+            //result.Composers = Artist.CreateArray(entity.Composers);
+            //result.Performers = Artist.CreateArray(entity.Performers);
+            return result;
+        };
+        Track.CreateFromMopidy = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Track();
+            result.Id = null;
+            result.Name = entity.name || null;
+            result.LowerName = (entity.name)
+                ? entity.name.toLowerCase()
+                : null;
+            result.Uri = entity.uri || null;
+            result.TlId = null;
+            result.DiscNo = entity.disc_no || null;
+            result.TrackNo = entity.track_no || null;
+            result.Date = entity.date || null;
+            result.Comment = entity.comment || null;
+            result.Length = entity.length || null;
+            result.BitRate = entity.bitrate || null;
+            result.LastModified = entity.last_modified || null;
+            result.Album = Album_1.default.CreateFromMopidy(entity.album);
+            result.Artists = Artist_2.default.CreateArrayFromMopidy(entity.artists);
+            // JSONがアホほどでかくなるのでやめる
+            //result.Genre = Genre.Create(entity.Genre);
+            //result.Composers = Artist.CreateArray(entity.Composers);
+            //result.Performers = Artist.CreateArray(entity.Performers);
+            return result;
+        };
+        Track.EnsureTrackByMopidy = function (entity, mopidyTrack) {
+            if (!entity)
+                Dump_3.default.Error('argument entity null');
+            if (!mopidyTrack)
+                Dump_3.default.Error('argument mopidyTrack null');
+            entity.Id = null;
+            entity.Name = mopidyTrack.name || null;
+            entity.LowerName = (mopidyTrack.name)
+                ? mopidyTrack.name.toLowerCase()
+                : null;
+            entity.Uri = mopidyTrack.uri || null;
+            entity.TlId = null;
+            entity.DiscNo = mopidyTrack.disc_no || null;
+            entity.TrackNo = mopidyTrack.track_no || null;
+            entity.Date = mopidyTrack.date || null;
+            entity.Comment = mopidyTrack.comment || null;
+            entity.Length = mopidyTrack.length || null;
+            entity.BitRate = mopidyTrack.bitrate || null;
+            entity.LastModified = mopidyTrack.last_modified || null;
+            entity.Album = Album_1.default.CreateFromMopidy(mopidyTrack.album);
+            entity.Artists = Artist_2.default.CreateArrayFromMopidy(mopidyTrack.artists);
+        };
+        Track.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Track.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Track.CreateArrayFromMopidy = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Track.CreateFromMopidy(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        //public Genre: Genre;
+        //public Composers: Artist[];
+        //public Performers: Artist[];
+        Track.prototype.GetTimeString = function () {
+            if (!this.Length)
+                return '--:--';
+            var minute = Math.floor(this.Length / 60000);
+            var second = Math.floor((this.Length % 60000) / 1000);
+            var minuteStr = ('00' + minute.toString()).slice(-2);
+            var secondStr = ('00' + second.toString()).slice(-2);
+            return minuteStr + ':' + secondStr;
+        };
+        /**
+         * ※Uri以外のプロパティが取得出来ないトラックがある。
+         */
+        Track.prototype.GetDisplayName = function () {
+            if (this.Name && this.Name !== '')
+                return this.Name;
+            var uriParts = this.Uri.split('/');
+            if (uriParts.length <= 0)
+                return '--';
+            return uriParts[uriParts.length - 1];
+        };
+        Track.prototype.GetYear = function () {
+            if (!this.Date || this.Date.length < 1)
+                return null;
+            return (4 < this.Date.length)
+                ? parseInt(this.Date.substr(0, 4), 10)
+                : parseInt(this.Date, 10);
+        };
+        Track.prototype.GetFormattedYearString = function () {
+            var year = this.GetYear();
+            return (!year)
+                ? ''
+                : '(' + year.toString() + ')';
+        };
+        Track.prototype.GetAlbumName = function () {
+            return (this.Album && this.Album.Name)
+                ? this.Album.Name
+                : '--';
+        };
+        Track.prototype.GetFormattedArtistsName = function () {
+            return (!this.Artists || this.Artists.length <= 0)
+                ? '--'
+                : (this.Artists.length === 1)
+                    ? this.Artists[0].Name
+                    : (this.Artists[0].Name + ' and more...');
+        };
+        Track.prototype.GetAlbumImageFullUri = function () {
+            return (!this.Album)
+                ? Album_1.default.DefaultImage
+                : this.Album.GetImageFullUri();
+        };
+        return Track;
+    }());
+    exports.default = Track;
+});
+define("Models/AlbumTracks/AlbumTracks", ["require", "exports", "Models/Albums/Album", "Models/Artists/Artist", "Models/Tracks/Track"], function (require, exports, Album_2, Artist_3, Track_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AlbumTracks = /** @class */ (function () {
+        function AlbumTracks() {
+            this.Album = null;
+            this.Artists = [];
+            this.Tracks = [];
+        }
+        AlbumTracks.Create = function (entity) {
+            if (!entity)
+                return null;
+            var result = new AlbumTracks();
+            result.Album = Album_2.default.Create(entity.Album);
+            result.Artists = Artist_3.default.CreateArray(entity.Artists);
+            result.Tracks = Track_1.default.CreateArray(entity.Tracks);
+            for (var i = 0; i < result.Tracks.length; i++) {
+                var track = result.Tracks[i];
+                track.Album = result.Album;
+                track.Artists = result.Artists;
+            }
+            return result;
+        };
+        AlbumTracks.CreateArray = function (entities) {
+            var result = [];
+            if (!entities)
+                return result;
+            for (var i = 0; i < entities.length; i++) {
+                var entity = AlbumTracks.Create(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        AlbumTracks.prototype.GetArtistName = function () {
+            if (this.Artists.length <= 0)
+                return '';
+            if (this.Artists.length === 1)
+                return this.Artists[0].Name;
+            return this.Artists[0].Name + ' and more...';
+        };
+        return AlbumTracks;
+    }());
+    exports.default = AlbumTracks;
+});
+define("Models/AlbumTracks/AlbumTracksStore", ["require", "exports", "Models/Bases/StoreBase", "Models/AlbumTracks/AlbumTracks", "Utils/Exception"], function (require, exports, StoreBase_4, AlbumTracks_1, Exception_6) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var AlbumTracksStore = /** @class */ (function (_super) {
+        __extends(AlbumTracksStore, _super);
+        function AlbumTracksStore() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        AlbumTracksStore.prototype.GetList = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryGet('AlbumTracks/GetPagenatedList', args)];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_6.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            result = response.Result;
+                            result.ResultList = AlbumTracks_1.default.CreateArray(result.ResultList);
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        AlbumTracksStore.prototype.PlayAlbumByTrack = function (track) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response, result;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Player/PlayAlbumByTrackId', track.Id)];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_6.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            result = AlbumTracks_1.default.Create(response.Result);
+                            return [2 /*return*/, result];
+                    }
+                });
+            });
+        };
+        AlbumTracksStore.prototype.PlayAlbumByTlId = function (tlId) {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Player/PlayAlbumByTlId', tlId)];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_6.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        AlbumTracksStore.prototype.ClearList = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var response;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.QueryPost('Player/ClearList')];
+                        case 1:
+                            response = _a.sent();
+                            if (!response.Succeeded)
+                                Exception_6.default.Throw('Unexpected Error on ApiQuery', response.Errors);
+                            return [2 /*return*/, response.Result];
+                    }
+                });
+            });
+        };
+        return AlbumTracksStore;
+    }(StoreBase_4.default));
+    exports.default = AlbumTracksStore;
+});
+define("Models/Mopidies/IRef", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Mopidies/IPlaylist", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+});
+define("Models/Playlists/Playlist", ["require", "exports", "Models/Tracks/Track"], function (require, exports, Track_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Playlist = /** @class */ (function () {
+        function Playlist() {
+            this.Name = null;
+            this.Uri = null;
+            this.Tracks = [];
+        }
+        Playlist.CreateFromRef = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Playlist();
+            result.Name = entity.name || null;
+            result.Uri = entity.uri || null;
+            result.Tracks = [];
+            return result;
+        };
+        Playlist.CreateFromMopidy = function (entity) {
+            if (!entity)
+                return null;
+            var result = new Playlist();
+            result.Name = entity.name || null;
+            result.Uri = entity.uri || null;
+            result.Tracks = Track_2.default.CreateArrayFromMopidy(entity.tracks);
+            return result;
+        };
+        Playlist.CreateArrayFromRefs = function (entities) {
+            var result = [];
+            for (var i = 0; i < entities.length; i++) {
+                var entity = Playlist.CreateFromRef(entities[i]);
+                if (entity)
+                    result.push(entity);
+            }
+            return result;
+        };
+        Playlist.MinNameLength = 1;
+        Playlist.MaxNameLength = 40;
+        return Playlist;
+    }());
+    exports.default = Playlist;
+});
 define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_2, Dump_3, JsonRpcQueryableBase_1, Track_3) {
+define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_2, Dump_4, JsonRpcQueryableBase_2, Track_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackStore = /** @class */ (function (_super) {
@@ -1683,7 +2081,7 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Du
                                     continue;
                                 if ((!track.Name || !track.Length)
                                     && (!pairedTrackArray || pairedTrackArray.length <= 0)) {
-                                    Dump_3.default.Error('TrackStore.EnsureTracks: Track Details Not Found', { track: track, pairedTrackArray: pairedTrackArray });
+                                    Dump_4.default.Error('TrackStore.EnsureTracks: Track Details Not Found', { track: track, pairedTrackArray: pairedTrackArray });
                                     continue;
                                 }
                                 mpTrack = pairList[uri][0];
@@ -1698,10 +2096,10 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Du
             LibraryLookup: 'core.library.lookup',
         };
         return TrackStore;
-    }(JsonRpcQueryableBase_1.default));
+    }(JsonRpcQueryableBase_2.default));
     exports.default = TrackStore;
 });
-define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_3, Exception_3, JsonRpcQueryableBase_2, Track_4, TrackStore_1, Playlist_1) {
+define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Utils/Exception", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track", "Models/Tracks/TrackStore", "Models/Playlists/Playlist"], function (require, exports, Libraries_3, Exception_7, JsonRpcQueryableBase_3, Track_4, TrackStore_1, Playlist_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var PlaylistStore = /** @class */ (function (_super) {
@@ -1796,7 +2194,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 2:
                             resAdd = _a.sent();
                             if (resAdd.error)
-                                Exception_3.default.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
+                                Exception_7.default.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
                             tlTracks = resAdd.result;
                             tlDictionary = Libraries_3.default.Enumerable.from(tlTracks)
                                 .toDictionary(function (e) { return e.track.uri; }, function (e2) { return e2.tlid; });
@@ -1807,7 +2205,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                                     : null;
                             }
                             if (track.TlId === null)
-                                Exception_3.default.Throw("track: " + track.Name + " not assigned TlId");
+                                Exception_7.default.Throw("track: " + track.Name + " not assigned TlId");
                             return [4 /*yield*/, this.PlayByTlId(track.TlId)];
                         case 3:
                             _a.sent();
@@ -1841,7 +2239,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_3.default.Throw('PlaylistStore.AddPlaylist: Playlist Create Failed.', response.error);
+                                Exception_7.default.Throw('PlaylistStore.AddPlaylist: Playlist Create Failed.', response.error);
                             }
                             mpPlaylist = response.result;
                             result = Playlist_1.default.CreateFromMopidy(mpPlaylist);
@@ -1861,14 +2259,14 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             playlist = _a.sent();
                             if (!playlist) {
-                                Exception_3.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Playlist Create Failed');
+                                Exception_7.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Playlist Create Failed');
                             }
                             playlist.Tracks = albumTracks.Tracks;
                             return [4 /*yield*/, this.UpdatePlayllist(playlist)];
                         case 2:
                             response = _a.sent();
                             if (response !== true) {
-                                Exception_3.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Track Update Failed.');
+                                Exception_7.default.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Track Update Failed.');
                             }
                             return [2 /*return*/, playlist];
                     }
@@ -1924,7 +2322,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_3.default.Throw('PlaylistStore.UpdatePlayllist: Track Update Failed.', response.error);
+                                Exception_7.default.Throw('PlaylistStore.UpdatePlayllist: Track Update Failed.', response.error);
                             }
                             return [2 /*return*/, (response.result !== null)];
                     }
@@ -1942,7 +2340,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
                         case 1:
                             response = _a.sent();
                             if (response && response.error) {
-                                Exception_3.default.Throw('PlaylistStore.DeletePlaylist: Delete Failed.', response.error);
+                                Exception_7.default.Throw('PlaylistStore.DeletePlaylist: Delete Failed.', response.error);
                             }
                             return [2 /*return*/, true];
                     }
@@ -1962,143 +2360,10 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
             PlaybackPlay: 'core.playback.play'
         };
         return PlaylistStore;
-    }(JsonRpcQueryableBase_2.default));
+    }(JsonRpcQueryableBase_3.default));
     exports.default = PlaylistStore;
 });
-define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/ViewBase"], function (require, exports, ViewBase_3) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ContentDetailBase = /** @class */ (function (_super) {
-        __extends(ContentDetailBase, _super);
-        function ContentDetailBase() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        ContentDetailBase.prototype.Show = function () {
-            if (this.$el.classList.contains(ContentDetailBase.DisplayNone))
-                this.$el.classList.remove(ContentDetailBase.DisplayNone);
-        };
-        ContentDetailBase.prototype.Hide = function () {
-            if (!this.$el.classList.contains(ContentDetailBase.DisplayNone))
-                this.$el.classList.add(ContentDetailBase.DisplayNone);
-        };
-        ContentDetailBase.DisplayNone = 'd-none';
-        return ContentDetailBase;
-    }(ViewBase_3.default));
-    exports.default = ContentDetailBase;
-});
-define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ContentDetailBase", "Views/Shared/SelectionItem"], function (require, exports, _, Libraries_4, Exception_4, ContentDetailBase_1, SelectionItem_2) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SelectionEvents = {
-        ListUpdated: 'ListUpdated',
-        SelectionOrdered: SelectionItem_2.SelectionItemEvents.SelectionOrdered,
-        SelectionChanged: SelectionItem_2.SelectionItemEvents.SelectionChanged,
-        Refreshed: 'Refreshed',
-    };
-    var SelectionListBase = /** @class */ (function (_super) {
-        __extends(SelectionListBase, _super);
-        function SelectionListBase() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.page = 1;
-            _this.viewport = Libraries_4.default.ResponsiveBootstrapToolkit;
-            return _this;
-        }
-        Object.defineProperty(SelectionListBase.prototype, "Page", {
-            get: function () {
-                return this.page;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(SelectionListBase.prototype, "InfiniteLoading", {
-            get: function () {
-                return (this.$refs.InfiniteLoading)
-                    ? this.$refs.InfiniteLoading
-                    : null;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        SelectionListBase.prototype.OnInfinite = function ($state) {
-            return __awaiter(this, void 0, void 0, function () {
-                var result, isUpdated, args, e_1;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            _a.trys.push([0, 2, , 3]);
-                            return [4 /*yield*/, this.GetPagenatedList()];
-                        case 1:
-                            result = _a.sent();
-                            isUpdated = false;
-                            if (0 < result.ResultList.length) {
-                                this.entities = this.entities.concat(result.ResultList);
-                                isUpdated = true;
-                            }
-                            if (this.entities.length < result.TotalLength) {
-                                $state.loaded();
-                                this.page++;
-                            }
-                            else {
-                                $state.complete();
-                            }
-                            if (isUpdated) {
-                                args = {
-                                    Entities: this.entities
-                                };
-                                this.$emit(exports.SelectionEvents.ListUpdated, args);
-                            }
-                            return [3 /*break*/, 3];
-                        case 2:
-                            e_1 = _a.sent();
-                            Exception_4.default.Throw(null, e_1);
-                            return [3 /*break*/, 3];
-                        case 3: return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        SelectionListBase.prototype.OnClickRefresh = function () {
-            this.Refresh();
-            this.$emit(exports.SelectionEvents.Refreshed);
-        };
-        SelectionListBase.prototype.OnSelectionOrdered = function (args) {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    this.$emit(exports.SelectionEvents.SelectionOrdered, args);
-                    return [2 /*return*/, args.Permitted];
-                });
-            });
-        };
-        SelectionListBase.prototype.OnSelectionChanged = function (args) {
-            var _this = this;
-            _.delay(function () {
-                _this.$emit(exports.SelectionEvents.SelectionChanged, args);
-            }, 300);
-        };
-        SelectionListBase.prototype.Refresh = function () {
-            var _this = this;
-            this.page = 1;
-            this.entities = [];
-            this.$nextTick(function () {
-                _this.InfiniteLoading.stateChanger.reset();
-                _this.InfiniteLoading.attemptLoad();
-            });
-        };
-        return SelectionListBase;
-    }(ContentDetailBase_1.default));
-    exports.default = SelectionListBase;
-});
-define("Views/Events/HammerEvents", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.SwipeEvents = {
-        Left: 'swipeleft',
-        Right: 'swiperight',
-        Up: 'swipeup',
-        Down: 'swipedown'
-    };
-});
-define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function (require, exports, _, Dump_4) {
+define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function (require, exports, _, Dump_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Speed;
@@ -2346,7 +2611,7 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function
                     this._resolver(result);
                 }
                 catch (ex) {
-                    Dump_4.default.Error('Animated.Resolve: Unexpected Error on Resolve', ex);
+                    Dump_5.default.Error('Animated.Resolve: Unexpected Error on Resolve', ex);
                 }
             }
             this._resolver = null;
@@ -2398,16 +2663,240 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function
     }());
     exports.default = Animate;
 });
-define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Utils/Exception", "Views/Bases/ViewBase", "Utils/Animate"], function (require, exports, Animate_1, Exception_5, ViewBase_4, Animate_2) {
+define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/ViewBase", "Utils/Animate"], function (require, exports, ViewBase_3, Animate_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.Animation = Animate_2.Animation;
-    exports.Speed = Animate_2.Speed;
+    var ContentDetailBase = /** @class */ (function (_super) {
+        __extends(ContentDetailBase, _super);
+        function ContentDetailBase() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.AnimationSlideInRight = Animate_1.Animation.SlideInRight;
+            _this.AnimationSlideOutRight = Animate_1.Animation.SlideOutRight;
+            _this.AnimationSlideInLeft = Animate_1.Animation.SlideInLeft;
+            _this.AnimationSlideOutLeft = Animate_1.Animation.SlideOutLeft;
+            _this.AnimationSpeed = Animate_1.Speed.Faster;
+            return _this;
+        }
+        ContentDetailBase.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    _super.prototype.Initialize.call(this);
+                    this.animate = new Animate_1.default(this.$el);
+                    this.elClasses = this.$el.classList;
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        ContentDetailBase.prototype.GetIsVisible = function () {
+            return !this.elClasses.contains(ContentDetailBase.DisplayNone);
+        };
+        ContentDetailBase.prototype.ToPositionStatic = function () {
+            this.$el.setAttribute('style', ContentDetailBase.PositionStatic);
+        };
+        ContentDetailBase.prototype.ToPositionAbsolute = function () {
+            this.$el.setAttribute('style', ContentDetailBase.PositionAbsolute);
+        };
+        ContentDetailBase.prototype.ToVisible = function () {
+            if (this.elClasses.contains(ContentDetailBase.DisplayNone))
+                this.elClasses.remove(ContentDetailBase.DisplayNone);
+        };
+        ContentDetailBase.prototype.ToHide = function () {
+            if (!this.elClasses.contains(ContentDetailBase.DisplayNone))
+                this.elClasses.add(ContentDetailBase.DisplayNone);
+        };
+        ContentDetailBase.prototype.SlideInRight = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.ToVisible();
+                            return [4 /*yield*/, this.animate.Execute(this.AnimationSlideInRight, this.AnimationSpeed)];
+                        case 1:
+                            _a.sent();
+                            this.animate.Clear();
+                            this.ToVisible();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ContentDetailBase.prototype.SlideInLeft = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.ToVisible();
+                            return [4 /*yield*/, this.animate.Execute(this.AnimationSlideInLeft, this.AnimationSpeed)];
+                        case 1:
+                            _a.sent();
+                            this.animate.Clear();
+                            this.ToVisible();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ContentDetailBase.prototype.SlideOutRight = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.ToVisible();
+                            return [4 /*yield*/, this.animate.Execute(this.AnimationSlideOutRight, this.AnimationSpeed)];
+                        case 1:
+                            _a.sent();
+                            this.animate.Clear();
+                            this.ToHide();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ContentDetailBase.prototype.SlideOutLeft = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            this.ToVisible();
+                            return [4 /*yield*/, this.animate.Execute(this.AnimationSlideOutLeft, this.AnimationSpeed)];
+                        case 1:
+                            _a.sent();
+                            this.animate.Clear();
+                            this.ToHide();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        ContentDetailBase.DisplayNone = 'd-none';
+        ContentDetailBase.PositionStatic = 'position: static;';
+        ContentDetailBase.PositionAbsolute = 'position: absolute;';
+        return ContentDetailBase;
+    }(ViewBase_3.default));
+    exports.default = ContentDetailBase;
+});
+define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Libraries", "Utils/Exception", "Views/Bases/ContentDetailBase", "Views/Shared/SelectionItem"], function (require, exports, _, Libraries_4, Exception_8, ContentDetailBase_1, SelectionItem_2) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.SelectionEvents = {
+        ListUpdated: 'ListUpdated',
+        SelectionOrdered: SelectionItem_2.SelectionItemEvents.SelectionOrdered,
+        SelectionChanged: SelectionItem_2.SelectionItemEvents.SelectionChanged,
+        Refreshed: 'Refreshed',
+    };
+    var SelectionListBase = /** @class */ (function (_super) {
+        __extends(SelectionListBase, _super);
+        function SelectionListBase() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.page = 1;
+            _this.viewport = Libraries_4.default.ResponsiveBootstrapToolkit;
+            return _this;
+        }
+        Object.defineProperty(SelectionListBase.prototype, "Page", {
+            get: function () {
+                return this.page;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SelectionListBase.prototype, "InfiniteLoading", {
+            get: function () {
+                return (this.$refs.InfiniteLoading)
+                    ? this.$refs.InfiniteLoading
+                    : null;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        SelectionListBase.prototype.OnInfinite = function ($state) {
+            return __awaiter(this, void 0, void 0, function () {
+                var result, isUpdated, args, e_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            _a.trys.push([0, 2, , 3]);
+                            return [4 /*yield*/, this.GetPagenatedList()];
+                        case 1:
+                            result = _a.sent();
+                            isUpdated = false;
+                            if (0 < result.ResultList.length) {
+                                this.entities = this.entities.concat(result.ResultList);
+                                isUpdated = true;
+                            }
+                            if (this.entities.length < result.TotalLength) {
+                                $state.loaded();
+                                this.page++;
+                            }
+                            else {
+                                $state.complete();
+                            }
+                            if (isUpdated) {
+                                args = {
+                                    Entities: this.entities
+                                };
+                                this.$emit(exports.SelectionEvents.ListUpdated, args);
+                            }
+                            return [3 /*break*/, 3];
+                        case 2:
+                            e_1 = _a.sent();
+                            Exception_8.default.Throw(null, e_1);
+                            return [3 /*break*/, 3];
+                        case 3: return [2 /*return*/, true];
+                    }
+                });
+            });
+        };
+        SelectionListBase.prototype.OnClickRefresh = function () {
+            this.Refresh();
+            this.$emit(exports.SelectionEvents.Refreshed);
+        };
+        SelectionListBase.prototype.OnSelectionOrdered = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    this.$emit(exports.SelectionEvents.SelectionOrdered, args);
+                    return [2 /*return*/, args.Permitted];
+                });
+            });
+        };
+        SelectionListBase.prototype.OnSelectionChanged = function (args) {
+            var _this = this;
+            _.delay(function () {
+                _this.$emit(exports.SelectionEvents.SelectionChanged, args);
+            }, 300);
+        };
+        SelectionListBase.prototype.Refresh = function () {
+            var _this = this;
+            this.page = 1;
+            this.entities = [];
+            this.$nextTick(function () {
+                _this.InfiniteLoading.stateChanger.reset();
+                _this.InfiniteLoading.attemptLoad();
+            });
+        };
+        return SelectionListBase;
+    }(ContentDetailBase_1.default));
+    exports.default = SelectionListBase;
+});
+define("Views/Events/HammerEvents", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.SwipeEvents = {
+        Left: 'swipeleft',
+        Right: 'swiperight',
+        Up: 'swipeup',
+        Down: 'swipedown'
+    };
+});
+define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Utils/Exception", "Views/Bases/ViewBase", "Utils/Animate"], function (require, exports, Animate_2, Exception_9, ViewBase_4, Animate_3) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.Animation = Animate_3.Animation;
+    exports.Speed = Animate_3.Speed;
     var AnimatedBase = /** @class */ (function (_super) {
         __extends(AnimatedBase, _super);
         function AnimatedBase() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this.Speed = Animate_1.Speed.Faster;
+            _this.Speed = Animate_2.Speed.Faster;
             _this.ClassHide = 'd-none';
             return _this;
         }
@@ -2422,17 +2911,17 @@ define("Views/Bases/AnimatedBase", ["require", "exports", "Utils/Animate", "Util
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    if (!this.AnimationIn || Animate_1.default.IsHideAnimation(this.AnimationIn))
-                        Exception_5.default.Throw('Invalid In-Animation', this.AnimationIn);
-                    if (!this.AnimationOut || !Animate_1.default.IsHideAnimation(this.AnimationOut))
-                        Exception_5.default.Throw('Invalid Out-Animation', this.AnimationOut);
-                    this.animate = new Animate_1.default(this.$el);
+                    if (!this.AnimationIn || Animate_2.default.IsHideAnimation(this.AnimationIn))
+                        Exception_9.default.Throw('Invalid In-Animation', this.AnimationIn);
+                    if (!this.AnimationOut || !Animate_2.default.IsHideAnimation(this.AnimationOut))
+                        Exception_9.default.Throw('Invalid Out-Animation', this.AnimationOut);
+                    this.animate = new Animate_2.default(this.$el);
                     return [2 /*return*/, true];
                 });
             });
         };
         AnimatedBase.prototype.ClearAllClasses = function () {
-            Animate_1.default.ClearAnimation(this.Element);
+            Animate_2.default.ClearAnimation(this.Element);
         };
         AnimatedBase.prototype.ShowNow = function () {
             this.ClearAllClasses();
@@ -2745,7 +3234,7 @@ define("Views/Events/BootstrapEvents", ["require", "exports"], function (require
         Hidden: 'hidden.bs.dropdown'
     };
 });
-define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_6, ViewBase_6, BootstrapEvents_1) {
+define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports", "vue-class-component", "vue-property-decorator", "Libraries", "Models/AlbumTracks/AlbumTracks", "Utils/Exception", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents"], function (require, exports, vue_class_component_5, vue_property_decorator_5, Libraries_6, AlbumTracks_2, Exception_10, ViewBase_6, BootstrapEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SelectionAlbumTracksEvents = {
@@ -2872,7 +3361,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var playlist = Libraries_6.default.Enumerable.from(this.innerPlaylists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
-                Exception_6.default.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
+                Exception_10.default.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
             var args = {
                 Playlist: playlist,
                 Tracks: this.entity.Tracks
@@ -2883,12 +3372,12 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var tr = args.currentTarget.parentElement;
             var trackIdString = tr.getAttribute('data-trackid');
             if (!trackIdString || trackIdString === '')
-                Exception_6.default.Throw('SelectionAlbumTrack.OnRowClicked: Track-Id not found.');
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
             var tracks = Libraries_6.default.Enumerable.from(this.entity.Tracks);
             var track = tracks.firstOrDefault(function (e) { return e.Id === trackId; });
             if (!track)
-                Exception_6.default.Throw('SelectionAlbumTrack.OnRowClicked: Track entity not found.');
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowClicked: Track entity not found.');
             var orderedArgs = {
                 Entity: this.entity,
                 Track: track,
@@ -2903,15 +3392,15 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             var playlist = Libraries_6.default.Enumerable.from(this.innerPlaylists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
-                Exception_6.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
             var trackIdString = Libraries_6.default.$(elem).parents('tr.track-row').attr('data-trackid');
             if (!trackIdString || trackIdString === '')
-                Exception_6.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
             var track = Libraries_6.default.Enumerable.from(this.entity.Tracks)
                 .firstOrDefault(function (e) { return e.Id === trackId; });
             if (!track)
-                Exception_6.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
+                Exception_10.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
             var args = {
                 Playlist: playlist,
                 Tracks: [track]
@@ -2936,7 +3425,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Dump", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Dump_5, Exception_7, IContent_1, IContentDetail_2, SelectionListBase_1, HammerEvents_1, Filterbox_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Dump", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Dump_6, Exception_11, IContent_1, IContentDetail_2, SelectionListBase_1, HammerEvents_1, Filterbox_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AlbumListEvents = {
@@ -2977,7 +3466,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Dump_5.default.Log('Finder.AlbumList.Initialize: Start.');
+                            Dump_6.default.Log('Finder.AlbumList.Initialize: Start.');
                             _super.prototype.Initialize.call(this);
                             this.swipeDetector = new Libraries_7.default.Hammer(this.$el);
                             this.swipeDetector.get('swipe').set({
@@ -2986,7 +3475,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             this.swipeDetector.on(HammerEvents_1.SwipeEvents.Left, function () {
                                 var args = {
                                     Content: IContent_1.Contents.Finder,
-                                    ContentDetail: IContentDetail_2.ContentDetails.AlbumTracks,
+                                    ContentDetail: null,
                                     Direction: IContentDetail_2.SwipeDirection.Left
                                 };
                                 _this.$emit(IContentDetail_2.ContentDetailEvents.Swiped, args);
@@ -2994,7 +3483,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             this.swipeDetector.on(HammerEvents_1.SwipeEvents.Right, function () {
                                 var args = {
                                     Content: IContent_1.Contents.Finder,
-                                    ContentDetail: IContentDetail_2.ContentDetails.AlbumTracks,
+                                    ContentDetail: IContentDetail_2.ContentDetails.Artists,
                                     Direction: IContentDetail_2.SwipeDirection.Right
                                 };
                                 _this.$emit(IContentDetail_2.ContentDetailEvents.Swiped, args);
@@ -3024,7 +3513,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             return [4 /*yield*/, this.InitPlaylistList()];
                         case 1:
                             _a.sent();
-                            Dump_5.default.Log('Finder.AlbumList.Initialize: End.');
+                            Dump_6.default.Log('Finder.AlbumList.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -3083,10 +3572,10 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                         case 2:
                             albumTracks = args.Entity;
                             if (!albumTracks)
-                                Exception_7.default.Throw('AlbumTracks Not Found', args);
+                                Exception_11.default.Throw('AlbumTracks Not Found', args);
                             track = args.Track;
                             if (!track)
-                                Exception_7.default.Throw('Track Not Found', args);
+                                Exception_11.default.Throw('Track Not Found', args);
                             isAllTracksRegistered = Libraries_7.default.Enumerable.from(albumTracks.Tracks)
                                 .all(function (e) { return e.TlId !== null; });
                             if (!isAllTracksRegistered) return [3 /*break*/, 4];
@@ -3260,51 +3749,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
     }(SelectionListBase_1.default));
     exports.default = AlbumList;
 });
-define("Models/Artists/ArtistStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Artists/Artist", "Utils/Exception"], function (require, exports, StoreBase_2, Artist_3, Exception_8) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var ArtistStore = /** @class */ (function (_super) {
-        __extends(ArtistStore, _super);
-        function ArtistStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        ArtistStore.prototype.Exists = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Artist/Exists')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_8.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            return [2 /*return*/, response.Result];
-                    }
-                });
-            });
-        };
-        ArtistStore.prototype.GetList = function (args) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Artist/GetPagenatedList', args)];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_8.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            result = response.Result;
-                            result.ResultList = Artist_3.default.CreateArray(result.ResultList);
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        return ArtistStore;
-    }(StoreBase_2.default));
-    exports.default = ArtistStore;
-});
-define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, Libraries_8, ArtistStore_1, IContent_2, IContentDetail_3, SelectionListBase_2, HammerEvents_2, Filterbox_2, SelectionItem_3) {
+define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Artists/ArtistStore", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem"], function (require, exports, _, vue_class_component_7, vue_infinite_loading_2, Libraries_8, ArtistStore_2, IContent_2, IContentDetail_3, SelectionListBase_2, HammerEvents_2, Filterbox_2, SelectionItem_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ArtistList = /** @class */ (function (_super) {
@@ -3313,7 +3758,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.tabId = 'subtab-artists';
             _this.linkId = 'nav-artists';
-            _this.store = new ArtistStore_1.default();
+            _this.store = new ArtistStore_2.default();
             _this.entities = [];
             _this.genreIds = [];
             return _this;
@@ -3338,7 +3783,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                     this.swipeDetector.on(HammerEvents_2.SwipeEvents.Left, function () {
                         var args = {
                             Content: IContent_2.Contents.Finder,
-                            ContentDetail: IContentDetail_3.ContentDetails.Artists,
+                            ContentDetail: IContentDetail_3.ContentDetails.AlbumTracks,
                             Direction: IContentDetail_3.SwipeDirection.Left
                         };
                         _this.$emit(IContentDetail_3.ContentDetailEvents.Swiped, args);
@@ -3346,7 +3791,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
                     this.swipeDetector.on(HammerEvents_2.SwipeEvents.Right, function () {
                         var args = {
                             Content: IContent_2.Contents.Finder,
-                            ContentDetail: IContentDetail_3.ContentDetails.Artists,
+                            ContentDetail: IContentDetail_3.ContentDetails.Genres,
                             Direction: IContentDetail_3.SwipeDirection.Right
                         };
                         _this.$emit(IContentDetail_3.ContentDetailEvents.Swiped, args);
@@ -3443,51 +3888,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
     }(SelectionListBase_2.default));
     exports.default = ArtistList;
 });
-define("Models/Genres/GenreStore", ["require", "exports", "Models/Bases/StoreBase", "Models/Genres/Genre", "Utils/Exception"], function (require, exports, StoreBase_3, Genre_1, Exception_9) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var GenreStore = /** @class */ (function (_super) {
-        __extends(GenreStore, _super);
-        function GenreStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        GenreStore.prototype.Exists = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Genre/Exists')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_9.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            return [2 /*return*/, response.Result];
-                    }
-                });
-            });
-        };
-        GenreStore.prototype.GetList = function (args) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, result;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Genre/GetPagenatedList', args)];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_9.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            result = response.Result;
-                            result.ResultList = Genre_1.default.CreateArray(result.ResultList);
-                            return [2 /*return*/, result];
-                    }
-                });
-            });
-        };
-        return GenreStore;
-    }(StoreBase_3.default));
-    exports.default = GenreStore;
-});
-define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Genres/GenreStore", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, Libraries_9, GenreStore_1, IContent_3, IContentDetail_4, SelectionListBase_3, HammerEvents_3, Filterbox_3, SelectionItem_4) {
+define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Genres/GenreStore", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem"], function (require, exports, vue_class_component_8, vue_infinite_loading_3, Libraries_9, GenreStore_2, IContent_3, IContentDetail_4, SelectionListBase_3, HammerEvents_3, Filterbox_3, SelectionItem_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var GenreList = /** @class */ (function (_super) {
@@ -3496,7 +3897,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.tabId = 'subtab-genres';
             _this.linkId = 'nav-genres';
-            _this.store = new GenreStore_1.default();
+            _this.store = new GenreStore_2.default();
             _this.entities = [];
             return _this;
             // #endregion
@@ -3520,7 +3921,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                     this.swipeDetector.on(HammerEvents_3.SwipeEvents.Left, function () {
                         var args = {
                             Content: IContent_3.Contents.Finder,
-                            ContentDetail: IContentDetail_4.ContentDetails.Genres,
+                            ContentDetail: IContentDetail_4.ContentDetails.Artists,
                             Direction: IContentDetail_4.SwipeDirection.Left
                         };
                         _this.$emit(IContentDetail_4.ContentDetailEvents.Swiped, args);
@@ -3528,7 +3929,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
                     this.swipeDetector.on(HammerEvents_3.SwipeEvents.Right, function () {
                         var args = {
                             Content: IContent_3.Contents.Finder,
-                            ContentDetail: IContentDetail_4.ContentDetails.Genres,
+                            ContentDetail: null,
                             Direction: IContentDetail_4.SwipeDirection.Right
                         };
                         _this.$emit(IContentDetail_4.ContentDetailEvents.Swiped, args);
@@ -3605,7 +4006,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionListBase_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList", "Utils/Dump", "lodash"], function (require, exports, vue_class_component_9, Delay_3, Exception_10, IContentDetail_5, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1, Dump_6, _) {
+define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList", "lodash"], function (require, exports, vue_class_component_9, Delay_3, Exception_12, IContentDetail_5, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1, _) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FinderEvents = _.extend({}, AlbumList_1.AlbumListEvents);
@@ -3614,7 +4015,9 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
         function Finder() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             // #region "IContentView"
+            _this.detailWrapperElement = null;
             _this.details = [];
+            _this.currentDetail = null;
             return _this;
         }
         Object.defineProperty(Finder.prototype, "GenreList", {
@@ -3641,12 +4044,12 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
         Finder.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    Dump_6.default.Log('Finder.Initialize: Start.');
                     _super.prototype.Initialize.call(this);
                     this.details.push(this.GenreList);
                     this.details.push(this.ArtistList);
                     this.details.push(this.AlbumList);
-                    Dump_6.default.Log('Finder.Initialize: End.');
+                    this.currentDetail = this.GenreList;
+                    this.detailWrapperElement = this.$refs.DetailWrapper;
                     return [2 /*return*/, true];
                 });
             });
@@ -3664,26 +4067,42 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
                 _this.AlbumList.LoadIfEmpty();
             });
         };
-        Finder.prototype.ShowContentDetail = function (args) {
-            switch (args.Detail) {
+        Finder.prototype.GetContentDetail = function (detail) {
+            switch (detail) {
                 case IContentDetail_5.ContentDetails.Genres:
-                    this.HideAllDetails();
-                    this.GenreList.Show();
-                    this.GenreList.LoadIfEmpty();
-                    break;
+                    return this.GenreList;
                 case IContentDetail_5.ContentDetails.Artists:
-                    this.HideAllDetails();
-                    this.ArtistList.Show();
-                    this.ArtistList.LoadIfEmpty();
-                    break;
+                    return this.ArtistList;
                 case IContentDetail_5.ContentDetails.AlbumTracks:
-                    this.HideAllDetails();
-                    this.AlbumList.Show();
-                    this.AlbumList.LoadIfEmpty();
-                    break;
+                    return this.AlbumList;
                 default:
-                    Exception_10.default.Throw('Unexpected ContentDetail');
+                    Exception_12.default.Throw('Unexpected ContentDetail');
             }
+        };
+        Finder.prototype.ShowContentDetail = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.ShowContentDetail.call(this, args)];
+                        case 1:
+                            _a.sent();
+                            switch (args.Detail) {
+                                case IContentDetail_5.ContentDetails.Genres:
+                                    this.GenreList.LoadIfEmpty();
+                                    break;
+                                case IContentDetail_5.ContentDetails.Artists:
+                                    this.ArtistList.LoadIfEmpty();
+                                    break;
+                                case IContentDetail_5.ContentDetails.AlbumTracks:
+                                    this.AlbumList.LoadIfEmpty();
+                                    break;
+                                default:
+                                    Exception_12.default.Throw('Unexpected ContentDetail');
+                            }
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         Finder.prototype.OnSwiped = function (args) {
             _super.prototype.OnSwiped.call(this, args);
@@ -3728,7 +4147,7 @@ define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Ut
         };
         Finder = __decorate([
             vue_class_component_9.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"nav-finder\">\n    <div class=\"row\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\"\n            @Swiped=\"OnSwiped\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\"\n            @Swiped=\"OnSwiped\" />\n        <album-list\n            ref=\"AlbumList\"\n            @PlaylistUpdated=\"OnPlaylistUpdated\"\n            @Swiped=\"OnSwiped\" />\n    </div>\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n                        id=\"tab-finder\"\n                        role=\"tabpanel\"\n                        aria-labelledby=\"nav-finder\">\n    <div class=\"row\"\n        ref=\"DetailWrapper\">\n        <genre-list\n            ref=\"GenreList\"\n            @SelectionChanged=\"OnGenreSelectionChanged\"\n            @Refreshed=\"OnGenreRefreshed\"\n            @Swiped=\"OnSwiped\" />\n        <artist-list\n            ref=\"ArtistList\"\n            @SelectionChanged=\"OnArtistSelectionChanged\"\n            @Refreshed=\"OnArtistRefreshed\"\n            @Swiped=\"OnSwiped\" />\n        <album-list\n            ref=\"AlbumList\"\n            @PlaylistUpdated=\"OnPlaylistUpdated\"\n            @Swiped=\"OnSwiped\" />\n    </div>\n</section>",
                 components: {
                     'genre-list': GenreList_1.default,
                     'artist-list': ArtistList_1.default,
@@ -3755,7 +4174,7 @@ define("Views/Events/AdminLteEvents", ["require", "exports"], function (require,
         Shown: 'shown.lte.pushmenu'
     };
 });
-define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail", "Views/Events/AdminLteEvents"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_4, Exception_11, Libraries_10, IContentDetail_6, AdminLteEvents_1) {
+define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Bases/IContent", "Utils/Exception", "Libraries", "Views/Bases/IContentDetail", "Views/Events/AdminLteEvents"], function (require, exports, vue_class_component_10, ViewBase_7, IContent_4, Exception_13, Libraries_10, IContentDetail_6, AdminLteEvents_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.HeaderBarEvents = {
@@ -3920,7 +4339,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     this.MenuScanProgress.classList.remove(this.displayNone);
                     break;
                 default:
-                    Exception_11.default.Throw('Unexpected Page.', args);
+                    Exception_13.default.Throw('Unexpected Page.', args);
             }
         };
         HeaderBar.prototype.OnGenresClicked = function () {
@@ -4147,7 +4566,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                     this.swipeDetector.on(HammerEvents_4.SwipeEvents.Left, function () {
                         var args = {
                             Content: IContent_5.Contents.Finder,
-                            ContentDetail: IContentDetail_7.ContentDetails.Playlists,
+                            ContentDetail: IContentDetail_7.ContentDetails.PlaylistTracks,
                             Direction: IContentDetail_7.SwipeDirection.Left
                         };
                         _this.$emit(IContentDetail_7.ContentDetailEvents.Swiped, args);
@@ -4155,7 +4574,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
                     this.swipeDetector.on(HammerEvents_4.SwipeEvents.Right, function () {
                         var args = {
                             Content: IContent_5.Contents.Finder,
-                            ContentDetail: IContentDetail_7.ContentDetails.Playlists,
+                            ContentDetail: null,
                             Direction: IContentDetail_7.SwipeDirection.Right
                         };
                         _this.$emit(IContentDetail_7.ContentDetailEvents.Swiped, args);
@@ -4299,7 +4718,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
     }(SelectionListBase_4.default));
     exports.default = PlaylistList;
 });
-define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Bases/SelectionListBase"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_13, vue_property_decorator_6, Libraries_13, Track_5, Animate_3, Delay_5, ViewBase_9, SelectionListBase_5) {
+define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-property-decorator", "Libraries", "Models/Tracks/Track", "Utils/Animate", "Utils/Delay", "Views/Bases/ViewBase", "Views/Bases/SelectionListBase"], function (require, exports, _, sortable_complete_esm_1, vue_class_component_13, vue_property_decorator_6, Libraries_13, Track_5, Animate_4, Delay_5, ViewBase_9, SelectionListBase_5) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackSelectionEvents = _.extend(_.clone(SelectionListBase_5.SelectionEvents), {
@@ -4312,7 +4731,7 @@ define("Views/Playlists/Lists/Tracks/SelectionTrack", ["require", "exports", "lo
             _this.selected = false;
             _this.liClasses = SelectionTrack_1.LiClasses;
             _this.isDeleting = false;
-            _this.deletingClasses = Animate_3.default.GetClassString(Animate_3.Animation.FadeOutRight, Animate_3.Speed.Faster);
+            _this.deletingClasses = Animate_4.default.GetClassString(Animate_4.Animation.FadeOutRight, Animate_4.Speed.Faster);
             return _this;
         }
         SelectionTrack_1 = SelectionTrack;
@@ -4558,7 +4977,7 @@ define("Views/Playlists/Lists/Tracks/UpdateDialog", ["require", "exports", "View
     }(ConfirmDialog_2.default));
     exports.default = UpdateDialog;
 });
-define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_15, vue_infinite_loading_5, Libraries_15, Playlist_3, PlaylistStore_3, Animate_4, Delay_6, IContent_6, IContentDetail_8, SelectionListBase_6, HammerEvents_5, Filterbox_5, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
+define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash", "sortablejs/modular/sortable.complete.esm", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/Playlist", "Models/Playlists/PlaylistStore", "Utils/Animate", "Utils/Delay", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SlideupButton", "Views/Playlists/Lists/Tracks/SelectionTrack", "Views/Playlists/Lists/Tracks/UpdateDialog"], function (require, exports, _, sortable_complete_esm_2, vue_class_component_15, vue_infinite_loading_5, Libraries_15, Playlist_3, PlaylistStore_3, Animate_5, Delay_6, IContent_6, IContentDetail_8, SelectionListBase_6, HammerEvents_5, Filterbox_5, SlideupButton_2, SelectionTrack_2, UpdateDialog_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.TrackListEvents = {
@@ -4669,7 +5088,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     this.swipeDetector.on(HammerEvents_5.SwipeEvents.Left, function () {
                         var args = {
                             Content: IContent_6.Contents.Finder,
-                            ContentDetail: IContentDetail_8.ContentDetails.PlaylistTracks,
+                            ContentDetail: null,
                             Direction: IContentDetail_8.SwipeDirection.Left
                         };
                         _this.$emit(IContentDetail_8.ContentDetailEvents.Swiped, args);
@@ -4677,7 +5096,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                     this.swipeDetector.on(HammerEvents_5.SwipeEvents.Right, function () {
                         var args = {
                             Content: IContent_6.Contents.Finder,
-                            ContentDetail: IContentDetail_8.ContentDetails.PlaylistTracks,
+                            ContentDetail: IContentDetail_8.ContentDetails.Playlists,
                             Direction: IContentDetail_8.SwipeDirection.Right
                         };
                         _this.$emit(IContentDetail_8.ContentDetailEvents.Swiped, args);
@@ -4702,8 +5121,8 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             }
                         });
                     }); });
-                    this.titleH3Animate = new Animate_4.default(this.TitleH3);
-                    this.titleInputAnimate = new Animate_4.default(this.TitleInput);
+                    this.titleH3Animate = new Animate_5.default(this.TitleH3);
+                    this.titleInputAnimate = new Animate_5.default(this.TitleInput);
                     return [2 /*return*/, true];
                 });
             });
@@ -4896,7 +5315,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                         return [4 /*yield*/, Promise.all([
                                 this.Filterbox.Hide(),
                                 this.EditButton.Hide(),
-                                this.titleH3Animate.Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster),
+                                this.titleH3Animate.Execute(Animate_5.Animation.FadeOutDown, Animate_5.Speed.Faster),
                             ])];
                         case 1:
                             // タイトル・編集開始ボタン非表示化
@@ -4907,7 +5326,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             this.listClasses = TrackList_1.ListBaseClasses + this.listMode.toString();
                             // 編集操作ボタン類の表示化
                             return [4 /*yield*/, Promise.all([
-                                    this.titleInputAnimate.Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster),
+                                    this.titleInputAnimate.Execute(Animate_5.Animation.FadeInUp, Animate_5.Speed.Faster),
                                     this.HeaderDeleteButton.Show(),
                                     this.EndEditButton.Show()
                                 ])];
@@ -4933,7 +5352,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             this.ClearSelection();
                             this.DisposeSortable();
                             promises = [
-                                this.titleInputAnimate.Execute(Animate_4.Animation.FadeOutDown, Animate_4.Speed.Faster),
+                                this.titleInputAnimate.Execute(Animate_5.Animation.FadeOutDown, Animate_5.Speed.Faster),
                                 this.HeaderDeleteButton.Hide(),
                                 this.EndEditButton.Hide()
                             ];
@@ -4948,7 +5367,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
                             this.TitleInput.value = '';
                             // タイトル・編集開始ボタン表示化
                             return [4 /*yield*/, Promise.all([
-                                    this.titleH3Animate.Execute(Animate_4.Animation.FadeInUp, Animate_4.Speed.Faster),
+                                    this.titleH3Animate.Execute(Animate_5.Animation.FadeInUp, Animate_5.Speed.Faster),
                                     this.EditButton.Show(),
                                     this.Filterbox.Show()
                                 ])];
@@ -5286,7 +5705,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionListBase_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_9, Exception_12) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_9, Exception_14) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistsEvents = {
@@ -5297,7 +5716,9 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
         function Playlists() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             // #region "IContentView"
+            _this.detailWrapperElement = null;
             _this.details = [];
+            _this.currentDetail = null;
             return _this;
         }
         Object.defineProperty(Playlists.prototype, "PlaylistList", {
@@ -5320,6 +5741,8 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                     _super.prototype.Initialize.call(this);
                     this.details.push(this.PlaylistList);
                     this.details.push(this.TrackList);
+                    this.currentDetail = this.PlaylistList;
+                    this.detailWrapperElement = this.$refs.DetailWrapper;
                     return [2 /*return*/, true];
                 });
             });
@@ -5339,21 +5762,37 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
                 _this.PlaylistList.LoadIfEmpty();
             });
         };
-        Playlists.prototype.ShowContentDetail = function (args) {
-            switch (args.Detail) {
+        Playlists.prototype.GetContentDetail = function (detail) {
+            switch (detail) {
                 case IContentDetail_9.ContentDetails.Playlists:
-                    this.HideAllDetails();
-                    this.PlaylistList.Show();
-                    this.PlaylistList.LoadIfEmpty();
-                    break;
+                    return this.PlaylistList;
                 case IContentDetail_9.ContentDetails.PlaylistTracks:
-                    this.HideAllDetails();
-                    this.TrackList.Show();
-                    this.TrackList.LoadIfEmpty();
-                    break;
+                    return this.TrackList;
                 default:
-                    Exception_12.default.Throw('Unexpected ContentDetail');
+                    Exception_14.default.Throw('Unexpected ContentDetail');
             }
+        };
+        Playlists.prototype.ShowContentDetail = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.ShowContentDetail.call(this, args)];
+                        case 1:
+                            _a.sent();
+                            switch (args.Detail) {
+                                case IContentDetail_9.ContentDetails.Playlists:
+                                    this.PlaylistList.LoadIfEmpty();
+                                    break;
+                                case IContentDetail_9.ContentDetails.PlaylistTracks:
+                                    this.TrackList.LoadIfEmpty();
+                                    break;
+                                default:
+                                    Exception_14.default.Throw('Unexpected ContentDetail');
+                            }
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         Playlists.prototype.OnSwiped = function (args) {
             _super.prototype.OnSwiped.call(this, args);
@@ -5396,7 +5835,7 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
         };
         Playlists = __decorate([
             vue_class_component_16.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n    id=\"tab-playlists\"\n    role=\"tabpanel\"\n    aria-labelledby=\"nav-playlists\">\n    <div class=\"row\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionOrdered=\"OnPlaylistsSelectionOrdered\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\"\n            @Swiped=\"OnSwiped\" />\n        <track-list\n            ref=\"TrackList\"\n            @PlaylistDeleted=\"OnPlaylistDeleted\"\n            @PlaylistUpdated=\"OnPlaylistUpdated\"\n            @Swiped=\"OnSwiped\" />\n    </div>\n</section>",
+                template: "<section class=\"content h-100 tab-pane fade\"\n    id=\"tab-playlists\"\n    role=\"tabpanel\"\n    aria-labelledby=\"nav-playlists\">\n    <div class=\"row\"\n        ref=\"DetailWrapper\">\n        <playlist-list\n            ref=\"PlaylistList\"\n            @SelectionOrdered=\"OnPlaylistsSelectionOrdered\"\n            @SelectionChanged=\"OnPlaylistsSelectionChanged\"\n            @Swiped=\"OnSwiped\" />\n        <track-list\n            ref=\"TrackList\"\n            @PlaylistDeleted=\"OnPlaylistDeleted\"\n            @PlaylistUpdated=\"OnPlaylistUpdated\"\n            @Swiped=\"OnSwiped\" />\n    </div>\n</section>",
                 components: {
                     'playlist-list': PlaylistList_2.default,
                     'track-list': TrackList_2.default
@@ -5406,259 +5845,6 @@ define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component"
         return Playlists;
     }(ContentBase_2.default));
     exports.default = Playlists;
-});
-define("Models/Settings/Settings", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Settings = /** @class */ (function () {
-        function Settings() {
-            this._serverAddress = null;
-            this._serverPort = null;
-            this._isBusy = false;
-            this._isMopidyConnectable = false;
-        }
-        Object.defineProperty(Settings, "Entity", {
-            get: function () {
-                return Settings._entity;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Settings.Apply = function (newSettings) {
-            this._entity._serverAddress = newSettings.ServerAddress;
-            this._entity._serverPort = newSettings.ServerPort;
-        };
-        Object.defineProperty(Settings.prototype, "ServerAddress", {
-            get: function () {
-                return this._serverAddress;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Settings.prototype, "ServerPort", {
-            get: function () {
-                return this._serverPort;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Settings.prototype, "IsBusy", {
-            get: function () {
-                return this._isBusy;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Settings.prototype, "IsMopidyConnectable", {
-            get: function () {
-                return this._isMopidyConnectable;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Settings.prototype.SetBusy = function (isBusy) {
-            this._isBusy = isBusy;
-        };
-        Settings.prototype.SetMopidyConnectable = function (isConnectable) {
-            this._isMopidyConnectable = isConnectable;
-        };
-        Settings._entity = new Settings();
-        return Settings;
-    }());
-    exports.default = Settings;
-});
-define("Models/Albums/AlbumStore", ["require", "exports", "Models/Bases/StoreBase", "Utils/Exception"], function (require, exports, StoreBase_4, Exception_13) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var AlbumStore = /** @class */ (function (_super) {
-        __extends(AlbumStore, _super);
-        function AlbumStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        AlbumStore.prototype.Exists = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Album/Exists')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_13.default.Throw('Unexpected Error on ApiQuery', response.Errors);
-                            return [2 /*return*/, response.Result];
-                    }
-                });
-            });
-        };
-        return AlbumStore;
-    }(StoreBase_4.default));
-    exports.default = AlbumStore;
-});
-define("Models/Settings/SettingsStore", ["require", "exports", "Utils/Dump", "Utils/Exception", "Models/Albums/AlbumStore", "Models/Artists/ArtistStore", "Models/Bases/JsonRpcQueryableBase", "Models/Genres/GenreStore", "Models/Settings/Settings"], function (require, exports, Dump_7, Exception_14, AlbumStore_1, ArtistStore_2, JsonRpcQueryableBase_3, GenreStore_2, Settings_1) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var SettingsStore = /** @class */ (function (_super) {
-        __extends(SettingsStore, _super);
-        function SettingsStore() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        Object.defineProperty(SettingsStore.prototype, "Entity", {
-            get: function () {
-                return Settings_1.default.Entity;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        SettingsStore.prototype.Get = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Settings')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Exception_14.default.Throw('SettingStore.Get: Unexpected Error.', response.Errors);
-                            Settings_1.default.Apply(response.Result);
-                            return [2 /*return*/, Settings_1.default.Entity];
-                    }
-                });
-            });
-        };
-        SettingsStore.prototype.Update = function (settings) {
-            return __awaiter(this, void 0, void 0, function () {
-                var response, updated;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Settings', settings)];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded) {
-                                Dump_7.default.Error('SettingStore.Update: Unexpected Error.', response.Errors);
-                                return [2 /*return*/, false];
-                            }
-                            updated = response.Result;
-                            Settings_1.default.Apply(updated);
-                            return [2 /*return*/, true];
-                    }
-                });
-            });
-        };
-        SettingsStore.prototype.TryConnect = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcRequest(SettingsStore.MethodGetState)];
-                        case 1:
-                            response = _a.sent();
-                            if (response.error)
-                                Dump_7.default.Error('SettingStore.TryConnect: Unexpected Error.', response.error);
-                            Settings_1.default.Entity.SetMopidyConnectable(!(response.error));
-                            return [2 /*return*/, Settings_1.default.Entity.IsMopidyConnectable];
-                    }
-                });
-            });
-        };
-        SettingsStore.prototype.ExistsData = function () {
-            var genreStore = new GenreStore_2.default();
-            var artistStore = new ArtistStore_2.default();
-            var albumStore = new AlbumStore_1.default();
-            var existsGenres = false;
-            var existsArtists = false;
-            var existsAlbums = false;
-            var promises = [];
-            promises.push(genreStore.Exists().then(function (res) { existsGenres = res; }));
-            promises.push(artistStore.Exists().then(function (res) { existsArtists = res; }));
-            promises.push(albumStore.Exists().then(function (res) { existsAlbums = res; }));
-            // なぜか、Promise.all をawait した後で各bool値を比較しようとすると
-            // "常にfalseになるぞ"警告が出る。
-            // Promiseをまだきちんと理解してない...？
-            return Promise.all(promises)
-                .then(function () {
-                return (existsGenres === true
-                    && existsArtists === true
-                    && existsAlbums === true);
-            });
-        };
-        SettingsStore.prototype.GetAlbumScanProgress = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryGet('Settings/AlbumScanProgress')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded) {
-                                Dump_7.default.Error('SettingsStore.GetAlbumScanProgress: Unexpected Error.', response.Errors);
-                                return [2 /*return*/, {
-                                        TotalAlbumCount: -1,
-                                        ScannedAlbumCount: -1
-                                    }];
-                            }
-                            return [2 /*return*/, response.Result];
-                    }
-                });
-            });
-        };
-        SettingsStore.prototype.DbScanNew = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Settings/DbScanNew')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Dump_7.default.Error('SettingsStore.DbScanNew: Unexpected Error.', response.Errors);
-                            return [2 /*return*/, response.Succeeded];
-                    }
-                });
-            });
-        };
-        SettingsStore.prototype.DbCleanup = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.QueryPost('Settings/DbCleanup')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded)
-                                Dump_7.default.Error('SettingsStore.DbCleanup: Unexpected Error.', response.Errors);
-                            return [2 /*return*/, response.Succeeded];
-                    }
-                });
-            });
-        };
-        SettingsStore.prototype.GetDbUpdateProgress = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var a, response;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            a = 1;
-                            return [4 /*yield*/, this.QueryGet('Settings/UpdateProgress')];
-                        case 1:
-                            response = _a.sent();
-                            if (!response.Succeeded) {
-                                Dump_7.default.Error('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
-                                return [2 /*return*/, {
-                                        IsRunning: false,
-                                        Succeeded: false,
-                                        Progress: 0,
-                                        Message: 'Unexpected Error'
-                                    }];
-                            }
-                            return [2 /*return*/, response.Result];
-                    }
-                });
-            });
-        };
-        SettingsStore.MethodGetState = 'core.playback.get_state';
-        return SettingsStore;
-    }(JsonRpcQueryableBase_3.default));
-    exports.default = SettingsStore;
 });
 define("Views/Shared/Dialogs/ProgressDialog", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_17, Libraries_17, ViewBase_11) {
     "use strict";
@@ -5760,7 +5946,7 @@ define("Views/Settings/Blocks/DbBlock", ["require", "exports", "vue-class-compon
                     this.swipeDetector.on(HammerEvents_6.SwipeEvents.Left, function () {
                         var args = {
                             Content: IContent_7.Contents.Finder,
-                            ContentDetail: IContentDetail_10.ContentDetails.Database,
+                            ContentDetail: IContentDetail_10.ContentDetails.ScanProgress,
                             Direction: IContentDetail_10.SwipeDirection.Left
                         };
                         _this.$emit(IContentDetail_10.ContentDetailEvents.Swiped, args);
@@ -5768,7 +5954,7 @@ define("Views/Settings/Blocks/DbBlock", ["require", "exports", "vue-class-compon
                     this.swipeDetector.on(HammerEvents_6.SwipeEvents.Right, function () {
                         var args = {
                             Content: IContent_7.Contents.Finder,
-                            ContentDetail: IContentDetail_10.ContentDetails.Database,
+                            ContentDetail: IContentDetail_10.ContentDetails.SetMopidy,
                             Direction: IContentDetail_10.SwipeDirection.Right
                         };
                         _this.$emit(IContentDetail_10.ContentDetailEvents.Swiped, args);
@@ -6089,7 +6275,7 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
                     this.swipeDetector.on(HammerEvents_7.SwipeEvents.Left, function () {
                         var args = {
                             Content: IContent_8.Contents.Finder,
-                            ContentDetail: IContentDetail_11.ContentDetails.SetMopidy,
+                            ContentDetail: IContentDetail_11.ContentDetails.Database,
                             Direction: IContentDetail_11.SwipeDirection.Left
                         };
                         _this.$emit(IContentDetail_11.ContentDetailEvents.Swiped, args);
@@ -6097,7 +6283,7 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
                     this.swipeDetector.on(HammerEvents_7.SwipeEvents.Right, function () {
                         var args = {
                             Content: IContent_8.Contents.Finder,
-                            ContentDetail: IContentDetail_11.ContentDetails.SetMopidy,
+                            ContentDetail: null,
                             Direction: IContentDetail_11.SwipeDirection.Right
                         };
                         _this.$emit(IContentDetail_11.ContentDetailEvents.Swiped, args);
@@ -6254,7 +6440,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
                     this.swipeDetector.on(HammerEvents_8.SwipeEvents.Left, function () {
                         var args = {
                             Content: IContent_9.Contents.Finder,
-                            ContentDetail: IContentDetail_12.ContentDetails.ScanProgress,
+                            ContentDetail: null,
                             Direction: IContentDetail_12.SwipeDirection.Left
                         };
                         _this.$emit(IContentDetail_12.ContentDetailEvents.Swiped, args);
@@ -6262,7 +6448,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
                     this.swipeDetector.on(HammerEvents_8.SwipeEvents.Right, function () {
                         var args = {
                             Content: IContent_9.Contents.Finder,
-                            ContentDetail: IContentDetail_12.ContentDetails.ScanProgress,
+                            ContentDetail: IContentDetail_12.ContentDetails.Database,
                             Direction: IContentDetail_12.SwipeDirection.Right
                         };
                         _this.$emit(IContentDetail_12.ContentDetailEvents.Swiped, args);
@@ -6303,7 +6489,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
     }(ContentDetailBase_4.default));
     exports.default = ScanProgressBlock;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock", "Libraries"], function (require, exports, vue_class_component_21, SettingsStore_1, Exception_15, ContentBase_3, IContentDetail_13, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1, Libraries_21) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock", "Libraries"], function (require, exports, vue_class_component_21, SettingsStore_2, Exception_15, ContentBase_3, IContentDetail_13, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1, Libraries_21) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SettingsEvents = {
@@ -6314,7 +6500,9 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         function Settings() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             // #region "IContentView"
+            _this.detailWrapperElement = null;
             _this.details = [];
+            _this.currentDetail = null;
             return _this;
         }
         Object.defineProperty(Settings.prototype, "InnerDiv", {
@@ -6352,7 +6540,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                     switch (_b.label) {
                         case 0:
                             _super.prototype.Initialize.call(this);
-                            this.store = new SettingsStore_1.default();
+                            this.store = new SettingsStore_2.default();
                             _a = this;
                             return [4 /*yield*/, this.store.Get()];
                         case 1:
@@ -6368,6 +6556,8 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             this.details.push(this.MopidyBlock);
                             this.details.push(this.DbBlock);
                             this.details.push(this.ScanProgressBlock);
+                            this.currentDetail = this.MopidyBlock;
+                            this.detailWrapperElement = this.$refs.InnerDiv;
                             return [2 /*return*/, true];
                     }
                 });
@@ -6379,23 +6569,29 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         };
         Settings.prototype.InitContent = function () {
         };
-        Settings.prototype.ShowContentDetail = function (args) {
-            switch (args.Detail) {
+        Settings.prototype.GetContentDetail = function (detail) {
+            switch (detail) {
                 case IContentDetail_13.ContentDetails.SetMopidy:
-                    this.HideAllDetails();
-                    this.MopidyBlock.Show();
-                    break;
+                    return this.MopidyBlock;
                 case IContentDetail_13.ContentDetails.Database:
-                    this.HideAllDetails();
-                    this.DbBlock.Show();
-                    break;
+                    return this.DbBlock;
                 case IContentDetail_13.ContentDetails.ScanProgress:
-                    this.HideAllDetails();
-                    this.ScanProgressBlock.Show();
-                    break;
+                    return this.ScanProgressBlock;
                 default:
                     Exception_15.default.Throw('Unexpected ContentDetail');
             }
+        };
+        Settings.prototype.ShowContentDetail = function (args) {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, _super.prototype.ShowContentDetail.call(this, args)];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/, true];
+                    }
+                });
+            });
         };
         Settings.prototype.OnSwiped = function (args) {
             _super.prototype.OnSwiped.call(this, args);
@@ -6427,7 +6623,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ContentBase_3.default));
     exports.default = Settings;
 });
-define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_8, JsonRpcQueryableBase_4, Settings_2) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_7, JsonRpcQueryableBase_4, Settings_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -6666,7 +6862,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
                             return [3 /*break*/, 15];
                         case 14:
                             ex_1 = _a.sent();
-                            Dump_8.default.Error('Polling Error', ex_1);
+                            Dump_7.default.Error('Polling Error', ex_1);
                             return [3 /*break*/, 15];
                         case 15:
                             this._nowOnPollingProsess = false;
@@ -6949,7 +7145,7 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
     }(JsonRpcQueryableBase_5.default));
     exports.default = Player;
 });
-define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_22, Monitor_2, Player_1, ViewBase_12) {
+define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_22, Monitor_2, Player_1, ViewBase_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayerPanelEvents = {
@@ -7168,7 +7364,7 @@ define("Views/Sidebars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/Sidebars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_23, Exception_16, IContent_10, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
+define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/SideBars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_23, Exception_16, IContent_10, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SideBarEvents = {
@@ -7340,7 +7536,7 @@ define("Views/Sidebars/Sidebar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = SideBar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/Sidebars/Sidebar"], function (require, exports, vue_class_component_24, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, SideBar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/SideBars/SideBar"], function (require, exports, vue_class_component_24, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, SideBar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7411,7 +7607,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
     }(ViewBase_14.default));
     exports.default = RootView;
 });
-define("Controllers/ContentController", ["require", "exports", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/TabBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Utils/Dump"], function (require, exports, Exception_17, IContent_11, IContentDetail_14, TabBase_3, Finder_2, HeaderBar_2, Playlists_2, Settings_4, Dump_9) {
+define("Controllers/ContentController", ["require", "exports", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/TabBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings"], function (require, exports, Exception_17, IContent_11, IContentDetail_14, TabBase_3, Finder_2, HeaderBar_2, Playlists_2, Settings_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ContentController = /** @class */ (function () {
@@ -7424,7 +7620,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
             this._settings = null;
             this._currentContent = null;
             this._allContents = [];
-            this._isDetailFullscreen = false;
+            this._isFullscreen = false;
             this._headerBar = rootView.HeaderBar;
             this._sideBar = rootView.SideBar;
             this._finder = rootView.Finder;
@@ -7447,13 +7643,44 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                 _this._playlists.RefreshPlaylist();
             });
             this._finder.$on(IContentDetail_14.ContentDetailEvents.Swiped, function (args) {
-                _this.OnFinderSwiped(args);
+                if (!_this._isFullscreen)
+                    return;
+                if (args.Direction === IContentDetail_14.SwipeDirection.Right && args.ContentDetail === null) {
+                    _this._headerBar.SetSideBarOpen();
+                }
+                else if (args.ContentDetail) {
+                    var detailArgs = {
+                        Content: IContent_11.Contents.Finder,
+                        Detail: args.ContentDetail
+                    };
+                    _this._finder.ShowContentDetail(detailArgs);
+                }
             });
             this._playlists.$on(IContentDetail_14.ContentDetailEvents.Swiped, function (args) {
-                _this.OnPlaylistsSwiped(args);
+                if (!_this._isFullscreen)
+                    return;
+                if (args.Direction === IContentDetail_14.SwipeDirection.Right && args.ContentDetail === null) {
+                }
+                else if (args.ContentDetail) {
+                    var detailArgs = {
+                        Content: IContent_11.Contents.Playlists,
+                        Detail: args.ContentDetail
+                    };
+                    _this._playlists.ShowContentDetail(detailArgs);
+                }
             });
             this._settings.$on(IContentDetail_14.ContentDetailEvents.Swiped, function (args) {
-                _this.OnSettingsSwiped(args);
+                if (!_this._isFullscreen)
+                    return;
+                if (args.Direction === IContentDetail_14.SwipeDirection.Right && args.ContentDetail === null) {
+                }
+                else if (args.ContentDetail) {
+                    var detailArgs = {
+                        Content: IContent_11.Contents.Settings,
+                        Detail: args.ContentDetail
+                    };
+                    _this._settings.ShowContentDetail(detailArgs);
+                }
             });
         }
         ContentController.prototype.EmitTabEvent = function (args) {
@@ -7501,12 +7728,12 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                 : this._currentContent.GetIsPermitLeave();
         };
         ContentController.prototype.ContentToFullscreen = function () {
-            this._isDetailFullscreen = true;
+            this._isFullscreen = true;
             for (var i = 0; i < this._allContents.length; i++)
                 this._allContents[i].SetDetailToFulscreen();
         };
         ContentController.prototype.ContentToColumn = function () {
-            this._isDetailFullscreen = false;
+            this._isFullscreen = false;
             for (var i = 0; i < this._allContents.length; i++)
                 this._allContents[i].SetDetailToColumn();
         };
@@ -7520,143 +7747,26 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                 this.SetCurrentContent(IContent_11.Contents.Settings);
             this._settings.InitialScan();
         };
-        ContentController.prototype.OnFinderSwiped = function (args) {
-            if (!this._isDetailFullscreen)
-                return;
-            var isSideBarOrdered = false;
-            var target = null;
-            if (args.Direction == IContentDetail_14.SwipeDirection.Left) {
-                // 左へ=>進む
-                switch (args.ContentDetail) {
-                    case IContentDetail_14.ContentDetails.Genres:
-                        target = IContentDetail_14.ContentDetails.Artists;
-                        break;
-                    case IContentDetail_14.ContentDetails.Artists:
-                        target = IContentDetail_14.ContentDetails.AlbumTracks;
-                        break;
-                    case IContentDetail_14.ContentDetails.AlbumTracks:
-                        break;
-                    default:
-                        Exception_17.default.Throw('Unexpected ContentDetail.', args);
-                }
-            }
-            else if (args.Direction == IContentDetail_14.SwipeDirection.Right) {
-                // 右へ=>戻る
-                switch (args.ContentDetail) {
-                    case IContentDetail_14.ContentDetails.Genres:
-                        isSideBarOrdered = true;
-                        break;
-                    case IContentDetail_14.ContentDetails.Artists:
-                        target = IContentDetail_14.ContentDetails.Genres;
-                        break;
-                    case IContentDetail_14.ContentDetails.AlbumTracks:
-                        target = IContentDetail_14.ContentDetails.Artists;
-                        break;
-                    default:
-                        Exception_17.default.Throw('Unexpected ContentDetail.', args);
-                }
-            }
-            Dump_9.default.Log('ContentController.OnFinderSwiped', {
-                args: args,
-                isSideBarOrdered: isSideBarOrdered,
-                target: target
-            });
-        };
-        ContentController.prototype.OnPlaylistsSwiped = function (args) {
-            if (!this._isDetailFullscreen)
-                return;
-            var isSideBarOrdered = false;
-            var target = null;
-            if (args.Direction == IContentDetail_14.SwipeDirection.Left) {
-                // 左へ=>進む
-                switch (args.ContentDetail) {
-                    case IContentDetail_14.ContentDetails.Playlists:
-                        target = IContentDetail_14.ContentDetails.PlaylistTracks;
-                        break;
-                    case IContentDetail_14.ContentDetails.PlaylistTracks:
-                        break;
-                    default:
-                        Exception_17.default.Throw('Unexpected ContentDetail.', args);
-                }
-            }
-            else if (args.Direction == IContentDetail_14.SwipeDirection.Right) {
-                // 右へ=>戻る
-                switch (args.ContentDetail) {
-                    case IContentDetail_14.ContentDetails.Playlists:
-                        isSideBarOrdered = true;
-                        break;
-                    case IContentDetail_14.ContentDetails.PlaylistTracks:
-                        target = IContentDetail_14.ContentDetails.Playlists;
-                        break;
-                    default:
-                        Exception_17.default.Throw('Unexpected ContentDetail.', args);
-                }
-            }
-            Dump_9.default.Log('ContentController.OnPlaylistsSwiped', {
-                args: args,
-                isSideBarOrdered: isSideBarOrdered,
-                target: target
-            });
-        };
-        ContentController.prototype.OnSettingsSwiped = function (args) {
-            if (!this._isDetailFullscreen)
-                return;
-            var isSideBarOrdered = false;
-            var target = null;
-            if (args.Direction == IContentDetail_14.SwipeDirection.Left) {
-                // 左へ=>進む
-                switch (args.ContentDetail) {
-                    case IContentDetail_14.ContentDetails.SetMopidy:
-                        target = IContentDetail_14.ContentDetails.Database;
-                        break;
-                    case IContentDetail_14.ContentDetails.Database:
-                        target = IContentDetail_14.ContentDetails.ScanProgress;
-                        break;
-                    case IContentDetail_14.ContentDetails.ScanProgress:
-                        break;
-                    default:
-                        Exception_17.default.Throw('Unexpected ContentDetail.', args);
-                }
-            }
-            else if (args.Direction == IContentDetail_14.SwipeDirection.Right) {
-                // 右へ=>戻る
-                switch (args.ContentDetail) {
-                    case IContentDetail_14.ContentDetails.SetMopidy:
-                        isSideBarOrdered = true;
-                        break;
-                    case IContentDetail_14.ContentDetails.Database:
-                        target = IContentDetail_14.ContentDetails.SetMopidy;
-                        break;
-                    case IContentDetail_14.ContentDetails.ScanProgress:
-                        target = IContentDetail_14.ContentDetails.Database;
-                        break;
-                    default:
-                        Exception_17.default.Throw('Unexpected ContentDetail.', args);
-                }
-            }
-            Dump_9.default.Log('ContentController.OnSettingsSwiped', {
-                args: args,
-                isSideBarOrdered: isSideBarOrdered,
-                target: target
-            });
-        };
         return ContentController;
     }());
     exports.default = ContentController;
 });
-define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/Sidebars/Sidebar"], function (require, exports, Libraries_24, SettingsStore_2, IContent_12, HeaderBar_3, SideBar_3) {
+define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/SideBars/SideBar", "Utils/Dump"], function (require, exports, Libraries_24, SettingsStore_3, IContent_12, HeaderBar_3, SideBar_3, Dump_8) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var NavigationController = /** @class */ (function () {
         function NavigationController(contentController, rootView) {
             var _this = this;
             this._content = null;
+            this._rootView = null;
             this._headerBar = null;
             this._sideBar = null;
             this._viewport = Libraries_24.default.ResponsiveBootstrapToolkit;
             this._content = contentController;
-            this._headerBar = rootView.HeaderBar;
-            this._sideBar = rootView.SideBar;
+            this._rootView = rootView;
+            this._headerBar = this._rootView.HeaderBar;
+            this._sideBar = this._rootView.SideBar;
+            this._store = new SettingsStore_3.default();
             Libraries_24.default.$(window).resize(this._viewport.changed(function () {
                 _this.AdjustScreen();
             }));
@@ -7681,27 +7791,28 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                 if (_this._viewport.is('<=lg'))
                     _this._headerBar.SetSideBarClose();
             });
-            this.AdjustScreen();
-            (this._headerBar.GetIsSideBarVisible())
-                ? this._sideBar.OnShown()
-                : this._sideBar.OnCollapsed();
             this.InitialNavigation();
         }
         NavigationController.prototype.InitialNavigation = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var store, isConnectable, updateProgress, isDbUpdating, content, existsData;
+                var isConnectable, updateProgress, isDbUpdating, content, existsData;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            store = new SettingsStore_2.default();
-                            return [4 /*yield*/, store.TryConnect()];
+                        case 0: return [4 /*yield*/, this._store.TryConnect()];
                         case 1:
                             isConnectable = _a.sent();
-                            return [4 /*yield*/, store.GetDbUpdateProgress()];
+                            return [4 /*yield*/, this._store.GetDbUpdateProgress()];
                         case 2:
                             updateProgress = _a.sent();
+                            // どうも、ResponsiveToolkitの初期化後から反応が正しくなるまで
+                            // すこし時間がかかるっぽい。
+                            // Settingsクエリが終わるまで待ってからAdjustする。
+                            this.AdjustScreen();
+                            (this._headerBar.GetIsSideBarVisible())
+                                ? this._sideBar.OnShown()
+                                : this._sideBar.OnCollapsed();
                             isDbUpdating = (updateProgress.UpdateType !== 'None');
-                            content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
+                            content = (this._store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
                                 ? IContent_12.Contents.Settings
                                 : IContent_12.Contents.Finder;
                             this._content.SetCurrentContent(content);
@@ -7709,8 +7820,8 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                             this._content.ShowSettingsDbProgress(updateProgress);
                             return [3 /*break*/, 5];
                         case 3:
-                            if (!store.Entity.IsMopidyConnectable) return [3 /*break*/, 5];
-                            return [4 /*yield*/, store.ExistsData()];
+                            if (!this._store.Entity.IsMopidyConnectable) return [3 /*break*/, 5];
+                            return [4 /*yield*/, this._store.ExistsData()];
                         case 4:
                             existsData = _a.sent();
                             if (!existsData)
@@ -7724,19 +7835,57 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
         NavigationController.prototype.AdjustScreen = function () {
             // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
             if (this._viewport.is('<=sm')) {
+                Dump_8.default.Log('viewport is <=sm');
                 this._content.ContentToFullscreen();
             }
             else {
+                Dump_8.default.Log('viewport is >sm');
                 this._content.ContentToColumn();
             }
             // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
             if (this._viewport.is('<=lg')) {
+                Dump_8.default.Log('viewport is <=lg');
                 this._headerBar.SetSideBarClose();
             }
             else {
+                Dump_8.default.Log('viewport is >lg');
                 this._headerBar.SetSideBarOpen();
             }
+            var rootClasses = this._rootView.$el.classList;
+            if (this._store.Entity.IsTouchScreen) {
+                if (!rootClasses.contains(NavigationController.TouchScreenClass))
+                    rootClasses.add(NavigationController.TouchScreenClass);
+                if (rootClasses.contains(NavigationController.NonTouchScreenClass))
+                    rootClasses.remove(NavigationController.NonTouchScreenClass);
+            }
+            else {
+                if (rootClasses.contains(NavigationController.TouchScreenClass))
+                    rootClasses.remove(NavigationController.TouchScreenClass);
+                if (!rootClasses.contains(NavigationController.NonTouchScreenClass))
+                    rootClasses.add(NavigationController.NonTouchScreenClass);
+            }
+            this.ToFullscreenIfAndroidChrome();
         };
+        NavigationController.prototype.ToFullscreenIfAndroidChrome = function () {
+            // Android判定
+            // https://gist.github.com/sayaka-nonsta/d68d4afc7b08d52971f2d477adab5e1d
+            // フルスクリーン要求
+            // https://developers.google.com/web/fundamentals/native-hardware/fullscreen/
+            var ua = navigator.userAgent;
+            var doc = window.document;
+            var docEl = doc.documentElement;
+            var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+            if (/Android/.test(ua)) {
+                try {
+                    requestFullScreen.call(docEl);
+                }
+                catch (ex) {
+                    Dump_8.default.Error('Fullscreen Request Failed.', ex);
+                }
+            }
+        };
+        NavigationController.TouchScreenClass = 'touchable';
+        NavigationController.NonTouchScreenClass = 'nontouchable';
         return NavigationController;
     }());
     exports.default = NavigationController;

@@ -102,7 +102,7 @@ export default class PlaylistList extends SelectionListBase<Playlist, PlaylistSt
         this.swipeDetector.on(SwipeEvents.Left, () => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
-                ContentDetail: ContentDetails.Playlists,
+                ContentDetail: ContentDetails.PlaylistTracks,
                 Direction: SwipeDirection.Left
             };
             this.$emit(ContentDetailEvents.Swiped, args);
@@ -111,7 +111,7 @@ export default class PlaylistList extends SelectionListBase<Playlist, PlaylistSt
         this.swipeDetector.on(SwipeEvents.Right, () => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
-                ContentDetail: ContentDetails.Playlists,
+                ContentDetail: null,
                 Direction: SwipeDirection.Right
             };
             this.$emit(ContentDetailEvents.Swiped, args);

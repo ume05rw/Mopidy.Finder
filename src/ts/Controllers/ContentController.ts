@@ -20,7 +20,7 @@ export default class ContentController {
     private _settings: Settings = null;
     private _currentContent: IContent = null;
     private _allContents: IContent[] = [];
-    private _isDetailFullscreen: boolean = false;
+    private _isFullscreen: boolean = false;
 
     public constructor(rootView: RootView) {
         this._headerBar = rootView.HeaderBar;
@@ -48,13 +48,44 @@ export default class ContentController {
         });
 
         this._finder.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs) => {
-            this.OnFinderSwiped(args);
+            if (!this._isFullscreen)
+                return;
+
+            if (args.Direction === SwipeDirection.Right && args.ContentDetail === null) {
+                this._headerBar.SetSideBarOpen();
+            } else if (args.ContentDetail) {
+                const detailArgs: IContentDetailArgs = {
+                    Content: Contents.Finder,
+                    Detail: args.ContentDetail
+                };
+                this._finder.ShowContentDetail(detailArgs);
+            }
         });
         this._playlists.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs) => {
-            this.OnPlaylistsSwiped(args);
+            if (!this._isFullscreen)
+                return;
+
+            if (args.Direction === SwipeDirection.Right && args.ContentDetail === null) {
+            } else if (args.ContentDetail) {
+                const detailArgs: IContentDetailArgs = {
+                    Content: Contents.Playlists,
+                    Detail: args.ContentDetail
+                };
+                this._playlists.ShowContentDetail(detailArgs);
+            }
         });
         this._settings.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs) => {
-            this.OnSettingsSwiped(args);
+            if (!this._isFullscreen)
+                return;
+
+            if (args.Direction === SwipeDirection.Right && args.ContentDetail === null) {
+            } else if (args.ContentDetail) {
+                const detailArgs: IContentDetailArgs = {
+                    Content: Contents.Settings,
+                    Detail: args.ContentDetail
+                };
+                this._settings.ShowContentDetail(detailArgs);
+            }
         });
     }
 
@@ -108,12 +139,12 @@ export default class ContentController {
     }
 
     public ContentToFullscreen(): void {
-        this._isDetailFullscreen = true;
+        this._isFullscreen = true;
         for (let i = 0; i < this._allContents.length; i++)
             this._allContents[i].SetDetailToFulscreen();
     }
     public ContentToColumn(): void {
-        this._isDetailFullscreen = false;
+        this._isFullscreen = false;
         for (let i = 0; i < this._allContents.length; i++)
             this._allContents[i].SetDetailToColumn();
     }
@@ -132,129 +163,129 @@ export default class ContentController {
         this._settings.InitialScan();
     }
 
-    private OnFinderSwiped(args: IContentSwipeArgs): void {
-        if (!this._isDetailFullscreen)
-            return;
+    //private OnFinderSwiped(args: IContentSwipeArgs): void {
+    //    if (!this._isDetailFullscreen)
+    //        return;
 
-        let isSideBarOrdered = false;
-        let target: ContentDetails = null;
-        if (args.Direction == SwipeDirection.Left) {
-            // 左へ=>進む
-            switch (args.ContentDetail) {
-                case ContentDetails.Genres:
-                    target = ContentDetails.Artists;
-                    break;
-                case ContentDetails.Artists:
-                    target = ContentDetails.AlbumTracks;
-                    break;
-                case ContentDetails.AlbumTracks:
-                    break;
-                default:
-                    Exception.Throw('Unexpected ContentDetail.', args);
-            }
-        } else if (args.Direction == SwipeDirection.Right) {
-            // 右へ=>戻る
-            switch (args.ContentDetail) {
-                case ContentDetails.Genres:
-                    isSideBarOrdered = true;
-                    break;
-                case ContentDetails.Artists:
-                    target = ContentDetails.Genres;
-                    break;
-                case ContentDetails.AlbumTracks:
-                    target = ContentDetails.Artists;
-                    break;
-                default:
-                    Exception.Throw('Unexpected ContentDetail.', args);
-            }
-        }
+    //    let isSideBarOrdered = false;
+    //    let target: ContentDetails = null;
+    //    if (args.Direction == SwipeDirection.Left) {
+    //        // 左へ=>進む
+    //        switch (args.ContentDetail) {
+    //            case ContentDetails.Genres:
+    //                target = ContentDetails.Artists;
+    //                break;
+    //            case ContentDetails.Artists:
+    //                target = ContentDetails.AlbumTracks;
+    //                break;
+    //            case ContentDetails.AlbumTracks:
+    //                break;
+    //            default:
+    //                Exception.Throw('Unexpected ContentDetail.', args);
+    //        }
+    //    } else if (args.Direction == SwipeDirection.Right) {
+    //        // 右へ=>戻る
+    //        switch (args.ContentDetail) {
+    //            case ContentDetails.Genres:
+    //                isSideBarOrdered = true;
+    //                break;
+    //            case ContentDetails.Artists:
+    //                target = ContentDetails.Genres;
+    //                break;
+    //            case ContentDetails.AlbumTracks:
+    //                target = ContentDetails.Artists;
+    //                break;
+    //            default:
+    //                Exception.Throw('Unexpected ContentDetail.', args);
+    //        }
+    //    }
 
-        Dump.Log('ContentController.OnFinderSwiped', {
-            args: args,
-            isSideBarOrdered: isSideBarOrdered,
-            target: target
-        });
-    }
+    //    Dump.Log('ContentController.OnFinderSwiped', {
+    //        args: args,
+    //        isSideBarOrdered: isSideBarOrdered,
+    //        target: target
+    //    });
+    //}
 
-    private OnPlaylistsSwiped(args: IContentSwipeArgs): void {
-        if (!this._isDetailFullscreen)
-            return;
+    //private OnPlaylistsSwiped(args: IContentSwipeArgs): void {
+    //    if (!this._isDetailFullscreen)
+    //        return;
 
-        let isSideBarOrdered = false;
-        let target: ContentDetails = null;
-        if (args.Direction == SwipeDirection.Left) {
-            // 左へ=>進む
-            switch (args.ContentDetail) {
-                case ContentDetails.Playlists:
-                    target = ContentDetails.PlaylistTracks;
-                    break;
-                case ContentDetails.PlaylistTracks:
-                    break;
-                default:
-                    Exception.Throw('Unexpected ContentDetail.', args);
-            }
-        } else if (args.Direction == SwipeDirection.Right) {
-            // 右へ=>戻る
-            switch (args.ContentDetail) {
-                case ContentDetails.Playlists:
-                    isSideBarOrdered = true;
-                    break;
-                case ContentDetails.PlaylistTracks:
-                    target = ContentDetails.Playlists;
-                    break;
-                default:
-                    Exception.Throw('Unexpected ContentDetail.', args);
-            }
-        }
+    //    let isSideBarOrdered = false;
+    //    let target: ContentDetails = null;
+    //    if (args.Direction == SwipeDirection.Left) {
+    //        // 左へ=>進む
+    //        switch (args.ContentDetail) {
+    //            case ContentDetails.Playlists:
+    //                target = ContentDetails.PlaylistTracks;
+    //                break;
+    //            case ContentDetails.PlaylistTracks:
+    //                break;
+    //            default:
+    //                Exception.Throw('Unexpected ContentDetail.', args);
+    //        }
+    //    } else if (args.Direction == SwipeDirection.Right) {
+    //        // 右へ=>戻る
+    //        switch (args.ContentDetail) {
+    //            case ContentDetails.Playlists:
+    //                isSideBarOrdered = true;
+    //                break;
+    //            case ContentDetails.PlaylistTracks:
+    //                target = ContentDetails.Playlists;
+    //                break;
+    //            default:
+    //                Exception.Throw('Unexpected ContentDetail.', args);
+    //        }
+    //    }
 
-        Dump.Log('ContentController.OnPlaylistsSwiped', {
-            args: args,
-            isSideBarOrdered: isSideBarOrdered,
-            target: target
-        });
-    }
+    //    Dump.Log('ContentController.OnPlaylistsSwiped', {
+    //        args: args,
+    //        isSideBarOrdered: isSideBarOrdered,
+    //        target: target
+    //    });
+    //}
 
-    private OnSettingsSwiped(args: IContentSwipeArgs): void {
-        if (!this._isDetailFullscreen)
-            return;
+    //private OnSettingsSwiped(args: IContentSwipeArgs): void {
+    //    if (!this._isDetailFullscreen)
+    //        return;
 
-        let isSideBarOrdered = false;
-        let target: ContentDetails = null;
-        if (args.Direction == SwipeDirection.Left) {
-            // 左へ=>進む
-            switch (args.ContentDetail) {
-                case ContentDetails.SetMopidy:
-                    target = ContentDetails.Database;
-                    break;
-                case ContentDetails.Database:
-                    target = ContentDetails.ScanProgress;
-                    break;
-                case ContentDetails.ScanProgress:
-                    break;
-                default:
-                    Exception.Throw('Unexpected ContentDetail.', args);
-            }
-        } else if (args.Direction == SwipeDirection.Right) {
-            // 右へ=>戻る
-            switch (args.ContentDetail) {
-                case ContentDetails.SetMopidy:
-                    isSideBarOrdered = true;
-                    break;
-                case ContentDetails.Database:
-                    target = ContentDetails.SetMopidy;
-                    break;
-                case ContentDetails.ScanProgress:
-                    target = ContentDetails.Database;
-                    break;
-                default:
-                    Exception.Throw('Unexpected ContentDetail.', args);
-            }
-        }
+    //    let isSideBarOrdered = false;
+    //    let target: ContentDetails = null;
+    //    if (args.Direction == SwipeDirection.Left) {
+    //        // 左へ=>進む
+    //        switch (args.ContentDetail) {
+    //            case ContentDetails.SetMopidy:
+    //                target = ContentDetails.Database;
+    //                break;
+    //            case ContentDetails.Database:
+    //                target = ContentDetails.ScanProgress;
+    //                break;
+    //            case ContentDetails.ScanProgress:
+    //                break;
+    //            default:
+    //                Exception.Throw('Unexpected ContentDetail.', args);
+    //        }
+    //    } else if (args.Direction == SwipeDirection.Right) {
+    //        // 右へ=>戻る
+    //        switch (args.ContentDetail) {
+    //            case ContentDetails.SetMopidy:
+    //                isSideBarOrdered = true;
+    //                break;
+    //            case ContentDetails.Database:
+    //                target = ContentDetails.SetMopidy;
+    //                break;
+    //            case ContentDetails.ScanProgress:
+    //                target = ContentDetails.Database;
+    //                break;
+    //            default:
+    //                Exception.Throw('Unexpected ContentDetail.', args);
+    //        }
+    //    }
 
-        Dump.Log('ContentController.OnSettingsSwiped', {
-            args: args,
-            isSideBarOrdered: isSideBarOrdered,
-            target: target
-        });
-    }
+    //    Dump.Log('ContentController.OnSettingsSwiped', {
+    //        args: args,
+    //        isSideBarOrdered: isSideBarOrdered,
+    //        target: target
+    //    });
+    //}
 }

@@ -37,6 +37,7 @@ import * as Mopidy from 'mopidy';
 import * as Hammer from 'hammerjs';
 import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
 import Vue from 'vue';
+import SettingsStore from './Models/Settings/SettingsStore';
 
 // SweetAlert2 は個別読み込みOK.
 //import Swal from 'admin-lte/plugins/sweetalert2/sweetalert2';
@@ -128,6 +129,11 @@ export default class Libraries {
     /* eslint-disable @typescript-eslint/indent */
     public static readonly SetTooltip: (element: HTMLElement, message: string) => void
         = (element: HTMLElement, message: string): void => {
+            // タッチスクリーンの場合はツールティップを作らない。
+            // 自動で非表示化出来そうなら戻す。
+            if (Libraries.SettingsStore.Entity.IsTouchScreen)
+                return;
+
             Libraries.$(element).tooltip({
                 placement: 'top',
                 title: message,
@@ -201,7 +207,11 @@ export default class Libraries {
         }
     }
 
+    private static SettingsStore: SettingsStore = null;
+
     public static Initialize(): void {
+        Libraries.SettingsStore = new SettingsStore();
+
         // ResponsiveBootstrapToolkitをbootstrap4に対応させる
         // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
         Libraries.ResponsiveBootstrapToolkit.use('bs4', {

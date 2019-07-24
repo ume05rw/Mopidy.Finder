@@ -19,7 +19,8 @@ export const FinderEvents = _.extend({}, AlbumListEvents);
                         id="tab-finder"
                         role="tabpanel"
                         aria-labelledby="nav-finder">
-    <div class="row">
+    <div class="row"
+        ref="DetailWrapper">
         <genre-list
             ref="GenreList"
             @SelectionChanged="OnGenreSelectionChanged"
@@ -57,19 +58,21 @@ export default class Finder extends ContentBase {
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('Finder.Initialize: Start.');
         super.Initialize();
 
         this.details.push(this.GenreList);
         this.details.push(this.ArtistList);
         this.details.push(this.AlbumList);
+        this.currentDetail = this.GenreList;
+        this.detailWrapperElement = this.$refs.DetailWrapper as HTMLElement;
 
-        Dump.Log('Finder.Initialize: End.');
         return true;
     }
 
     // #region "IContentView"
+    protected detailWrapperElement: HTMLElement = null;
     protected details: IContentDetail[] = [];
+    protected currentDetail: IContentDetail = null;
     public GetIsPermitLeave(): boolean {
         return true;
     }
@@ -82,26 +85,36 @@ export default class Finder extends ContentBase {
                 this.AlbumList.LoadIfEmpty();
             });
     }
-    public ShowContentDetail(args: IContentDetailArgs): void {
+    protected GetContentDetail(detail: ContentDetails): IContentDetail {
+        switch (detail) {
+            case ContentDetails.Genres:
+                return this.GenreList;
+            case ContentDetails.Artists:
+                return this.ArtistList;
+            case ContentDetails.AlbumTracks:
+                return this.AlbumList;
+            default:
+                Exception.Throw('Unexpected ContentDetail');
+        }
+    }
+    public async ShowContentDetail(args: IContentDetailArgs): Promise<boolean> {
+        await super.ShowContentDetail(args);
+
         switch (args.Detail) {
             case ContentDetails.Genres:
-                this.HideAllDetails();
-                this.GenreList.Show();
                 this.GenreList.LoadIfEmpty();
                 break;
             case ContentDetails.Artists:
-                this.HideAllDetails();
-                this.ArtistList.Show();
                 this.ArtistList.LoadIfEmpty();
                 break;
             case ContentDetails.AlbumTracks:
-                this.HideAllDetails();
-                this.AlbumList.Show();
                 this.AlbumList.LoadIfEmpty();
                 break;
             default:
                 Exception.Throw('Unexpected ContentDetail');
         }
+
+        return true;
     }
     protected OnSwiped(args: IContentSwipeArgs): void {
         super.OnSwiped(args);

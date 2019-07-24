@@ -16,13 +16,11 @@ export default class Settings implements ISettings {
         this._entity._serverPort = newSettings.ServerPort;
     }
 
-    private constructor() {
-    }
-
     private _serverAddress: string = null;
     private _serverPort: number = null;
     private _isBusy = false;
     private _isMopidyConnectable: boolean = false;
+    private _isTouchScreen: boolean = false;
 
     public get ServerAddress(): string {
         return this._serverAddress;
@@ -35,6 +33,13 @@ export default class Settings implements ISettings {
     }
     public get IsMopidyConnectable(): boolean {
         return this._isMopidyConnectable;
+    }
+    public get IsTouchScreen(): boolean {
+        return this._isTouchScreen;
+    }
+
+    private constructor() {
+        this._isTouchScreen = !(!window.ontouchstart);
     }
 
     public SetBusy(isBusy: boolean): void {

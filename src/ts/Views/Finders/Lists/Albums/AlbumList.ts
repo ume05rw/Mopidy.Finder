@@ -96,7 +96,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
         this.swipeDetector.on(SwipeEvents.Left, () => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
-                ContentDetail: ContentDetails.AlbumTracks,
+                ContentDetail: null,
                 Direction: SwipeDirection.Left
             };
             this.$emit(ContentDetailEvents.Swiped, args);
@@ -105,7 +105,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
         this.swipeDetector.on(SwipeEvents.Right, () => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
-                ContentDetail: ContentDetails.AlbumTracks,
+                ContentDetail: ContentDetails.Artists,
                 Direction: SwipeDirection.Right
             };
             this.$emit(ContentDetailEvents.Swiped, args);

@@ -5,18 +5,26 @@ import { default as HeaderBar, HeaderBarEvents } from '../Views/HeaderBars/Heade
 import RootView from '../Views/RootView';
 import { default as SideBar, ITabEventRecievedArgs, SideBarEvents } from '../Views/SideBars/SideBar';
 import ContentController from './ContentController';
+import Dump from '../Utils/Dump';
 
 export default class NavigationController {
 
+    private static readonly TouchScreenClass = 'touchable';
+    private static readonly NonTouchScreenClass = 'nontouchable';
+
     private _content: ContentController = null;
+    private _rootView: RootView = null;
     private _headerBar: HeaderBar = null;
     private _sideBar: SideBar = null;
     private _viewport = Libraries.ResponsiveBootstrapToolkit;
+    private _store: SettingsStore;
 
     public constructor(contentController: ContentController, rootView: RootView) {
         this._content = contentController;
-        this._headerBar = rootView.HeaderBar;
-        this._sideBar = rootView.SideBar;
+        this._rootView = rootView;
+        this._headerBar = this._rootView.HeaderBar;
+        this._sideBar = this._rootView.SideBar;
+        this._store = new SettingsStore();
 
         (Libraries.$(window) as any).resize(
             this._viewport.changed((): void => {
@@ -49,23 +57,25 @@ export default class NavigationController {
                 this._headerBar.SetSideBarClose();
         });
 
+        this.InitialNavigation();
+    }
+
+    private async InitialNavigation(): Promise<boolean> {
+        // 個別にawaitした方が、複数promise配列をawait Promise.all するより早い。
+        const isConnectable = await this._store.TryConnect();
+        const updateProgress = await this._store.GetDbUpdateProgress();
+
+        // どうも、ResponsiveToolkitの初期化後から反応が正しくなるまで
+        // すこし時間がかかるっぽい。
+        // Settingsクエリが終わるまで待ってからAdjustする。
         this.AdjustScreen();
         (this._headerBar.GetIsSideBarVisible())
             ? this._sideBar.OnShown()
             : this._sideBar.OnCollapsed();
 
-        this.InitialNavigation();
-    }
-
-    private async InitialNavigation(): Promise<boolean> {
-        const store = new SettingsStore();
-
-        // 個別にawaitした方が、複数promise配列をawait Promise.all するより早い。
-        const isConnectable = await store.TryConnect();
-        const updateProgress = await store.GetDbUpdateProgress();
 
         const isDbUpdating = (updateProgress.UpdateType !== 'None');
-        const content = (store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
+        const content = (this._store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
             ? Contents.Settings
             : Contents.Finder;
 
@@ -73,8 +83,8 @@ export default class NavigationController {
 
         if (isDbUpdating) {
             this._content.ShowSettingsDbProgress(updateProgress);
-        } else if (store.Entity.IsMopidyConnectable) {
-            const existsData = await store.ExistsData();
+        } else if (this._store.Entity.IsMopidyConnectable) {
+            const existsData = await this._store.ExistsData();
             if (!existsData)
                 this._content.ShowSettingsInitialScan();
         }
@@ -85,16 +95,53 @@ export default class NavigationController {
     private AdjustScreen(): void {
         // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
         if (this._viewport.is('<=sm')) {
+            Dump.Log('viewport is <=sm');
             this._content.ContentToFullscreen();
         } else {
+            Dump.Log('viewport is >sm');
             this._content.ContentToColumn();
         }
 
         // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
         if (this._viewport.is('<=lg')) {
+            Dump.Log('viewport is <=lg');
             this._headerBar.SetSideBarClose();
         } else {
+            Dump.Log('viewport is >lg');
             this._headerBar.SetSideBarOpen();
+        }
+
+        const rootClasses = (this._rootView.$el as HTMLElement).classList;
+        if (this._store.Entity.IsTouchScreen) {
+            if (!rootClasses.contains(NavigationController.TouchScreenClass))
+                rootClasses.add(NavigationController.TouchScreenClass);
+            if (rootClasses.contains(NavigationController.NonTouchScreenClass))
+                rootClasses.remove(NavigationController.NonTouchScreenClass);
+        } else {
+            if (rootClasses.contains(NavigationController.TouchScreenClass))
+                rootClasses.remove(NavigationController.TouchScreenClass);
+            if (!rootClasses.contains(NavigationController.NonTouchScreenClass))
+                rootClasses.add(NavigationController.NonTouchScreenClass);            
+        }
+
+        this.ToFullscreenIfAndroidChrome();
+    }
+
+    private ToFullscreenIfAndroidChrome(): void {
+        // Android判定
+        // https://gist.github.com/sayaka-nonsta/d68d4afc7b08d52971f2d477adab5e1d
+        // フルスクリーン要求
+        // https://developers.google.com/web/fundamentals/native-hardware/fullscreen/
+        const ua = navigator.userAgent;
+        const doc = window.document;
+        const docEl = doc.documentElement as any;
+        const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+        if (/Android/.test(ua)) {
+            try {
+                requestFullScreen.call(docEl);
+            } catch (ex) {
+                Dump.Error('Fullscreen Request Failed.', ex)
+            }
         }
     }
 }

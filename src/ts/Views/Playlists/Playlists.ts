@@ -9,6 +9,7 @@ import Delay from '../../Utils/Delay';
 import { default as IContentDetail, ContentDetails, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
 import Exception from '../../Utils/Exception';
 import Dump from '../../Utils/Dump';
+import * as _ from 'lodash';
 
 export const PlaylistsEvents = {
     PlaylistsUpdated: 'PlaylistsUpdated'
@@ -19,7 +20,8 @@ export const PlaylistsEvents = {
     id="tab-playlists"
     role="tabpanel"
     aria-labelledby="nav-playlists">
-    <div class="row">
+    <div class="row"
+        ref="DetailWrapper">
         <playlist-list
             ref="PlaylistList"
             @SelectionOrdered="OnPlaylistsSelectionOrdered"
@@ -51,12 +53,16 @@ export default class Playlists extends ContentBase {
 
         this.details.push(this.PlaylistList);
         this.details.push(this.TrackList);
+        this.currentDetail = this.PlaylistList;
+        this.detailWrapperElement = this.$refs.DetailWrapper as HTMLElement;
 
         return true;
     }
 
     // #region "IContentView"
+    protected detailWrapperElement: HTMLElement = null;
     protected details: IContentDetail[] = [];
+    protected currentDetail: IContentDetail = null;
     public GetIsPermitLeave(): boolean {
         // プレイリスト画面からの移動可否判定
         const isSaved = this.TrackList.GetIsSavedPlaylistChanges();
@@ -72,21 +78,31 @@ export default class Playlists extends ContentBase {
                 this.PlaylistList.LoadIfEmpty();
             });
     }
-    public ShowContentDetail(args: IContentDetailArgs): void {
+    protected GetContentDetail(detail: ContentDetails): IContentDetail {
+        switch (detail) {
+            case ContentDetails.Playlists:
+                return this.PlaylistList;
+            case ContentDetails.PlaylistTracks:
+                return this.TrackList;
+            default:
+                Exception.Throw('Unexpected ContentDetail');
+        }
+    }
+    public async ShowContentDetail(args: IContentDetailArgs): Promise<boolean> {
+        await super.ShowContentDetail(args);
+
         switch (args.Detail) {
             case ContentDetails.Playlists:
-                this.HideAllDetails();
-                this.PlaylistList.Show();
                 this.PlaylistList.LoadIfEmpty();
                 break;
             case ContentDetails.PlaylistTracks:
-                this.HideAllDetails();
-                this.TrackList.Show();
                 this.TrackList.LoadIfEmpty();
                 break;
             default:
                 Exception.Throw('Unexpected ContentDetail');
         }
+
+        return true;
     }
     protected OnSwiped(args: IContentSwipeArgs): void {
         super.OnSwiped(args);

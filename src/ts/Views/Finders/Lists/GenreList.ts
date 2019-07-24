@@ -80,7 +80,7 @@ export default class GenreList extends SelectionListBase<Genre, GenreStore> {
         this.swipeDetector.on(SwipeEvents.Left, () => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
-                ContentDetail: ContentDetails.Genres,
+                ContentDetail: ContentDetails.Artists,
                 Direction: SwipeDirection.Left
             };
             this.$emit(ContentDetailEvents.Swiped, args);
@@ -89,7 +89,7 @@ export default class GenreList extends SelectionListBase<Genre, GenreStore> {
         this.swipeDetector.on(SwipeEvents.Right, () => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
-                ContentDetail: ContentDetails.Genres,
+                ContentDetail: null,
                 Direction: SwipeDirection.Right
             };
             this.$emit(ContentDetailEvents.Swiped, args);            

@@ -76,35 +76,38 @@ export default class Settings extends ContentBase {
         this.details.push(this.MopidyBlock);
         this.details.push(this.DbBlock);
         this.details.push(this.ScanProgressBlock);
+        this.currentDetail = this.MopidyBlock;
+        this.detailWrapperElement = this.$refs.InnerDiv as HTMLElement;
 
         return true;
     }
 
     // #region "IContentView"
+    protected detailWrapperElement: HTMLElement = null;
     protected details: IContentDetail[] = [];
+    protected currentDetail: IContentDetail = null;
     public GetIsPermitLeave(): boolean {
         // DBリフレッシュ中はページ移動NGにする。
         return true;
     }
     public InitContent(): void {
     }
-    public ShowContentDetail(args: IContentDetailArgs): void {
-        switch (args.Detail) {
+    protected GetContentDetail(detail: ContentDetails): IContentDetail {
+        switch (detail) {
             case ContentDetails.SetMopidy:
-                this.HideAllDetails();
-                this.MopidyBlock.Show();
-                break;
+                return this.MopidyBlock;
             case ContentDetails.Database:
-                this.HideAllDetails();
-                this.DbBlock.Show();
-                break;
+                return this.DbBlock;
             case ContentDetails.ScanProgress:
-                this.HideAllDetails();
-                this.ScanProgressBlock.Show();
-                break;
+                return this.ScanProgressBlock;
             default:
                 Exception.Throw('Unexpected ContentDetail');
         }
+    }
+    public async ShowContentDetail(args: IContentDetailArgs): Promise<boolean> {
+        await super.ShowContentDetail(args);
+
+        return true;
     }
     protected OnSwiped(args: IContentSwipeArgs): void {
         super.OnSwiped(args);

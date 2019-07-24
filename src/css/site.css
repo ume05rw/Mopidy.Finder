@@ -130,7 +130,7 @@ div.dropdown {
     transition: all 0.3s ease-in-out;
     color: #e5dfff;
 }
-.plain-list li:hover {
+.nontouchable .plain-list li:hover {
     background-color: #1f1c40;
     cursor: pointer;
 }
@@ -138,7 +138,7 @@ div.dropdown {
     background-color: #171135;
     color: #ffffff;
 }
-.plain-list li.selected:hover {
+.nontouchable .plain-list li.selected:hover {
     background-color: #171525;
     color: #c4c2ca;
 }
@@ -163,6 +163,7 @@ div.dropdown {
     width: calc(100% + 18px);
     height: 100%;
     overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 }
 .card-inner-body {
     width: 100%;
@@ -184,7 +185,7 @@ div.dropdown {
 .table.table-hover.tracks tr {
     transition: all 0.3s ease-in-out;
 }
-.table.table-hover.tracks tr:hover {
+.nontouchable .table.table-hover.tracks tr:hover {
     background-color: #1f1c40;
     color: #c4c2ca;
 }
@@ -212,14 +213,7 @@ div.dropdown {
 .albumtrack .header-dropdown {
     max-width: 200px;
 }
-.albumtrack .header-dropdown .slimScrollDiv {
-    max-height: 50vh;
-    max-width: 200px;
-}
-.albumtrack .row-dropdown .slimScrollDiv {
-    max-height: 40vh;
-    max-width: 200px;
-}
+
 /**
  * プレイリスト-トラックリスト
  */
@@ -237,20 +231,20 @@ div.dropdown {
 .card-body.listbox .products-list > .item.playlisttrack-row {
     background-color: #32334a;
 }
-.card-body.listbox .products-list > .item.playlisttrack-row:hover {
+.nontouchable .card-body.listbox .products-list > .item.playlisttrack-row:hover {
     background-color: #1f1c40;
     cursor: pointer;
 }
 .card-body.listbox .products-list > .item.playlisttrack-row.selected {
     background-color: #171135;
 }
-.card-body.listbox .products-list > .item.playlisttrack-row.selected:hover {
+.nontouchable .card-body.listbox .products-list > .item.playlisttrack-row.selected:hover {
     background-color: #171525;
 }
-.playlisttrack-row.selected:hover .product-title {
+.nontouchable .playlisttrack-row.selected:hover .product-title {
     color: #000000;
 }
-.playlisttrack-row.selected:hover .product-description {
+.nontouchable .playlisttrack-row.selected:hover .product-description {
     color: #f5f5f5;
 }
 .playlisttrack-row.selected .product-title {

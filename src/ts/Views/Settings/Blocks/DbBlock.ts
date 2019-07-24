@@ -98,7 +98,7 @@ export default class DbBlock extends ContentDetailBase {
         this.swipeDetector.on(SwipeEvents.Left, () => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
-                ContentDetail: ContentDetails.Database,
+                ContentDetail: ContentDetails.ScanProgress,
                 Direction: SwipeDirection.Left
             };
             this.$emit(ContentDetailEvents.Swiped, args);
@@ -107,7 +107,7 @@ export default class DbBlock extends ContentDetailBase {
         this.swipeDetector.on(SwipeEvents.Right, () => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
-                ContentDetail: ContentDetails.Database,
+                ContentDetail: ContentDetails.SetMopidy,
                 Direction: SwipeDirection.Right
             };
             this.$emit(ContentDetailEvents.Swiped, args);

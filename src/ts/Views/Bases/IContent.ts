@@ -18,6 +18,5 @@ export default interface IContent extends ITab {
     InitContent(): void;
     SetDetailToFulscreen(): void;
     SetDetailToColumn(): void;
-    ShowContentDetail(args: IContentDetailArgs): void;
+    ShowContentDetail(args: IContentDetailArgs): Promise<boolean>;
 }
-

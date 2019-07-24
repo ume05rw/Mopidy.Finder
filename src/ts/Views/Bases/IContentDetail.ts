@@ -17,8 +17,17 @@ export interface IContentDetailArgs {
 }
 
 export default interface IContentDetail {
-    Show(): void;
-    Hide(): void;
+    ToPositionStatic(): void;
+    ToPositionAbsolute(): void;
+    ToVisible(): void;
+    ToHide(): void;
+    GetIsVisible(): boolean;
+    SlideInRight(): Promise<boolean>;
+    SlideInLeft(): Promise<boolean>;
+    SlideOutRight(): Promise<boolean>;
+    SlideOutLeft(): Promise<boolean>;
+    //Show(): void;
+    //Hide(): void;
 }
 
 export enum SwipeDirection {
