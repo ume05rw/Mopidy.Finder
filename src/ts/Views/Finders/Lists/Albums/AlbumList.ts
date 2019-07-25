@@ -166,16 +166,30 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
 
     private async OnPlayOrdered(args: IPlayOrderedArgs): Promise<boolean> {
 
-        if (this.isEntitiesRefreshed) {
+        const orderedAlbumTrack = Libraries.Enumerable.from(this.entities)
+            .where(e => 0 <= _.indexOf(e.Tracks, args.Track))
+            .firstOrDefault();
+
+        if (!orderedAlbumTrack)
+            Exception.Throw('AlbumTracks Not Found.', { args: args, entities: this.entities });
+
+        let exists = false;
+        _.each(this.entities, (entity): void => {
+            if (this.isEntitiesRefreshed !== true && entity == orderedAlbumTrack)
+                return;
+
+            _.each(entity.Tracks, (track): void => {
+                if (track.TlId !== null && track.TlId !== undefined) {
+                    exists = true;
+                    track.TlId = null;
+                }
+            });
+        });
+
+        if (this.isEntitiesRefreshed || exists !== false)
             await this.store.ClearList();
 
-            _.each(this.entities, (entity): void => {
-                _.each(entity.Tracks, (track): void => {
-                    track.TlId = null;
-                });
-            });
-            this.isEntitiesRefreshed = false;
-        }
+        this.isEntitiesRefreshed = false;
 
         const albumTracks = args.Entity;
         if (!albumTracks)

@@ -44,7 +44,11 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
         GetImages: 'core.library.get_images',
         GetVolume: 'core.mixer.get_volume',
         GetRandom: 'core.tracklist.get_random',
-        GetRepeat: 'core.tracklist.get_repeat'
+        GetRepeat: 'core.tracklist.get_repeat',
+        GetConsume: 'core.tracklist.get_consume',
+        SetConsume: 'core.tracklist.set_consume',
+        GetSingle: 'core.tracklist.get_single',
+        SetSingle: 'core.tracklist.set_single'
     };
 
     private _settingsEntity: Settings = null;
@@ -205,6 +209,23 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
             this._isRepeat = (resRepeat.result)
                 ? resRepeat.result as boolean
                 : false;
+
+            // Consumeモード(=トラックリストから再生都度曲を消す), シングルモード(1曲のみ再生)を
+            // 無効化する。
+            const resConsume = await this.JsonRpcRequest(Monitor.Methods.GetConsume);
+            const isConsume = resConsume.result as boolean;
+            if (isConsume) {
+                const resSetConsume = await this.JsonRpcRequest(Monitor.Methods.SetConsume, {
+                    value: false
+                });
+            }
+            const resSingle = await this.JsonRpcRequest(Monitor.Methods.GetSingle);
+            const isSingle = resSingle.result as boolean;
+            if (isSingle) {
+                const resSetConsume = await this.JsonRpcRequest(Monitor.Methods.SetSingle, {
+                    value: false
+                });
+            }
 
             this.DetectChanges();
         } catch (ex) {

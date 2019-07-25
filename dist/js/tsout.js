@@ -3627,22 +3627,34 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList.prototype.OnPlayOrdered = function (args) {
             return __awaiter(this, void 0, void 0, function () {
-                var albumTracks, track, isAllTracksRegistered, result, resultAtls, updatedTracks_1;
+                var orderedAlbumTrack, exists, albumTracks, track, isAllTracksRegistered, result, resultAtls, updatedTracks_1;
+                var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            if (!this.isEntitiesRefreshed) return [3 /*break*/, 2];
+                            orderedAlbumTrack = Libraries_7.default.Enumerable.from(this.entities)
+                                .where(function (e) { return 0 <= _.indexOf(e.Tracks, args.Track); })
+                                .firstOrDefault();
+                            if (!orderedAlbumTrack)
+                                Exception_11.default.Throw('AlbumTracks Not Found.', { args: args, entities: this.entities });
+                            exists = false;
+                            _.each(this.entities, function (entity) {
+                                if (_this.isEntitiesRefreshed !== true && entity == orderedAlbumTrack)
+                                    return;
+                                _.each(entity.Tracks, function (track) {
+                                    if (track.TlId !== null && track.TlId !== undefined) {
+                                        exists = true;
+                                        track.TlId = null;
+                                    }
+                                });
+                            });
+                            if (!(this.isEntitiesRefreshed || exists !== false)) return [3 /*break*/, 2];
                             return [4 /*yield*/, this.store.ClearList()];
                         case 1:
                             _a.sent();
-                            _.each(this.entities, function (entity) {
-                                _.each(entity.Tracks, function (track) {
-                                    track.TlId = null;
-                                });
-                            });
-                            this.isEntitiesRefreshed = false;
                             _a.label = 2;
                         case 2:
+                            this.isEntitiesRefreshed = false;
                             albumTracks = args.Entity;
                             if (!albumTracks)
                                 Exception_11.default.Throw('AlbumTracks Not Found', args);
@@ -6908,7 +6920,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
         };
         Monitor.prototype.Update = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var resState, resTrack, tlTrack, resTs, resVol, resRandom, resRepeat, ex_1;
+                var resState, resTrack, tlTrack, resTs, resVol, resRandom, resRepeat, resConsume, isConsume, resSetConsume, resSingle, isSingle, resSetConsume, ex_1;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -6920,7 +6932,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
                             this._nowOnPollingProsess = true;
                             _a.label = 1;
                         case 1:
-                            _a.trys.push([1, 14, , 15]);
+                            _a.trys.push([1, 20, , 21]);
                             this.SetBackupValues();
                             return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetState)];
                         case 2:
@@ -6979,13 +6991,36 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
                             this._isRepeat = (resRepeat.result)
                                 ? resRepeat.result
                                 : false;
-                            this.DetectChanges();
-                            return [3 /*break*/, 15];
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetConsume)];
                         case 14:
+                            resConsume = _a.sent();
+                            isConsume = resConsume.result;
+                            if (!isConsume) return [3 /*break*/, 16];
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.SetConsume, {
+                                    value: false
+                                })];
+                        case 15:
+                            resSetConsume = _a.sent();
+                            _a.label = 16;
+                        case 16: return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetSingle)];
+                        case 17:
+                            resSingle = _a.sent();
+                            isSingle = resSingle.result;
+                            if (!isSingle) return [3 /*break*/, 19];
+                            return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.SetSingle, {
+                                    value: false
+                                })];
+                        case 18:
+                            resSetConsume = _a.sent();
+                            _a.label = 19;
+                        case 19:
+                            this.DetectChanges();
+                            return [3 /*break*/, 21];
+                        case 20:
                             ex_1 = _a.sent();
                             Dump_7.default.Error('Polling Error', ex_1);
-                            return [3 /*break*/, 15];
-                        case 15:
+                            return [3 /*break*/, 21];
+                        case 21:
                             this._nowOnPollingProsess = false;
                             return [2 /*return*/, true];
                     }
@@ -7101,13 +7136,17 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
             GetImages: 'core.library.get_images',
             GetVolume: 'core.mixer.get_volume',
             GetRandom: 'core.tracklist.get_random',
-            GetRepeat: 'core.tracklist.get_repeat'
+            GetRepeat: 'core.tracklist.get_repeat',
+            GetConsume: 'core.tracklist.get_consume',
+            SetConsume: 'core.tracklist.set_consume',
+            GetSingle: 'core.tracklist.get_single',
+            SetSingle: 'core.tracklist.set_single'
         };
         return Monitor;
     }(JsonRpcQueryableBase_4.default));
     exports.default = Monitor;
 });
-define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Mopidies/Monitor"], function (require, exports, JsonRpcQueryableBase_5, Monitor_1) {
+define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQueryableBase", "Models/Mopidies/Monitor", "Utils/Delay"], function (require, exports, JsonRpcQueryableBase_5, Monitor_1, Delay_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Player = /** @class */ (function (_super) {
@@ -7146,7 +7185,11 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                         case 3:
                             _a.sent();
                             _a.label = 4;
-                        case 4: return [2 /*return*/, true];
+                        case 4: return [4 /*yield*/, Delay_9.default.Wait(500)];
+                        case 5:
+                            _a.sent();
+                            this.Monitor.Update();
+                            return [2 /*return*/, true];
                     }
                 });
             });
@@ -7161,6 +7204,10 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                             return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Pause)];
                         case 1:
                             _a.sent();
+                            return [4 /*yield*/, Delay_9.default.Wait(500)];
+                        case 2:
+                            _a.sent();
+                            this.Monitor.Update();
                             return [2 /*return*/, true];
                     }
                 });
@@ -7173,6 +7220,10 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                         case 0: return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Next)];
                         case 1:
                             _a.sent();
+                            return [4 /*yield*/, Delay_9.default.Wait(500)];
+                        case 2:
+                            _a.sent();
+                            this.Monitor.Update();
                             return [2 /*return*/, true];
                     }
                 });
@@ -7180,11 +7231,50 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
         };
         Player.prototype.Previous = function () {
             return __awaiter(this, void 0, void 0, function () {
+                var currentTlId, resTlTracks, tlTracks, prevTlId, i;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Previous)];
+                        case 0:
+                            if (!(this.Monitor.IsRepeat && !this.Monitor.IsShuffle)) return [3 /*break*/, 4];
+                            currentTlId = this.Monitor.TlId;
+                            return [4 /*yield*/, this.JsonRpcRequest(Player.Methods.GetTlTracks)];
                         case 1:
+                            resTlTracks = _a.sent();
+                            tlTracks = resTlTracks.result;
+                            if (!tlTracks || tlTracks.length <= 0)
+                                return [2 /*return*/, false];
+                            prevTlId = null;
+                            for (i = 0; i < tlTracks.length; i++) {
+                                if (tlTracks[i].tlid == currentTlId)
+                                    break;
+                                prevTlId = tlTracks[i].tlid;
+                            }
+                            if (prevTlId === null)
+                                return [2 /*return*/, false];
+                            return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Play, {
+                                    tlid: prevTlId
+                                })];
+                        case 2:
                             _a.sent();
+                            return [4 /*yield*/, Delay_9.default.Wait(500)];
+                        case 3:
+                            _a.sent();
+                            this.Monitor.Update();
+                            return [2 /*return*/, true];
+                        case 4: 
+                        // リピートがOff、もしくはシャッフルがOn
+                        // シャッフルOn : カレントトラックの最初から開始
+                        // シャッフルOff: 前のトラックを開始
+                        return [4 /*yield*/, this.JsonRpcNotice(Player.Methods.Previous)];
+                        case 5:
+                            // リピートがOff、もしくはシャッフルがOn
+                            // シャッフルOn : カレントトラックの最初から開始
+                            // シャッフルOff: 前のトラックを開始
+                            _a.sent();
+                            return [4 /*yield*/, Delay_9.default.Wait(500)];
+                        case 6:
+                            _a.sent();
+                            this.Monitor.Update();
                             return [2 /*return*/, true];
                     }
                 });
@@ -7199,6 +7289,10 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                             })];
                         case 1:
                             _a.sent();
+                            return [4 /*yield*/, Delay_9.default.Wait(500)];
+                        case 2:
+                            _a.sent();
+                            this.Monitor.Update();
                             return [2 /*return*/, true];
                     }
                 });
@@ -7227,6 +7321,10 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                             })];
                         case 1:
                             _a.sent();
+                            return [4 /*yield*/, Delay_9.default.Wait(500)];
+                        case 2:
+                            _a.sent();
+                            this.Monitor.Update();
                             return [2 /*return*/, true];
                     }
                 });
@@ -7241,6 +7339,10 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
                             })];
                         case 1:
                             _a.sent();
+                            return [4 /*yield*/, Delay_9.default.Wait(500)];
+                        case 2:
+                            _a.sent();
+                            this.Monitor.Update();
                             return [2 /*return*/, true];
                     }
                 });
@@ -7257,6 +7359,8 @@ define("Models/Mopidies/Player", ["require", "exports", "Models/Bases/JsonRpcQue
             Stop: 'core.playback.stop',
             Next: 'core.playback.next',
             Previous: 'core.playback.previous',
+            GetTlTracks: 'core.tracklist.get_tl_tracks',
+            GetPreviousTlId: 'core.tracklist.get_previous_tlid',
             Seek: 'core.playback.seek',
             SetVolume: 'core.mixer.set_volume',
             SetRandom: 'core.tracklist.set_random',
