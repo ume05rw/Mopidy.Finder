@@ -22,7 +22,7 @@ export const AlbumListEvents = {
 };
 
 @Component({
-    template: `<div class="col-md-6">
+    template: `<div class="col-lg-6">
     <div class="card">
         <div class="card-header with-border bg-warning">
             <h3 class="card-title">

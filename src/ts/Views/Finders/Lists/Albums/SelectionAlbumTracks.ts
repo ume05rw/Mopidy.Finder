@@ -69,6 +69,7 @@ export const SelectionAlbumTracksEvents = {
         <div class="card-body row">
             <div class="col-md-4">
                 <img class="albumart" v-bind:src="entity.Album.GetImageFullUri()" />
+                <img class="albumart reflection d-none d-md-inline" v-bind:src="entity.Album.GetImageFullUri()" />
             </div>
             <div class="col-md-8">
                 <table class="table table-sm table-hover tracks">
@@ -76,11 +77,11 @@ export const SelectionAlbumTracksEvents = {
                         <template v-for="track in entity.Tracks">
                         <tr class="track-row"
                             v-bind:data-trackid="track.Id">
-                            <td class="tracknum"
+                            <td class="tracktext tracknum"
                                 @click="OnRowClicked">{{ track.TrackNo }}</td>
-                            <td class="trackname text-truncate"
+                            <td class="tracktext trackname text-truncate"
                                 @click="OnRowClicked">{{ track.Name }}</td>
-                            <td class="tracklength"
+                            <td class="tracktext tracklength"
                                 @click="OnRowClicked">{{ track.GetTimeString() }}</td>
                             <td class="trackoperation">
                                 <div class="dropdown"

@@ -100,6 +100,31 @@ export default class Libraries {
         ? (Hammer as any).default
         : Hammer) as typeof Hammer;
 
+    // Androidでスワイプが反応しない現象への対応を入れたが、
+    // Androidでは修正されるもののPC等で反応しなくなった。
+    // スクローラブルな要素に touch-action: pan-y; を入れることで解決した。
+    // https://github.com/hammerjs/hammer.js/issues/1065
+    //public static readonly CreateHorizontalSwipeDetector: (element: Element) => HammerManager
+    //    = (element: Element) => {
+    //        const result = new Libraries.Hammer(element as HTMLElement, {
+    //            touchAction: 'auto',
+    //            inputClass: Libraries.Hammer.SUPPORT_POINTER_EVENTS
+    //                ? Libraries.Hammer.PointerEventInput
+    //                : Libraries.Hammer.TouchInput,
+    //            recognizers: [
+    //                [
+    //                    Libraries.Hammer.Swipe, {
+    //                        direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+    //                    }
+    //                ]
+    //            ]
+    //        });
+    //        result.get('swipe').set({
+    //            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+    //        });
+    //        return result;
+    //    };
+
     /**
      * AdminLTE
      */
@@ -203,7 +228,6 @@ export default class Libraries {
 
     public static Initialize(): void {
         Libraries.SettingsStore = new SettingsStore();
-
         // ResponsiveBootstrapToolkitをbootstrap4に対応させる
         // https://github.com/maciej-gurban/responsive-bootstrap-toolkit/issues/52
         Libraries.ResponsiveBootstrapToolkit.use('bs4', {

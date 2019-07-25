@@ -62,7 +62,7 @@ export default class NavigationController {
 
     private async InitialNavigation(): Promise<boolean> {
         // 個別にawaitした方が、複数promise配列をawait Promise.all するより早い。
-        const isConnectable = await this._store.TryConnect();
+        await this._store.TryConnect();
         const updateProgress = await this._store.GetDbUpdateProgress();
 
         // どうも、ResponsiveToolkitの初期化後から反応が正しくなるまで
@@ -93,12 +93,14 @@ export default class NavigationController {
     }
 
     private AdjustScreen(): void {
+        
+        Dump.Log('viewport = ' + this._viewport.current());
         // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
-        if (this._viewport.is('<=sm')) {
-            Dump.Log('viewport is <=sm');
+        if (this._viewport.is('<=md')) {
+            Dump.Log('viewport is <=md');
             this._content.ContentToFullscreen();
         } else {
-            Dump.Log('viewport is >sm');
+            Dump.Log('viewport is >md');
             this._content.ContentToColumn();
         }
 
@@ -132,13 +134,19 @@ export default class NavigationController {
         // https://gist.github.com/sayaka-nonsta/d68d4afc7b08d52971f2d477adab5e1d
         // フルスクリーン要求
         // https://developers.google.com/web/fundamentals/native-hardware/fullscreen/
-        const ua = navigator.userAgent;
-        const doc = window.document;
-        const docEl = doc.documentElement as any;
-        const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-        if (/Android/.test(ua)) {
+        const doc = (window)
+            ? window.document
+            : null;
+        const docEl = (doc)
+            ? doc.documentElement as any
+            : null;
+        const requestFullScreen = (docEl)
+            ? docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen
+            : null;
+        if (this._store.Entity.IsAndroid) {
             try {
-                requestFullScreen.call(docEl);
+                if (requestFullScreen)
+                    requestFullScreen.call(docEl);
             } catch (ex) {
                 Dump.Error('Fullscreen Request Failed.', ex)
             }

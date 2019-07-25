@@ -13,7 +13,7 @@ import Filterbox from '../../Shared/Filterboxes/Filterbox';
 import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
 
 @Component({
-    template: `<div class="col-md-3">
+    template: `<div class="col-lg-3">
     <div class="card plain-list">
         <div class="card-header with-border bg-warning">
             <h3 class="card-title">

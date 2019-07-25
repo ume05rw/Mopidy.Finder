@@ -81,7 +81,6 @@
     <None Remove="types\adminlte\index.d.ts" />
     <None Remove="types\ion-range-slider\index.d.ts" />
     <None Remove="types\jquery-slimscroll\index.d.ts" />
-    <None Remove="types\mopidy\index.d.ts" />
     <None Remove="types\responsive-toolkit\index.d.ts" />
   </ItemGroup>
 
@@ -189,12 +188,12 @@
     <TypeScriptCompile Include="types\adminlte\index.d.ts" />
     <TypeScriptCompile Include="types\ion-range-slider\index.d.ts" />
     <TypeScriptCompile Include="types\jquery-slimscroll\index.d.ts" />
-    <TypeScriptCompile Include="types\mopidy\index.d.ts" />
     <TypeScriptCompile Include="types\responsive-toolkit\index.d.ts" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="types\sortable\" />
+    <Folder Include="types\hammerjs\" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

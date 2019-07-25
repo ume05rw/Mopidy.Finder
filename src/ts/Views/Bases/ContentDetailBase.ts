@@ -7,8 +7,8 @@ export default abstract class ContentDetailBase extends ViewBase implements ICon
     protected abstract readonly linkId: string;
 
     private static readonly DisplayNone: string = 'd-none';
-    private static readonly PositionStatic: string = 'position: static;';
-    private static readonly PositionAbsolute: string = 'position: absolute;';
+    private static readonly PositionStatic: string = 'position-static';
+    private static readonly PositionAbsolute: string = 'position-absolute';
     private animate: Animate;
     private elClasses: DOMTokenList;
 
@@ -32,11 +32,19 @@ export default abstract class ContentDetailBase extends ViewBase implements ICon
     }
 
     public ToPositionStatic(): void {
-        this.$el.setAttribute('style', ContentDetailBase.PositionStatic);
+        const classes = this.$el.classList;
+        if (!classes.contains(ContentDetailBase.PositionStatic))
+            classes.add(ContentDetailBase.PositionStatic);
+        if (classes.contains(ContentDetailBase.PositionAbsolute))
+            classes.remove(ContentDetailBase.PositionAbsolute);
     }
 
     public ToPositionAbsolute(): void {
-        this.$el.setAttribute('style', ContentDetailBase.PositionAbsolute);
+        const classes = this.$el.classList;
+        if (!classes.contains(ContentDetailBase.PositionAbsolute))
+            classes.add(ContentDetailBase.PositionAbsolute);
+        if (classes.contains(ContentDetailBase.PositionStatic))
+            classes.remove(ContentDetailBase.PositionStatic);
     }
 
     public ToVisible(): void {

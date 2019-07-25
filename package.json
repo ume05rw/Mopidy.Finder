@@ -21,7 +21,6 @@
     "devDependencies": {
         "@types/bootstrap": "^4.3.1",
         "@types/chai": "^4.1.7",
-        "@types/hammerjs": "^2.0.36",
         "@types/jquery": "^3.3.30",
         "@types/lodash": "^4.14.134",
         "@types/mocha": "^5.2.7",

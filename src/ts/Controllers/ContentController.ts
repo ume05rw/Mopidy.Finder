@@ -59,6 +59,7 @@ export default class ContentController {
                     Detail: args.ContentDetail
                 };
                 this._finder.ShowContentDetail(detailArgs);
+                this._headerBar.SetDetail(detailArgs);
             }
         });
         this._playlists.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs) => {
@@ -73,6 +74,7 @@ export default class ContentController {
                     Detail: args.ContentDetail
                 };
                 this._playlists.ShowContentDetail(detailArgs);
+                this._headerBar.SetDetail(detailArgs);
             }
         });
         this._settings.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs) => {
@@ -87,6 +89,7 @@ export default class ContentController {
                     Detail: args.ContentDetail
                 };
                 this._settings.ShowContentDetail(detailArgs);
+                this._headerBar.SetDetail(detailArgs);
             }
         });
     }

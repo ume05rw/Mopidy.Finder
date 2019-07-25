@@ -54,13 +54,14 @@
         //"traceResolution": true,
 
         "paths": {
-            "responsive-toolkit": [ "types/responsive-toolkit" ],
+            "responsive-toolkit/dist/bootstrap-toolkit": [ "types/responsive-toolkit" ],
             "admin-lte/dist/js/adminlte": [ "types/adminlte" ],
             "mopidy": [ "types/mopidy" ],
             "jquery-slimscroll": [ "types/jquery-slimscroll" ],
             "sortablejs/modular/sortable.complete.esm": [ "types/sortable" ],
             "admin-lte/plugins/bootstrap/js/bootstrap.bundle": [ "node_modules/@types/bootstrap" ],
-            "admin-lte/plugins/sweetalert2/sweetalert2": [ "types/sweetalert2" ]
+            "admin-lte/plugins/sweetalert2/sweetalert2": [ "types/sweetalert2" ],
+            "hammerjs": [ "types/hammerjs" ]
         },
 
         // TSの型定義ファイル参照パス

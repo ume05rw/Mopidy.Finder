@@ -10,9 +10,9 @@ import { ConfirmType, default as ConfirmDialog } from '../../Shared/Dialogs/Conf
 import ProgressDialog from '../../Shared/Dialogs/ProgressDialog';
 
 @Component({
-    template: `<div class="row">
-    <div class="col-12">
-        <div class="card">
+    template: `<div class="row content-detail">
+    <div class="col-12 card-wrapper">
+        <div class="card settings database">
             <div class="card-header with-border bg-warning">
                 <h3 class="card-title">
                     <i class="fa fa-database" />

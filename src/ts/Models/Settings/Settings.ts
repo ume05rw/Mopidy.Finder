@@ -21,6 +21,9 @@ export default class Settings implements ISettings {
     private _isBusy = false;
     private _isMopidyConnectable: boolean = false;
     private _isTouchScreen: boolean = false;
+    private _isMobile: boolean = false;
+    private _isAndroid: boolean = false;
+    private _isIos: boolean = false;
 
     public get ServerAddress(): string {
         return this._serverAddress;
@@ -37,9 +40,36 @@ export default class Settings implements ISettings {
     public get IsTouchScreen(): boolean {
         return this._isTouchScreen;
     }
+    public get IsMobile(): boolean {
+        return this._isMobile;
+    }
+    public get IsIos(): boolean {
+        return this._isIos;
+    }
+    public get IsAndroid(): boolean {
+        return this._isAndroid;
+    }
 
     private constructor() {
-        this._isTouchScreen = !(!window.ontouchstart);
+        // https://freefielder.jp/blog/2014/12/javascript-touch-screen.html
+        // ontouchstartが存在しない場合はundefined、する場合でもイベントがないのでnull。
+        this._isTouchScreen = (window.ontouchstart === null);
+
+        const ua = (navigator)
+            ? navigator.userAgent
+            : '';
+
+        if (
+            ua.indexOf('iPhone') > 0
+            || ua.indexOf('iPad') > 0
+            || ua.indexOf('iPod') > 0
+        ) {
+            this._isMobile = true;
+            this._isIos = true;
+        } else if (ua.indexOf('Android') > 0) {
+            this._isMobile = true;
+            this._isAndroid = true;
+        }
     }
 
     public SetBusy(isBusy: boolean): void {

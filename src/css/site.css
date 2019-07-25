@@ -27,18 +27,18 @@ div#root {
 .content-wrapper .row .col-10,
 .content-wrapper .row .col-11,
 .content-wrapper .row .col-12,
-.content-wrapper .row .col-md-1,
-.content-wrapper .row .col-md-2,
-.content-wrapper .row .col-md-3,
-.content-wrapper .row .col-md-4,
-.content-wrapper .row .col-md-5,
-.content-wrapper .row .col-md-6,
-.content-wrapper .row .col-md-7,
-.content-wrapper .row .col-md-8,
-.content-wrapper .row .col-md-9,
-.content-wrapper .row .col-md-10,
-.content-wrapper .row .col-md-11,
-.content-wrapper .row .col-md-12 {
+.content-wrapper .row .col-lg-1,
+.content-wrapper .row .col-lg-2,
+.content-wrapper .row .col-lg-3,
+.content-wrapper .row .col-lg-4,
+.content-wrapper .row .col-lg-5,
+.content-wrapper .row .col-lg-6,
+.content-wrapper .row .col-lg-7,
+.content-wrapper .row .col-lg-8,
+.content-wrapper .row .col-lg-9,
+.content-wrapper .row .col-lg-10,
+.content-wrapper .row .col-lg-11,
+.content-wrapper .row .col-lg-12 {
     padding-left: 6px;
     padding-right: 6px;
 }
@@ -71,6 +71,9 @@ div.dropdown {
 /**
  * サイドバー等
  */
+.wrapper .main-sidebar .brand-link {
+    display: block !important;
+}
 .main-sidebar.sidebar-dark-warning .sidebar .inner-sidebar {
     margin-bottom: 58px;
 }
@@ -78,6 +81,18 @@ div.dropdown {
 .albumart {
     width: 100%;
     height: auto;
+}
+.albumart.reflection {
+    width: 100%;
+    height: auto;
+    opacity: 0.25;
+    transform: rotateX(180deg);
+    /* IEは11でもマスクが使用できない。*/
+    /* グラデーションマスク-Firefox/Edge用: */
+    mask: url(../img/gradation_to_bottom.png);
+    mask-size: 100% 100%;
+    /* グラデーションマスク-Chrome用: */
+    -webkit-mask-box-image: url(../img/gradation_to_bottom.png);
 }
 .row.volume-box {
     margin-left: -4px;
@@ -120,6 +135,15 @@ div.dropdown {
 /**
  * 各種リスト
  */
+.position-static {
+    position: static !important;
+}
+.position-absolute {
+    position: absolute !important;
+}
+.position-relative {
+    position: relative !important;
+}
 .card .card-header .card-title {
     margin-bottom: 0;
 }
@@ -164,6 +188,7 @@ div.dropdown {
     height: 100%;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
 }
 .card-inner-body {
     width: 100%;
@@ -189,17 +214,20 @@ div.dropdown {
     background-color: #1f1c40;
     color: #c4c2ca;
 }
-.table.table-hover.tracks tr .tracknum {
-    width: 40px;
-    text-align: right;
+.table.table-hover.tracks .tracktext {
+    padding-top: 12px;
 }
-.table.table-hover.tracks tr .trackname {
+.table.table-hover.tracks .tracknum {
+    width: 50px;
+    text-align: center;
+}
+.table.table-hover.tracks .trackname {
     width: auto;
 }
-.table.table-hover.tracks tr .tracklength {
-    width: 50px;
+.table.table-hover.tracks .tracklength {
+    width: 60px;
 }
-.table.table-hover.tracks tr .trackoperation {
+.table.table-hover.tracks .trackoperation {
     width: 40px;
     transition: none;
 }
@@ -271,6 +299,18 @@ div.dropdown {
 /**
  * 設定
  */
+#tab-settings .position-absolute.content-detail {
+    width: 100%;
+    min-height: calc(100% - 24px);
+}
+#tab-settings .position-absolute .card-wrapper {
+    width: 100%;
+    min-height: 100%;
+}
+#tab-settings .position-absolute .card.settings {
+    width: 100%;
+    min-height: 100%;
+}
 #tab-settings input.port {
     max-width: 110px;
 }
@@ -289,3 +329,7 @@ div.dropdown {
     width: 100px;
     margin: 0;
 }
+#tab-settings .card.database button {
+    width: 100px;
+}
+

@@ -26,7 +26,12 @@ interface IResponsiveBootstrapToolkit {
 
     use(framewrokName: string, breadpoints: { [breadkpoint: string]: JQuery }): void;
 }
-
 declare const ResponsiveBootstrapToolkit: IResponsiveBootstrapToolkit;
 
-export default ResponsiveBootstrapToolkit;
+// "export default"でなく、"export ="がミソ。
+// グローバル空間に名前が決め打ちで存在するインスタンスの場合は、
+// import時に取得するのはクラスでなくインスタンス。
+// クラスの場合は命名自由だが、インスタンスの場合は名前を固定してexportする。
+// ...というのが現状での理解。
+export = ResponsiveBootstrapToolkit;
+

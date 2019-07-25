@@ -8,14 +8,19 @@ export default abstract class ContentBase extends TabBase implements IContent {
     protected abstract currentDetail: IContentDetail;
     protected abstract detailWrapperElement: HTMLElement;
 
-    private static readonly PositionStatic: string = 'position: static;';
-    private static readonly PositionRelative: string = 'position: relative;';
+    private static readonly PositionStatic: string = 'position-static';
+    private static readonly PositionRelative: string = 'position-relative';
 
     public abstract GetIsPermitLeave(): boolean;
     public abstract InitContent(): void;
 
     public SetDetailToFulscreen(): void {
-        this.detailWrapperElement.setAttribute('style', ContentBase.PositionRelative);
+        const wrapperClasses = this.detailWrapperElement.classList;
+        if (!wrapperClasses.contains(ContentBase.PositionRelative))
+            wrapperClasses.add(ContentBase.PositionRelative);
+        if (wrapperClasses.contains(ContentBase.PositionStatic))
+            wrapperClasses.remove(ContentBase.PositionStatic);
+
         for (let i = 0; i < this.details.length; i++) {
             const detail = this.details[i];
             detail.ToPositionAbsolute();
@@ -25,7 +30,12 @@ export default abstract class ContentBase extends TabBase implements IContent {
         }
     }
     public SetDetailToColumn(): void {
-        this.detailWrapperElement.setAttribute('style', ContentBase.PositionStatic);
+        const wrapperClasses = this.detailWrapperElement.classList;
+        if (!wrapperClasses.contains(ContentBase.PositionStatic))
+            wrapperClasses.add(ContentBase.PositionStatic);
+        if (wrapperClasses.contains(ContentBase.PositionRelative))
+            wrapperClasses.remove(ContentBase.PositionRelative);
+
         for (let i = 0; i < this.details.length; i++) {
             const detail = this.details[i];
             detail.ToPositionStatic();

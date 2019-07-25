@@ -29,7 +29,7 @@ enum ListMode {
 }
 
 @Component({
-    template: `<div class="col-md-9 playlist-track">
+    template: `<div class="col-lg-9 playlist-track">
     <div class="card">
         <div class="card-header with-border bg-warning">
             <h3 class="card-title"

@@ -931,7 +931,25 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
             this._isBusy = false;
             this._isMopidyConnectable = false;
             this._isTouchScreen = false;
-            this._isTouchScreen = !(!window.ontouchstart);
+            this._isMobile = false;
+            this._isAndroid = false;
+            this._isIos = false;
+            // https://freefielder.jp/blog/2014/12/javascript-touch-screen.html
+            // ontouchstartが存在しない場合はundefined、する場合でもイベントがないのでnull。
+            this._isTouchScreen = (window.ontouchstart === null);
+            var ua = (navigator)
+                ? navigator.userAgent
+                : '';
+            if (ua.indexOf('iPhone') > 0
+                || ua.indexOf('iPad') > 0
+                || ua.indexOf('iPod') > 0) {
+                this._isMobile = true;
+                this._isIos = true;
+            }
+            else if (ua.indexOf('Android') > 0) {
+                this._isMobile = true;
+                this._isAndroid = true;
+            }
         }
         Object.defineProperty(Settings, "Entity", {
             get: function () {
@@ -975,6 +993,27 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
         Object.defineProperty(Settings.prototype, "IsTouchScreen", {
             get: function () {
                 return this._isTouchScreen;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsMobile", {
+            get: function () {
+                return this._isMobile;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsIos", {
+            get: function () {
+                return this._isIos;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsAndroid", {
+            get: function () {
+                return this._isAndroid;
             },
             enumerable: true,
             configurable: true
@@ -1230,6 +1269,30 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
         Libraries.Hammer = ((Hammer.default)
             ? Hammer.default
             : Hammer);
+        // Androidでスワイプが反応しない現象への対応を入れたが、
+        // Androidでは修正されるもののPC等で反応しなくなった。
+        // スクローラブルな要素に touch-action: pan-y; を入れることで解決した。
+        // https://github.com/hammerjs/hammer.js/issues/1065
+        //public static readonly CreateHorizontalSwipeDetector: (element: Element) => HammerManager
+        //    = (element: Element) => {
+        //        const result = new Libraries.Hammer(element as HTMLElement, {
+        //            touchAction: 'auto',
+        //            inputClass: Libraries.Hammer.SUPPORT_POINTER_EVENTS
+        //                ? Libraries.Hammer.PointerEventInput
+        //                : Libraries.Hammer.TouchInput,
+        //            recognizers: [
+        //                [
+        //                    Libraries.Hammer.Swipe, {
+        //                        direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        //                    }
+        //                ]
+        //            ]
+        //        });
+        //        result.get('swipe').set({
+        //            direction: Libraries.Hammer.DIRECTION_HORIZONTAL
+        //        });
+        //        return result;
+        //    };
         /**
          * AdminLTE
          */
@@ -1552,7 +1615,11 @@ define("Views/Bases/ContentBase", ["require", "exports", "Views/Bases/TabBase", 
             return _super !== null && _super.apply(this, arguments) || this;
         }
         ContentBase.prototype.SetDetailToFulscreen = function () {
-            this.detailWrapperElement.setAttribute('style', ContentBase.PositionRelative);
+            var wrapperClasses = this.detailWrapperElement.classList;
+            if (!wrapperClasses.contains(ContentBase.PositionRelative))
+                wrapperClasses.add(ContentBase.PositionRelative);
+            if (wrapperClasses.contains(ContentBase.PositionStatic))
+                wrapperClasses.remove(ContentBase.PositionStatic);
             for (var i = 0; i < this.details.length; i++) {
                 var detail = this.details[i];
                 detail.ToPositionAbsolute();
@@ -1562,7 +1629,11 @@ define("Views/Bases/ContentBase", ["require", "exports", "Views/Bases/TabBase", 
             }
         };
         ContentBase.prototype.SetDetailToColumn = function () {
-            this.detailWrapperElement.setAttribute('style', ContentBase.PositionStatic);
+            var wrapperClasses = this.detailWrapperElement.classList;
+            if (!wrapperClasses.contains(ContentBase.PositionStatic))
+                wrapperClasses.add(ContentBase.PositionStatic);
+            if (wrapperClasses.contains(ContentBase.PositionRelative))
+                wrapperClasses.remove(ContentBase.PositionRelative);
             for (var i = 0; i < this.details.length; i++) {
                 var detail = this.details[i];
                 detail.ToPositionStatic();
@@ -1614,8 +1685,8 @@ define("Views/Bases/ContentBase", ["require", "exports", "Views/Bases/TabBase", 
                 });
             });
         };
-        ContentBase.PositionStatic = 'position: static;';
-        ContentBase.PositionRelative = 'position: relative;';
+        ContentBase.PositionStatic = 'position-static';
+        ContentBase.PositionRelative = 'position-relative';
         return ContentBase;
     }(TabBase_1.default));
     exports.default = ContentBase;
@@ -2685,10 +2756,18 @@ define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/View
             return !this.elClasses.contains(ContentDetailBase.DisplayNone);
         };
         ContentDetailBase.prototype.ToPositionStatic = function () {
-            this.$el.setAttribute('style', ContentDetailBase.PositionStatic);
+            var classes = this.$el.classList;
+            if (!classes.contains(ContentDetailBase.PositionStatic))
+                classes.add(ContentDetailBase.PositionStatic);
+            if (classes.contains(ContentDetailBase.PositionAbsolute))
+                classes.remove(ContentDetailBase.PositionAbsolute);
         };
         ContentDetailBase.prototype.ToPositionAbsolute = function () {
-            this.$el.setAttribute('style', ContentDetailBase.PositionAbsolute);
+            var classes = this.$el.classList;
+            if (!classes.contains(ContentDetailBase.PositionAbsolute))
+                classes.add(ContentDetailBase.PositionAbsolute);
+            if (classes.contains(ContentDetailBase.PositionStatic))
+                classes.remove(ContentDetailBase.PositionStatic);
         };
         ContentDetailBase.prototype.ToVisible = function () {
             if (this.elClasses.contains(ContentDetailBase.DisplayNone))
@@ -2763,8 +2842,8 @@ define("Views/Bases/ContentDetailBase", ["require", "exports", "Views/Bases/View
             });
         };
         ContentDetailBase.DisplayNone = 'd-none';
-        ContentDetailBase.PositionStatic = 'position: static;';
-        ContentDetailBase.PositionAbsolute = 'position: absolute;';
+        ContentDetailBase.PositionStatic = 'position-static';
+        ContentDetailBase.PositionAbsolute = 'position-absolute';
         return ContentDetailBase;
     }(ViewBase_3.default));
     exports.default = ContentDetailBase;
@@ -3412,7 +3491,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         ], SelectionAlbumTracks.prototype, "playlists", void 0);
         SelectionAlbumTracks = __decorate([
             vue_class_component_5.default({
-                template: "<li class=\"nav-item albumtrack w-100\"\n                   ref=\"Li\" >\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnHeaderPlayClicked\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <div class=\"dropdown\">\n                    <button type=\"button\"\n                        class=\"btn btn-tool dropdown-toggle\"\n                        data-toggle=\"dropdown\"\n                        data-offset=\"-160px, 0\"\n                        ref=\"HeaderPlaylistButton\">\n                        <i class=\"fa fa-bookmark\" />\n                    </button>\n                    <div class=\"dropdown-menu header-dropdown\">\n                        <div class=\"inner\" ref=\"HeaderDropDownInnerDiv\">\n                            <a class=\"dropdown-item\"\n                                href=\"javascript:void(0)\"\n                                @click=\"OnHeaderNewPlaylistClicked\">New Playlist</a>\n                            <div class=\"dropdown-divider\"></div>\n                            <template v-for=\"playlist in innerPlaylists\">\n                            <a class=\"dropdown-item text-truncate\"\n                                href=\"javascript:void(0)\"\n                                v-bind:data-uri=\"playlist.Uri\"\n                                @click=\"OnHeaderPlaylistClicked\">{{ playlist.Name }}</a>\n                            </template>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr class=\"track-row\"\n                            v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracknum\"\n                                @click=\"OnRowClicked\">{{ track.TrackNo }}</td>\n                            <td class=\"trackname text-truncate\"\n                                @click=\"OnRowClicked\">{{ track.Name }}</td>\n                            <td class=\"tracklength\"\n                                @click=\"OnRowClicked\">{{ track.GetTimeString() }}</td>\n                            <td class=\"trackoperation\">\n                                <div class=\"dropdown\"\n                                    ref=\"RowDropdownWrappers\">\n                                    <button type=\"button\"\n                                        class=\"btn btn-tool dropdown-toggle\"\n                                        data-toggle=\"dropdown\"\n                                        data-offset=\"-160px, 0\"\n                                        ref=\"RowPlaylistButtons\">\n                                        <i class=\"fa fa-bookmark\" />\n                                    </button>\n                                    <div class=\"dropdown-menu row-dropdown\">\n                                    </div>\n                                </div>\n                            </td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n    <div class=\"d-none\">\n        <div class=\"inner\" ref=\"RowDropdownInnerDiv\">\n            <template v-for=\"playlist in innerPlaylists\">\n            <a class=\"dropdown-item text-truncate\"\n                href=\"javascript:void(0)\"\n                v-bind:data-uri=\"playlist.Uri\"\n                @click=\"OnRowPlaylistClicked\">{{ playlist.Name }}</a>\n            </template>\n        </div>\n    </div>\n</li>"
+                template: "<li class=\"nav-item albumtrack w-100\"\n                   ref=\"Li\" >\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title text-nowrap text-truncate\">\n                {{ entity.GetArtistName() }} {{ (entity.Album.Year) ? '(' + entity.Album.Year + ')' : '' }} : {{ entity.Album.Name }}\n            </h3>\n            <div class=\"card-tools\">\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"AlbumPlayButton\"\n                    @click=\"OnHeaderPlayClicked\" >\n                    <i class=\"fa fa-play\" />\n                </button>\n                <div class=\"dropdown\">\n                    <button type=\"button\"\n                        class=\"btn btn-tool dropdown-toggle\"\n                        data-toggle=\"dropdown\"\n                        data-offset=\"-160px, 0\"\n                        ref=\"HeaderPlaylistButton\">\n                        <i class=\"fa fa-bookmark\" />\n                    </button>\n                    <div class=\"dropdown-menu header-dropdown\">\n                        <div class=\"inner\" ref=\"HeaderDropDownInnerDiv\">\n                            <a class=\"dropdown-item\"\n                                href=\"javascript:void(0)\"\n                                @click=\"OnHeaderNewPlaylistClicked\">New Playlist</a>\n                            <div class=\"dropdown-divider\"></div>\n                            <template v-for=\"playlist in innerPlaylists\">\n                            <a class=\"dropdown-item text-truncate\"\n                                href=\"javascript:void(0)\"\n                                v-bind:data-uri=\"playlist.Uri\"\n                                @click=\"OnHeaderPlaylistClicked\">{{ playlist.Name }}</a>\n                            </template>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"card-body row\">\n            <div class=\"col-md-4\">\n                <img class=\"albumart\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n                <img class=\"albumart reflection d-none d-md-inline\" v-bind:src=\"entity.Album.GetImageFullUri()\" />\n            </div>\n            <div class=\"col-md-8\">\n                <table class=\"table table-sm table-hover tracks\">\n                    <tbody>\n                        <template v-for=\"track in entity.Tracks\">\n                        <tr class=\"track-row\"\n                            v-bind:data-trackid=\"track.Id\">\n                            <td class=\"tracktext tracknum\"\n                                @click=\"OnRowClicked\">{{ track.TrackNo }}</td>\n                            <td class=\"tracktext trackname text-truncate\"\n                                @click=\"OnRowClicked\">{{ track.Name }}</td>\n                            <td class=\"tracktext tracklength\"\n                                @click=\"OnRowClicked\">{{ track.GetTimeString() }}</td>\n                            <td class=\"trackoperation\">\n                                <div class=\"dropdown\"\n                                    ref=\"RowDropdownWrappers\">\n                                    <button type=\"button\"\n                                        class=\"btn btn-tool dropdown-toggle\"\n                                        data-toggle=\"dropdown\"\n                                        data-offset=\"-160px, 0\"\n                                        ref=\"RowPlaylistButtons\">\n                                        <i class=\"fa fa-bookmark\" />\n                                    </button>\n                                    <div class=\"dropdown-menu row-dropdown\">\n                                    </div>\n                                </div>\n                            </td>\n                        </tr>\n                        </template>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n    <div class=\"d-none\">\n        <div class=\"inner\" ref=\"RowDropdownInnerDiv\">\n            <template v-for=\"playlist in innerPlaylists\">\n            <a class=\"dropdown-item text-truncate\"\n                href=\"javascript:void(0)\"\n                v-bind:data-uri=\"playlist.Uri\"\n                @click=\"OnRowPlaylistClicked\">{{ playlist.Name }}</a>\n            </template>\n        </div>\n    </div>\n</li>"
             })
         ], SelectionAlbumTracks);
         return SelectionAlbumTracks;
@@ -3731,7 +3810,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList = __decorate([
             vue_class_component_6.default({
-                template: "<div class=\"col-md-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-music\" />\n                Album Tracks\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox album-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                            <selection-album-tracks\n                                v-bind:playlists=\"playlists\"\n                                ref=\"Items\"\n                                v-bind:entity=\"entity\"\n                                @PlayOrdered=\"OnPlayOrdered\"\n                                @CreatePlaylistOrdered=\"OnCreatePlaylistOrdered\"\n                                @AddToPlaylistOrdered=\"OnAddToPlaylistOrdered\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.album-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-lg-6\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-music\" />\n                Album Tracks\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Album?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox album-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                            <selection-album-tracks\n                                v-bind:playlists=\"playlists\"\n                                ref=\"Items\"\n                                v-bind:entity=\"entity\"\n                                @PlayOrdered=\"OnPlayOrdered\"\n                                @CreatePlaylistOrdered=\"OnCreatePlaylistOrdered\"\n                                @AddToPlaylistOrdered=\"OnAddToPlaylistOrdered\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.album-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_1.default,
                     'selection-album-tracks': SelectionAlbumTracks_1.default,
@@ -3870,7 +3949,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         };
         ArtistList = __decorate([
             vue_class_component_7.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-users\" />\n                Artists\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox artist-list\"\n                    ref=\"CardInnerBody\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.artist-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-lg-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-users\" />\n                Artists\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Artist?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                </button>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox artist-list\"\n                    ref=\"CardInnerBody\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.artist-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_2.default,
                     'selection-item': SelectionItem_3.default,
@@ -3988,7 +4067,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         };
         GenreList = __decorate([
             vue_class_component_8.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-tags\" />\n                Genres\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox genre-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                            <selection-item\n                                ref=\"Items\"\n                                v-bind:entity=\"entity\"\n                                @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.genre-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
+                template: "<div class=\"col-lg-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-tags\" />\n                Genres\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Genre?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button type=\"button\"\n                    class=\"btn btn-tool\"\n                    ref=\"RefreshButton\"\n                    @click=\"OnClickRefresh\" >\n                    <i class=\"fa fa-repeat\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox genre-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                            <selection-item\n                                ref=\"Items\"\n                                v-bind:entity=\"entity\"\n                                @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.genre-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_3.default,
                     'selection-item': SelectionItem_4.default,
@@ -4300,7 +4379,55 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 if (!this.allButtons[i].classList.contains(this.displayNone))
                     this.allButtons[i].classList.add(this.displayNone);
         };
-        HeaderBar.prototype.SetButtonActive = function (activeButton, buttonGroup) {
+        HeaderBar.prototype.SetDetail = function (args) {
+            switch (args.Content) {
+                case IContent_4.Contents.Finder:
+                    switch (args.Detail) {
+                        case IContentDetail_6.ContentDetails.Genres:
+                            this.SetDetailActive(this.MenuGenres, this.finderButtons);
+                            break;
+                        case IContentDetail_6.ContentDetails.Artists:
+                            this.SetDetailActive(this.MenuArtists, this.finderButtons);
+                            break;
+                        case IContentDetail_6.ContentDetails.AlbumTracks:
+                            this.SetDetailActive(this.MenuAlbumTracks, this.finderButtons);
+                            break;
+                        default:
+                            Exception_13.default.Throw('Unexpected ContentDetail.', args);
+                    }
+                    break;
+                case IContent_4.Contents.Playlists:
+                    switch (args.Detail) {
+                        case IContentDetail_6.ContentDetails.Playlists:
+                            this.SetDetailActive(this.MenuPlaylists, this.playlistsButtons);
+                            break;
+                        case IContentDetail_6.ContentDetails.PlaylistTracks:
+                            this.SetDetailActive(this.MenuPlaylistTracks, this.playlistsButtons);
+                            break;
+                        default:
+                            Exception_13.default.Throw('Unexpected ContentDetail.', args);
+                    }
+                    break;
+                case IContent_4.Contents.Settings:
+                    switch (args.Detail) {
+                        case IContentDetail_6.ContentDetails.SetMopidy:
+                            this.SetDetailActive(this.MenuMopidy, this.settingsButtons);
+                            break;
+                        case IContentDetail_6.ContentDetails.Database:
+                            this.SetDetailActive(this.MenuDb, this.settingsButtons);
+                            break;
+                        case IContentDetail_6.ContentDetails.ScanProgress:
+                            this.SetDetailActive(this.MenuScanProgress, this.settingsButtons);
+                            break;
+                        default:
+                            Exception_13.default.Throw('Unexpected ContentDetail.', args);
+                    }
+                    break;
+                default:
+                    Exception_13.default.Throw('Unexpected Content.', args);
+            }
+        };
+        HeaderBar.prototype.SetDetailActive = function (activeButton, buttonGroup) {
             for (var i = 0; i < buttonGroup.length; i++) {
                 var btn = buttonGroup[i];
                 if (activeButton === btn)
@@ -4333,7 +4460,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     this.MenuScanProgress.classList.remove(this.displayNone);
                     break;
                 default:
-                    Exception_13.default.Throw('Unexpected Page.', args);
+                    Exception_13.default.Throw('Unexpected Content.', args);
             }
         };
         HeaderBar.prototype.OnGenresClicked = function () {
@@ -4342,7 +4469,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_6.ContentDetails.Genres
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
-            this.SetButtonActive(this.MenuGenres, this.finderButtons);
+            this.SetDetailActive(this.MenuGenres, this.finderButtons);
         };
         HeaderBar.prototype.OnArtistsClicked = function () {
             var args = {
@@ -4350,7 +4477,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_6.ContentDetails.Artists
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
-            this.SetButtonActive(this.MenuArtists, this.finderButtons);
+            this.SetDetailActive(this.MenuArtists, this.finderButtons);
         };
         HeaderBar.prototype.OnAlbumTracksClicked = function () {
             var args = {
@@ -4358,7 +4485,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_6.ContentDetails.AlbumTracks
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
-            this.SetButtonActive(this.MenuAlbumTracks, this.finderButtons);
+            this.SetDetailActive(this.MenuAlbumTracks, this.finderButtons);
         };
         HeaderBar.prototype.OnPlaylistsClicked = function () {
             var args = {
@@ -4366,7 +4493,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_6.ContentDetails.Playlists
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
-            this.SetButtonActive(this.MenuPlaylists, this.playlistsButtons);
+            this.SetDetailActive(this.MenuPlaylists, this.playlistsButtons);
         };
         HeaderBar.prototype.OnPlaylistTracksClicked = function () {
             var args = {
@@ -4374,7 +4501,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_6.ContentDetails.PlaylistTracks
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
-            this.SetButtonActive(this.MenuPlaylistTracks, this.playlistsButtons);
+            this.SetDetailActive(this.MenuPlaylistTracks, this.playlistsButtons);
         };
         HeaderBar.prototype.OnMopidyClicked = function () {
             var args = {
@@ -4382,7 +4509,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_6.ContentDetails.SetMopidy
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
-            this.SetButtonActive(this.MenuMopidy, this.settingsButtons);
+            this.SetDetailActive(this.MenuMopidy, this.settingsButtons);
         };
         HeaderBar.prototype.OnDbClicked = function () {
             var args = {
@@ -4390,7 +4517,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_6.ContentDetails.Database
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
-            this.SetButtonActive(this.MenuDb, this.settingsButtons);
+            this.SetDetailActive(this.MenuDb, this.settingsButtons);
         };
         HeaderBar.prototype.OnScanProgressClicked = function () {
             var args = {
@@ -4398,7 +4525,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                 Detail: IContentDetail_6.ContentDetails.ScanProgress
             };
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
-            this.SetButtonActive(this.MenuScanProgress, this.settingsButtons);
+            this.SetDetailActive(this.MenuScanProgress, this.settingsButtons);
         };
         HeaderBar.prototype.GetIsSideBarVisible = function () {
             return this.mainMenuButton.isShown();
@@ -4413,7 +4540,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
         };
         HeaderBar = __decorate([
             vue_class_component_10.default({
-                template: "<nav class=\"main-header navbar navbar-expand border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\"\n                data-widget=\"pushmenu\"\n                href=\"javascript:void(0)\"\n                ref=\"MainMenuButton\" >\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n        <li class=\"nav-item\">\n            <h3>{{ title }}</h3>\n        </li>\n    </ul>\n    <ul class=\"navbar-nav ml-auto nav-pills\">\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuGenres\">\n            <a class=\"nav-link active\"\n                @click=\"OnGenresClicked\" >\n                <i class=\"fa fa-tags\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuArtists\">\n            <a class=\"nav-link\"\n                @click=\"OnArtistsClicked\" >\n                <i class=\"fa fa-users\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuAlbumTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnAlbumTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuPlaylists\">\n            <a class=\"nav-link active\"\n                @click=\"OnPlaylistsClicked\" >\n                <i class=\"fa fa-list-ul\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuPlaylistTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnPlaylistTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuMopidy\">\n            <a class=\"nav-link active\"\n                @click=\"OnMopidyClicked\" >\n                <i class=\"fa fa-wifi\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuDb\">\n            <a class=\"nav-link\"\n                @click=\"OnDbClicked\" >\n                <i class=\"fa fa-database\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-md-none\"\n            ref=\"MenuScanProgress\">\n            <a class=\"nav-link\"\n                @click=\"OnScanProgressClicked\" >\n                <i class=\"fa fa-rocket\" />\n            </a>\n        </li>\n    </ul>\n</nav>"
+                template: "<nav class=\"main-header navbar navbar-expand border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\"\n                data-widget=\"pushmenu\"\n                href=\"javascript:void(0)\"\n                ref=\"MainMenuButton\" >\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n        <li class=\"nav-item\">\n            <h3>{{ title }}</h3>\n        </li>\n    </ul>\n    <ul class=\"navbar-nav ml-auto nav-pills\">\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuGenres\">\n            <a class=\"nav-link active\"\n                @click=\"OnGenresClicked\" >\n                <i class=\"fa fa-tags\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuArtists\">\n            <a class=\"nav-link\"\n                @click=\"OnArtistsClicked\" >\n                <i class=\"fa fa-users\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuAlbumTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnAlbumTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuPlaylists\">\n            <a class=\"nav-link active\"\n                @click=\"OnPlaylistsClicked\" >\n                <i class=\"fa fa-list-ul\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuPlaylistTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnPlaylistTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuMopidy\">\n            <a class=\"nav-link active\"\n                @click=\"OnMopidyClicked\" >\n                <i class=\"fa fa-wifi\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuDb\">\n            <a class=\"nav-link\"\n                @click=\"OnDbClicked\" >\n                <i class=\"fa fa-database\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuScanProgress\">\n            <a class=\"nav-link\"\n                @click=\"OnScanProgressClicked\" >\n                <i class=\"fa fa-rocket\" />\n            </a>\n        </li>\n    </ul>\n</nav>"
             })
         ], HeaderBar);
         return HeaderBar;
@@ -4699,7 +4826,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         PlaylistList.PageLength = 30;
         PlaylistList = PlaylistList_1 = __decorate([
             vue_class_component_12.default({
-                template: "<div class=\"col-md-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-list-ul\" />\n                Playlists\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox playlist-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionOrdered=\"OnSelectionOrdered\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.playlist-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
+                template: "<div class=\"col-lg-3\">\n    <div class=\"card plain-list\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\">\n                <i class=\"fa fa-list-ul\" />\n                Playlists\n            </h3>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'List?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\"/>\n                <button\n                    class=\"btn btn-tool\"\n                    ref=\"ButtonAdd\"\n                    @click=\"OnClickAdd\" >\n                    <i class=\"fa fa-plus-circle\" />\n                </button>\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox playlist-list\">\n                    <ul class=\"nav nav-pills h-100 d-flex flex-column flex-nowrap\">\n                        <template v-for=\"entity in entities\">\n                        <selection-item\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionOrdered=\"OnSelectionOrdered\"\n                            @SelectionChanged=\"OnSelectionChanged\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.playlist-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    <add-modal\n        ref=\"AddModal\"\n        @AddOrdered=\"OnAddOrdered\"/>\n</div>",
                 components: {
                     'filter-textbox': Filterbox_4.default,
                     'selection-item': SelectionItem_5.default,
@@ -5685,7 +5812,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         TrackList.ListBaseClasses = 'products-list product-list-in-box ';
         TrackList = TrackList_1 = __decorate([
             vue_class_component_15.default({
-                template: "<div class=\"col-md-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                <i class=\"fa fa-music\" />\n                Playlist Tracks\n            </h3>\n            <input type=\"text\" class=\"form-control form-control-sm d-none title-input\"\n                maxlength=\"40\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox playlisttrack-list\">\n                    <ul v-bind:class=\"listClasses\"\n                        ref=\"TrackListUl\">\n                        <template v-for=\"entity in entities\">\n                        <selection-track\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\"\n                            @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.playlisttrack-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
+                template: "<div class=\"col-lg-9 playlist-track\">\n    <div class=\"card\">\n        <div class=\"card-header with-border bg-warning\">\n            <h3 class=\"card-title\"\n                ref=\"TitleH3\">\n                <i class=\"fa fa-music\" />\n                Playlist Tracks\n            </h3>\n            <input type=\"text\" class=\"form-control form-control-sm d-none title-input\"\n                maxlength=\"40\"\n                ref=\"TitleInput\"\n                @input=\"OnInputTitle\"/>\n            <div class=\"card-tools form-row\">\n                <filter-textbox\n                    v-bind:placeHolder=\"'Track?'\"\n                    ref=\"Filterbox\"\n                    @TextUpdated=\"Refresh()\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"false\"\n                    iconClass=\"fa fa-pencil\"\n                    tooltip=\"Edit\"\n                    ref=\"EditButton\"\n                    @Clicked=\"OnClickEdit\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-trash\"\n                    tooltip=\"Delete\"\n                    ref=\"HeaderDeleteButton\"\n                    @Clicked=\"OnClickHeaderDelete\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-undo\"\n                    tooltip=\"Rollback\"\n                    ref=\"UndoButton\"\n                    @Clicked=\"OnClickUndoButton\" />\n                <slideup-button\n                    v-bind:hideOnInit=\"true\"\n                    iconClass=\"fa fa-check\"\n                    tooltip=\"Update\"\n                    ref=\"EndEditButton\"\n                    @Clicked=\"OnClickEndEdit\" />\n            </div>\n        </div>\n        <div class=\"card-body listbox\">\n            <div class=\"outer-scrollbox\">\n                <div class=\"inner-scrollbox playlisttrack-list\">\n                    <ul v-bind:class=\"listClasses\"\n                        ref=\"TrackListUl\">\n                        <template v-for=\"entity in entities\">\n                        <selection-track\n                            ref=\"Items\"\n                            v-bind:entity=\"entity\"\n                            @SelectionChanged=\"OnSelectionChanged\"\n                            @DeleteOrdered=\"OnDeleteRowOrdered\" />\n                        </template>\n                        <infinite-loading\n                            @infinite=\"OnInfinite\"\n                            force-use-infinite-wrapper=\".inner-scrollbox.playlisttrack-list\"\n                            ref=\"InfiniteLoading\" />\n                    </ul>\n                </div>\n            </div>\n        </div>\n    </div>\n    <update-dialog\n        ref=\"UpdateDialog\" />\n</div>",
                 components: {
                     'filter-textbox': Filterbox_5.default,
                     'slideup-button': SlideupButton_2.default,
@@ -6193,7 +6320,7 @@ define("Views/Settings/Blocks/DbBlock", ["require", "exports", "vue-class-compon
         };
         DbBlock = __decorate([
             vue_class_component_18.default({
-                template: "<div class=\"row\">\n    <div class=\"col-12\">\n        <div class=\"card\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-database\" />\n                    Refresh Relation Data\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"form-row\">\n                    <div class=\"col-md-3 px-2\">\n                        <p>\n                            Scan New Albums.<br/>\n                            The data in <strong>Mopidy Itself is not affected.</strong>\n                        </p>\n                        <p class=\"d-flex flex-row justify-content-center\">\n                            <button class=\"btn btn-app btn-outline-warning disabled button-database\"\n                                @click=\"OnScanNewButtonClicked\"\n                                ref=\"ScanNewButton\">\n                                <i class=\"fa fa-search-plus\"></i> Scan New\n                            </button>\n                        </p>\n                    </div>\n                    <div class=\"col-md-3 px-2\">\n                        <p>\n                            Delete All and Refresh.<br/>\n                            The data in <strong>Mopidy Itself is not affected.</strong>\n                        </p>\n                        <p class=\"d-flex flex-row justify-content-center\">\n                            <button class=\"btn btn-app btn-outline-warning disabled button-database\"\n                                @click=\"OnCleanupButtonClicked\"\n                                ref=\"CleanupButton\">\n                                <i class=\"fa fa-refresh\"></i> Cleanup\n                            </button>\n                        </p>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <confirm-dialog\n        ref=\"ConfirmDialog\" />\n    <progress-dialog\n        ref=\"ProgressDialog\" />\n</div>",
+                template: "<div class=\"row content-detail\">\n    <div class=\"col-12 card-wrapper\">\n        <div class=\"card settings database\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-database\" />\n                    Refresh Relation Data\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"form-row\">\n                    <div class=\"col-md-3 px-2\">\n                        <p>\n                            Scan New Albums.<br/>\n                            The data in <strong>Mopidy Itself is not affected.</strong>\n                        </p>\n                        <p class=\"d-flex flex-row justify-content-center\">\n                            <button class=\"btn btn-app btn-outline-warning disabled button-database\"\n                                @click=\"OnScanNewButtonClicked\"\n                                ref=\"ScanNewButton\">\n                                <i class=\"fa fa-search-plus\"></i> Scan New\n                            </button>\n                        </p>\n                    </div>\n                    <div class=\"col-md-3 px-2\">\n                        <p>\n                            Delete All and Refresh.<br/>\n                            The data in <strong>Mopidy Itself is not affected.</strong>\n                        </p>\n                        <p class=\"d-flex flex-row justify-content-center\">\n                            <button class=\"btn btn-app btn-outline-warning disabled button-database\"\n                                @click=\"OnCleanupButtonClicked\"\n                                ref=\"CleanupButton\">\n                                <i class=\"fa fa-refresh\"></i> Cleanup\n                            </button>\n                        </p>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <confirm-dialog\n        ref=\"ConfirmDialog\" />\n    <progress-dialog\n        ref=\"ProgressDialog\" />\n</div>",
                 components: {
                     'confirm-dialog': ConfirmDialog_3.default,
                     'progress-dialog': ProgressDialog_1.default,
@@ -6395,7 +6522,7 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
         };
         MopidyBlock = __decorate([
             vue_class_component_19.default({
-                template: "<div class=\"row\">\n    <div class=\"col-12\">\n        <div class=\"card\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-wifi\" />\n                    Set Your Mopidy\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"form-row\">\n                    <div class=\"col-auto\">\n                        <div class=\"input-group\">\n                            <div class=\"input-group-prepend\">\n                                <div class=\"input-group-text\">http://</div>\n                            </div>\n                            <input type=\"text\"\n                                id=\"server_address\"\n                                maxlength=\"255\"\n                                class=\"form-control address\"\n                                placeholder=\"Server Address\"\n                                autocomplete=\"off\"\n                                ref=\"ServerAddressInput\"\n                                @input=\"OnServerAddressInput\" />\n                            <div class=\"input-group-prepend\">\n                                <div class=\"input-group-text\">:</div>\n                            </div>\n                            <input type=\"number\"\n                                maxlength=\"5\"\n                                class=\"form-control port\"\n                                placeholder=\"Port\"\n                                autocomplete=\"off\"\n                                ref=\"ServerPortInput\"\n                                @input=\"OnServerPortInput\" />\n                            <div class=\"input-group-append\">\n                                <div class=\"input-group-text\">/mopidy/</div>\n                            </div>\n                            <span class=\"connection-icon\"\n                                ref=\"IconWrapper\">\n                                <i class=\"\"\n                                    ref=\"Icon\"/>\n                            </span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"row content-detail\">\n    <div class=\"col-12 card-wrapper\">\n        <div class=\"card settings setmopidy\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-wifi\" />\n                    Set Your Mopidy\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"form-row\">\n                    <div class=\"col-auto\">\n                        <div class=\"input-group\">\n                            <div class=\"input-group-prepend\">\n                                <div class=\"input-group-text\">http://</div>\n                            </div>\n                            <input type=\"text\"\n                                id=\"server_address\"\n                                maxlength=\"255\"\n                                class=\"form-control address\"\n                                placeholder=\"Server Address\"\n                                autocomplete=\"off\"\n                                ref=\"ServerAddressInput\"\n                                @input=\"OnServerAddressInput\" />\n                            <div class=\"input-group-prepend\">\n                                <div class=\"input-group-text\">:</div>\n                            </div>\n                            <input type=\"number\"\n                                maxlength=\"5\"\n                                class=\"form-control port\"\n                                placeholder=\"Port\"\n                                autocomplete=\"off\"\n                                ref=\"ServerPortInput\"\n                                @input=\"OnServerPortInput\" />\n                            <div class=\"input-group-append\">\n                                <div class=\"input-group-text\">/mopidy/</div>\n                            </div>\n                            <span class=\"connection-icon\"\n                                ref=\"IconWrapper\">\n                                <i class=\"\"\n                                    ref=\"Icon\"/>\n                            </span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], MopidyBlock);
         return MopidyBlock;
@@ -6476,7 +6603,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
         };
         ScanProgressBlock = __decorate([
             vue_class_component_20.default({
-                template: "<div class=\"row\">\n    <div class=\"col-12\">\n        <div class=\"card\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-rocket\" />\n                    Album Scan Progress\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"row\">\n                    <div class=\"col-auto\">\n                        <p>\n                            Mopidy.Finder Backend is always Scanning Album-Images and belonging Tracks.<br/>\n                            This action makes the operation response faster.\n                        </p>\n                        <div class=\"progress\">\n                            <div class=\"progress-bar bg-success progress-bar-striped\"\n                                role=\"progressbar\"\n                                aria-valuenow=\"0\"\n                                aria-valuemin=\"0\"\n                                aria-valuemax=\"100\"\n                                ref=\"AlbumScanProgressBar\">\n                            </div>\n                        </div>\n                        <p>\n                            Total: {{ totalAlbumCount }} Albums.<br/>\n                            Scaned: {{ scanedAlbumCount }} Albums competed.<br/>\n                        </p>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"row content-detail\">\n    <div class=\"col-12  card-wrapper\">\n        <div class=\"card settings scanprogress\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-rocket\" />\n                    Album Scan Progress\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"row\">\n                    <div class=\"col-auto\">\n                        <p>\n                            Mopidy.Finder Backend is always Scanning Album-Images and belonging Tracks.<br/>\n                            This action makes the operation response faster.\n                        </p>\n                        <div class=\"progress\">\n                            <div class=\"progress-bar bg-success progress-bar-striped\"\n                                role=\"progressbar\"\n                                aria-valuenow=\"0\"\n                                aria-valuemin=\"0\"\n                                aria-valuemax=\"100\"\n                                ref=\"AlbumScanProgressBar\">\n                            </div>\n                        </div>\n                        <p>\n                            Total: {{ totalAlbumCount }} Albums.<br/>\n                            Scaned: {{ scanedAlbumCount }} Albums competed.<br/>\n                        </p>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], ScanProgressBlock);
         return ScanProgressBlock;
@@ -7648,6 +7775,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                         Detail: args.ContentDetail
                     };
                     _this._finder.ShowContentDetail(detailArgs);
+                    _this._headerBar.SetDetail(detailArgs);
                 }
             });
             this._playlists.$on(IContentDetail_14.ContentDetailEvents.Swiped, function (args) {
@@ -7662,6 +7790,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                         Detail: args.ContentDetail
                     };
                     _this._playlists.ShowContentDetail(detailArgs);
+                    _this._headerBar.SetDetail(detailArgs);
                 }
             });
             this._settings.$on(IContentDetail_14.ContentDetailEvents.Swiped, function (args) {
@@ -7676,6 +7805,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                         Detail: args.ContentDetail
                     };
                     _this._settings.ShowContentDetail(detailArgs);
+                    _this._headerBar.SetDetail(detailArgs);
                 }
             });
         }
@@ -7791,12 +7921,15 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
         }
         NavigationController.prototype.InitialNavigation = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var isConnectable, updateProgress, isDbUpdating, content, existsData;
+                var updateProgress, isDbUpdating, content, existsData;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0: return [4 /*yield*/, this._store.TryConnect()];
+                        case 0: 
+                        // 個別にawaitした方が、複数promise配列をawait Promise.all するより早い。
+                        return [4 /*yield*/, this._store.TryConnect()];
                         case 1:
-                            isConnectable = _a.sent();
+                            // 個別にawaitした方が、複数promise配列をawait Promise.all するより早い。
+                            _a.sent();
                             return [4 /*yield*/, this._store.GetDbUpdateProgress()];
                         case 2:
                             updateProgress = _a.sent();
@@ -7829,13 +7962,14 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             });
         };
         NavigationController.prototype.AdjustScreen = function () {
+            Dump_8.default.Log('viewport = ' + this._viewport.current());
             // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
-            if (this._viewport.is('<=sm')) {
-                Dump_8.default.Log('viewport is <=sm');
+            if (this._viewport.is('<=md')) {
+                Dump_8.default.Log('viewport is <=md');
                 this._content.ContentToFullscreen();
             }
             else {
-                Dump_8.default.Log('viewport is >sm');
+                Dump_8.default.Log('viewport is >md');
                 this._content.ContentToColumn();
             }
             // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
@@ -7867,13 +8001,19 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             // https://gist.github.com/sayaka-nonsta/d68d4afc7b08d52971f2d477adab5e1d
             // フルスクリーン要求
             // https://developers.google.com/web/fundamentals/native-hardware/fullscreen/
-            var ua = navigator.userAgent;
-            var doc = window.document;
-            var docEl = doc.documentElement;
-            var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-            if (/Android/.test(ua)) {
+            var doc = (window)
+                ? window.document
+                : null;
+            var docEl = (doc)
+                ? doc.documentElement
+                : null;
+            var requestFullScreen = (docEl)
+                ? docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen
+                : null;
+            if (this._store.Entity.IsAndroid) {
                 try {
-                    requestFullScreen.call(docEl);
+                    if (requestFullScreen)
+                        requestFullScreen.call(docEl);
                 }
                 catch (ex) {
                     Dump_8.default.Error('Fullscreen Request Failed.', ex);

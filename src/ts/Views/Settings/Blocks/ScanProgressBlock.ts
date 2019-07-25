@@ -8,9 +8,9 @@ import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection 
 import { SwipeEvents } from '../../Events/HammerEvents';
 
 @Component({
-    template: `<div class="row">
-    <div class="col-12">
-        <div class="card">
+    template: `<div class="row content-detail">
+    <div class="col-12  card-wrapper">
+        <div class="card settings scanprogress">
             <div class="card-header with-border bg-warning">
                 <h3 class="card-title">
                     <i class="fa fa-rocket" />
