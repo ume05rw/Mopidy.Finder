@@ -13,7 +13,6 @@ export default class Dump {
             console.log(Dump.GetDumpString(value)); // eslint-disable-line
     }
     public static Error(message: string, value?: any): void {
-        const dumpString = Dump.GetDumpString(value);
         const time = Dump.GetTimestamp();
         console.error(`[${time.TimeStamp}]:: ` + message); // eslint-disable-line
         if (value)
@@ -22,13 +21,15 @@ export default class Dump {
 
     private static GetDumpString(value: any): string {
         const type = typeof value;
+
         return (type === 'object' || type === 'function' || type === 'symbol')
             ? JSON.stringify(value, null, 4)
             : ('' + value);
     }
 
-    private static GetTimestamp(): { Time: Date, TimeStamp: string } {
+    private static GetTimestamp(): { Time: Date; TimeStamp: string } {
         const now = new Date();
+
         return {
             Time: now,
             TimeStamp: `${('0' + now.getHours()).slice(-2)}:${('0' + now.getMinutes()).slice(-2)}:${('0' + now.getSeconds()).slice(-2)}.${('000' + now.getMilliseconds()).substr(-3)}`

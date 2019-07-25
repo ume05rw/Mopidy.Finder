@@ -160,7 +160,7 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
         this.swipeDetector.get('swipe').set({
             direction: Libraries.Hammer.DIRECTION_HORIZONTAL
         });
-        this.swipeDetector.on(SwipeEvents.Left, () => {
+        this.swipeDetector.on(SwipeEvents.Left, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
                 ContentDetail: null,
@@ -169,7 +169,7 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
             this.$emit(ContentDetailEvents.Swiped, args);
         });
 
-        this.swipeDetector.on(SwipeEvents.Right, () => {
+        this.swipeDetector.on(SwipeEvents.Right, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
                 ContentDetail: ContentDetails.Playlists,
@@ -531,8 +531,8 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
 
             // 表示圏外だったエンティティを追加する。
             if (
-                enResult.all(e => e.Uri !== track.Uri)
-                && enRemoved.all(e => e.Uri !== track.Uri)
+                enResult.all((e): boolean => e.Uri !== track.Uri)
+                && enRemoved.all((e): boolean => e.Uri !== track.Uri)
             ) {
                 result.push(track);
             }

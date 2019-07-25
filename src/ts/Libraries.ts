@@ -67,19 +67,19 @@ export default class Libraries {
     public static readonly $ = Libraries.jQuery;
 
     public static readonly JQueryEventBinds: {
-        On: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => void,
-        Off: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => void,
-        OffAll: (element: HTMLElement | Vue, eventName: string) => void
+        On: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => void;
+        Off: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => void;
+        OffAll: (element: HTMLElement | Vue, eventName: string) => void;
     } = {
-        On: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => {
+        On: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void): void => {
             const elem = Libraries.GetElement(element);
             Libraries.$(elem).on(eventName, handler);
         },
-        Off: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void) => {
+        Off: (element: HTMLElement | Vue, eventName: string, handler: (ev: any) => void): void => {
             const elem = Libraries.GetElement(element);
             Libraries.$(elem).off(eventName, handler);
         },
-        OffAll: (element: HTMLElement | Vue, eventName: string) => {
+        OffAll: (element: HTMLElement | Vue, eventName: string): void => {
             const elem = Libraries.GetElement(element);
             Libraries.$(elem).off(eventName);
         }
@@ -197,11 +197,11 @@ export default class Libraries {
      * 型定義が冗長なのはなんとかならんのか
      */
     public static readonly ShowToast: {
-        Success: (message: string) => void,
-        Info: (message: string) => void,
-        Question: (message: string) => void,
-        Warning: (message: string) => void,
-        Error: (message: string) => void
+        Success: (message: string) => void;
+        Info: (message: string) => void;
+        Question: (message: string) => void;
+        Warning: (message: string) => void;
+        Error: (message: string) => void;
     } = {
         Success: (message: string): void => Libraries.InnerShowToast('success', message),
         Info: (message: string): void => Libraries.InnerShowToast('info', message),
@@ -211,8 +211,8 @@ export default class Libraries {
     }
 
     public static readonly Modal: {
-        Show: (arg: HTMLElement | Vue) => void,
-        Hide: (arg: HTMLElement | Vue) => void
+        Show: (arg: HTMLElement | Vue) => void;
+        Hide: (arg: HTMLElement | Vue) => void;
     } = {
         Show: (arg: HTMLElement | Vue): void => {
             const elem = Libraries.GetElement(arg);

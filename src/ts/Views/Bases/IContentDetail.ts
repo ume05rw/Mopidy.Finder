@@ -12,8 +12,8 @@ export enum ContentDetails {
 }
 
 export interface IContentDetailArgs {
-    Content: Contents,
-    Detail: ContentDetails
+    Content: Contents;
+    Detail: ContentDetails;
 }
 
 export default interface IContentDetail {
@@ -26,8 +26,6 @@ export default interface IContentDetail {
     SlideInLeft(): Promise<boolean>;
     SlideOutRight(): Promise<boolean>;
     SlideOutLeft(): Promise<boolean>;
-    //Show(): void;
-    //Hide(): void;
 }
 
 export enum SwipeDirection {
@@ -35,12 +33,12 @@ export enum SwipeDirection {
     Right,
     Up,
     Down
-};
+}
 
 export interface IContentSwipeArgs {
     Direction: SwipeDirection;
     Content: Contents;
-    ContentDetail: ContentDetails
+    ContentDetail: ContentDetails;
 }
 
 export const ContentDetailEvents = {

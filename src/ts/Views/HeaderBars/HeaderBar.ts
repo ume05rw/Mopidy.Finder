@@ -164,10 +164,10 @@ export default class HeaderBar extends ViewBase {
 
         this.jqMainManuButton = Libraries.$(this.MainMenuButton);
         this.mainMenuButton = new Libraries.AdminLte.PushMenu(this.jqMainManuButton);
-        this.jqMainManuButton.on(PushMenuEvents.Shown, () => {
+        this.jqMainManuButton.on(PushMenuEvents.Shown, (): void => {
             this.$emit(HeaderBarEvents.SideBarShown);
         });
-        this.jqMainManuButton.on(PushMenuEvents.Collapsed, () => {
+        this.jqMainManuButton.on(PushMenuEvents.Collapsed, (): void => {
             this.$emit(HeaderBarEvents.SideBarCollapsed);
         });
 

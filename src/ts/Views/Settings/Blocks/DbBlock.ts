@@ -95,7 +95,7 @@ export default class DbBlock extends ContentDetailBase {
         this.swipeDetector.get('swipe').set({
             direction: Libraries.Hammer.DIRECTION_HORIZONTAL
         });
-        this.swipeDetector.on(SwipeEvents.Left, () => {
+        this.swipeDetector.on(SwipeEvents.Left, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Settings,
                 ContentDetail: ContentDetails.ScanProgress,
@@ -104,7 +104,7 @@ export default class DbBlock extends ContentDetailBase {
             this.$emit(ContentDetailEvents.Swiped, args);
         });
 
-        this.swipeDetector.on(SwipeEvents.Right, () => {
+        this.swipeDetector.on(SwipeEvents.Right, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Settings,
                 ContentDetail: ContentDetails.SetMopidy,
@@ -154,6 +154,7 @@ export default class DbBlock extends ContentDetailBase {
     public async InitialScan(): Promise<boolean> {
         if (this.entity.IsMopidyConnectable !== true) {
             Libraries.ShowToast.Error('Mopidy Not Found...');
+
             return;
         }
 
@@ -179,6 +180,7 @@ export default class DbBlock extends ContentDetailBase {
     private async OnScanNewButtonClicked(): Promise<boolean> {
         if (this.entity.IsMopidyConnectable !== true) {
             Libraries.ShowToast.Error('Mopidy Not Found...');
+
             return;
         }
 
@@ -222,6 +224,7 @@ export default class DbBlock extends ContentDetailBase {
     private async OnCleanupButtonClicked(): Promise<boolean> {
         if (this.entity.IsMopidyConnectable !== true) {
             Libraries.ShowToast.Error('Mopidy Not Found...');
+
             return;
         }
 

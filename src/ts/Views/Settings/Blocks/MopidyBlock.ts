@@ -77,7 +77,7 @@ export default class MopidyBlock extends ContentDetailBase {
     private store: SettingsStore;
     private entity: SettingsEntity;
     private swipeDetector: HammerManager;
-    private connectionClasses: { True: IIconClasses, False: IIconClasses } = {
+    private connectionClasses: { True: IIconClasses; False: IIconClasses } = {
         True: {
             Icon: 'fa fa-link',
             Wrapper: 'connection-icon connectable'
@@ -109,7 +109,7 @@ export default class MopidyBlock extends ContentDetailBase {
         this.swipeDetector.get('swipe').set({
             direction: Libraries.Hammer.DIRECTION_HORIZONTAL
         });
-        this.swipeDetector.on(SwipeEvents.Left, () => {
+        this.swipeDetector.on(SwipeEvents.Left, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Settings,
                 ContentDetail: ContentDetails.Database,
@@ -118,7 +118,7 @@ export default class MopidyBlock extends ContentDetailBase {
             this.$emit(ContentDetailEvents.Swiped, args);
         });
 
-        this.swipeDetector.on(SwipeEvents.Right, () => {
+        this.swipeDetector.on(SwipeEvents.Right, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Settings,
                 ContentDetail: null,
@@ -128,8 +128,7 @@ export default class MopidyBlock extends ContentDetailBase {
         });
 
         this.Update = this.Update.bind(this);
-        this.lazyUpdater = Delay.DelayedOnce(() => {
-            console.log('lazyUpdater Run.');
+        this.lazyUpdater = Delay.DelayedOnce((): void => {
             this.Update();
         }, 2000);
 
@@ -230,9 +229,6 @@ export default class MopidyBlock extends ContentDetailBase {
     }
 
     private SetConnectionIcon(): void {
-        const wrapperClasses = this.IconWrapper.classList;
-        const iconClasses = this.Icon.classList;
-
         if (this.entity.IsMopidyConnectable === true) {
             this.IconWrapper.className = this.connectionClasses.True.Wrapper;
             this.Icon.className = this.connectionClasses.True.Icon;
@@ -241,6 +237,4 @@ export default class MopidyBlock extends ContentDetailBase {
             this.Icon.className = this.connectionClasses.False.Icon;
         }
     }
-
-
 }

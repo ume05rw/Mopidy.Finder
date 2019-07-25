@@ -93,7 +93,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
         this.swipeDetector.get('swipe').set({
             direction: Libraries.Hammer.DIRECTION_HORIZONTAL
         });
-        this.swipeDetector.on(SwipeEvents.Left, () => {
+        this.swipeDetector.on(SwipeEvents.Left, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
                 ContentDetail: null,
@@ -102,7 +102,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
             this.$emit(ContentDetailEvents.Swiped, args);
         });
 
-        this.swipeDetector.on(SwipeEvents.Right, () => {
+        this.swipeDetector.on(SwipeEvents.Right, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Finder,
                 ContentDetail: ContentDetails.Artists,
@@ -131,8 +131,8 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
         });
 
         await this.InitPlaylistList();
-
         Dump.Log('Finder.AlbumList.Initialize: End.');
+
         return true;
     }
 
@@ -167,7 +167,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     private async OnPlayOrdered(args: IPlayOrderedArgs): Promise<boolean> {
 
         const orderedAlbumTrack = Libraries.Enumerable.from(this.entities)
-            .where(e => 0 <= _.indexOf(e.Tracks, args.Track))
+            .where((e): boolean => 0 <= _.indexOf(e.Tracks, args.Track))
             .firstOrDefault();
 
         if (!orderedAlbumTrack)

@@ -169,7 +169,6 @@ define("Utils/Dump", ["require", "exports"], function (require, exports) {
                 console.log(Dump.GetDumpString(value)); // eslint-disable-line
         };
         Dump.Error = function (message, value) {
-            var dumpString = Dump.GetDumpString(value);
             var time = Dump.GetTimestamp();
             console.error("[" + time.TimeStamp + "]:: " + message); // eslint-disable-line
             if (value)
@@ -1118,7 +1117,7 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Utils/Dump", "Ut
         };
         SettingsStore.prototype.GetAlbumScanProgress = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var response;
+                var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.QueryGet('Settings/AlbumScanProgress')];
@@ -1126,10 +1125,11 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Utils/Dump", "Ut
                             response = _a.sent();
                             if (!response.Succeeded) {
                                 Dump_1.default.Error('SettingsStore.GetAlbumScanProgress: Unexpected Error.', response.Errors);
-                                return [2 /*return*/, {
-                                        TotalAlbumCount: -1,
-                                        ScannedAlbumCount: -1
-                                    }];
+                                result = {
+                                    TotalAlbumCount: -1,
+                                    ScannedAlbumCount: -1
+                                };
+                                return [2 /*return*/, result];
                             }
                             return [2 /*return*/, response.Result];
                     }
@@ -1168,22 +1168,22 @@ define("Models/Settings/SettingsStore", ["require", "exports", "Utils/Dump", "Ut
         };
         SettingsStore.prototype.GetDbUpdateProgress = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var a, response;
+                var response, result;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            a = 1;
-                            return [4 /*yield*/, this.QueryGet('Settings/UpdateProgress')];
+                        case 0: return [4 /*yield*/, this.QueryGet('Settings/UpdateProgress')];
                         case 1:
                             response = _a.sent();
                             if (!response.Succeeded) {
                                 Dump_1.default.Error('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
-                                return [2 /*return*/, {
-                                        IsRunning: false,
-                                        Succeeded: false,
-                                        Progress: 0,
-                                        Message: 'Unexpected Error'
-                                    }];
+                                result = {
+                                    UpdateType: 'None',
+                                    IsRunning: false,
+                                    Succeeded: false,
+                                    Progress: 0,
+                                    Message: 'Unexpected Error'
+                                };
+                                return [2 /*return*/, result];
                             }
                             return [2 /*return*/, response.Result];
                     }
@@ -1370,7 +1370,7 @@ define("Libraries", ["require", "exports", "jquery", "responsive-toolkit/dist/bo
     }());
     exports.default = Libraries;
 });
-define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function (require, exports, _, vue_2) {
+define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue", "Utils/Dump"], function (require, exports, _, vue_2, Dump_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ViewBase = /** @class */ (function (_super) {
@@ -1390,9 +1390,8 @@ define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function
                             try {
                                 view.Initialize();
                             }
-                            catch (e) {
-                                console.error('Initialize Error');
-                                console.error(e);
+                            catch (ex) {
+                                Dump_2.default.Error('Initialize Error', ex);
                             }
                         }
                     });
@@ -1408,7 +1407,7 @@ define("Views/Bases/ViewBase", ["require", "exports", "lodash", "vue"], function
     }(vue_2.default));
     exports.default = ViewBase;
 });
-define("Utils/Delay", ["require", "exports", "Utils/Exception", "Utils/Dump"], function (require, exports, Exception_5, Dump_2) {
+define("Utils/Delay", ["require", "exports", "Utils/Exception", "Utils/Dump"], function (require, exports, Exception_5, Dump_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var DelayedOnceExecuter = /** @class */ (function () {
@@ -1438,13 +1437,13 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception", "Utils/Dump"], f
                         if (DelayedOnceExecuter.DelayThreshold < elapsed) {
                             // Delay閾値より長い時間の間、一度も実行されていない。
                             // 無限ループの可能性がある。
-                            Dump_2.default.Warning('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
+                            Dump_3.default.Warning('＊＊＊無限ループの可能性があります＊＊＊', _this.Name + ": \u7D4C\u904E\u6642\u9593(msec) = " + elapsed);
                         }
                     }
                     if (DelayedOnceExecuter.SuppressThreshold < _this._suppressCount) {
                         // Suppress閾値より多くの回数分、実行が抑制されている。
                         // 呼び出し回数が多すぎる可能性がある。
-                        Dump_2.default.Warning('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
+                        Dump_3.default.Warning('＊＊＊呼び出し回数が多すぎます＊＊＊', _this.Name + ": \u6291\u5236\u56DE\u6570 = " + _this._suppressCount);
                     }
                 }, DelayedOnceExecuter.MonitorInterval);
             }
@@ -1503,7 +1502,7 @@ define("Utils/Delay", ["require", "exports", "Utils/Exception", "Utils/Dump"], f
                 this._callback(args);
             }
             catch (ex) {
-                Dump_2.default.Error('Callback FAILED!!', ex);
+                Dump_3.default.Error('Callback FAILED!!', ex);
             }
             if (this._timer) {
                 clearInterval(this._timer);
@@ -1570,16 +1569,6 @@ define("Views/Bases/TabBase", ["require", "exports", "Views/Bases/ViewBase"], fu
     }(ViewBase_1.default));
     exports.default = TabBase;
 });
-define("Views/Bases/IContent", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Contents;
-    (function (Contents) {
-        Contents["Finder"] = "Finder";
-        Contents["Playlists"] = "Playlists";
-        Contents["Settings"] = "Settings";
-    })(Contents = exports.Contents || (exports.Contents = {}));
-});
 define("Views/Bases/IContentDetail", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -1601,10 +1590,19 @@ define("Views/Bases/IContentDetail", ["require", "exports"], function (require, 
         SwipeDirection[SwipeDirection["Up"] = 2] = "Up";
         SwipeDirection[SwipeDirection["Down"] = 3] = "Down";
     })(SwipeDirection = exports.SwipeDirection || (exports.SwipeDirection = {}));
-    ;
     exports.ContentDetailEvents = {
         Swiped: 'Swiped'
     };
+});
+define("Views/Bases/IContent", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var Contents;
+    (function (Contents) {
+        Contents["Finder"] = "Finder";
+        Contents["Playlists"] = "Playlists";
+        Contents["Settings"] = "Settings";
+    })(Contents = exports.Contents || (exports.Contents = {}));
 });
 define("Views/Bases/ContentBase", ["require", "exports", "Views/Bases/TabBase", "Views/Bases/IContentDetail", "lodash"], function (require, exports, TabBase_1, IContentDetail_1, _) {
     "use strict";
@@ -1768,7 +1766,7 @@ define("Models/Mopidies/ITrack", ["require", "exports"], function (require, expo
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Tracks/Track", ["require", "exports", "Utils/Dump", "Models/Albums/Album", "Models/Artists/Artist"], function (require, exports, Dump_3, Album_1, Artist_2) {
+define("Models/Tracks/Track", ["require", "exports", "Utils/Dump", "Models/Albums/Album", "Models/Artists/Artist"], function (require, exports, Dump_4, Album_1, Artist_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Track = /** @class */ (function () {
@@ -1840,9 +1838,9 @@ define("Models/Tracks/Track", ["require", "exports", "Utils/Dump", "Models/Album
         };
         Track.EnsureTrackByMopidy = function (entity, mopidyTrack) {
             if (!entity)
-                Dump_3.default.Error('argument entity null');
+                Dump_4.default.Error('argument entity null');
             if (!mopidyTrack)
-                Dump_3.default.Error('argument mopidyTrack null');
+                Dump_4.default.Error('argument mopidyTrack null');
             entity.Id = null;
             entity.Name = mopidyTrack.name || null;
             entity.LowerName = (mopidyTrack.name)
@@ -2113,7 +2111,7 @@ define("Models/Mopidies/ITlTrack", ["require", "exports"], function (require, ex
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
-define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_2, Dump_4, JsonRpcQueryableBase_2, Track_3) {
+define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Tracks/Track"], function (require, exports, Libraries_2, Dump_5, JsonRpcQueryableBase_2, Track_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var TrackStore = /** @class */ (function (_super) {
@@ -2146,7 +2144,7 @@ define("Models/Tracks/TrackStore", ["require", "exports", "Libraries", "Utils/Du
                                     continue;
                                 if ((!track.Name || !track.Length)
                                     && (!pairedTrackArray || pairedTrackArray.length <= 0)) {
-                                    Dump_4.default.Error('TrackStore.EnsureTracks: Track Details Not Found', { track: track, pairedTrackArray: pairedTrackArray });
+                                    Dump_5.default.Error('TrackStore.EnsureTracks: Track Details Not Found', { track: track, pairedTrackArray: pairedTrackArray });
                                     continue;
                                 }
                                 mpTrack = pairList[uri][0];
@@ -2428,7 +2426,7 @@ define("Models/Playlists/PlaylistStore", ["require", "exports", "Libraries", "Ut
     }(JsonRpcQueryableBase_3.default));
     exports.default = PlaylistStore;
 });
-define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function (require, exports, _, Dump_5) {
+define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function (require, exports, _, Dump_6) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Speed;
@@ -2676,7 +2674,7 @@ define("Utils/Animate", ["require", "exports", "lodash", "Utils/Dump"], function
                     this._resolver(result);
                 }
                 catch (ex) {
-                    Dump_5.default.Error('Animated.Resolve: Unexpected Error on Resolve', ex);
+                    Dump_6.default.Error('Animated.Resolve: Unexpected Error on Resolve', ex);
                 }
             }
             this._resolver = null;
@@ -3459,14 +3457,15 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
             this.$emit(exports.SelectionAlbumTracksEvents.PlayOrdered, orderedArgs);
         };
         SelectionAlbumTracks.prototype.OnRowPlaylistClicked = function (ev) {
-            console.log('row playlist selected');
             var elem = ev.currentTarget;
             var uri = elem.getAttribute('data-uri');
             var playlist = Libraries_6.default.Enumerable.from(this.innerPlaylists)
                 .firstOrDefault(function (e) { return e.Uri === uri; });
             if (!playlist)
                 Exception_10.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
-            var trackIdString = Libraries_6.default.$(elem).parents('tr.track-row').attr('data-trackid');
+            var trackIdString = Libraries_6.default.$(elem)
+                .parents('tr.track-row')
+                .attr('data-trackid');
             if (!trackIdString || trackIdString === '')
                 Exception_10.default.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
             var trackId = parseInt(trackIdString, 10);
@@ -3498,7 +3497,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Dump", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Dump_6, Exception_11, IContent_1, IContentDetail_2, SelectionListBase_1, HammerEvents_1, Filterbox_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Dump", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Dump_7, Exception_11, IContent_1, IContentDetail_2, SelectionListBase_1, HammerEvents_1, Filterbox_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AlbumListEvents = {
@@ -3539,7 +3538,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Dump_6.default.Log('Finder.AlbumList.Initialize: Start.');
+                            Dump_7.default.Log('Finder.AlbumList.Initialize: Start.');
                             _super.prototype.Initialize.call(this);
                             this.swipeDetector = new Libraries_7.default.Hammer(this.$el);
                             this.swipeDetector.get('swipe').set({
@@ -3586,7 +3585,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             return [4 /*yield*/, this.InitPlaylistList()];
                         case 1:
                             _a.sent();
-                            Dump_6.default.Log('Finder.AlbumList.Initialize: End.');
+                            Dump_7.default.Log('Finder.AlbumList.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -4091,7 +4090,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
     }(SelectionListBase_3.default));
     exports.default = GenreList;
 });
-define("Views/Finders/Finder", ["require", "exports", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/IContentDetail", "Views/Bases/ContentBase", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList", "lodash"], function (require, exports, vue_class_component_9, Delay_3, Exception_12, IContentDetail_5, ContentBase_1, AlbumList_1, ArtistList_1, GenreList_1, _) {
+define("Views/Finders/Finder", ["require", "exports", "lodash", "vue-class-component", "Utils/Delay", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Finders/Lists/Albums/AlbumList", "Views/Finders/Lists/ArtistList", "Views/Finders/Lists/GenreList"], function (require, exports, _, vue_class_component_9, Delay_3, Exception_12, ContentBase_1, IContentDetail_5, AlbumList_1, ArtistList_1, GenreList_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FinderEvents = _.extend({}, AlbumList_1.AlbumListEvents);
@@ -5838,7 +5837,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
     }(SelectionListBase_6.default));
     exports.default = TrackList;
 });
-define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentBase", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList", "Utils/Delay", "Views/Bases/IContentDetail", "Utils/Exception"], function (require, exports, vue_class_component_16, Libraries_16, ContentBase_2, PlaylistList_2, TrackList_2, Delay_7, IContentDetail_9, Exception_14) {
+define("Views/Playlists/Playlists", ["require", "exports", "vue-class-component", "Libraries", "Utils/Delay", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Playlists/Lists/Playlists/PlaylistList", "Views/Playlists/Lists/Tracks/TrackList"], function (require, exports, vue_class_component_16, Libraries_16, Delay_7, Exception_14, ContentBase_2, IContentDetail_9, PlaylistList_2, TrackList_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistsEvents = {
@@ -6423,7 +6422,6 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
                     });
                     this.Update = this.Update.bind(this);
                     this.lazyUpdater = Delay_8.default.DelayedOnce(function () {
-                        console.log('lazyUpdater Run.');
                         _this.Update();
                     }, 2000);
                     return [2 /*return*/, true];
@@ -6521,8 +6519,6 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
             return result;
         };
         MopidyBlock.prototype.SetConnectionIcon = function () {
-            var wrapperClasses = this.IconWrapper.classList;
-            var iconClasses = this.Icon.classList;
             if (this.entity.IsMopidyConnectable === true) {
                 this.IconWrapper.className = this.connectionClasses.True.Wrapper;
                 this.Icon.className = this.connectionClasses.True.Icon;
@@ -6622,7 +6618,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
     }(ContentDetailBase_4.default));
     exports.default = ScanProgressBlock;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock", "Libraries"], function (require, exports, vue_class_component_21, SettingsStore_2, Exception_15, ContentBase_3, IContentDetail_13, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1, Libraries_21) {
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, Libraries_21, SettingsStore_2, Exception_15, ContentBase_3, IContentDetail_13, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SettingsEvents = {
@@ -6756,7 +6752,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ContentBase_3.default));
     exports.default = Settings;
 });
-define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_7, JsonRpcQueryableBase_4, Settings_2) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_8, JsonRpcQueryableBase_4, Settings_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -6920,7 +6916,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
         };
         Monitor.prototype.Update = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var resState, resTrack, tlTrack, resTs, resVol, resRandom, resRepeat, resConsume, isConsume, resSetConsume, resSingle, isSingle, resSetConsume, ex_1;
+                var resState, resTrack, tlTrack, resTs, resVol, resRandom, resRepeat, resConsume, isConsume, resSingle, isSingle, ex_1;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -7000,7 +6996,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
                                     value: false
                                 })];
                         case 15:
-                            resSetConsume = _a.sent();
+                            _a.sent();
                             _a.label = 16;
                         case 16: return [4 /*yield*/, this.JsonRpcRequest(Monitor.Methods.GetSingle)];
                         case 17:
@@ -7011,14 +7007,14 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
                                     value: false
                                 })];
                         case 18:
-                            resSetConsume = _a.sent();
+                            _a.sent();
                             _a.label = 19;
                         case 19:
                             this.DetectChanges();
                             return [3 /*break*/, 21];
                         case 20:
                             ex_1 = _a.sent();
-                            Dump_7.default.Error('Polling Error', ex_1);
+                            Dump_8.default.Error('Polling Error', ex_1);
                             return [3 /*break*/, 21];
                         case 21:
                             this._nowOnPollingProsess = false;
@@ -7981,7 +7977,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
     }());
     exports.default = ContentController;
 });
-define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/SideBars/SideBar", "Utils/Dump"], function (require, exports, Libraries_24, SettingsStore_3, IContent_12, HeaderBar_3, SideBar_3, Dump_8) {
+define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/SideBars/SideBar", "Utils/Dump"], function (require, exports, Libraries_24, SettingsStore_3, IContent_12, HeaderBar_3, SideBar_3, Dump_9) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var NavigationController = /** @class */ (function () {
@@ -8066,23 +8062,23 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             });
         };
         NavigationController.prototype.AdjustScreen = function () {
-            Dump_8.default.Log('viewport = ' + this._viewport.current());
+            Dump_9.default.Log('viewport = ' + this._viewport.current());
             // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
             if (this._viewport.is('<=md')) {
-                Dump_8.default.Log('viewport is <=md');
+                Dump_9.default.Log('viewport is <=md');
                 this._content.ContentToFullscreen();
             }
             else {
-                Dump_8.default.Log('viewport is >md');
+                Dump_9.default.Log('viewport is >md');
                 this._content.ContentToColumn();
             }
             // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
             if (this._viewport.is('<=lg')) {
-                Dump_8.default.Log('viewport is <=lg');
+                Dump_9.default.Log('viewport is <=lg');
                 this._headerBar.SetSideBarClose();
             }
             else {
-                Dump_8.default.Log('viewport is >lg');
+                Dump_9.default.Log('viewport is >lg');
                 this._headerBar.SetSideBarOpen();
             }
             var rootClasses = this._rootView.$el.classList;
@@ -8120,7 +8116,7 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                         requestFullScreen.call(docEl);
                 }
                 catch (ex) {
-                    Dump_8.default.Error('Fullscreen Request Failed.', ex);
+                    Dump_9.default.Error('Fullscreen Request Failed.', ex);
                 }
             }
         };
@@ -8159,7 +8155,7 @@ define("Controllers/RootController", ["require", "exports", "Views/RootView", "C
     }());
     exports.default = RootController;
 });
-define("Main", ["require", "exports", "Libraries", "Controllers/RootController"], function (require, exports, Libraries_25, RootController_1) {
+define("Main", ["require", "exports", "Controllers/RootController", "Libraries"], function (require, exports, RootController_1, Libraries_25) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {

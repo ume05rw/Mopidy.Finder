@@ -66,7 +66,7 @@ export default class ScanProgressBlock extends ContentDetailBase {
         this.swipeDetector.get('swipe').set({
             direction: Libraries.Hammer.DIRECTION_HORIZONTAL
         });
-        this.swipeDetector.on(SwipeEvents.Left, () => {
+        this.swipeDetector.on(SwipeEvents.Left, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Settings,
                 ContentDetail: null,
@@ -75,7 +75,7 @@ export default class ScanProgressBlock extends ContentDetailBase {
             this.$emit(ContentDetailEvents.Swiped, args);
         });
 
-        this.swipeDetector.on(SwipeEvents.Right, () => {
+        this.swipeDetector.on(SwipeEvents.Right, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Settings,
                 ContentDetail: ContentDetails.Database,

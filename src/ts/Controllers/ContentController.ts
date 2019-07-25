@@ -1,7 +1,7 @@
 import { IUpdateProgress } from '../Models/Settings/SettingsStore';
 import Exception from '../Utils/Exception';
 import { Contents, default as IContent, IContentArgs } from '../Views/Bases/IContent';
-import { IContentDetailArgs, ContentDetails, ContentDetailEvents, IContentSwipeArgs, SwipeDirection } from '../Views/Bases/IContentDetail';
+import { ContentDetailEvents, IContentDetailArgs, IContentSwipeArgs, SwipeDirection } from '../Views/Bases/IContentDetail';
 import { TabEvents } from '../Views/Bases/TabBase';
 import { default as Finder, FinderEvents } from '../Views/Finders/Finder';
 import { default as HeaderBar, HeaderBarEvents } from '../Views/HeaderBars/HeaderBar';
@@ -9,7 +9,6 @@ import { default as Playlists, PlaylistsEvents } from '../Views/Playlists/Playli
 import RootView from '../Views/RootView';
 import { default as Settings, SettingsEvents } from '../Views/Settings/Settings';
 import { default as SideBar, ITabEventRecievedArgs } from '../Views/SideBars/SideBar';
-import Dump from '../Utils/Dump';
 
 export default class ContentController {
 
@@ -32,22 +31,22 @@ export default class ContentController {
         this._allContents.push(this._playlists);
         this._allContents.push(this._settings);
 
-        this._headerBar.$on(HeaderBarEvents.DetailOrdered, (args: IContentDetailArgs) => {
+        this._headerBar.$on(HeaderBarEvents.DetailOrdered, (args: IContentDetailArgs): void => {
             this.GetContent(args.Content).ShowContentDetail(args);
         });
 
-        this._finder.$on(FinderEvents.PlaylistUpdated, () => {
+        this._finder.$on(FinderEvents.PlaylistUpdated, (): void => {
             this._playlists.RefreshPlaylist();
         });
-        this._playlists.$on(PlaylistsEvents.PlaylistsUpdated, () => {
+        this._playlists.$on(PlaylistsEvents.PlaylistsUpdated, (): void => {
             this._finder.RefreshPlaylist();
         });
-        this._settings.$on(SettingsEvents.ServerFound, () => {
+        this._settings.$on(SettingsEvents.ServerFound, (): void => {
             this._finder.ForceRefresh();
             this._playlists.RefreshPlaylist();
         });
 
-        this._finder.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs) => {
+        this._finder.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs): void => {
             if (!this._isFullscreen)
                 return;
 
@@ -62,7 +61,7 @@ export default class ContentController {
                 this._headerBar.SetDetail(detailArgs);
             }
         });
-        this._playlists.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs) => {
+        this._playlists.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs): void => {
             if (!this._isFullscreen)
                 return;
 
@@ -77,7 +76,7 @@ export default class ContentController {
                 this._headerBar.SetDetail(detailArgs);
             }
         });
-        this._settings.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs) => {
+        this._settings.$on(ContentDetailEvents.Swiped, (args: IContentSwipeArgs): void => {
             if (!this._isFullscreen)
                 return;
 

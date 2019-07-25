@@ -1,6 +1,5 @@
-import Libraries from './Libraries';
-import RootView from './Views/RootView';
 import RootController from './Controllers/RootController';
+import Libraries from './Libraries';
 
 class Main {
 

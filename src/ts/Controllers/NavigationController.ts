@@ -32,14 +32,14 @@ export default class NavigationController {
             })
         );
 
-        this._headerBar.$on(HeaderBarEvents.SideBarShown, () => {
+        this._headerBar.$on(HeaderBarEvents.SideBarShown, (): void => {
             this._sideBar.OnShown();
         });
-        this._headerBar.$on(HeaderBarEvents.SideBarCollapsed, () => {
+        this._headerBar.$on(HeaderBarEvents.SideBarCollapsed, (): void => {
             this._sideBar.OnCollapsed();
         });
 
-        this._sideBar.$on(SideBarEvents.ContentOrdered, (args: IContentOrderedArgs) => {
+        this._sideBar.$on(SideBarEvents.ContentOrdered, (args: IContentOrderedArgs): void => {
             // カレント画面の移動に支障がある場合は移動しない。
             args.Permitted = this._content.CanLeave();
             if (!args.Permitted)
@@ -48,11 +48,11 @@ export default class NavigationController {
             this._content.SetCurrentContent(args.Content);
         });
         // Bootstrap-Tabイベントのプロキシ
-        this._sideBar.$on(SideBarEvents.TabEventRecieved, (args: ITabEventRecievedArgs) => {
+        this._sideBar.$on(SideBarEvents.TabEventRecieved, (args: ITabEventRecievedArgs): void => {
             this._content.EmitTabEvent(args);
         });
 
-        this._sideBar.$on(SideBarEvents.Operated, () => {
+        this._sideBar.$on(SideBarEvents.Operated, (): void => {
             if (this._viewport.is('<=lg'))
                 this._headerBar.SetSideBarClose();
         });

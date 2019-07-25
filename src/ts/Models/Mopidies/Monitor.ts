@@ -215,14 +215,14 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
             const resConsume = await this.JsonRpcRequest(Monitor.Methods.GetConsume);
             const isConsume = resConsume.result as boolean;
             if (isConsume) {
-                const resSetConsume = await this.JsonRpcRequest(Monitor.Methods.SetConsume, {
+                await this.JsonRpcRequest(Monitor.Methods.SetConsume, {
                     value: false
                 });
             }
             const resSingle = await this.JsonRpcRequest(Monitor.Methods.GetSingle);
             const isSingle = resSingle.result as boolean;
             if (isSingle) {
-                const resSetConsume = await this.JsonRpcRequest(Monitor.Methods.SetSingle, {
+                await this.JsonRpcRequest(Monitor.Methods.SetSingle, {
                     value: false
                 });
             }

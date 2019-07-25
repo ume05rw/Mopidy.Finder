@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import Vue from 'vue';
+import Dump from '../../Utils/Dump';
 
 export default abstract class ViewBase extends Vue {
 
@@ -18,9 +19,8 @@ export default abstract class ViewBase extends Vue {
             if (view instanceof ViewBase) {
                 try {
                     (view as ViewBase).Initialize();
-                } catch (e) {
-                    console.error('Initialize Error');
-                    console.error(e);
+                } catch (ex) {
+                    Dump.Error('Initialize Error', ex);
                 }
             }
         });

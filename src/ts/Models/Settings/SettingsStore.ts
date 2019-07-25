@@ -67,20 +67,20 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         const artistStore = new ArtistStore();
         const albumStore = new AlbumStore();
 
-        let existsGenres: boolean = false;
-        let existsArtists: boolean = false;
-        let existsAlbums: boolean = false;
+        let existsGenres = false;
+        let existsArtists = false;
+        let existsAlbums = false;
 
         const promises: Promise<any>[] = [];
-        promises.push(genreStore.Exists().then((res) => { existsGenres = res; }));
-        promises.push(artistStore.Exists().then((res) => { existsArtists = res; }));
-        promises.push(albumStore.Exists().then((res) => { existsAlbums = res; }));
+        promises.push(genreStore.Exists().then((res): void => { existsGenres = res; }));
+        promises.push(artistStore.Exists().then((res): void => { existsArtists = res; }));
+        promises.push(albumStore.Exists().then((res): void => { existsAlbums = res; }));
 
         // なぜか、Promise.all をawait した後で各bool値を比較しようとすると
         // "常にfalseになるぞ"警告が出る。
         // Promiseをまだきちんと理解してない...？
         return Promise.all(promises)
-            .then(() => {
+            .then((): boolean => {
                 return (
                     existsGenres === true
                     && existsArtists === true
@@ -95,10 +95,12 @@ export default class SettingsStore extends JsonRpcQueryableBase {
         if (!response.Succeeded) {
             Dump.Error('SettingsStore.GetAlbumScanProgress: Unexpected Error.', response.Errors);
 
-            return {
+            const result: IAlbumScanProgress = {
                 TotalAlbumCount: -1,
                 ScannedAlbumCount: -1
-            } as IAlbumScanProgress;
+            };
+
+            return result;
         }
 
         return response.Result as IAlbumScanProgress;
@@ -123,18 +125,19 @@ export default class SettingsStore extends JsonRpcQueryableBase {
     }
 
     public async GetDbUpdateProgress(): Promise<IUpdateProgress> {
-        const a = 1;
         const response = await this.QueryGet('Settings/UpdateProgress');
 
         if (!response.Succeeded) {
             Dump.Error('SettingsStore.GetDbUpdateProgress: Unexpected Error.', response.Errors);
-
-            return {
+            const result: IUpdateProgress = {
+                UpdateType: 'None',
                 IsRunning: false,
                 Succeeded: false,
                 Progress: 0,
                 Message: 'Unexpected Error'
-            } as IUpdateProgress;
+            };
+
+            return result;
         }
 
         return response.Result as IUpdateProgress;

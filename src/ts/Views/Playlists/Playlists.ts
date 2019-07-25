@@ -1,15 +1,13 @@
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
 import Playlist from '../../Models/Playlists/Playlist';
+import Delay from '../../Utils/Delay';
+import Exception from '../../Utils/Exception';
 import ContentBase from '../Bases/ContentBase';
+import { ContentDetails, default as IContentDetail, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
 import { ISelectionChangedArgs, ISelectionOrderedArgs } from '../Shared/SelectionItem';
 import PlaylistList from './Lists/Playlists/PlaylistList';
 import TrackList from './Lists/Tracks/TrackList';
-import Delay from '../../Utils/Delay';
-import { default as IContentDetail, ContentDetails, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
-import Exception from '../../Utils/Exception';
-import Dump from '../../Utils/Dump';
-import * as _ from 'lodash';
 
 export const PlaylistsEvents = {
     PlaylistsUpdated: 'PlaylistsUpdated'

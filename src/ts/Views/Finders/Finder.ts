@@ -1,16 +1,15 @@
+import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import Artist from '../../Models/Artists/Artist';
 import Genre from '../../Models/Genres/Genre';
 import Delay from '../../Utils/Delay';
 import Exception from '../../Utils/Exception';
-import { default as IContentDetail, ContentDetails, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
 import ContentBase from '../Bases/ContentBase';
+import { ContentDetails, default as IContentDetail, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
 import { ISelectionChangedArgs } from '../Shared/SelectionItem';
 import { AlbumListEvents, default as AlbumList } from './Lists/Albums/AlbumList';
 import ArtistList from './Lists/ArtistList';
 import GenreList from './Lists/GenreList';
-import Dump from '../../Utils/Dump';
-import * as _ from 'lodash';
 
 export const FinderEvents = _.extend({}, AlbumListEvents);
 

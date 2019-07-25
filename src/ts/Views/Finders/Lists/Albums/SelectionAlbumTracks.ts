@@ -16,7 +16,7 @@ export interface ICreatePlaylistOrderedArgs {
     AlbumTracks: AlbumTracks;
 }
 export interface IAddToPlaylistOrderedArgs {
-    Playlist: Playlist
+    Playlist: Playlist;
     Tracks: Track[];
 }
 
@@ -173,12 +173,12 @@ export default class SelectionAlbumTracks extends ViewBase {
         for (let i = 0; i < this.RowDropdownWrappers.length; i++) {
             const elem = this.RowDropdownWrappers[i];
             // トラックごとのプレイリストボタン操作で、SlimScrollDivをappend/removeする。
-            Libraries.JQueryEventBinds.On(elem, DropdownEvents.Show, (ev: Event) => {
+            Libraries.JQueryEventBinds.On(elem, DropdownEvents.Show, (ev: Event): void => {
                 const wrapper = ev.currentTarget as HTMLElement;
                 const outer = wrapper.querySelector('div.dropdown-menu') as HTMLDivElement;
                 outer.appendChild(this.rowDropdownContent);
             });
-            Libraries.JQueryEventBinds.On(elem, DropdownEvents.Hide, (ev: Event) => {
+            Libraries.JQueryEventBinds.On(elem, DropdownEvents.Hide, (ev: Event): void => {
                 // 行選択イベントよりHideイベントの方が遅いため、DomTreeを辿った
                 // トラックID取得には支障が無い。
                 //console.log('hide event handled.');
@@ -222,7 +222,7 @@ export default class SelectionAlbumTracks extends ViewBase {
     private OnHeaderPlaylistClicked(ev: MouseEvent): void {
         const uri = (ev.target as HTMLElement).getAttribute('data-uri');
         const playlist = Libraries.Enumerable.from(this.innerPlaylists)
-            .firstOrDefault(e => e.Uri === uri);
+            .firstOrDefault((e): boolean => e.Uri === uri);
 
         if (!playlist)
             Exception.Throw('SelectionAlbumTrack.OnHeaderPlaylistClicked: Uri not found.', uri);
@@ -255,23 +255,26 @@ export default class SelectionAlbumTracks extends ViewBase {
     }
 
     private OnRowPlaylistClicked(ev: MouseEvent): void {
-        console.log('row playlist selected');
         const elem = ev.currentTarget as HTMLElement;
 
         const uri = elem.getAttribute('data-uri');
         const playlist = Libraries.Enumerable.from(this.innerPlaylists)
-            .firstOrDefault(e => e.Uri === uri);
+            .firstOrDefault((e): boolean => e.Uri === uri);
 
         if (!playlist)
             Exception.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Uri not found.', uri);
 
-        const trackIdString = Libraries.$(elem).parents('tr.track-row').attr('data-trackid');
+        const trackIdString = Libraries.$(elem)
+            .parents('tr.track-row')
+            .attr('data-trackid');
+
         if (!trackIdString || trackIdString === '')
             Exception.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track-Id not found.');
 
         const trackId = parseInt(trackIdString, 10)
         const track = Libraries.Enumerable.from(this.entity.Tracks)
-            .firstOrDefault(e => e.Id === trackId);
+            .firstOrDefault((e): boolean => e.Id === trackId);
+
         if (!track)
             Exception.Throw('SelectionAlbumTrack.OnRowPlaylistClicked: Track not found.', uri);
 

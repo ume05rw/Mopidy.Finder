@@ -1,14 +1,13 @@
 import Component from 'vue-class-component';
+import Libraries from '../../Libraries';
 import { default as SettingsEntity } from '../../Models/Settings/Settings';
 import { default as SettingsStore, IUpdateProgress } from '../../Models/Settings/SettingsStore';
-import Dump from '../../Utils/Dump';
 import Exception from '../../Utils/Exception';
 import ContentBase from '../Bases/ContentBase';
 import { ContentDetails, default as IContentDetail, IContentDetailArgs, IContentSwipeArgs } from '../Bases/IContentDetail';
 import DbBlock from './Blocks/DbBlock';
 import MopidyBlock from './Blocks/MopidyBlock';
 import ScanProgressBlock from './Blocks/ScanProgressBlock';
-import Libraries from '../../Libraries';
 
 export const SettingsEvents = {
     ServerFound: 'ServerFound'

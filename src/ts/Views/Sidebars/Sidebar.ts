@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import Component from 'vue-class-component';
 import Libraries from '../../Libraries';
 import Exception from '../../Utils/Exception';
@@ -128,16 +127,16 @@ export default class SideBar extends ViewBase {
             this.NavigationSettings
         ]);
 
-        this.navigationAnchors.on(BsTabEvents.Show, (args: Event) => {
+        this.navigationAnchors.on(BsTabEvents.Show, (args: Event): void => {
             this.EmitTabEvent(TabEvents.Show, args);
         });
-        this.navigationAnchors.on(BsTabEvents.Shown, (args: Event) => {
+        this.navigationAnchors.on(BsTabEvents.Shown, (args: Event): void => {
             this.EmitTabEvent(TabEvents.Shown, args);
         });
-        this.navigationAnchors.on(BsTabEvents.Hide, (args: Event) => {
+        this.navigationAnchors.on(BsTabEvents.Hide, (args: Event): void => {
             this.EmitTabEvent(TabEvents.Hide, args);
         });
-        this.navigationAnchors.on(BsTabEvents.Hidden, (args: Event) => {
+        this.navigationAnchors.on(BsTabEvents.Hidden, (args: Event): void => {
             this.EmitTabEvent(TabEvents.Hidden, args);
         });
 
