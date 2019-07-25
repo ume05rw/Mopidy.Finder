@@ -96,13 +96,13 @@ namespace MopidyFinder
                 .AddTransient<TrackStore, TrackStore>()
                 .AddTransient<SettingsStore, SettingsStore>()
                 .AddTransient<JobStore, JobStore>()
+                .AddTransient<DbEnsurer, DbEnsurer>()
                 .AddSingleton<Query, Query>()
                 .AddSingleton<Playback, Playback>()
                 .AddSingleton<Library, Library>()
                 .AddSingleton<Tracklist, Tracklist>()
                 .AddSingleton<DbMaintainer, DbMaintainer>();
         }
-
 
         private DbMaintainer _dbMaintainer;
 
@@ -114,7 +114,9 @@ namespace MopidyFinder
         )
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            using (var dbEnsurer = serviceScope.ServiceProvider.GetService<DbEnsurer>())
             {
+                dbEnsurer.Ensure();
                 this._dbMaintainer = serviceScope.ServiceProvider.GetService<DbMaintainer>();
             }
 
