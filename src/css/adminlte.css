@@ -231,7 +231,7 @@ body,
   z-index: 949;
 }
 
-@media (max-width: 991.98px) {
+@media (max-width: 929.98px) {
   .sidebar-open #sidebar-overlay {
     display: block;
   }

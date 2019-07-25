@@ -320,7 +320,7 @@ small,
     max-width: 75%;
   }
 }
-@media (min-width: 992px) {
+@media (min-width: 930px) {
   .col-lg {
     -webkit-flex-basis: 0;
         -ms-flex-preferred-size: 0;
@@ -1471,7 +1471,7 @@ button.close {
   }
 }
 
-@media (min-width: 992px) {
+@media (min-width: 930px) {
   .d-lg-none {
     display: none !important;
   }
