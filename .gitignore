@@ -252,6 +252,8 @@ node_modules/
 # ts compiled
 src/ts/**/*.js
 src/ts/**/*.js.map
+test/**/*.test.jp
+test/**/*.test.jp.map
 
 # assets
 dist/content/
