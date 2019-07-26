@@ -15,6 +15,7 @@ import { default as SelectionListBase, SelectionEvents } from '../../../Bases/Se
 import { SwipeEvents } from '../../../Events/HammerEvents';
 import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import { default as SelectionAlbumTracks, IAddToPlaylistOrderedArgs, ICreatePlaylistOrderedArgs, IPlayOrderedArgs } from './SelectionAlbumTracks';
+import Player from '../../../../Models/Mopidies/Player';
 
 export const AlbumListEvents = {
     PlaylistUpdated: 'PlaylistUpdated'
@@ -70,7 +71,8 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     protected readonly linkId: string = 'nav-albumtracks';
     protected store: AlbumTracksStore = new AlbumTracksStore();
     protected entities: AlbumTracks[] = [];
-
+    
+    private player: Player = null;
     private isEntitiesRefreshed: boolean = false;
     private genreIds: number[] = [];
     private artistIds: number[] = [];
@@ -87,6 +89,7 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     public async Initialize(): Promise<boolean> {
         super.Initialize();
 
+        this.player = Player.Instance;
         this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
         this.swipeDetector.get('swipe').set({
             direction: Libraries.Hammer.DIRECTION_HORIZONTAL
@@ -162,7 +165,6 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     }
 
     private async OnPlayOrdered(args: IPlayOrderedArgs): Promise<boolean> {
-
         const orderedAlbumTrack = Libraries.Enumerable.from(this.entities)
             .where((e): boolean => 0 <= _.indexOf(e.Tracks, args.Track))
             .firstOrDefault();
@@ -170,21 +172,16 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
         if (!orderedAlbumTrack)
             Exception.Throw('AlbumTracks Not Found.', { args: args, entities: this.entities });
 
-        let exists = false;
         _.each(this.entities, (entity): void => {
             if (this.isEntitiesRefreshed !== true && entity == orderedAlbumTrack)
                 return;
 
             _.each(entity.Tracks, (track): void => {
                 if (track.TlId !== null && track.TlId !== undefined) {
-                    exists = true;
                     track.TlId = null;
                 }
             });
         });
-
-        if (this.isEntitiesRefreshed || exists !== false)
-            await this.store.ClearList();
 
         this.isEntitiesRefreshed = false;
 
@@ -196,35 +193,21 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
         if (!track)
             Exception.Throw('Track Not Found', args);
 
-        const isAllTracksRegistered = Libraries.Enumerable.from(albumTracks.Tracks)
-            .all((e): boolean => e.TlId !== null);
-
-        if (isAllTracksRegistered) {
+        if (track.TlId !== null && track.TlId !== undefined) {
             // TlId割り当て済みの場合
-            const result = await this.store.PlayAlbumByTlId(track.TlId);
+            const resPlay = await this.player.PlayByTlId(track.TlId);
 
-            (result)
+            (resPlay)
                 ? Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started!`)
-                : Libraries.ShowToast.Error('Track Play Order Failed...');
+                : Libraries.ShowToast.Error('Play Order Failed...');
 
-            return result;
+            return resPlay;
         } else {
             // TlId未割り当ての場合
-            const resultAtls = await this.store.PlayAlbumByTrack(track);
-
-            if (!resultAtls) {
-                Libraries.ShowToast.Error('Track Play Order Failed...');
-
-                return false;
-            }
-
-            const updatedTracks = Libraries.Enumerable.from(resultAtls.Tracks);
-
-            _.each(albumTracks.Tracks, (track): void => {
-                track.TlId = updatedTracks.firstOrDefault((e): boolean => e.Id == track.Id).TlId;
-            });
-
-            Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started!`)
+            const resPlayAlbum = await this.player.PlayByAlbumTracks(albumTracks, track);
+            (resPlayAlbum)
+                ? Libraries.ShowToast.Success(`Track [ ${track.Name} ] Started!`)
+                : Libraries.ShowToast.Error('Play Order Failed...');
 
             return true;
         }

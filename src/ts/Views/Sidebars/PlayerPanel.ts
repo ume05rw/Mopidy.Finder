@@ -77,7 +77,7 @@ export default class PlayerPanel extends ViewBase {
 
     private volumeSlider: JQuery;
     private volumeData: any;
-    private player: Player = new Player();
+    private player: Player = Player.Instance;
     private monitor: Monitor = this.player.Monitor;
     private imageFullUri: string = this.monitor.ImageFullUri;
     private trackName: string = '--';
@@ -158,7 +158,6 @@ export default class PlayerPanel extends ViewBase {
         });
         this.$emit(PlayerPanelEvents.Operated);
         await this.player.SetVolume(0);
-        this.monitor.Update();
 
         return true;
     }
@@ -169,7 +168,6 @@ export default class PlayerPanel extends ViewBase {
         });
         this.$emit(PlayerPanelEvents.Operated);
         await this.player.SetVolume(100);
-        this.monitor.Update();
 
         return true;
     }
@@ -177,19 +175,17 @@ export default class PlayerPanel extends ViewBase {
     private async OnClickPrevious(): Promise<boolean> {
         this.$emit(PlayerPanelEvents.Operated);
         await this.player.Previous();
-        this.monitor.Update();
+        this.RemoveFocus();
 
         return true;
     }
 
     private async OnClickPlayPause(): Promise<boolean> {
         this.$emit(PlayerPanelEvents.Operated);
-        if (this.monitor.PlayerState === PlayerState.Playing) {
-            await this.player.Pause();
-        } else {
-            await this.player.Play();
-        }
-        this.monitor.Update();
+        (this.monitor.PlayerState === PlayerState.Playing)
+            ? await this.player.Pause()
+            : await this.player.Play();
+        this.RemoveFocus();
 
         return true;
     }
@@ -197,7 +193,7 @@ export default class PlayerPanel extends ViewBase {
     private async OnClickNext(): Promise<boolean> {
         this.$emit(PlayerPanelEvents.Operated);
         await this.player.Next();
-        this.monitor.Update();
+        this.RemoveFocus();
 
         return true;
     }
@@ -206,7 +202,7 @@ export default class PlayerPanel extends ViewBase {
         this.$emit(PlayerPanelEvents.Operated);
         const enabled = !this.ButtonShuffle.classList.contains(PlayerPanel.ClassDisabled);
         await this.player.SetShuffle(!enabled);
-        this.monitor.Update();
+        this.RemoveFocus();
 
         return true;
     }
@@ -215,8 +211,18 @@ export default class PlayerPanel extends ViewBase {
         this.$emit(PlayerPanelEvents.Operated);
         const enabled = !this.ButtonRepeat.classList.contains(PlayerPanel.ClassDisabled);
         await this.player.SetRepeat(!enabled);
-        this.monitor.Update();
+        this.RemoveFocus();
 
         return true;
+    }
+
+    private RemoveFocus(): void {
+        if (document.activeElement) {
+            try {
+                (document.activeElement as HTMLElement).blur();
+            } catch (ex) {
+                // 握りつぶす。
+            }
+        }
     }
 }

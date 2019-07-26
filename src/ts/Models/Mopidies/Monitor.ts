@@ -35,7 +35,14 @@ export interface IStatus {
 
 export default class Monitor extends JsonRpcQueryableBase implements IStatus {
 
-    private static readonly PollingMsec = 3000;
+    private static readonly _pollingMsec = 3000;
+    private static _instance: Monitor = null;
+    public static get Instance(): Monitor {
+        if (!Monitor._instance)
+            Monitor._instance = new Monitor();
+
+        return Monitor._instance;
+    }
 
     private static readonly Methods = {
         GetState: 'core.playback.get_state',
@@ -124,7 +131,7 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
             : `${location.protocol}//${location.host}${this._imageUri}`;
     }
 
-    public constructor() {
+    private constructor() {
         super();
 
         this._settingsEntity = Settings.Entity;
@@ -138,7 +145,7 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
 
         this._timer = setInterval((): void => {
             this.Update();
-        }, Monitor.PollingMsec);
+        }, Monitor._pollingMsec);
     }
 
     public StopPolling(): void {
@@ -166,10 +173,20 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
             this.SetBackupValues();
 
             const resState = await this.JsonRpcRequest(Monitor.Methods.GetState);
-            if (resState.result) {
-                this._playerState = resState.result as PlayerState;
-                this._isPlaying = (this._playerState === PlayerState.Playing);
+            if (resState.error || !resState.result) {
+                this._tlId = null;
+                this._trackName = '--';
+                this._trackLength = 0;
+                this._trackProgress = 0;
+                this._artistName = '--';
+                this._year = null;
+                this._imageUri = null;
+
+                return;
             }
+
+            this._playerState = resState.result as PlayerState;
+            this._isPlaying = (this._playerState === PlayerState.Playing);
 
             const resTrack = await this.JsonRpcRequest(Monitor.Methods.GetCurrentTlTrack);
             if (resTrack.result) {
@@ -213,18 +230,22 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
             // Consumeモード(=トラックリストから再生都度曲を消す), シングルモード(1曲のみ再生)を
             // 無効化する。
             const resConsume = await this.JsonRpcRequest(Monitor.Methods.GetConsume);
-            const isConsume = resConsume.result as boolean;
-            if (isConsume) {
-                await this.JsonRpcRequest(Monitor.Methods.SetConsume, {
-                    value: false
-                });
+            if (resConsume) {
+                const isConsume = resConsume.result as boolean;
+                if (isConsume) {
+                    await this.JsonRpcRequest(Monitor.Methods.SetConsume, {
+                        value: false
+                    });
+                }
             }
             const resSingle = await this.JsonRpcRequest(Monitor.Methods.GetSingle);
-            const isSingle = resSingle.result as boolean;
-            if (isSingle) {
-                await this.JsonRpcRequest(Monitor.Methods.SetSingle, {
-                    value: false
-                });
+            if (resSingle) {
+                const isSingle = resSingle.result as boolean;
+                if (isSingle) {
+                    await this.JsonRpcRequest(Monitor.Methods.SetSingle, {
+                        value: false
+                    });
+                }
             }
 
             this.DetectChanges();

@@ -17,6 +17,7 @@ import Filterbox from '../../../Shared/Filterboxes/Filterbox';
 import SlideupButton from '../../../Shared/SlideupButton';
 import { default as SelectionTrack, ITrackDeleteOrderedArgs, ITrackSelectionChangedArgs } from './SelectionTrack';
 import UpdateDialog from './UpdateDialog';
+import Player from '../../../../Models/Mopidies/Player';
 
 export const TrackListEvents = {
     PlaylistDeleted: 'PlaylistDeleted',
@@ -113,6 +114,8 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
 
     protected store: PlaylistStore = new PlaylistStore();
     protected entities: Track[] = [];
+
+    private player: Player = null;
     private playlist: Playlist = null;
     private removedEntities: Track[] = [];
     private listMode: ListMode = ListMode.Playable;
@@ -156,6 +159,7 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
     public async Initialize(): Promise<boolean> {
         super.Initialize();
 
+        this.player = Player.Instance;
         this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
         this.swipeDetector.get('swipe').set({
             direction: Libraries.Hammer.DIRECTION_HORIZONTAL
@@ -290,13 +294,10 @@ export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
     protected async OnSelectionChanged(args: ITrackSelectionChangedArgs): Promise<boolean> {
         if (this.listMode === ListMode.Playable) {
             // 再生モード時
-            const isAllTracksRegistered = Libraries.Enumerable.from(this.playlist.Tracks)
-                .all((e): boolean => e.TlId !== null);
-
-            // トラックリスト登録状況で再生方法を変える。
-            const response = (isAllTracksRegistered)
-                ? await this.store.PlayByTlId(args.Entity.TlId)
-                : await this.store.PlayPlaylist(this.playlist, args.Entity);
+            const track = args.Entity;
+            const response = (track.TlId !== null && track.TlId !== undefined)
+                ? await this.player.PlayByTlId(track.TlId)
+                :  await this.player.PlayByPlaylist(this.playlist, track);
 
             (response)
                 ? Libraries.ShowToast.Success(`Track [ ${args.Entity.Name} ] Started!`)

@@ -4,7 +4,6 @@ import AlbumTracks from '../AlbumTracks/AlbumTracks';
 import JsonRpcQueryableBase from '../Bases/JsonRpcQueryableBase';
 import { default as IPlaylist, default as MopidyPlaylist } from '../Mopidies/IPlaylist';
 import IRef from '../Mopidies/IRef';
-import ITlTrack from '../Mopidies/ITlTrack';
 import Track from '../Tracks/Track';
 import TrackStore from '../Tracks/TrackStore';
 import Playlist from './Playlist';
@@ -81,59 +80,13 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         return null;
     }
 
-    public async PlayPlaylist(playlist: Playlist, track: Track): Promise<boolean> {
-        const resClear
-            = await this.JsonRpcRequest(PlaylistStore.Methods.TracklistClearList);
-
-        if (resClear.error)
-            throw new Error(resClear.error);
-
-        const uris = Libraries.Enumerable.from(playlist.Tracks)
-            .select((e): string => e.Uri)
-            .toArray();
-        const resAdd
-            = await this.JsonRpcRequest(PlaylistStore.Methods.TracklistAdd, {
-                uris: uris
-            });
-
-        if (resAdd.error)
-            Exception.Throw('PlaylistStore.PlayPlaylist: Play Failed.', resAdd.error);
-
-        const tlTracks = resAdd.result as ITlTrack[];
-        const tlDictionary = Libraries.Enumerable.from(tlTracks)
-            .toDictionary<string, number>((e): string => e.track.uri, (e2): number => e2.tlid);
-
-        for (let i = 0; i < playlist.Tracks.length; i++) {
-            const tr = playlist.Tracks[i];
-            tr.TlId = (tlDictionary.contains(tr.Uri))
-                ? tlDictionary.get(tr.Uri)
-                : null;
-        }
-
-        if (track.TlId === null)
-            Exception.Throw(`track: ${track.Name} not assigned TlId`);
-
-        await this.PlayByTlId(track.TlId);
-
-        return true;
-    }
-
-    public async PlayByTlId(tlId: number): Promise<boolean> {
-        await this.JsonRpcNotice(PlaylistStore.Methods.PlaybackPlay, {
-            tlid: tlId
-        });
-
-        return true;
-    }
-
     public async AddPlaylist(name: string): Promise<Playlist> {
         const response = await this.JsonRpcRequest(PlaylistStore.Methods.PlaylistCreate, {
             name: name
         });
 
-        if (response && response.error) {
+        if (response && response.error)
             Exception.Throw('PlaylistStore.AddPlaylist: Playlist Create Failed.', response.error);
-        }
 
         const mpPlaylist = response.result as MopidyPlaylist;
         const result = Playlist.CreateFromMopidy(mpPlaylist)
@@ -145,17 +98,15 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
         const name = `${albumTracks.GetArtistName()} - ${albumTracks.Album.Name}`;
         const playlist = await this.AddPlaylist(name);
 
-        if (!playlist) {
+        if (!playlist)
             Exception.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Playlist Create Failed');
-        }
 
         playlist.Tracks = albumTracks.Tracks;
 
         const response = await this.UpdatePlayllist(playlist);
 
-        if (response !== true) {
+        if (response !== true)
             Exception.Throw('PlaylistStore.AddPlaylistByAlbumTracks: Track Update Failed.');
-        }
 
         return playlist;
     }
@@ -182,7 +133,6 @@ export default class PlaylistStore extends JsonRpcQueryableBase {
     }
 
     public async UpdatePlayllist(playlist: Playlist): Promise<boolean> {
-
         const tracks: { __model__: string; uri: string }[] = [];
         for (let i = 0; i < playlist.Tracks.length; i++) {
             const track = playlist.Tracks[i];

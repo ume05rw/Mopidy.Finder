@@ -1,5 +1,6 @@
 import XhrQueryableBase from './XhrQueryableBase';
 import { AxiosResponse } from 'axios';
+import Dump from '../../Utils/Dump'
 
 interface IJsonRpcParamsBase {
     jsonrpc: string;
@@ -11,7 +12,7 @@ interface IJsonRpcQueryParams extends IJsonRpcParamsBase {
     id?: number;
 }
 
-interface IJsonRpcResultParams extends IJsonRpcParamsBase {
+export interface IJsonRpcResultParams extends IJsonRpcParamsBase {
     result?: any;
     error?: any;
     id?: number;
@@ -26,10 +27,12 @@ export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
 
         const response
             = await XhrQueryableBase.XhrInstance.post(JsonRpcQueryableBase.Url, params)
-                .catch((e): AxiosResponse => {
+                .catch((ex): AxiosResponse => {
+                    Dump.Error('JsonRpcQueryableBase.QueryJsonRpc: Unexpected Xhr Error.', ex);
+
                     const resultData: IJsonRpcResultParams = {
                         jsonrpc: '2.0',
-                        error: e
+                        error: ex
                     };
                     if (params.id)
                         resultData.id = params.id;
@@ -49,14 +52,17 @@ export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
 
         if (params.id && !result) {
             // id付きにも拘らず、応答が無いとき
-            console.error(`JsonRpcError: method=${params.method}`); // eslint-disable-line
-            console.error('returns null'); // eslint-disable-line
+            Dump.Error('JsonRpcQueryableBase.QueryJsonRpc: Query with id, but No-Response.', {
+                queryParams: params
+            });
         }
 
         if (result && result.error) {
             // 応答にerrorが含まれるとき
-            console.error(`JsonRpcError: method=${params.method}`); // eslint-disable-line
-            console.error(result); // eslint-disable-line
+            Dump.Error('JsonRpcQueryableBase.QueryJsonRpc: Error Result.', {
+                queryParams: params,
+                response: result
+            });
         }
 
         return result;
@@ -74,12 +80,10 @@ export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
 
         JsonRpcQueryableBase.IdCounter++;
 
-        const result = await this.QueryJsonRpc(query);
-
-        return result;
+        return await this.QueryJsonRpc(query);
     }
 
-    protected async JsonRpcNotice(method: string, params: any = null): Promise<boolean> {
+    protected async JsonRpcNotice(method: string, params: any = null): Promise<true | IJsonRpcResultParams> {
         const query: IJsonRpcQueryParams = {
             jsonrpc: '2.0',
             method: method
@@ -90,6 +94,16 @@ export default abstract class JsonRpcQueryableBase extends XhrQueryableBase {
 
         const result = await this.QueryJsonRpc(query);
 
-        return (!result || (result && !result.error));
+        return (result && result.error)
+            ? result
+            : true;
+    }
+
+    protected CreateResponse(): IJsonRpcResultParams {
+        const result: IJsonRpcResultParams = {
+            jsonrpc: '2.0'
+        };
+
+        return result;
     }
 }

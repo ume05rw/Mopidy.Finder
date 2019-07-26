@@ -1,6 +1,7 @@
 import Axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import * as qs from 'qs';
 import EventableBase from '../../EventableBase';
+import Dump from '../../Utils/Dump';
 
 export interface IXhrError {
     Message: string;
@@ -106,8 +107,10 @@ export default abstract class XhrQueryableBase extends EventableBase {
             paramsSerializer: XhrQueryableBase.ParamsSerializer            
         };
         const response = await XhrQueryableBase.XhrInstance.get(url, config)
-            .catch((e): AxiosResponse => {
-                return this.CreateErrorResponse(e);
+            .catch((ex): AxiosResponse => {
+                Dump.Error('XhrQueryableBase.QueryGet: Unexpexted Xhr Error.', ex);
+
+                return this.CreateErrorResponse(ex);
             });
 
         return this.ParseResponse(response.data);
@@ -115,8 +118,10 @@ export default abstract class XhrQueryableBase extends EventableBase {
 
     protected async QueryPost(url: string, params: any = null): Promise<IXhrResult> {
         const response = await XhrQueryableBase.XhrInstance.post(url, params)
-            .catch((e): AxiosResponse => {
-                return this.CreateErrorResponse(e);
+            .catch((ex): AxiosResponse => {
+                Dump.Error('XhrQueryableBase.QueryPost: Unexpexted Xhr Error.', ex);
+
+                return this.CreateErrorResponse(ex);
             });
 
         return this.ParseResponse(response.data);
@@ -125,8 +130,10 @@ export default abstract class XhrQueryableBase extends EventableBase {
 
     protected async QueryPut(url: string, params: any = null): Promise<IXhrResult> {
         const response = await XhrQueryableBase.XhrInstance.put(url, params)
-            .catch((e): AxiosResponse => {
-                return this.CreateErrorResponse(e);
+            .catch((ex): AxiosResponse => {
+                Dump.Error('XhrQueryableBase.QueryPut: Unexpexted Xhr Error.', ex);
+
+                return this.CreateErrorResponse(ex);
             });
 
         return this.ParseResponse(response.data);
@@ -134,8 +141,10 @@ export default abstract class XhrQueryableBase extends EventableBase {
 
     protected async QueryDelete(url: string, params: any = null): Promise<IXhrResult> {
         const response = await XhrQueryableBase.XhrInstance.delete(url, params)
-            .catch((e): AxiosResponse => {
-                return this.CreateErrorResponse(e);
+            .catch((ex): AxiosResponse => {
+                Dump.Error('XhrQueryableBase.QueryDelete: Unexpexted Xhr Error.', ex);
+
+                return this.CreateErrorResponse(ex);
             });
 
         return this.ParseResponse(response.data);
