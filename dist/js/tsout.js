@@ -493,8 +493,8 @@ define("Models/Albums/Album", ["require", "exports", "Models/Relations/ArtistAlb
              */
             get: function () {
                 return (!location)
-                    ? 'http://localhost:6680/img/nullImage.jpg'
-                    : location.protocol + "//" + location.host + "/img/nullImage.jpg";
+                    ? 'http://localhost:6680/img/nullImage.png'
+                    : location.protocol + "//" + location.host + "/img/nullImage.png";
             },
             enumerable: true,
             configurable: true
@@ -3497,7 +3497,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
     }(ViewBase_6.default));
     exports.default = SelectionAlbumTracks;
 });
-define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Dump", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Dump_7, Exception_11, IContent_1, IContentDetail_2, SelectionListBase_1, HammerEvents_1, Filterbox_1, SelectionAlbumTracks_1) {
+define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/AlbumTracks/AlbumTracksStore", "Models/Playlists/PlaylistStore", "Utils/Delay", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Finders/Lists/Albums/SelectionAlbumTracks"], function (require, exports, _, vue_class_component_6, vue_infinite_loading_1, Libraries_7, AlbumTracksStore_1, PlaylistStore_1, Delay_2, Exception_11, IContent_1, IContentDetail_2, SelectionListBase_1, HammerEvents_1, Filterbox_1, SelectionAlbumTracks_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AlbumListEvents = {
@@ -3538,7 +3538,6 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
-                            Dump_7.default.Log('Finder.AlbumList.Initialize: Start.');
                             _super.prototype.Initialize.call(this);
                             this.swipeDetector = new Libraries_7.default.Hammer(this.$el);
                             this.swipeDetector.get('swipe').set({
@@ -3585,7 +3584,6 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             return [4 /*yield*/, this.InitPlaylistList()];
                         case 1:
                             _a.sent();
-                            Dump_7.default.Log('Finder.AlbumList.Initialize: End.');
                             return [2 /*return*/, true];
                     }
                 });
@@ -6752,7 +6750,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ContentBase_3.default));
     exports.default = Settings;
 });
-define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_8, JsonRpcQueryableBase_4, Settings_2) {
+define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/Bases/JsonRpcQueryableBase", "Models/Settings/Settings"], function (require, exports, Dump_7, JsonRpcQueryableBase_4, Settings_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.MonitorEvents = {
@@ -6890,7 +6888,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
         Object.defineProperty(Monitor.prototype, "ImageFullUri", {
             get: function () {
                 return (!this._imageUri || this._imageUri == '')
-                    ? location.protocol + "//" + location.host + "/img/nullImage.jpg"
+                    ? location.protocol + "//" + location.host + "/img/nullImage.png"
                     : location.protocol + "//" + location.host + this._imageUri;
             },
             enumerable: true,
@@ -7014,7 +7012,7 @@ define("Models/Mopidies/Monitor", ["require", "exports", "Utils/Dump", "Models/B
                             return [3 /*break*/, 21];
                         case 20:
                             ex_1 = _a.sent();
-                            Dump_8.default.Error('Polling Error', ex_1);
+                            Dump_7.default.Error('Polling Error', ex_1);
                             return [3 /*break*/, 21];
                         case 21:
                             this._nowOnPollingProsess = false;
@@ -7977,7 +7975,7 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
     }());
     exports.default = ContentController;
 });
-define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/SideBars/SideBar", "Utils/Dump"], function (require, exports, Libraries_24, SettingsStore_3, IContent_12, HeaderBar_3, SideBar_3, Dump_9) {
+define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Utils/Dump", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/SideBars/SideBar"], function (require, exports, Libraries_24, SettingsStore_3, Dump_8, IContent_12, HeaderBar_3, SideBar_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var NavigationController = /** @class */ (function () {
@@ -8062,23 +8060,19 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             });
         };
         NavigationController.prototype.AdjustScreen = function () {
-            Dump_9.default.Log('viewport = ' + this._viewport.current());
+            //Dump.Log('viewport = ' + this._viewport.current());
             // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
             if (this._viewport.is('<=md')) {
-                Dump_9.default.Log('viewport is <=md');
                 this._content.ContentToFullscreen();
             }
             else {
-                Dump_9.default.Log('viewport is >md');
                 this._content.ContentToColumn();
             }
             // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
             if (this._viewport.is('<=lg')) {
-                Dump_9.default.Log('viewport is <=lg');
                 this._headerBar.SetSideBarClose();
             }
             else {
-                Dump_9.default.Log('viewport is >lg');
                 this._headerBar.SetSideBarOpen();
             }
             var rootClasses = this._rootView.$el.classList;
@@ -8116,7 +8110,7 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                         requestFullScreen.call(docEl);
                 }
                 catch (ex) {
-                    Dump_9.default.Error('Fullscreen Request Failed.', ex);
+                    Dump_8.default.Error('Fullscreen Request Failed.', ex);
                 }
             }
         };

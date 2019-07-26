@@ -20,8 +20,8 @@ export default class Album implements IAlbum {
      */
     public static get DefaultImage(): string {
         return (!location)
-            ? 'http://localhost:6680/img/nullImage.jpg'
-            : `${location.protocol}//${location.host}/img/nullImage.jpg`;
+            ? 'http://localhost:6680/img/nullImage.png'
+            : `${location.protocol}//${location.host}/img/nullImage.png`;
     }
 
     public static Create(entity: IAlbum): Album {

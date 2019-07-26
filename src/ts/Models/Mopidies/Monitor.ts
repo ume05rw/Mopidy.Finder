@@ -120,7 +120,7 @@ export default class Monitor extends JsonRpcQueryableBase implements IStatus {
     }
     public get ImageFullUri(): string {
         return (!this._imageUri || this._imageUri == '')
-            ? `${location.protocol}//${location.host}/img/nullImage.jpg`
+            ? `${location.protocol}//${location.host}/img/nullImage.png`
             : `${location.protocol}//${location.host}${this._imageUri}`;
     }
 

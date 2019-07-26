@@ -1,11 +1,11 @@
 import Libraries from '../Libraries';
 import SettingsStore from '../Models/Settings/SettingsStore';
+import Dump from '../Utils/Dump';
 import { Contents, IContentOrderedArgs } from '../Views/Bases/IContent';
 import { default as HeaderBar, HeaderBarEvents } from '../Views/HeaderBars/HeaderBar';
 import RootView from '../Views/RootView';
 import { default as SideBar, ITabEventRecievedArgs, SideBarEvents } from '../Views/SideBars/SideBar';
 import ContentController from './ContentController';
-import Dump from '../Utils/Dump';
 
 export default class NavigationController {
 
@@ -93,23 +93,18 @@ export default class NavigationController {
     }
 
     private AdjustScreen(): void {
-        
-        Dump.Log('viewport = ' + this._viewport.current());
+        //Dump.Log('viewport = ' + this._viewport.current());
         // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
         if (this._viewport.is('<=md')) {
-            Dump.Log('viewport is <=md');
             this._content.ContentToFullscreen();
         } else {
-            Dump.Log('viewport is >md');
             this._content.ContentToColumn();
         }
 
         // サイドバーは、lgサイズを基点に常時表示<-->操作終了で非表示化を切り替える。
         if (this._viewport.is('<=lg')) {
-            Dump.Log('viewport is <=lg');
             this._headerBar.SetSideBarClose();
         } else {
-            Dump.Log('viewport is >lg');
             this._headerBar.SetSideBarOpen();
         }
 

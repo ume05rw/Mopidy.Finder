@@ -8,7 +8,6 @@ import { IPagenatedResult } from '../../../../Models/Bases/StoreBase';
 import Playlist from '../../../../Models/Playlists/Playlist';
 import PlaylistStore from '../../../../Models/Playlists/PlaylistStore';
 import Delay from '../../../../Utils/Delay';
-import Dump from '../../../../Utils/Dump';
 import Exception from '../../../../Utils/Exception';
 import { Contents } from '../../../Bases/IContent';
 import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection } from '../../../Bases/IContentDetail';
@@ -86,7 +85,6 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
     }
 
     public async Initialize(): Promise<boolean> {
-        Dump.Log('Finder.AlbumList.Initialize: Start.');
         super.Initialize();
 
         this.swipeDetector = new Libraries.Hammer(this.$el as HTMLElement);
@@ -131,7 +129,6 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
         });
 
         await this.InitPlaylistList();
-        Dump.Log('Finder.AlbumList.Initialize: End.');
 
         return true;
     }
