@@ -12,8 +12,12 @@ using System.Threading.Tasks;
 
 namespace MopidyFinder.Models
 {
-    public class DbMaintainer
+    public class DbMaintainer: IDisposable
     {
+        private static DbMaintainer _instance = null;
+        public static DbMaintainer Instance => DbMaintainer._instance;
+
+
         private Dbc _dbc;
         private GenreStore _genreStore;
         private ArtistStore _artistStore;
@@ -39,6 +43,8 @@ namespace MopidyFinder.Models
             this._artistAlbumStore = artistAlbumStore;
             this._genreAlbumStore = genreAlbumStore;
             this._genreArtistStore = genreArtistStore;
+
+            DbMaintainer._instance = this;
         }
 
         #region "Resident Task"
@@ -453,6 +459,55 @@ namespace MopidyFinder.Models
 
             return $"{newEntities.Length} {scanTypeMessage} Added.";
         }
+
+        #region IDisposable Support
+        private bool _isDisposed = false; // 重複する呼び出しを検出するには
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this._isDisposed)
+            {
+                if (disposing)
+                {
+                    if (
+                        this._albumScannerCanceler != null
+                        || this._dbUpdaterCanceler != null
+                    )
+                    {
+                        this.StopAllTasks()
+                            .GetAwaiter()
+                            .GetResult();
+                    }
+
+                    this._genreStore.Dispose();
+                    this._albumStore.Dispose();
+                    this._artistStore.Dispose();
+                    this._artistAlbumStore.Dispose();
+                    this._genreAlbumStore.Dispose();
+                    this._genreArtistStore.Dispose();
+                    this._dbc.Dispose();
+                    this._updaters?.Clear();
+
+                    this._genreStore = null;
+                    this._albumStore = null;
+                    this._artistStore = null;
+                    this._artistAlbumStore = null;
+                    this._genreAlbumStore = null;
+                    this._genreArtistStore = null;
+                    this._dbc = null;
+                    this._updaters = null;
+                    this._message = null;
+                }
+
+                this._isDisposed = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+        #endregion
 
         #endregion
     }

@@ -147,14 +147,19 @@ namespace MopidyFinder
 
         private void OnStarted()
         {
-            this._dbMaintainer.RunAlbumScanner();
+            if (!this._dbMaintainer.IsAlbumScannerRunning)
+                this._dbMaintainer.RunAlbumScanner();
         }
 
         private void OnShutdown()
         {
-            this._dbMaintainer.StopAllTasks()
-                .GetAwaiter()
-                .GetResult();
+            if (this._dbMaintainer.IsAlbumScannerRunning
+                || this._dbMaintainer.IsDbUpdateRunning)
+            {
+                this._dbMaintainer.StopAllTasks()
+                    .GetAwaiter()
+                    .GetResult();
+            }
         }
     }
 }

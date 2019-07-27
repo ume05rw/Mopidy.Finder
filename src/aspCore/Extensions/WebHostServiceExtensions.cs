@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.WindowsServices;
-using System;
+using MopidyFinder.Models;
 using System.ServiceProcess;
 
 namespace MopidyFinder.Extensions
@@ -23,19 +23,35 @@ namespace MopidyFinder.Extensions
 
         protected override void OnStarting(string[] args)
         {
-            Console.WriteLine("OnStarting method called.");
             base.OnStarting(args);
         }
 
         protected override void OnStarted()
         {
-            Console.WriteLine("OnStarted method called.");
+            if (
+                DbMaintainer.Instance != null
+                && !DbMaintainer.Instance.IsAlbumScannerRunning
+            )
+            {
+                DbMaintainer.Instance.RunAlbumScanner();
+            }
+
             base.OnStarted();
         }
 
         protected override void OnStopping()
         {
-            Console.WriteLine("OnStopping method called.");
+            if (
+                DbMaintainer.Instance != null
+                && (DbMaintainer.Instance.IsAlbumScannerRunning
+                    || DbMaintainer.Instance.IsDbUpdateRunning)
+            )
+            {
+                DbMaintainer.Instance.StopAllTasks()
+                    .GetAwaiter()
+                    .GetResult();
+            }
+
             base.OnStopping();
         }
     }
