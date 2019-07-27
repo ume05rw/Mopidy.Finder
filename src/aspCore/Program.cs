@@ -12,7 +12,7 @@ namespace MopidyFinder
 {
     public class Program
     {
-        public static int Port { get; private set; } = 8080;
+        public static int Port { get; private set; } = 6690;
         public static string CurrentPath { get; private set; } = string.Empty;
         public static string SrcPath { get; private set; } = string.Empty;
         public static string DistPath { get; private set; } = string.Empty;

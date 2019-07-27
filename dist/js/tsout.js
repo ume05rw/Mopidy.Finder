@@ -250,7 +250,7 @@ define("Models/Bases/XhrQueryableBase", ["require", "exports", "axios", "qs", "E
             get: function () {
                 return (location)
                     ? location.port
-                    : '8080';
+                    : '6690';
             },
             enumerable: true,
             configurable: true

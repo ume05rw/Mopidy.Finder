@@ -38,7 +38,7 @@ export default abstract class XhrQueryableBase extends EventableBase {
     private static get Port(): string {
         return (location)
             ? location.port
-            : '8080';
+            : '6690';
     }
 
     protected static XhrInstance: AxiosInstance = Axios.create({
