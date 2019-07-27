@@ -74,9 +74,9 @@ namespace MopidyFinder
                 {
                     // JSON生成時、キャメル先頭を大文字で返す。
                     options.SerializerSettings.ContractResolver
-                        // アッパーキャメルの場合
+                        // 変数名定義通りの場合
                         // = new DefaultContractResolver();
-                        // ロウアーキャメルの場合
+                        // ロウアーキャメルに変更する場合
                         //= new CamelCasePropertyNamesContractResolver();
                         = new DefaultContractResolver();
 
