@@ -7,8 +7,6 @@ namespace MopidyFinder.Models.JsonRpcs
     [JsonObject(MemberSerialization.OptIn)]
     public class JsonRpcQueryRequest : JsonRpcQuery
     {
-        private static int _idForService = 90001;
-
         [JsonProperty("id")]
         public int Id;
 

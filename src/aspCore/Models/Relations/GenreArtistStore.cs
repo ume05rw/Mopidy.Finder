@@ -59,8 +59,8 @@ namespace MopidyFinder.Models.Relations
                     exists => new { exists.GenreId, exists.ArtistId },
                     (found, exists) => new
                     {
-                        found = found,
-                        exists = exists
+                        found,
+                        exists
                     }
                 )
                 .Where(e => !e.exists.Any())

@@ -130,8 +130,7 @@ namespace MopidyFinder.Models.Albums
             var yearResults = await this._library.Browse(AlbumStore.YearQueryString);
             foreach (var row in yearResults)
             {
-                var year = default(int);
-                if (!int.TryParse(row.Name, out year))
+                if (!int.TryParse(row.Name, out var year))
                     continue;
 
                 var yearAlbums = await this._library.Browse(row.Uri);
@@ -164,10 +163,10 @@ namespace MopidyFinder.Models.Albums
 
         public AlbumScanProgress GetAlbumScanProgress()
         {
-            var result = new AlbumScanProgress();
-            result.TotalAlbumCount = this.Dbc.Albums.Count();
-            result.ScannedAlbumCount
-                = this.Dbc.Albums
+            var result = new AlbumScanProgress()
+            {
+                TotalAlbumCount = this.Dbc.Albums.Count(),
+                ScannedAlbumCount = this.Dbc.Albums
                     .GroupJoin(
                         this.Dbc.Tracks,
                         al => al.Id,
@@ -179,7 +178,8 @@ namespace MopidyFinder.Models.Albums
                         }
                     )
                     .Where(e => e.Tracks.Any())
-                    .Count();
+                    .Count()
+            };
 
             return result;
         }
@@ -297,7 +297,6 @@ namespace MopidyFinder.Models.Albums
                         {
                             // なぜ重複しているか、確認のこと。
                             existsAlbumTrack = true;
-                            var tmp = 1;
                         }
                         else
                         {

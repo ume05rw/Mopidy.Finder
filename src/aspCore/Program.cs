@@ -61,12 +61,12 @@ namespace MopidyFinder
                 if (Program.IsWindowsService)
                 {
                     // Windowsサービスとして起動する。
-                    Program.BuildWebHost(new string[] { }).RunAsCustomService();
+                    Program.BuildWebHost(Array.Empty<string>()).RunAsCustomService();
                 }
                 else
                 {
                     // コマンドライン起動やVSによる起動など、通常こちら。
-                    Program.BuildWebHost(new string[] { }).Run();
+                    Program.BuildWebHost(Array.Empty<string>()).Run();
                 }
 
                 logger.Debug("Exit Normally");

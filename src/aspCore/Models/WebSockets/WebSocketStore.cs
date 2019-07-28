@@ -21,7 +21,7 @@ namespace MopidyFinder.Models.WebSockets
     {
         private const int MessageBufferSize = 8192;
         private static Settings.Settings _settings = null;
-        private List<WebSocket> _accepts = new List<WebSocket>();
+        private readonly List<WebSocket> _accepts = new List<WebSocket>();
         private ClientWebSocket _client;
 
         public WebSocketStore([FromServices] Dbc dbc): base(dbc)
@@ -44,7 +44,7 @@ namespace MopidyFinder.Models.WebSockets
                 var uri = new Uri($"{WebSocketStore._settings.WebSocketUri}/");
                 await this._client.ConnectAsync(uri, CancellationToken.None);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // 接続が拒否された
                 return false;
