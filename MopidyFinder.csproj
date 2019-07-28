@@ -196,6 +196,12 @@
     <Folder Include="types\hammerjs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="database.template.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptJSXEmit>None</TypeScriptJSXEmit>
