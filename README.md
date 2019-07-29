@@ -18,8 +18,12 @@ You will soon find the song you are looking for!　　
 * Any Linux on x64
 * RaspberryPi (**Raspbian November 2018 or later**)
   
+## Requirements
+* Mopidy (Running on your LAN, It doesn't have to run on the same device as Mopidy.Finder.)
+* Mopidy-Local-Images
+* Mopidy-Local-Sqlite (recommended, not required)
 
-## Usage for Windows
+## Installation on Windows
 1. [Download Zip-Arvhive.](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.1/win-x64-installer-v1.1.zip)  
 2. Unzip archived-files. 
 3. Run 'setup.exe', to Install your system.
@@ -29,7 +33,7 @@ You will soon find the song you are looking for!　　
 6. Show, Start and Stop, Right-click the icon to display a list for each operation.  
 ![ShowList](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/iconRightClicked.jpg "ShowList")  
 
-## Usage for Linux
+## Installation on Linux
 1. [Download Zip-Arvhive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
 2. Unzip archived-files to your Install Folder, ex) /var/mopidyfinder/  
 3. Set your Firewall, Open TCP 6690 ports.
@@ -71,42 +75,30 @@ starting service:
     # sudo systemctl start mopidyfinder
      
 
-and Access **localhost:6690** from your browser.  
+and Access **device-ipaddress:6690** from your browser.  
   
 If it NOT Works, Install [**.Net Core 2.2 Runtime**](https://dotnet.microsoft.com/download/dotnet-core/2.2) to your platform.  
 
-## Usage for OSX
+## Installation on OSX
 ...I'm only checking that the binary running correctly.  
 I don't know how to make the app work as a service.  
-Please let me know!
-
-## Usage for Othres
-1. Install [**.Net Core 2.2 SDK**](https://dotnet.microsoft.com/download/dotnet-core/2.2) to your platform.
-2. Git Clone this project.
-3. Restore, Build, Publish "MopidyFinder" and Run.
-
-restore Nuget packages:   
-     
-    # dotnet restore ./MopidyFinder.csproj
-
-build:  
-     
-    # dotnet build ./MopidyFinder.csproj
-
-publish:
-     
-    # dotnet publish ./MopidyFinder.csproj -c Release -r [osx-x64|linux-x86|win-x86|as your platform]
-
-copy "dist" folder:  
-
-    # cp -rf ./dist [published_path]/dist
-
-run:
-     
-    # dotnet [published_path]/MopidyFinder.dll
+Please let me know!  
   
-and Access **localhost:6690** from your browser.    
-  
+## Initial Setup
+
+1. When Mopidy can not be found in local, a setup form comes out.  
+Enter your Mopidy address.  
+![Initial-Setup1](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/initial-setup1.png "Initial-Setup1")  
+
+2. If App find your Mopidy, Data initialization for the app will be performed.  
+![Initial-Setup2](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/initial-setup2.png "Initial-Setup2")  
+
+3. Data initialization may take some time depending on the number of songs, or app running device.  
+![Initial-Setup3](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/initial-setup3.png "Initial-Setup3")  
+
+4. If possible, leave it for a night or so after initialization.  
+The track-scanning is finished, It can be used comfortably.  
+![Initial-Setup1](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/initial-setup4.png "Initial-Setup1")  
 
 
 ## Licence
