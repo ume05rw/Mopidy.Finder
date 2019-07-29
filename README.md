@@ -32,7 +32,7 @@ You will soon find the song you are looking for!　　
 ## Usage for Linux
 1. [Download Zip-Arvhive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
 2. Unzip archived-files to your Install Folder, ex) /var/mopidyfinder/  
-3. Set your Firewall, Open TCP/UDP 6690 ports.
+3. Set your Firewall, Open TCP 6690 ports.
 
 
 Start on Command-Line.
@@ -83,7 +83,7 @@ Please let me know!
 ## Usage for Othres
 1. Install [**.Net Core 2.2 SDK**](https://dotnet.microsoft.com/download/dotnet-core/2.2) to your platform.
 2. Git Clone this project.
-3. Restore, Build, Publish "BrWebHost" and Run.
+3. Restore, Build, Publish "MopidyFinder" and Run.
 
 restore Nuget packages:   
      
