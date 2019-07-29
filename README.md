@@ -111,7 +111,7 @@ and Access **localhost:6690** from your browser.
 
 ## Licence
 
-[MIT Licence](https://github.com/ume05rw/MopidyFinder/blob/master/LICENSE)
+[MIT Licence](https://github.com/ume05rw/Mopidy.Finder/blob/master/LICENSE)
 
 ## Author
 
