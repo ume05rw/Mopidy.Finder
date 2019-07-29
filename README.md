@@ -3,7 +3,7 @@ Mopidy.Finder
 
 Mopidy that Findable - Mopidy Frontend for a Thousand Songs or More.
 
-![Mopidy.Finder](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forHitHyb/fullscreen.png "Mopidy.Finder")  
+![Mopidy.Finder](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/fullscreen.png "Mopidy.Finder")  
   
 ## Description
 
