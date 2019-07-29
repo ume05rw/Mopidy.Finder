@@ -75,6 +75,10 @@ and Access **localhost:6690** from your browser.
   
 If it NOT Works, Install [**.Net Core 2.2 Runtime**](https://dotnet.microsoft.com/download/dotnet-core/2.2) to your platform.  
 
+## Usage for OSX
+...I'm only checking that the binary running correctly.  
+I don't know how to make the app work as a service.  
+Please let me know!
 
 ## Usage for Othres
 1. Install [**.Net Core 2.2 SDK**](https://dotnet.microsoft.com/download/dotnet-core/2.2) to your platform.
@@ -92,6 +96,10 @@ build:
 publish:
      
     # dotnet publish ./MopidyFinder.csproj -c Release -r [osx-x64|linux-x86|win-x86|as your platform]
+
+copy "dist" folder:  
+
+    # cp -rf ./dist [published_path]/dist
 
 run:
      
