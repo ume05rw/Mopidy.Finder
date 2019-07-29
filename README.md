@@ -97,7 +97,7 @@ Enter your Mopidy address.
 ![Initial-Setup3](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/initial-setup3.png "Initial-Setup3")  
 
 4. If possible, leave it for a night or so after initialization.  
-The track-scanning is finished, It can be used comfortably.  
+The album-scanning is finished, It can be used comfortably.  
 ![Initial-Setup1](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/initial-setup4.png "Initial-Setup1")  
 
 
