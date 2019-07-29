@@ -20,13 +20,17 @@ You will soon find the song you are looking for!　　
   
 
 ## Usage for Windows
-1. [Download Zip-Arvhive.](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.0/win-x64-installer.zip)  
+1. [Download Zip-Arvhive.](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.1/win-x64-installer-v1.1.zip)  
 2. Unzip archived-files. 
 3. Run 'setup.exe', to Install your system.
 4. Run 'Start Mopidy Finder' on your Desktop Shoptcut and little wait, it wake up Browser.
+5. Once started, The icon is added to your task tray.  
+![IconOnTray](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/iconOnTray.jpg "IconOnTray")  
+6. Show, Start and Stop, Right-click the icon to display a list for each operation.  
+![ShowList](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/iconRightClicked.jpg "ShowList")  
 
 ## Usage for Linux
-1. [Download Zip-Arvhive for your platform.](https://github.com/ume05rw/BrWebHost/releases)  
+1. [Download Zip-Arvhive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
 2. Unzip archived-files to your Install Folder, ex) /var/mopidyfinder/  
 3. Set your Firewall, Open TCP/UDP 6690 ports.
 
