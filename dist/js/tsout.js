@@ -1596,6 +1596,7 @@ define("Views/Bases/IContentDetail", ["require", "exports"], function (require, 
         ContentDetails["SetMopidy"] = "SetMopidy";
         ContentDetails["Database"] = "Database";
         ContentDetails["ScanProgress"] = "ScanProgress";
+        ContentDetails["Thanks"] = "Thanks";
     })(ContentDetails = exports.ContentDetails || (exports.ContentDetails = {}));
     var SwipeDirection;
     (function (SwipeDirection) {
@@ -5055,6 +5056,13 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(HeaderBar.prototype, "MenuThanks", {
+            get: function () {
+                return this.$refs.MenuThanks;
+            },
+            enumerable: true,
+            configurable: true
+        });
         HeaderBar.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _this = this;
@@ -5068,6 +5076,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     this.allButtons.push(this.MenuMopidy);
                     this.allButtons.push(this.MenuDb);
                     this.allButtons.push(this.MenuScanProgress);
+                    this.allButtons.push(this.MenuThanks);
                     this.finderButtons.push(this.MenuGenres);
                     this.finderButtons.push(this.MenuArtists);
                     this.finderButtons.push(this.MenuAlbumTracks);
@@ -5076,6 +5085,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     this.settingsButtons.push(this.MenuMopidy);
                     this.settingsButtons.push(this.MenuDb);
                     this.settingsButtons.push(this.MenuScanProgress);
+                    this.settingsButtons.push(this.MenuThanks);
                     Libraries_11.default.SetTooltip(this.MenuGenres, 'Genres');
                     Libraries_11.default.SetTooltip(this.MenuArtists, 'Artists');
                     Libraries_11.default.SetTooltip(this.MenuAlbumTracks, 'Album Tracks');
@@ -5084,6 +5094,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     Libraries_11.default.SetTooltip(this.MenuMopidy, 'Set Mopidy');
                     Libraries_11.default.SetTooltip(this.MenuDb, 'Database');
                     Libraries_11.default.SetTooltip(this.MenuScanProgress, 'Scan Progress');
+                    Libraries_11.default.SetTooltip(this.MenuThanks, 'Thanks');
                     this.AllButtonToHide();
                     this.jqMainManuButton = Libraries_11.default.$(this.MainMenuButton);
                     this.mainMenuButton = new Libraries_11.default.AdminLte.PushMenu(this.jqMainManuButton);
@@ -5142,6 +5153,9 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                         case IContentDetail_6.ContentDetails.ScanProgress:
                             this.SetDetailActive(this.MenuScanProgress, this.settingsButtons);
                             break;
+                        case IContentDetail_6.ContentDetails.Thanks:
+                            this.SetDetailActive(this.MenuThanks, this.settingsButtons);
+                            break;
                         default:
                             Exception_14.default.Throw('Unexpected ContentDetail.', args);
                     }
@@ -5181,6 +5195,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
                     this.MenuMopidy.classList.remove(this.displayNone);
                     this.MenuDb.classList.remove(this.displayNone);
                     this.MenuScanProgress.classList.remove(this.displayNone);
+                    this.MenuThanks.classList.remove(this.displayNone);
                     break;
                 default:
                     Exception_14.default.Throw('Unexpected Content.', args);
@@ -5250,6 +5265,14 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
             this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
             this.SetDetailActive(this.MenuScanProgress, this.settingsButtons);
         };
+        HeaderBar.prototype.OnThanksClicked = function () {
+            var args = {
+                Content: IContent_4.Contents.Settings,
+                Detail: IContentDetail_6.ContentDetails.Thanks
+            };
+            this.$emit(exports.HeaderBarEvents.DetailOrdered, args);
+            this.SetDetailActive(this.MenuThanks, this.settingsButtons);
+        };
         HeaderBar.prototype.GetIsSideBarVisible = function () {
             return this.mainMenuButton.isShown();
         };
@@ -5263,7 +5286,7 @@ define("Views/HeaderBars/HeaderBar", ["require", "exports", "vue-class-component
         };
         HeaderBar = __decorate([
             vue_class_component_10.default({
-                template: "<nav class=\"main-header navbar navbar-expand border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\"\n                data-widget=\"pushmenu\"\n                href=\"javascript:void(0)\"\n                ref=\"MainMenuButton\" >\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n        <li class=\"nav-item\">\n            <h3>{{ title }}</h3>\n        </li>\n    </ul>\n    <ul class=\"navbar-nav ml-auto nav-pills\">\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuGenres\">\n            <a class=\"nav-link active\"\n                @click=\"OnGenresClicked\" >\n                <i class=\"fa fa-tags\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuArtists\">\n            <a class=\"nav-link\"\n                @click=\"OnArtistsClicked\" >\n                <i class=\"fa fa-users\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuAlbumTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnAlbumTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuPlaylists\">\n            <a class=\"nav-link active\"\n                @click=\"OnPlaylistsClicked\" >\n                <i class=\"fa fa-list-ul\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuPlaylistTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnPlaylistTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuMopidy\">\n            <a class=\"nav-link active\"\n                @click=\"OnMopidyClicked\" >\n                <i class=\"fa fa-wifi\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuDb\">\n            <a class=\"nav-link\"\n                @click=\"OnDbClicked\" >\n                <i class=\"fa fa-database\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuScanProgress\">\n            <a class=\"nav-link\"\n                @click=\"OnScanProgressClicked\" >\n                <i class=\"fa fa-rocket\" />\n            </a>\n        </li>\n    </ul>\n</nav>"
+                template: "<nav class=\"main-header navbar navbar-expand border-bottom\">\n    <ul class=\"navbar-nav\">\n        <li class=\"nav-item\">\n            <a class=\"nav-link\"\n                data-widget=\"pushmenu\"\n                href=\"javascript:void(0)\"\n                ref=\"MainMenuButton\" >\n                <i class=\"fa fa-bars\" />\n            </a>\n        </li>\n        <li class=\"nav-item\">\n            <h3>{{ title }}</h3>\n        </li>\n    </ul>\n    <ul class=\"navbar-nav ml-auto nav-pills\">\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuGenres\">\n            <a class=\"nav-link active\"\n                @click=\"OnGenresClicked\" >\n                <i class=\"fa fa-tags\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuArtists\">\n            <a class=\"nav-link\"\n                @click=\"OnArtistsClicked\" >\n                <i class=\"fa fa-users\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuAlbumTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnAlbumTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuPlaylists\">\n            <a class=\"nav-link active\"\n                @click=\"OnPlaylistsClicked\" >\n                <i class=\"fa fa-list-ul\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuPlaylistTracks\">\n            <a class=\"nav-link\"\n                @click=\"OnPlaylistTracksClicked\" >\n                <i class=\"fa fa-music\" />\n            </a>\n        </li>\n\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuMopidy\">\n            <a class=\"nav-link active\"\n                @click=\"OnMopidyClicked\" >\n                <i class=\"fa fa-wifi\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuDb\">\n            <a class=\"nav-link\"\n                @click=\"OnDbClicked\" >\n                <i class=\"fa fa-database\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuScanProgress\">\n            <a class=\"nav-link\"\n                @click=\"OnScanProgressClicked\" >\n                <i class=\"fa fa-rocket\" />\n            </a>\n        </li>\n        <li class=\"nav-item d-lg-none\"\n            ref=\"MenuThanks\">\n            <a class=\"nav-link\"\n                @click=\"OnThanksClicked\" >\n                <i class=\"fa fa-handshake-o\" />\n            </a>\n        </li>\n    </ul>\n</nav>"
             })
         ], HeaderBar);
         return HeaderBar;
@@ -7282,7 +7305,7 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
                     this.swipeDetector.on(HammerEvents_8.SwipeEvents.Left, function () {
                         var args = {
                             Content: IContent_9.Contents.Settings,
-                            ContentDetail: null,
+                            ContentDetail: IContentDetail_12.ContentDetails.Thanks,
                             Direction: IContentDetail_12.SwipeDirection.Left
                         };
                         _this.$emit(IContentDetail_12.ContentDetailEvents.Swiped, args);
@@ -7324,14 +7347,63 @@ define("Views/Settings/Blocks/ScanProgressBlock", ["require", "exports", "vue-cl
         };
         ScanProgressBlock = __decorate([
             vue_class_component_20.default({
-                template: "<div class=\"row content-detail\">\n    <div class=\"col-12  card-wrapper\">\n        <div class=\"card settings scanprogress\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-rocket\" />\n                    Album Scan Progress\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"row\">\n                    <div class=\"col-auto\">\n                        <p>\n                            Mopidy.Finder Backend is always Scanning Album-Images and belonging Tracks.<br/>\n                            This action makes the operation response faster.\n                        </p>\n                        <div class=\"progress\">\n                            <div class=\"progress-bar bg-success progress-bar-striped\"\n                                role=\"progressbar\"\n                                aria-valuenow=\"0\"\n                                aria-valuemin=\"0\"\n                                aria-valuemax=\"100\"\n                                ref=\"AlbumScanProgressBar\">\n                            </div>\n                        </div>\n                        <p>\n                            Total: {{ totalAlbumCount }} Albums.<br/>\n                            Scaned: {{ scanedAlbumCount }} Albums competed.<br/>\n                        </p>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
+                template: "<div class=\"row content-detail\">\n    <div class=\"col-12  card-wrapper\">\n        <div class=\"card settings scanprogress\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-rocket\" />\n                    Album Scan Progress\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"row\">\n                    <div class=\"col-auto\">\n                        <p>\n                            Mopidy.Finder Backend is Scanning Album-Images and belonging Tracks.<br/>\n                            This action makes app-response faster.\n                        </p>\n                        <div class=\"progress\">\n                            <div class=\"progress-bar bg-success progress-bar-striped\"\n                                role=\"progressbar\"\n                                aria-valuenow=\"0\"\n                                aria-valuemin=\"0\"\n                                aria-valuemax=\"100\"\n                                ref=\"AlbumScanProgressBar\">\n                            </div>\n                        </div>\n                        <p>\n                            Total: {{ totalAlbumCount }} Albums.<br/>\n                            Scaned: {{ scanedAlbumCount }} Albums competed.<br/>\n                        </p>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], ScanProgressBlock);
         return ScanProgressBlock;
     }(ContentDetailBase_4.default));
     exports.default = ScanProgressBlock;
 });
-define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock"], function (require, exports, vue_class_component_21, Libraries_22, SettingsStore_2, Exception_16, ContentBase_3, IContentDetail_13, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1) {
+define("Views/Settings/Blocks/ThanksBlock", ["require", "exports", "vue-class-component", "Libraries", "Views/Bases/ContentDetailBase", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Events/HammerEvents"], function (require, exports, vue_class_component_21, Libraries_22, ContentDetailBase_5, IContent_10, IContentDetail_13, HammerEvents_9) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var ThanksBlock = /** @class */ (function (_super) {
+        __extends(ThanksBlock, _super);
+        function ThanksBlock() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.tabId = 'subtab-thanks';
+            _this.linkId = 'nav-thanks';
+            return _this;
+        }
+        ThanksBlock.prototype.Initialize = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var _this = this;
+                return __generator(this, function (_a) {
+                    _super.prototype.Initialize.call(this);
+                    this.swipeDetector = new Libraries_22.default.Hammer(this.$el);
+                    this.swipeDetector.get('swipe').set({
+                        direction: Libraries_22.default.Hammer.DIRECTION_HORIZONTAL
+                    });
+                    this.swipeDetector.on(HammerEvents_9.SwipeEvents.Left, function () {
+                        var args = {
+                            Content: IContent_10.Contents.Settings,
+                            ContentDetail: null,
+                            Direction: IContentDetail_13.SwipeDirection.Left
+                        };
+                        _this.$emit(IContentDetail_13.ContentDetailEvents.Swiped, args);
+                    });
+                    this.swipeDetector.on(HammerEvents_9.SwipeEvents.Right, function () {
+                        var args = {
+                            Content: IContent_10.Contents.Settings,
+                            ContentDetail: IContentDetail_13.ContentDetails.ScanProgress,
+                            Direction: IContentDetail_13.SwipeDirection.Right
+                        };
+                        _this.$emit(IContentDetail_13.ContentDetailEvents.Swiped, args);
+                    });
+                    return [2 /*return*/, true];
+                });
+            });
+        };
+        ThanksBlock = __decorate([
+            vue_class_component_21.default({
+                template: "<div class=\"row content-detail\">\n    <div class=\"col-12 card-wrapper\">\n        <div class=\"card settings thanks\">\n            <div class=\"card-header with-border bg-warning\">\n                <h3 class=\"card-title\">\n                    <i class=\"fa fa-handshake-o\" />\n                    Thanks for all OSS Contributes\n                </h3>\n            </div>\n            <div class=\"card-body\">\n                <div class=\"row\">\n                    <div class=\"col-12\">\n                        <p>\n                            Mopidy.Finder is made up of many OSS and free implementations.<br/>\n                            THANKS A LOT!\n                        </p>\n                        <div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Mopidy</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://www.mopidy.com\" target=\"_blank\" title=\"Mopidy\">\n                                        https://www.mopidy.com\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/mopidy\" target=\"_blank\" title=\"GitHub\">\n                                        Stein Magnus Jodal and Contributors.\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Bootstrap4 Theme Neon Glow</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://hackerthemes.com/bootstrap-themes/demo/neon-glow/\" target=\"_blank\" title=\"Bootstrap4 Theme Neon Glow\">\n                                        https://hackerthemes.com/bootstrap-themes/demo/neon-glow/\n                                    </a><br/>\n                                    Created By Alexander Rechsteiner\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Bootstrap4</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://getbootstrap.com\" target=\"_blank\" title=\"Bootstrap4\">\n                                        https://getbootstrap.com\n                                    </a><br/>\n                                    Created By <a href=\"https://getbootstrap.com/docs/4.3/about/team/\" target=\"_blank\" title=\"Bootstrap Team\">\n                                        the Bootstrap team with the help of Contributors.\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">responsive-bootstrap-toolkit</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/maciej-gurban/responsive-bootstrap-toolkit\" target=\"_blank\" title=\"responsive-bootstrap-toolkit\">\n                                        https://github.com/maciej-gurban/responsive-bootstrap-toolkit\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/maciej-gurban/responsive-bootstrap-toolkit/graphs/contributors\" target=\"_blank\" title=\"responsive-bootstrap-toolkit Creators\">\n                                        responsive-bootstrap-toolkit Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Smashicons</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    Icons made by <a href=\"https://www.flaticon.com/authors/smashicons\" target=\"_blank\" title=\"Smashicons\">Smashicons</a> from \n                                    <a href=\"https://www.flaticon.com/\" target=\"_blank\" title=\"Flaticon\">www.flaticon.com</a> is licensed by \n                                    <a href=\"http://creativecommons.org/licenses/by/3.0/\" target=\"_blank\" title=\"Creative Commons BY 3.0\">CC 3.0 BY</a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Animate.css</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://daneden.github.io/animate.css/\" target=\"_blank\" title=\"Animate.css\">\n                                        https://daneden.github.io/animate.css/\n                                    </a><br/>\n                                    Created By <a href=\"https://daneden.me/\" target=\"_blank\" title=\"Daniel Eden\">\n                                        Daniel Eden.\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Admin LTE ver3</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://adminlte.io/themes/dev/AdminLTE/index.html\" target=\"_blank\" title=\"Admin LTE ver3\">\n                                        https://adminlte.io/themes/dev/AdminLTE/index.html\n                                    </a><br/>\n                                    Created By <a href=\"http://adminlte.io/\" target=\"_blank\" title=\"AdminLTE.io\">AdminLTE.io</a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Font Awesome 4</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://fontawesome.com/v4.7.0/icons/\" target=\"_blank\" title=\"Font Awesome 4\">\n                                        https://fontawesome.com/v4.7.0/icons/\n                                    </a><br/>\n                                    Create By <a href=\"https://fontawesome.com/\" target=\"_blank\" title=\"Font Awesome\">\n                                        Font Awesome\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">jQuery</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://jquery.com\" target=\"_blank\" title=\"jQuery\">\n                                        https://jquery.com\n                                    </a><br/>\n                                    Created By <a href=\"https://jquery.org/team/\" target=\"_blank\" title=\"jQuery foundation\">\n                                        jQuery foundation\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Ion.RangeSlider</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"http://ionden.com/a/plugins/ion.rangeSlider/\" target=\"_blank\" title=\"Ion.RangeSlider\">\n                                        http://ionden.com/a/plugins/ion.rangeSlider/\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/IonDen/ion.rangeSlider/graphs/contributors\" target=\"_blank\" title=\"Ion.RangeSlider Creators\">\n                                        Ion.RangeSlider Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">SweetAlert2</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://sweetalert2.github.io\" target=\"_blank\" title=\"SweetAlert2\">\n                                        https://sweetalert2.github.io\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/sweetalert2/sweetalert2/graphs/contributors\" target=\"_blank\" title=\"SweetAlert2 Creators\">\n                                        SweetAlert2 Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Vue.js</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://jp.vuejs.org/index.html\" target=\"_blank\" title=\"\">\n                                        https://jp.vuejs.org/index.html\n                                    </a><br/>\n                                    Created By <a href=\"https://jp.vuejs.org/v2/guide/team.html\" target=\"_blank\" title=\"Vue team\">\n                                        Vue team\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">vue-infinite-loading</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/PeachScript/vue-infinite-loading\" target=\"_blank\" title=\"\">\n                                        https://github.com/PeachScript/vue-infinite-loading\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/PeachScript/vue-infinite-loading/graphs/contributors\" target=\"_blank\" title=\"vue-infinite-loading Creators\">\n                                        vue-infinite-loading Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Axios</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/axios/axios\" target=\"_blank\" title=\"Axios\">\n                                        https://github.com/axios/axios\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/orgs/axios/people\" target=\"_blank\" title=\"Axios Creators\">\n                                        Axios Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">HAMMER.JS</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://hammerjs.github.io\" target=\"_blank\" title=\"HAMMER.JS\">\n                                        https://hammerjs.github.io\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/orgs/hammerjs/people\" target=\"_blank\" title=\"HAMMER.JS Creators\">\n                                        HAMMER.JS Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">linq.js</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://unpkg.com/browse/linq@3.2.0/\" target=\"_blank\" title=\"linq.js\">\n                                        https://unpkg.com/browse/linq@3.2.0/\n                                    </a><br/>\n                                    Created By <a href=\"https://mjackson.me\" target=\"_blank\" title=\"Michael Jackson\">\n                                        Michael Jackson\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">lodash</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://lodash.com\" target=\"_blank\" title=\"lodash\">\n                                        https://lodash.com\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/orgs/lodash/people\" target=\"_blank\" title=\"lodash Creators\">\n                                        lodash Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">qs</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/ljharb/qs\" target=\"_blank\" title=\"qs\">\n                                        https://github.com/ljharb/qs\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/ljharb/qs/graphs/contributors\" target=\"_blank\" title=\"qs Creators\">\n                                        qs Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">SortableJS</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/SortableJS/Sortable\" target=\"_blank\" title=\"\">\n                                        https://github.com/SortableJS/Sortable\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/orgs/SortableJS/people\" target=\"_blank\" title=\"SortableJS Creators\">\n                                        SortableJS Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">es6-promise</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/stefanpenner/es6-promise\" target=\"_blank\" title=\"es6-promise\">\n                                        https://github.com/stefanpenner/es6-promise\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/stefanpenner/es6-promise/graphs/contributors\" target=\"_blank\" title=\"es6-promise Creators\">\n                                        es6-promise Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">object.assign</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/ljharb/object.assign\" target=\"_blank\" title=\"\">\n                                        https://github.com/ljharb/object.assign\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/ljharb/object.assign/graphs/contributors\" target=\"_blank\" title=\"object.assign Creators\">\n                                        object.assign Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">smoothscroll-polyfill</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/iamdustan/smoothscroll\" target=\"_blank\" title=\"smoothscroll-polyfill\">\n                                        https://github.com/iamdustan/smoothscroll\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/iamdustan/smoothscroll/graphs/contributors\" target=\"_blank\" title=\"smoothscroll-polyfill Creators\">\n                                        smoothscroll-polyfill Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">RequireJS</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://requirejs.org\" target=\"_blank\" title=\"RequireJS\">\n                                        https://requirejs.org\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/requirejs/requirejs/graphs/contributors\" target=\"_blank\" title=\"RequireJS Creators\">\n                                        RequireJS Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">webpack</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://webpack.js.org\" target=\"_blank\" title=\"webpack\">\n                                        https://webpack.js.org\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/webpack/webpack/graphs/contributors\" target=\"_blank\" title=\"webpack Creators\">\n                                        webpack Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">mocha</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/mochajs/mocha\" target=\"_blank\" title=\"mocha\">\n                                        https://github.com/mochajs/mocha\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/mochajs/mocha/graphs/contributors\" target=\"_blank\" title=\"mocha Creators\">\n                                        mocha Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">chai</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://github.com/chaijs/chai\" target=\"_blank\" title=\"chai\">\n                                        https://github.com/chaijs/chai\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/chaijs/chai/graphs/contributors\" target=\"_blank\" title=\"chai Creators\">\n                                        chai Creators\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">ESLint</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://eslint.org\" target=\"_blank\" title=\"ESLint\">\n                                        https://eslint.org\n                                    </a><br/>\n                                    Created By <a href=\"https://eslint.org/team\" target=\"_blank\" title=\"ESLint Team\">\n                                        ESLint Team\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">ASP.NET Core 2.2</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-2.2\" target=\"_blank\" title=\"ASP.NET Core 2.2\">\n                                        https://docs.microsoft.com/en-us/aspnet/core/?view=aspnetcore-2.2\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/aspnet/AspNetCore/graphs/contributors\" target=\"_blank\" title=\"Microsoft and Contributers\">\n                                        Microsoft and Contributers\n                                    </a>\n                                </div>\n                            </div>\n                            <div class=\"card\">\n                                <div class=\"card-header with-border bg-warning\">\n                                    <h5 class=\"card-title\">Typescript 3.4</h5>\n                                </div>\n                                <div class=\"card-body\">\n                                    <a href=\"https://www.typescriptlang.org\" target=\"_blank\" title=\"Typescript\">\n                                        https://www.typescriptlang.org\n                                    </a><br/>\n                                    Created By <a href=\"https://github.com/microsoft/TypeScript/graphs/contributors\" target=\"_blank\" title=\"Microsoft and Contoributers\">\n                                        Microsoft and Contoributers\n                                    </a>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>"
+            })
+        ], ThanksBlock);
+        return ThanksBlock;
+    }(ContentDetailBase_5.default));
+    exports.default = ThanksBlock;
+});
+define("Views/Settings/Settings", ["require", "exports", "vue-class-component", "Libraries", "Models/Settings/SettingsStore", "Utils/Exception", "Views/Bases/ContentBase", "Views/Bases/IContentDetail", "Views/Settings/Blocks/DbBlock", "Views/Settings/Blocks/MopidyBlock", "Views/Settings/Blocks/ScanProgressBlock", "Views/Settings/Blocks/ThanksBlock"], function (require, exports, vue_class_component_22, Libraries_23, SettingsStore_2, Exception_16, ContentBase_3, IContentDetail_14, DbBlock_1, MopidyBlock_1, ScanProgressBlock_1, ThanksBlock_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SettingsEvents = {
@@ -7375,6 +7447,13 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Settings.prototype, "ThanksBlock", {
+            get: function () {
+                return this.$refs.ThanksBlock;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Settings.prototype.Initialize = function () {
             return __awaiter(this, void 0, void 0, function () {
                 var _a;
@@ -7388,7 +7467,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                         case 1:
                             _a.entity = _b.sent();
                             // 利便性的にどうなのか、悩む。
-                            Libraries_22.default.SlimScroll(this.InnerDiv, {
+                            Libraries_23.default.SlimScroll(this.InnerDiv, {
                                 height: 'calc(100vh - 73px)',
                                 wheelStep: 60
                             });
@@ -7398,6 +7477,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
                             this.details.push(this.MopidyBlock);
                             this.details.push(this.DbBlock);
                             this.details.push(this.ScanProgressBlock);
+                            this.details.push(this.ThanksBlock);
                             this.currentDetail = this.MopidyBlock;
                             this.detailWrapperElement = this.$refs.InnerDiv;
                             return [2 /*return*/, true];
@@ -7413,12 +7493,14 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         };
         Settings.prototype.GetContentDetail = function (detail) {
             switch (detail) {
-                case IContentDetail_13.ContentDetails.SetMopidy:
+                case IContentDetail_14.ContentDetails.SetMopidy:
                     return this.MopidyBlock;
-                case IContentDetail_13.ContentDetails.Database:
+                case IContentDetail_14.ContentDetails.Database:
                     return this.DbBlock;
-                case IContentDetail_13.ContentDetails.ScanProgress:
+                case IContentDetail_14.ContentDetails.ScanProgress:
                     return this.ScanProgressBlock;
+                case IContentDetail_14.ContentDetails.Thanks:
+                    return this.ThanksBlock;
                 default:
                     Exception_16.default.Throw('Unexpected ContentDetail');
             }
@@ -7452,12 +7534,13 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
             this.DbBlock.ShowProgress(args);
         };
         Settings = __decorate([
-            vue_class_component_21.default({
-                template: "<section class=\"content h-100 tab-pane fade\"\n    id=\"tab-settings\"\n    role=\"tabpanel\"\n    aria-labelledby=\"nav-settings\">\n    <div class=\"w-100 h-100\"\n        ref=\"InnerDiv\">\n        <mopidy-block\n            ref=\"MopidyBlock\"\n            @SettingsUpdated=\"OnSettingsUpdated\"\n            @Swiped=\"OnSwiped\" />\n        <db-block\n            ref=\"DbBlock\"\n            @Swiped=\"OnSwiped\" />\n        <scan-progress-block\n            ref=\"ScanProgressBlock\"\n            @Swiped=\"OnSwiped\" />\n    </div>\n</section>",
+            vue_class_component_22.default({
+                template: "<section class=\"content h-100 tab-pane fade\"\n    id=\"tab-settings\"\n    role=\"tabpanel\"\n    aria-labelledby=\"nav-settings\">\n    <div class=\"w-100 h-100\"\n        ref=\"InnerDiv\">\n        <mopidy-block\n            ref=\"MopidyBlock\"\n            @SettingsUpdated=\"OnSettingsUpdated\"\n            @Swiped=\"OnSwiped\" />\n        <db-block\n            ref=\"DbBlock\"\n            @Swiped=\"OnSwiped\" />\n        <scan-progress-block\n            ref=\"ScanProgressBlock\"\n            @Swiped=\"OnSwiped\" />\n        <thanks-block\n            ref=\"ThanksBlock\"\n            @Swiped=\"OnSwiped\" />\n    </div>\n</section>",
                 components: {
                     'mopidy-block': MopidyBlock_1.default,
                     'db-block': DbBlock_1.default,
                     'scan-progress-block': ScanProgressBlock_1.default,
+                    'thanks-block': ThanksBlock_1.default
                 }
             })
         ], Settings);
@@ -7465,7 +7548,7 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
     }(ContentBase_3.default));
     exports.default = Settings;
 });
-define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_22, Libraries_23, Monitor_2, Player_3, ViewBase_12) {
+define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component", "Libraries", "Models/Mopidies/Monitor", "Models/Mopidies/Player", "Views/Bases/ViewBase"], function (require, exports, vue_class_component_23, Libraries_24, Monitor_2, Player_3, ViewBase_12) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlayerPanelEvents = {
@@ -7502,7 +7585,7 @@ define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component
                 var _this = this;
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    this.volumeSlider = Libraries_23.default.$(this.$refs.Slider).ionRangeSlider({
+                    this.volumeSlider = Libraries_24.default.$(this.$refs.Slider).ionRangeSlider({
                         onFinish: function (data) {
                             // スライダー操作完了時のイベント
                             _this.player.SetVolume(data.from);
@@ -7686,7 +7769,7 @@ define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component
         var PlayerPanel_1;
         PlayerPanel.ClassDisabled = 'disabled';
         PlayerPanel = PlayerPanel_1 = __decorate([
-            vue_class_component_22.default({
+            vue_class_component_23.default({
                 template: "<div class=\"card siderbar-control pb-10\">\n    <div class=\"card-body\">\n        <img v-bind:src=\"imageFullUri\" class=\"albumart\" />\n        <h6 class=\"card-title\">{{ trackName }}</h6>\n        <span>{{ trackDetail }}</span>\n        <div class=\"player-box btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickPrevious\">\n                <i class=\"fa fa-fast-backward\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickPlayPause\">\n                <i v-bind:class=\"GetPlayPauseIconClass()\" ref=\"PlayPauseIcon\"/>\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning\"\n                @click=\"OnClickNext\">\n                <i class=\"fa fa-fast-forward\" />\n            </button>\n        </div>\n\n        <div class=\"btn-group btn-group-sm w-100 mt-2\" role=\"group\">\n            <button type=\"button\"\n                class=\"btn btn-warning disabled\"\n                ref=\"ButtonShuffle\"\n                @click=\"OnClickShuffle\">\n                <i class=\"fa fa fa-random\" />\n            </button>\n            <button type=\"button\"\n                class=\"btn btn-warning disabled\"\n                ref=\"ButtonRepeat\"\n                @click=\"OnClickRepeat\" >\n                <i class=\"fa fa-retweet\" />\n            </button>\n        </div>\n\n        <div class=\"row volume-box w-100 mt-2\">\n            <div class=\"col-1 volume-button volume-min\">\n                <a @click=\"OnClickVolumeMin\">\n                    <i class=\"fa fa-volume-off\" />\n                </a>\n            </div>\n            <div class=\"col-10\">\n                <input type=\"text\"\n                    data-type=\"single\"\n                    data-min=\"0\"\n                    data-max=\"100\"\n                    data-from=\"100\"\n                    data-grid=\"true\"\n                    data-hide-min-max=\"true\"\n                    ref=\"Slider\" />\n            </div>\n            <div class=\"col-1 volume-button volume-max\">\n                <a @click=\"OnClickVolumeMax\">\n                    <i class=\"fa fa-volume-up\" />\n                </a>\n            </div>\n        </div>\n    </div>\n</div>"
             })
         ], PlayerPanel);
@@ -7694,7 +7777,7 @@ define("Views/SideBars/PlayerPanel", ["require", "exports", "vue-class-component
     }(ViewBase_12.default));
     exports.default = PlayerPanel;
 });
-define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/SideBars/PlayerPanel"], function (require, exports, vue_class_component_23, Libraries_24, Exception_17, IContent_10, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
+define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "Libraries", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/TabBase", "Views/Bases/ViewBase", "Views/Events/BootstrapEvents", "Views/SideBars/PlayerPanel"], function (require, exports, vue_class_component_24, Libraries_25, Exception_17, IContent_11, TabBase_2, ViewBase_13, BootstrapEvents_3, PlayerPanel_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SideBarEvents = {
@@ -7753,10 +7836,10 @@ define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "
                 var _this = this;
                 return __generator(this, function (_a) {
                     _super.prototype.Initialize.call(this);
-                    Libraries_24.default.SlimScroll(this.SideBarSection, {
+                    Libraries_25.default.SlimScroll(this.SideBarSection, {
                         height: 'calc(100%)'
                     });
-                    this.navigationAnchors = Libraries_24.default.$([
+                    this.navigationAnchors = Libraries_25.default.$([
                         this.NavigationFinder,
                         this.NavigationPlaylists,
                         this.NavigationSettings
@@ -7783,13 +7866,13 @@ define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "
             var content;
             switch (naviTypeString) {
                 case exports.NavigationAriaControls.Finder:
-                    content = IContent_10.Contents.Finder;
+                    content = IContent_11.Contents.Finder;
                     break;
                 case exports.NavigationAriaControls.Playlists:
-                    content = IContent_10.Contents.Playlists;
+                    content = IContent_11.Contents.Playlists;
                     break;
                 case exports.NavigationAriaControls.Settings:
-                    content = IContent_10.Contents.Settings;
+                    content = IContent_11.Contents.Settings;
                     break;
                 default:
                     Exception_17.default.Throw('Unexpected Tab Kind', naviTypeString);
@@ -7809,13 +7892,13 @@ define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "
             var content;
             switch (naviTypeString) {
                 case exports.NavigationAriaControls.Finder:
-                    content = IContent_10.Contents.Finder;
+                    content = IContent_11.Contents.Finder;
                     break;
                 case exports.NavigationAriaControls.Playlists:
-                    content = IContent_10.Contents.Playlists;
+                    content = IContent_11.Contents.Playlists;
                     break;
                 case exports.NavigationAriaControls.Settings:
-                    content = IContent_10.Contents.Settings;
+                    content = IContent_11.Contents.Settings;
                     break;
                 default:
                     Exception_17.default.Throw('Unexpected Tab Kind', naviTypeString);
@@ -7830,14 +7913,14 @@ define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "
         };
         SideBar.prototype.SetNavigation = function (content) {
             switch (content) {
-                case IContent_10.Contents.Finder:
-                    Libraries_24.default.$(this.NavigationFinder).tab(SideBar_1.ShowTabMethod);
+                case IContent_11.Contents.Finder:
+                    Libraries_25.default.$(this.NavigationFinder).tab(SideBar_1.ShowTabMethod);
                     break;
-                case IContent_10.Contents.Playlists:
-                    Libraries_24.default.$(this.NavigationPlaylists).tab(SideBar_1.ShowTabMethod);
+                case IContent_11.Contents.Playlists:
+                    Libraries_25.default.$(this.NavigationPlaylists).tab(SideBar_1.ShowTabMethod);
                     break;
-                case IContent_10.Contents.Settings:
-                    Libraries_24.default.$(this.NavigationSettings).tab(SideBar_1.ShowTabMethod);
+                case IContent_11.Contents.Settings:
+                    Libraries_25.default.$(this.NavigationSettings).tab(SideBar_1.ShowTabMethod);
                     break;
                 default:
                     Exception_17.default.Throw('Unexpected Content Ordered.', content);
@@ -7855,8 +7938,8 @@ define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "
         var SideBar_1;
         SideBar.ShowTabMethod = 'show';
         SideBar = SideBar_1 = __decorate([
-            vue_class_component_23.default({
-                template: "<aside class=\"main-sidebar sidebar-dark-warning elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SideBarSection\">\n        <div class=\"w-100 inner-sidebar\">\n            <nav class=\"mt-2\">\n                <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-finder\"\n                            href=\"#tab-finder\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-finder\"\n                            aria-selected=\"false\"\n                            ref=\"NavigationFinder\"\n                            @click=\"OnNavigationClicked\" >\n                            <i class=\"fa fa-search nav-icon\" />\n                            <p>Finder</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-playlists\"\n                            href=\"#tab-playlists\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-playlists\"\n                            aria-selected=\"false\"\n                            ref=\"NavigationPlaylists\"\n                            @click=\"OnNavigationClicked\" >\n                            <i class=\"fa fa-bookmark nav-icon\" />\n                            <p>Playlists</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-settings\"\n                            href=\"#tab-settings\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-settings\"\n                            aria-selected=\"false\"\n                            ref=\"NavigationSettings\"\n                            @click=\"OnNavigationClicked\" >\n                            <i class=\"fa fa-cog nav-icon\" />\n                            <p>Settings</p>\n                        </a>\n                    </li>\n                </ul>\n            </nav>\n            <div class=\"row mt-2\">\n                <div class=\"col-12\">\n                    <player-panel\n                        ref=\"PlayerPanel\"\n                        @Operated=\"OnOperated\"/>\n                </div>\n            </div>\n        </div>\n    </section>\n</aside>",
+            vue_class_component_24.default({
+                template: "<aside class=\"main-sidebar sidebar-dark-warning elevation-4\">\n    <div class=\"brand-link navbar-secondary\">\n        <img src=\"img/apple-icon.png\" alt=\"Mopidy.Finder\" class=\"brand-image img-circle elevation-3\" />\n        <span class=\"brand-text font-weight-light\">Mopidy.Finder</span>\n    </div>\n    <section\n        class=\"sidebar\"\n        ref=\"SideBarSection\">\n        <div class=\"w-100 inner-sidebar\">\n            <nav class=\"mt-2\">\n                <ul class=\"nav nav-pills nav-sidebar flex-column\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-finder\"\n                            href=\"#tab-finder\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-finder\"\n                            aria-selected=\"false\"\n                            ref=\"NavigationFinder\"\n                            @click=\"OnNavigationClicked\" >\n                            <i class=\"fa fa-search nav-icon\" />\n                            <p>Finder</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-playlists\"\n                            href=\"#tab-playlists\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-playlists\"\n                            aria-selected=\"false\"\n                            ref=\"NavigationPlaylists\"\n                            @click=\"OnNavigationClicked\" >\n                            <i class=\"fa fa-bookmark nav-icon\" />\n                            <p>Playlists</p>\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\"\n                            id=\"nav-settings\"\n                            href=\"#tab-settings\"\n                            role=\"tab\"\n                            data-toggle=\"tab\"\n                            aria-controls=\"tab-settings\"\n                            aria-selected=\"false\"\n                            ref=\"NavigationSettings\"\n                            @click=\"OnNavigationClicked\" >\n                            <i class=\"fa fa-cog nav-icon\" />\n                            <p>Settings</p>\n                        </a>\n                    </li>\n                </ul>\n            </nav>\n            <div class=\"row mt-2\">\n                <div class=\"col-12\">\n                    <player-panel\n                        ref=\"PlayerPanel\"\n                        @Operated=\"OnOperated\"/>\n                </div>\n            </div>\n        </div>\n    </section>\n</aside>",
                 components: {
                     'player-panel': PlayerPanel_2.default
                 }
@@ -7866,7 +7949,7 @@ define("Views/SideBars/SideBar", ["require", "exports", "vue-class-component", "
     }(ViewBase_13.default));
     exports.default = SideBar;
 });
-define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/SideBars/SideBar"], function (require, exports, vue_class_component_24, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, SideBar_2) {
+define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Bases/ViewBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings", "Views/SideBars/SideBar"], function (require, exports, vue_class_component_25, ViewBase_14, Finder_1, HeaderBar_1, Playlists_1, Settings_3, SideBar_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var RootView = /** @class */ (function (_super) {
@@ -7922,7 +8005,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
             });
         };
         RootView = __decorate([
-            vue_class_component_24.default({
+            vue_class_component_25.default({
                 template: "<div class=\"wrapper\" style=\"height: 100%; min-height: 100%;\">\n    <header-bar\n        ref=\"HeaderBar\" />\n    <sidebar\n        ref=\"SideBar\" />\n    <div class=\"content-wrapper h-100 pt-3 tab-content\">\n        <finder\n            ref=\"Finder\" />\n        <playlists\n            ref=\"Playlists\" />\n        <settings\n            ref=\"Settings\" />\n    </div>\n</div>",
                 components: {
                     'header-bar': HeaderBar_1.default,
@@ -7937,7 +8020,7 @@ define("Views/RootView", ["require", "exports", "vue-class-component", "Views/Ba
     }(ViewBase_14.default));
     exports.default = RootView;
 });
-define("Controllers/ContentController", ["require", "exports", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/TabBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings"], function (require, exports, Exception_18, IContent_11, IContentDetail_14, TabBase_3, Finder_2, HeaderBar_2, Playlists_2, Settings_4) {
+define("Controllers/ContentController", ["require", "exports", "Utils/Exception", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/TabBase", "Views/Finders/Finder", "Views/HeaderBars/HeaderBar", "Views/Playlists/Playlists", "Views/Settings/Settings"], function (require, exports, Exception_18, IContent_12, IContentDetail_15, TabBase_3, Finder_2, HeaderBar_2, Playlists_2, Settings_4) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var ContentController = /** @class */ (function () {
@@ -7972,45 +8055,45 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
                 _this._finder.ForceRefresh();
                 _this._playlists.RefreshPlaylist();
             });
-            this._finder.$on(IContentDetail_14.ContentDetailEvents.Swiped, function (args) {
+            this._finder.$on(IContentDetail_15.ContentDetailEvents.Swiped, function (args) {
                 if (!_this._isFullscreen)
                     return;
-                if (args.Direction === IContentDetail_14.SwipeDirection.Right && args.ContentDetail === null) {
+                if (args.Direction === IContentDetail_15.SwipeDirection.Right && args.ContentDetail === null) {
                     _this._headerBar.SetSideBarOpen();
                 }
                 else if (args.ContentDetail) {
                     var detailArgs = {
-                        Content: IContent_11.Contents.Finder,
+                        Content: IContent_12.Contents.Finder,
                         Detail: args.ContentDetail
                     };
                     _this._finder.ShowContentDetail(detailArgs);
                     _this._headerBar.SetDetail(detailArgs);
                 }
             });
-            this._playlists.$on(IContentDetail_14.ContentDetailEvents.Swiped, function (args) {
+            this._playlists.$on(IContentDetail_15.ContentDetailEvents.Swiped, function (args) {
                 if (!_this._isFullscreen)
                     return;
-                if (args.Direction === IContentDetail_14.SwipeDirection.Right && args.ContentDetail === null) {
+                if (args.Direction === IContentDetail_15.SwipeDirection.Right && args.ContentDetail === null) {
                     _this._headerBar.SetSideBarOpen();
                 }
                 else if (args.ContentDetail) {
                     var detailArgs = {
-                        Content: IContent_11.Contents.Playlists,
+                        Content: IContent_12.Contents.Playlists,
                         Detail: args.ContentDetail
                     };
                     _this._playlists.ShowContentDetail(detailArgs);
                     _this._headerBar.SetDetail(detailArgs);
                 }
             });
-            this._settings.$on(IContentDetail_14.ContentDetailEvents.Swiped, function (args) {
+            this._settings.$on(IContentDetail_15.ContentDetailEvents.Swiped, function (args) {
                 if (!_this._isFullscreen)
                     return;
-                if (args.Direction === IContentDetail_14.SwipeDirection.Right && args.ContentDetail === null) {
+                if (args.Direction === IContentDetail_15.SwipeDirection.Right && args.ContentDetail === null) {
                     _this._headerBar.SetSideBarOpen();
                 }
                 else if (args.ContentDetail) {
                     var detailArgs = {
-                        Content: IContent_11.Contents.Settings,
+                        Content: IContent_12.Contents.Settings,
                         Detail: args.ContentDetail
                     };
                     _this._settings.ShowContentDetail(detailArgs);
@@ -8038,11 +8121,11 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
         };
         ContentController.prototype.GetContent = function (content) {
             switch (content) {
-                case IContent_11.Contents.Finder:
+                case IContent_12.Contents.Finder:
                     return this._finder;
-                case IContent_11.Contents.Playlists:
+                case IContent_12.Contents.Playlists:
                     return this._playlists;
-                case IContent_11.Contents.Settings:
+                case IContent_12.Contents.Settings:
                     return this._settings;
                 default:
                     Exception_18.default.Throw('Unexpected Content.', content);
@@ -8074,19 +8157,19 @@ define("Controllers/ContentController", ["require", "exports", "Utils/Exception"
         };
         ContentController.prototype.ShowSettingsDbProgress = function (updateProgress) {
             if (this._currentContent !== this._settings)
-                this.SetCurrentContent(IContent_11.Contents.Settings);
+                this.SetCurrentContent(IContent_12.Contents.Settings);
             this._settings.ShowProgress(updateProgress);
         };
         ContentController.prototype.ShowSettingsInitialScan = function () {
             if (this._currentContent !== this._settings)
-                this.SetCurrentContent(IContent_11.Contents.Settings);
+                this.SetCurrentContent(IContent_12.Contents.Settings);
             this._settings.InitialScan();
         };
         return ContentController;
     }());
     exports.default = ContentController;
 });
-define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Utils/Dump", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/SideBars/SideBar"], function (require, exports, Libraries_25, SettingsStore_3, Dump_10, IContent_12, HeaderBar_3, SideBar_3) {
+define("Controllers/NavigationController", ["require", "exports", "Libraries", "Models/Settings/SettingsStore", "Utils/Dump", "Views/Bases/IContent", "Views/HeaderBars/HeaderBar", "Views/SideBars/SideBar"], function (require, exports, Libraries_26, SettingsStore_3, Dump_10, IContent_13, HeaderBar_3, SideBar_3) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var NavigationController = /** @class */ (function () {
@@ -8096,13 +8179,13 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             this._rootView = null;
             this._headerBar = null;
             this._sideBar = null;
-            this._viewport = Libraries_25.default.ResponsiveBootstrapToolkit;
+            this._viewport = Libraries_26.default.ResponsiveBootstrapToolkit;
             this._content = contentController;
             this._rootView = rootView;
             this._headerBar = this._rootView.HeaderBar;
             this._sideBar = this._rootView.SideBar;
             this._store = new SettingsStore_3.default();
-            Libraries_25.default.$(window).resize(this._viewport.changed(function () {
+            Libraries_26.default.$(window).resize(this._viewport.changed(function () {
                 _this.AdjustScreen();
             }));
             this._headerBar.$on(HeaderBar_3.HeaderBarEvents.SideBarShown, function () {
@@ -8151,8 +8234,8 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
                                 : this._sideBar.OnCollapsed();
                             isDbUpdating = (updateProgress.UpdateType !== 'None');
                             content = (this._store.Entity.IsMopidyConnectable !== true || isDbUpdating !== false)
-                                ? IContent_12.Contents.Settings
-                                : IContent_12.Contents.Finder;
+                                ? IContent_13.Contents.Settings
+                                : IContent_13.Contents.Finder;
                             this._content.SetCurrentContent(content);
                             if (!isDbUpdating) return [3 /*break*/, 3];
                             this._content.ShowSettingsDbProgress(updateProgress);
@@ -8260,7 +8343,7 @@ define("Controllers/RootController", ["require", "exports", "Views/RootView", "C
     }());
     exports.default = RootController;
 });
-define("Main", ["require", "exports", "Controllers/RootController", "Libraries"], function (require, exports, RootController_1, Libraries_26) {
+define("Main", ["require", "exports", "Controllers/RootController", "Libraries"], function (require, exports, RootController_1, Libraries_27) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Main = /** @class */ (function () {
@@ -8269,7 +8352,7 @@ define("Main", ["require", "exports", "Controllers/RootController", "Libraries"]
         Main.prototype.Init = function () {
             return __awaiter(this, void 0, void 0, function () {
                 return __generator(this, function (_a) {
-                    Libraries_26.default.Initialize();
+                    Libraries_27.default.Initialize();
                     this._root = new RootController_1.default();
                     return [2 /*return*/, this];
                 });

@@ -26,6 +26,7 @@ export const NavigationAriaControls = {
 @Component({
     template: `<aside class="main-sidebar sidebar-dark-warning elevation-4">
     <div class="brand-link navbar-secondary">
+        <img src="img/apple-icon.png" alt="Mopidy.Finder" class="brand-image img-circle elevation-3" />
         <span class="brand-text font-weight-light">Mopidy.Finder</span>
     </div>
     <section

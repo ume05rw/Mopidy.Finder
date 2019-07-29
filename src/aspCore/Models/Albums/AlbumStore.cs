@@ -16,6 +16,7 @@ namespace MopidyFinder.Models.Albums
         private const string AlbumQueryString = "local:directory?type=album";
         private const string YearQueryString = "local:directory?type=date&format=%25Y";
 
+        private static Locker Locker = new Locker();
         //private readonly int AlbumPageLength = 10;
 
         private Library _library;
@@ -163,25 +164,31 @@ namespace MopidyFinder.Models.Albums
 
         public AlbumScanProgress GetAlbumScanProgress()
         {
-            var result = new AlbumScanProgress()
+            lock (AlbumStore.Locker)
             {
-                TotalAlbumCount = this.Dbc.Albums.Count(),
-                ScannedAlbumCount = this.Dbc.Albums
-                    .GroupJoin(
-                        this.Dbc.Tracks,
-                        al => al.Id,
-                        tr => tr.AlbumId,
-                        (al, tr) => new
-                        {
-                            Album = al,
-                            Tracks = tr
-                        }
-                    )
-                    .Where(e => e.Tracks.Any())
-                    .Count()
-            };
+                AlbumStore.Locker.IsLocked = true;
 
-            return result;
+                var result = new AlbumScanProgress()
+                {
+                    TotalAlbumCount = this.Dbc.Albums.Count(),
+                    ScannedAlbumCount = this.Dbc.Albums
+                        .GroupJoin(
+                            this.Dbc.Tracks,
+                            al => al.Id,
+                            tr => tr.AlbumId,
+                            (al, tr) => new
+                            {
+                                Album = al,
+                                Tracks = tr
+                            }
+                        )
+                        .Where(e => e.Tracks.Any())
+                        .Count()
+                };
+                AlbumStore.Locker.IsLocked = false;
+
+                return result;
+            }
         }
 
         public async Task<int> ScanAlbumDetail(CancellationToken cancelToken)

@@ -62,6 +62,7 @@
     <None Remove="src\ts\Views\Settings\Blocks\DbBlock.ts" />
     <None Remove="src\ts\Views\Settings\Blocks\MopidyBlock.ts" />
     <None Remove="src\ts\Views\Settings\Blocks\ScanProgressBlock.ts" />
+    <None Remove="src\ts\Views\Settings\Blocks\ThanksBlock.ts" />
     <None Remove="src\ts\Views\Settings\Settings.ts" />
     <None Remove="src\ts\Views\Shared\Dialogs\ConfirmDialog.ts" />
     <None Remove="src\ts\Views\Shared\Dialogs\ProgressDialog.ts" />
@@ -161,6 +162,7 @@
     <TypeScriptCompile Include="src\ts\Views\Settings\Blocks\DbBlock.ts" />
     <TypeScriptCompile Include="src\ts\Views\Settings\Blocks\MopidyBlock.ts" />
     <TypeScriptCompile Include="src\ts\Views\Settings\Blocks\ScanProgressBlock.ts" />
+    <TypeScriptCompile Include="src\ts\Views\Settings\Blocks\ThanksBlock.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Dialogs\ConfirmDialog.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Dialogs\ProgressDialog.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\Filterboxes\SearchInput.ts" />

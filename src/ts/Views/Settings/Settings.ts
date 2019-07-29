@@ -8,6 +8,7 @@ import { ContentDetails, default as IContentDetail, IContentDetailArgs, IContent
 import DbBlock from './Blocks/DbBlock';
 import MopidyBlock from './Blocks/MopidyBlock';
 import ScanProgressBlock from './Blocks/ScanProgressBlock';
+import ThanksBlock from './Blocks/ThanksBlock';
 
 export const SettingsEvents = {
     ServerFound: 'ServerFound'
@@ -30,12 +31,16 @@ export const SettingsEvents = {
         <scan-progress-block
             ref="ScanProgressBlock"
             @Swiped="OnSwiped" />
+        <thanks-block
+            ref="ThanksBlock"
+            @Swiped="OnSwiped" />
     </div>
 </section>`,
     components: {
         'mopidy-block': MopidyBlock,
         'db-block': DbBlock,
         'scan-progress-block': ScanProgressBlock,
+        'thanks-block': ThanksBlock
     }
 })
 export default class Settings extends ContentBase {
@@ -54,6 +59,9 @@ export default class Settings extends ContentBase {
     }
     private get ScanProgressBlock(): ScanProgressBlock {
         return this.$refs.ScanProgressBlock as ScanProgressBlock;
+    }
+    private get ThanksBlock(): ThanksBlock {
+        return this.$refs.ThanksBlock as ThanksBlock;
     }
 
     public async Initialize(): Promise<boolean> {
@@ -75,6 +83,7 @@ export default class Settings extends ContentBase {
         this.details.push(this.MopidyBlock);
         this.details.push(this.DbBlock);
         this.details.push(this.ScanProgressBlock);
+        this.details.push(this.ThanksBlock);
         this.currentDetail = this.MopidyBlock;
         this.detailWrapperElement = this.$refs.InnerDiv as HTMLElement;
 
@@ -99,6 +108,8 @@ export default class Settings extends ContentBase {
                 return this.DbBlock;
             case ContentDetails.ScanProgress:
                 return this.ScanProgressBlock;
+            case ContentDetails.Thanks:
+                return this.ThanksBlock;
             default:
                 Exception.Throw('Unexpected ContentDetail');
         }

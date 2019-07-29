@@ -333,3 +333,10 @@ div.dropdown {
     width: 100px;
 }
 
+#tab-settings .thanks a {
+    color: #e4e2ff;
+    font-weight: bold;
+}
+#tab-settings .thanks a:hover {
+    color: #ffffff;
+}

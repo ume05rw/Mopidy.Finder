@@ -21,8 +21,8 @@ import { SwipeEvents } from '../../Events/HammerEvents';
                 <div class="row">
                     <div class="col-auto">
                         <p>
-                            Mopidy.Finder Backend is always Scanning Album-Images and belonging Tracks.<br/>
-                            This action makes the operation response faster.
+                            Mopidy.Finder Backend is Scanning Album-Images and belonging Tracks.<br/>
+                            This action makes app-response faster.
                         </p>
                         <div class="progress">
                             <div class="progress-bar bg-success progress-bar-striped"
@@ -69,7 +69,7 @@ export default class ScanProgressBlock extends ContentDetailBase {
         this.swipeDetector.on(SwipeEvents.Left, (): void => {
             const args: IContentSwipeArgs = {
                 Content: Contents.Settings,
-                ContentDetail: null,
+                ContentDetail: ContentDetails.Thanks,
                 Direction: SwipeDirection.Left
             };
             this.$emit(ContentDetailEvents.Swiped, args);

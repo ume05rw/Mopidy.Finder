@@ -8,7 +8,8 @@ export enum ContentDetails {
     PlaylistTracks = 'PlaylistTracks',
     SetMopidy = 'SetMopidy',
     Database = 'Database',
-    ScanProgress = 'ScanProgress'
+    ScanProgress = 'ScanProgress',
+    Thanks = 'Thanks'
 }
 
 export interface IContentDetailArgs {

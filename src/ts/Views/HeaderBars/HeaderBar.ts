@@ -86,6 +86,13 @@ export const HeaderBarEvents = {
                 <i class="fa fa-rocket" />
             </a>
         </li>
+        <li class="nav-item d-lg-none"
+            ref="MenuThanks">
+            <a class="nav-link"
+                @click="OnThanksClicked" >
+                <i class="fa fa-handshake-o" />
+            </a>
+        </li>
     </ul>
 </nav>`
 })
@@ -130,6 +137,9 @@ export default class HeaderBar extends ViewBase {
     private get MenuScanProgress(): HTMLElement {
         return this.$refs.MenuScanProgress as HTMLElement
     }
+    private get MenuThanks(): HTMLElement {
+        return this.$refs.MenuThanks as HTMLElement
+    }
 
     public async Initialize(): Promise<boolean> {
         super.Initialize();
@@ -142,6 +152,7 @@ export default class HeaderBar extends ViewBase {
         this.allButtons.push(this.MenuMopidy);
         this.allButtons.push(this.MenuDb);
         this.allButtons.push(this.MenuScanProgress);
+        this.allButtons.push(this.MenuThanks);
 
         this.finderButtons.push(this.MenuGenres);
         this.finderButtons.push(this.MenuArtists);
@@ -151,6 +162,7 @@ export default class HeaderBar extends ViewBase {
         this.settingsButtons.push(this.MenuMopidy);
         this.settingsButtons.push(this.MenuDb);
         this.settingsButtons.push(this.MenuScanProgress);
+        this.settingsButtons.push(this.MenuThanks);
 
         Libraries.SetTooltip(this.MenuGenres, 'Genres');
         Libraries.SetTooltip(this.MenuArtists, 'Artists');
@@ -160,6 +172,7 @@ export default class HeaderBar extends ViewBase {
         Libraries.SetTooltip(this.MenuMopidy, 'Set Mopidy');
         Libraries.SetTooltip(this.MenuDb, 'Database');
         Libraries.SetTooltip(this.MenuScanProgress, 'Scan Progress');
+        Libraries.SetTooltip(this.MenuThanks, 'Thanks');
         this.AllButtonToHide();
 
         this.jqMainManuButton = Libraries.$(this.MainMenuButton);
@@ -220,6 +233,9 @@ export default class HeaderBar extends ViewBase {
                     case ContentDetails.ScanProgress:
                         this.SetDetailActive(this.MenuScanProgress, this.settingsButtons);
                         break;
+                    case ContentDetails.Thanks:
+                        this.SetDetailActive(this.MenuThanks, this.settingsButtons);
+                        break;
                     default:
                         Exception.Throw('Unexpected ContentDetail.', args);
                 }
@@ -266,6 +282,7 @@ export default class HeaderBar extends ViewBase {
                 this.MenuMopidy.classList.remove(this.displayNone);
                 this.MenuDb.classList.remove(this.displayNone);
                 this.MenuScanProgress.classList.remove(this.displayNone);
+                this.MenuThanks.classList.remove(this.displayNone);
 
                 break;
             default:
@@ -336,6 +353,14 @@ export default class HeaderBar extends ViewBase {
         };
         this.$emit(HeaderBarEvents.DetailOrdered, args);
         this.SetDetailActive(this.MenuScanProgress, this.settingsButtons);
+    }
+    private OnThanksClicked(): void {
+        const args: IContentDetailArgs = {
+            Content: Contents.Settings,
+            Detail: ContentDetails.Thanks
+        };
+        this.$emit(HeaderBarEvents.DetailOrdered, args);
+        this.SetDetailActive(this.MenuThanks, this.settingsButtons);
     }
 
     public GetIsSideBarVisible(): boolean {
