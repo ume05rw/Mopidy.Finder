@@ -1,7 +1,7 @@
 Mopidy.Finder
 ====
 
-Mopidy that Findable - Mopidy Frontend for a Thousand Songs or More.
+Mopidy that Findable - Mopidy Frontend for a Thousand Songs.
 
 ![Mopidy.Finder](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/fullscreen.png "Mopidy.Finder")  
   
