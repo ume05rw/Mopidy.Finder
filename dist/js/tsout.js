@@ -3315,6 +3315,7 @@ define("Views/Finders/Lists/Albums/SelectionAlbumTracks", ["require", "exports",
         };
         SelectionAlbumTracks.prototype.SetPlaylists = function (playlists) {
             this.innerPlaylists = playlists;
+            this.$forceUpdate();
         };
         SelectionAlbumTracks.prototype.GetPlaylists = function () {
             return this.innerPlaylists;
@@ -4335,7 +4336,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         };
         AlbumList.prototype.InitPlaylistList = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var store, _a, i;
+                var store, _a, items, i;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
@@ -4344,10 +4345,13 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
                             return [4 /*yield*/, store.GetPlaylists()];
                         case 1:
                             _a.playlists = _b.sent();
-                            if (!this.Items)
+                            // this.$onでハンドルしたとき、プロパティが取得出来ない。
+                            // this.$refsを直接参照する。
+                            if (!this.$refs.Items)
                                 return [2 /*return*/, true];
-                            for (i = 0; i < this.Items.length; i++)
-                                this.Items[i].SetPlaylists(this.playlists);
+                            items = this.$refs.Items;
+                            for (i = 0; i < items.length; i++)
+                                items[i].SetPlaylists(this.playlists);
                             return [2 /*return*/, true];
                     }
                 });

@@ -193,6 +193,7 @@ export default class SelectionAlbumTracks extends ViewBase {
 
     public SetPlaylists(playlists: Playlist[]): void {
         this.innerPlaylists = playlists;
+        this.$forceUpdate();
     }
     public GetPlaylists(): Playlist[] {
         return this.innerPlaylists;

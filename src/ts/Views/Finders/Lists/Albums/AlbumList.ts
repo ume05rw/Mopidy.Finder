@@ -155,11 +155,14 @@ export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTrack
         const store = new PlaylistStore();
         this.playlists = await store.GetPlaylists();
 
-        if (!this.Items)
+        // this.$onでハンドルしたとき、プロパティが取得出来ない。
+        // this.$refsを直接参照する。
+        if (!this.$refs.Items)
             return true;
 
-        for (let i = 0; i < this.Items.length; i++)
-            this.Items[i].SetPlaylists(this.playlists);
+        const items = this.$refs.Items as SelectionAlbumTracks[];
+        for (let i = 0; i < items.length; i++)
+            items[i].SetPlaylists(this.playlists);
 
         return true;
     }
