@@ -24,7 +24,7 @@ You will soon find the song you are looking for!　　
 * Mopidy-Local-Sqlite (recommended, not required)
 
 ## Installation on Windows
-1. [Download Zip-Arvhive.](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.1/win-x64-installer-v1.1.zip)  
+1. [Download Zip-Archived Installer.](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/win-x64-installer-v1.2.zip)  
 2. Unzip archived-files. 
 3. Run 'setup.exe', to Install your system.
 4. Run 'Start Mopidy Finder' on your Desktop Shoptcut and little wait, it wake up Browser.
@@ -34,7 +34,7 @@ You will soon find the song you are looking for!　　
 ![ShowList](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/iconRightClicked.jpg "ShowList")  
 
 ## Installation on Linux
-1. [Download Zip-Arvhive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
+1. [Download Zip-Archive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
 2. Unzip archived-files to your Install Folder, ex) /var/mopidyfinder/  
 3. Set your Firewall, Open TCP 6690 ports.
 
