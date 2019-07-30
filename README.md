@@ -5,7 +5,7 @@ Mopidy that Findable - Mopidy Frontend for a Thousand Songs.
 
 ![Mopidy.Finder](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/fullscreen.png "Mopidy.Finder")  
   
-[Live demo is here.](http://dobes.jp:6690)    
+[ **Live Demo is HERE!** ](http://dobes.jp:6690)    
 
 ## Description
 
