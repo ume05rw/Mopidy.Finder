@@ -5,6 +5,8 @@ Mopidy that Findable - Mopidy Frontend for a Thousand Songs.
 
 ![Mopidy.Finder](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/fullscreen.png "Mopidy.Finder")  
   
+[Live demo is here.](http://dobes.jp:6690)    
+
 ## Description
 
 Mopidy is a Great Music Server, It is very small and works every-linuxes.  
