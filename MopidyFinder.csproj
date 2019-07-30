@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RuntimeFrameworkVersion>2.2.0</RuntimeFrameworkVersion>
     <TypeScriptToolsVersion>3.4</TypeScriptToolsVersion>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
