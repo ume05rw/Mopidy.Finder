@@ -221,4 +221,8 @@
     <TypeScriptSourceRoot />
   </PropertyGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="npm run build:dev" />
+  </Target>
+
 </Project>

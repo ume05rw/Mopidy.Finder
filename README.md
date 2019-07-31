@@ -36,17 +36,29 @@ You will soon find the song you are looking for!　　
 ![ShowList](https://raw.githubusercontent.com/ume05rw/Mopidy.Finder/master/src/img/forGitHub/iconRightClicked.jpg "ShowList")  
 
 ## Installation on Linux
-1. [Download Zip-Archive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
-2. Unzip archived-files to your Install Folder, ex) /var/mopidyfinder/  
+1. [Download Tar-Archive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
+for Raspberry-Pi: [linux-arm-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz)  
+for any linux-x64: [linux-x64-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-x64-v1.2.tar.gz)  
+     
+     # wget https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz  
+     
+2. Extract archive to your Install Folder, ex) /var/mopidyfinder
+     
+     # sudo mkdir /var/mopidyfinder  
+     # sudo tar xvzf ./linux-arm-v1.2.tar.gz -C /var/mopidyfinder  
+     # sudo chown pi:pi -R /var/mopidyfinder  
+     # sudo chmod 755 -R /var/mopidyfinder  
+
 3. Set your Firewall, Open TCP 6690 ports.
 
-
-Start on Command-Line.
+4. Start on Command-Line.
      
-     # /var/mopidyfinder/MopidyFinder
+     # cd /var/mopidyfinder  
+     # ./MopidyFinder  
      
+5. Access **device-ipaddress:6690** from your browser.  
 
-If Start on Systemd, add 'mopidyfinder.service' to /etc/systemd/system/, like:
+6. If Start on Systemd, add 'mopidyfinder.service' to /etc/systemd/system/, like:
 
     
     [Unit]
@@ -59,7 +71,7 @@ If Start on Systemd, add 'mopidyfinder.service' to /etc/systemd/system/, like:
     RestartSet=10
     SyslogIdentifier=mopidyfinder
     KillSignal=SIGINT
-    User=root
+    User=pi
     Environment=ASPNETCORE_ENVIRONMENT=Production
 
     [Install]
@@ -76,8 +88,6 @@ starting service:
      
     # sudo systemctl start mopidyfinder
      
-
-and Access **device-ipaddress:6690** from your browser.  
   
 If it NOT Works, Install [**.Net Core 2.2 Runtime**](https://dotnet.microsoft.com/download/dotnet-core/2.2) to your platform.  
 
