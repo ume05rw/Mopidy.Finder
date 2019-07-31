@@ -38,35 +38,35 @@ You will soon find the song you are looking for!　　
 ## Installation on Linux
 1. [Download Tar-Archive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
 for Raspberry-Pi: [linux-arm-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz)  
-for any linux-x64: [linux-x64-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-x64-v1.2.tar.gz)  
-
-    
-    # wget https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz
-    
+for any linux-x64: [linux-x64-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-x64-v1.2.tar.gz)
+ex):
+```sh
+# wget https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz 
+```
 
 2. Extract archive to your Install Folder: ex) /var/mopidyfinder
 
-    
-    # sudo mkdir /var/mopidyfinder
-    # sudo tar xvzf ./linux-arm-v1.2.tar.gz -C /var/mopidyfinder
-    # sudo chown pi:pi -R /var/mopidyfinder
-    # sudo chmod 755 -R /var/mopidyfinder
-    
+```sh     
+# sudo mkdir /var/mopidyfinder
+# sudo tar xvzf ./linux-arm-v1.2.tar.gz -C /var/mopidyfinder
+# sudo chown pi:pi -R /var/mopidyfinder
+# sudo chmod 755 -R /var/mopidyfinder
+```     
 
 3. Set your Firewall, Open TCP 6690 ports.
 
 4. Start on Command-Line.
 
-    
-    # cd /var/mopidyfinder
-    # ./MopidyFinder
-    
+```sh    
+# cd /var/mopidyfinder
+# ./MopidyFinder
+```    
 
 5. Access **device-ipaddress:6690** from your browser.  
 
 6. If Start on Systemd, add 'mopidyfinder.service' to /etc/systemd/system/, like:
 
-    
+```sh    
     [Unit]
     Description=Mopidy.Finder
     
@@ -82,18 +82,19 @@ for any linux-x64: [linux-x64-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Fin
     
     [Install]
     WantedBy=multi-user.target
+```
     
 enabling service:
 
-     
-    # sudo systemctl enable mopidyfinder 
-     
+```sh     
+# sudo systemctl enable mopidyfinder 
+```     
 
 starting service:
 
-     
-    # sudo systemctl start mopidyfinder
-     
+```sh
+# sudo systemctl start mopidyfinder
+```     
   
 If it NOT Works, Install [**.Net Core 2.2 Runtime**](https://dotnet.microsoft.com/download/dotnet-core/2.2) to your platform.  
 
