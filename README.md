@@ -39,23 +39,29 @@ You will soon find the song you are looking for!　　
 1. [Download Tar-Archive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
 for Raspberry-Pi: [linux-arm-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz)  
 for any linux-x64: [linux-x64-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-x64-v1.2.tar.gz)  
-     
-     # wget https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz  
-     
-2. Extract archive to your Install Folder, ex) /var/mopidyfinder
-     
-     # sudo mkdir /var/mopidyfinder  
-     # sudo tar xvzf ./linux-arm-v1.2.tar.gz -C /var/mopidyfinder  
-     # sudo chown pi:pi -R /var/mopidyfinder  
-     # sudo chmod 755 -R /var/mopidyfinder  
+
+    
+    # wget https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz
+    
+
+2. Extract archive to your Install Folder: ex) /var/mopidyfinder
+
+    
+    # sudo mkdir /var/mopidyfinder
+    # sudo tar xvzf ./linux-arm-v1.2.tar.gz -C /var/mopidyfinder
+    # sudo chown pi:pi -R /var/mopidyfinder
+    # sudo chmod 755 -R /var/mopidyfinder
+    
 
 3. Set your Firewall, Open TCP 6690 ports.
 
 4. Start on Command-Line.
-     
-     # cd /var/mopidyfinder  
-     # ./MopidyFinder  
-     
+
+    
+    # cd /var/mopidyfinder
+    # ./MopidyFinder
+    
+
 5. Access **device-ipaddress:6690** from your browser.  
 
 6. If Start on Systemd, add 'mopidyfinder.service' to /etc/systemd/system/, like:
@@ -63,7 +69,7 @@ for any linux-x64: [linux-x64-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Fin
     
     [Unit]
     Description=Mopidy.Finder
-
+    
     [Service]
     ExecStart=/var/mopidyfinder/MopidyFinder
     WorkingDirectory=/var/mopidyfinder/
@@ -73,7 +79,7 @@ for any linux-x64: [linux-x64-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Fin
     KillSignal=SIGINT
     User=pi
     Environment=ASPNETCORE_ENVIRONMENT=Production
-
+    
     [Install]
     WantedBy=multi-user.target
     
