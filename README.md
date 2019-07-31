@@ -94,7 +94,29 @@ starting service:
 
 ```sh
 # sudo systemctl start mopidyfinder
-```     
+```
+
+check status:
+```sh
+# sudo systemctl status mopidyfinder
+● mopidyfinder.service - Mopidy.Finder - Mopidy that Findable
+   Loaded: loaded (/etc/systemd/system/mopidyfinder.service; enabled; vendor preset: enabled)
+   Active: active (running) since Wed 2019-07-31 15:34:34 JST; 26s ago
+ Main PID: 21102 (MopidyFinder)
+   CGroup: /system.slice/mopidyfinder.service
+           mq21102 /var/mopidyfinder/MopidyFinder
+
+ 7月 31 15:34:48 raspberrypi mopidyfinder[21102]: 2019-07-31 15:34:48.0929|10103|WARN|Microsoft.EntityFrameworkCore.Query|Query: '(from Settin
+ 7月 31 15:34:52 raspberrypi mopidyfinder[21102]: Hosting environment: Production
+ 7月 31 15:34:52 raspberrypi mopidyfinder[21102]: Content root path: /var/mopidyfinder
+ 7月 31 15:34:52 raspberrypi mopidyfinder[21102]: Now listening on: http://[::]:6690
+ 7月 31 15:34:52 raspberrypi mopidyfinder[21102]: Application started. Press Ctrl+C to shut down.
+ 7月 31 15:34:53 raspberrypi mopidyfinder[21102]: 2019-07-31 15:34:53.1781|10102|WARN|Microsoft.EntityFrameworkCore.Query|Query: '(from Album
+ 7月 31 15:34:53 raspberrypi mopidyfinder[21102]: 2019-07-31 15:34:53.7283|20500|WARN|Microsoft.EntityFrameworkCore.Query|The LINQ expression
+ 7月 31 15:34:53 raspberrypi mopidyfinder[21102]: 2019-07-31 15:34:53.7493|20500|WARN|Microsoft.EntityFrameworkCore.Query|The LINQ expression
+ 7月 31 15:34:53 raspberrypi mopidyfinder[21102]: 2019-07-31 15:34:53.7581|20500|WARN|Microsoft.EntityFrameworkCore.Query|The LINQ expression
+ 7月 31 15:34:53 raspberrypi mopidyfinder[21102]: 2019-07-31 15:34:53.8376|20500|WARN|Microsoft.EntityFrameworkCore.Query|The LINQ expression
+```
   
 If it NOT Works, Install [**.Net Core 2.2 Runtime**](https://dotnet.microsoft.com/download/dotnet-core/2.2) to your platform.  
 
