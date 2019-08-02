@@ -55,14 +55,8 @@ namespace MopidyFinder.Models.Mopidies.Methods
                     {
                         Error = ex
                     };
-                    var id = default(int?);
-                    try
-                    {
-                        id = ((JsonRpcQueryRequest)request).Id;
-                    }
-                    catch (Exception)
-                    {
-                    }
+                    if (request is JsonRpcQueryRequest)
+                        response.Id = ((JsonRpcQueryRequest)request).Id;
 
                     return response;
                 }
