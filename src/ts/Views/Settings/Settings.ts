@@ -126,6 +126,8 @@ export default class Settings extends ContentBase {
 
     public OnShow(): void {
         this.ScanProgressBlock.SetTrackScanProgress();
+        if (this.store.Entity.IsDemoMode)
+            Libraries.ShowToast.Warning("Now on Demo-Mode.");
     }
 
     private OnSettingsUpdated(): void {

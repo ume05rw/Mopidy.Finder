@@ -34,6 +34,8 @@ namespace MopidyFinder.Models.Settings
         [JsonProperty("ServerPort")]
         public int ServerPort { get; set; }
 
+        [JsonProperty("IsDemoMode")]
+        public bool IsDemoMode { get; } = Program.IsDemoMode;
 
         [NotMapped]
         public string RpcUri

@@ -17,11 +17,12 @@
     },
     "MusicFront": {
       "commandName": "Project",
+      "commandLineArgs": "--port 6691",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:6690"
+      "applicationUrl": "http://localhost:6691"
     }
   }
 }

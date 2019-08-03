@@ -25,9 +25,11 @@ namespace MopidyFinder.Controllers
         {
             store.Entity.ServerAddress = newSettings.ServerAddress;
             store.Entity.ServerPort = newSettings.ServerPort;
-            store.Update();
+            var result = store.Update();
 
-            return XhrResponseFactory.CreateSucceeded(store.Entity);
+            return (result)
+                ? XhrResponseFactory.CreateSucceeded(store.Entity)
+                : XhrResponseFactory.CreateError("Update Failed");
         }
 
         [HttpGet("AlbumScanProgress")]

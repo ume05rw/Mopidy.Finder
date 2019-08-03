@@ -941,6 +941,7 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
         function Settings() {
             this._serverAddress = null;
             this._serverPort = null;
+            this._isDemoMode = false;
             this._isBusy = false;
             this._isMopidyConnectable = false;
             this._isTouchScreen = false;
@@ -974,6 +975,8 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
         Settings.Apply = function (newSettings) {
             this._entity._serverAddress = newSettings.ServerAddress;
             this._entity._serverPort = newSettings.ServerPort;
+            if (newSettings.IsDemoMode === true || newSettings.IsDemoMode === false)
+                this._entity._isDemoMode = newSettings.IsDemoMode;
         };
         Object.defineProperty(Settings.prototype, "ServerAddress", {
             get: function () {
@@ -985,6 +988,13 @@ define("Models/Settings/Settings", ["require", "exports"], function (require, ex
         Object.defineProperty(Settings.prototype, "ServerPort", {
             get: function () {
                 return this._serverPort;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Settings.prototype, "IsDemoMode", {
+            get: function () {
+                return this._isDemoMode;
             },
             enumerable: true,
             configurable: true
@@ -7173,13 +7183,36 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
             this.entity = entity;
             this.ServerAddressInput.value = this.entity.ServerAddress;
             this.ServerPortInput.value = this.entity.ServerPort.toString();
-            this.Update();
+            if (this.entity.IsDemoMode) {
+                this.ServerAddressInput.setAttribute("readonly", "readonly");
+                this.ServerPortInput.setAttribute("readonly", "readonly");
+            }
+            this.TryConnect();
         };
         MopidyBlock.prototype.OnServerAddressInput = function () {
             this.lazyUpdater.Exec();
         };
         MopidyBlock.prototype.OnServerPortInput = function () {
             this.lazyUpdater.Exec();
+        };
+        MopidyBlock.prototype.TryConnect = function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, this.store.TryConnect()];
+                        case 1:
+                            _a.sent();
+                            if (this.entity.IsMopidyConnectable === true) {
+                                Libraries_20.default.ShowToast.Success('Mopidy Found!');
+                            }
+                            else {
+                                Libraries_20.default.ShowToast.Error('Mopidy Not Found...');
+                            }
+                            this.SetConnectionIcon();
+                            return [2 /*return*/, this.entity.IsMopidyConnectable];
+                    }
+                });
+            });
         };
         MopidyBlock.prototype.Update = function () {
             return __awaiter(this, void 0, void 0, function () {
@@ -7198,20 +7231,16 @@ define("Views/Settings/Blocks/MopidyBlock", ["require", "exports", "vue-class-co
                             return [4 /*yield*/, this.store.Update(update)];
                         case 1:
                             if (!((_a.sent()) !== true)) return [3 /*break*/, 2];
-                            Libraries_20.default.ShowToast.Error('Update Failed...');
+                            Libraries_20.default.ShowToast.Error('Update Failed, Now Demo-Mode.');
                             return [3 /*break*/, 4];
-                        case 2: return [4 /*yield*/, this.store.TryConnect()];
+                        case 2:
+                            this.ServerAddressInput.value = this.entity.ServerAddress;
+                            this.ServerPortInput.value = this.entity.ServerPort.toString();
+                            return [4 /*yield*/, this.TryConnect()];
                         case 3:
                             _a.sent();
-                            if (this.entity.IsMopidyConnectable === true) {
-                                Libraries_20.default.ShowToast.Success('Mopidy Found!');
-                            }
-                            else {
-                                Libraries_20.default.ShowToast.Error('Mopidy Not Found...');
-                            }
                             _a.label = 4;
                         case 4:
-                            this.SetConnectionIcon();
                             this.$emit(exports.MopidyBlockEvents.SettingsUpdated);
                             return [2 /*return*/, this.entity.IsMopidyConnectable];
                     }
@@ -7527,6 +7556,8 @@ define("Views/Settings/Settings", ["require", "exports", "vue-class-component", 
         // #endregion
         Settings.prototype.OnShow = function () {
             this.ScanProgressBlock.SetTrackScanProgress();
+            if (this.store.Entity.IsDemoMode)
+                Libraries_23.default.ShowToast.Warning("Now on Demo-Mode.");
         };
         Settings.prototype.OnSettingsUpdated = function () {
             this.DbBlock.OnSettingsUpdated();

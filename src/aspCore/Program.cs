@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 using MopidyFinder.Extensions;
 using NLog.Web;
@@ -17,6 +18,7 @@ namespace MopidyFinder
         public static string SrcPath { get; private set; } = string.Empty;
         public static string DistPath { get; private set; } = string.Empty;
         public static string DbPath { get; private set; } = string.Empty;
+        public static bool IsDemoMode { get; set; } = false;
         public static bool IsWindowsService { get; private set; } = false;
 
         public static void Main(string[] args)
@@ -28,7 +30,33 @@ namespace MopidyFinder
 
             // サービスとして起動するか否かのフラグ
             // 引数に"--winservice"を付与して起動すると、Windowsサービスとして起動する。
-            Program.IsWindowsService = args.Contains("--winservice");
+            Program.IsWindowsService = args.Contains("--winservice") || args.Contains("-ws");
+
+            // デモモード設定
+            Program.IsDemoMode = args.Contains("--demo") || args.Contains("-d");
+
+            if (args.Contains("--port") || args.Contains("-p"))
+            {
+                var idx = args.Contains("--port")
+                    ? args.IndexOf("--port")
+                    : args.IndexOf("-p");
+                if (idx + 1 <= args.Length - 1)
+                {
+                    var portString = args[idx + 1];
+                    var portNumber = default(int);
+                    if (!int.TryParse(portString, out portNumber))
+                        throw new ArgumentException("Specify the Port numerically.");
+
+                    if (portNumber < 1024 ||  65535 < portNumber)
+                        throw new ArgumentOutOfRangeException("Specify a Port in the range of 1024 to 65535.");
+
+                    Program.Port = portNumber;
+                }
+                else
+                {
+                    throw new ArgumentException("Port is not specified.");
+                }
+            }
 
             // カレントパスを取得する。
             var pathToExe = Process.GetCurrentProcess().MainModule.FileName;

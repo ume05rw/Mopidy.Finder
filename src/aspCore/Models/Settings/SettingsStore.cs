@@ -51,11 +51,17 @@ namespace MopidyFinder.Models.Settings
             }
         }
 
-        public void Update()
+        public bool Update()
         {
             this.Ensure();
+
+            if (SettingsStore._entity.IsDemoMode)
+                return false;
+
             this.Dbc.Entry(SettingsStore._entity).State = EntityState.Modified;
             this.Dbc.SaveChanges();
+
+            return true;
         }
     }
 }

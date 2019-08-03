@@ -142,7 +142,12 @@ export default class MopidyBlock extends ContentDetailBase {
         this.ServerAddressInput.value = this.entity.ServerAddress;
         this.ServerPortInput.value = this.entity.ServerPort.toString();
 
-        this.Update();
+        if (this.entity.IsDemoMode) {
+            this.ServerAddressInput.setAttribute("readonly", "readonly");
+            this.ServerPortInput.setAttribute("readonly", "readonly");
+        }
+
+        this.TryConnect();
     }
 
     private OnServerAddressInput(): void {
@@ -151,6 +156,20 @@ export default class MopidyBlock extends ContentDetailBase {
 
     private OnServerPortInput(): void {
         this.lazyUpdater.Exec();
+    }
+
+    private async TryConnect(): Promise<boolean> {
+        await this.store.TryConnect();
+        if (this.entity.IsMopidyConnectable === true) {
+            Libraries.ShowToast.Success('Mopidy Found!');
+
+        } else {
+            Libraries.ShowToast.Error('Mopidy Not Found...');
+        }
+
+        this.SetConnectionIcon();
+
+        return this.entity.IsMopidyConnectable;
     }
 
     private async Update(): Promise<boolean> {
@@ -166,18 +185,13 @@ export default class MopidyBlock extends ContentDetailBase {
         };
 
         if ((await this.store.Update(update)) !== true) {
-            Libraries.ShowToast.Error('Update Failed...');
+            Libraries.ShowToast.Error('Update Failed, Now Demo-Mode.');
         } else {
-            await this.store.TryConnect();
-            if (this.entity.IsMopidyConnectable === true) {
-                Libraries.ShowToast.Success('Mopidy Found!');
-
-            } else {
-                Libraries.ShowToast.Error('Mopidy Not Found...');
-            }
+            this.ServerAddressInput.value = this.entity.ServerAddress;
+            this.ServerPortInput.value = this.entity.ServerPort.toString();
+            await this.TryConnect();
         }
 
-        this.SetConnectionIcon();
         this.$emit(MopidyBlockEvents.SettingsUpdated);
 
         return this.entity.IsMopidyConnectable;

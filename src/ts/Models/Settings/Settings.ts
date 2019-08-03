@@ -1,6 +1,7 @@
 export interface ISettings {
     ServerAddress: string;
     ServerPort: number;
+    IsDemoMode?: boolean;
 }
 
 export default class Settings implements ISettings {
@@ -14,10 +15,14 @@ export default class Settings implements ISettings {
     public static Apply(newSettings: ISettings): void {
         this._entity._serverAddress = newSettings.ServerAddress;
         this._entity._serverPort = newSettings.ServerPort;
+
+        if (newSettings.IsDemoMode === true || newSettings.IsDemoMode === false)
+            this._entity._isDemoMode = newSettings.IsDemoMode;
     }
 
     private _serverAddress: string = null;
     private _serverPort: number = null;
+    private _isDemoMode: boolean = false;
     private _isBusy = false;
     private _isMopidyConnectable: boolean = false;
     private _isTouchScreen: boolean = false;
@@ -30,6 +35,9 @@ export default class Settings implements ISettings {
     }
     public get ServerPort(): number {
         return this._serverPort;
+    }
+    public get IsDemoMode(): boolean {
+        return this._isDemoMode;
     }
     public get IsBusy(): boolean {
         return this._isBusy;
