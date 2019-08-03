@@ -73,8 +73,8 @@
     <None Remove="src\ts\Views\Shared\SelectionItem.ts" />
     <None Remove="src\ts\Views\Shared\SelectionListBase.ts" />
     <None Remove="src\ts\Views\Shared\SlideupButton.ts" />
-    <None Remove="src\ts\Views\SideBars\PlayerPanel.ts" />
-    <None Remove="src\ts\Views\SideBars\Sidebar.ts" />
+    <None Remove="src\ts\Views\SideBarses\PlayerPanel.ts" />
+    <None Remove="src\ts\Views\SideBarses\Sidebar.ts" />
     <None Remove="tests\Models\Artist.test.ts" />
     <None Remove="tests\Models\ArtistAlbum.test.ts" />
     <None Remove="tests\Models\Genre.test.ts" />
@@ -179,8 +179,8 @@
     <TypeScriptCompile Include="src\ts\Views\Shared\SelectionItem.ts" />
     <TypeScriptCompile Include="src\ts\Views\Bases\SelectionListBase.ts" />
     <TypeScriptCompile Include="src\ts\Views\Shared\SlideupButton.ts" />
-    <TypeScriptCompile Include="src\ts\Views\SideBars\PlayerPanel.ts" />
-    <TypeScriptCompile Include="src\ts\Views\SideBars\SideBar.ts" />
+    <TypeScriptCompile Include="src\ts\Views\SideBarses\PlayerPanel.ts" />
+    <TypeScriptCompile Include="src\ts\Views\SideBarses\SideBar.ts" />
     <TypeScriptCompile Include="tests\Models\Album.test.ts" />
     <TypeScriptCompile Include="tests\Models\Artist.test.ts" />
     <TypeScriptCompile Include="tests\Models\ArtistAlbum.test.ts" />
