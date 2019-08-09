@@ -101,14 +101,14 @@ declare namespace Sortable {
          * dragged elements
          */
         items: HTMLElement[];
-        newIndicies: Indicies[] | undefined;
-        oldIndicies: Indicies[] | undefined;
+        newIndicies: Index[] | undefined;
+        oldIndicies: Index[] | undefined;
     }
 
     // --------------------------------------------------
     // MultiDragプラグイン用に追記
     // --------------------------------------------------
-    export interface Indicies {
+    export interface Index {
         index: number;
         multiDragElement: HTMLElement
     }
