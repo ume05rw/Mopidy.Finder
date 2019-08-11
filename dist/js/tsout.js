@@ -8289,8 +8289,7 @@ define("Controllers/NavigationController", ["require", "exports", "Libraries", "
             });
         };
         NavigationController.prototype.AdjustScreen = function () {
-            //Dump.Log('viewport = ' + this._viewport.current());
-            // コンテンツは、smサイズを基点にカラム<-->フルスクリーンを切り替える。
+            // コンテンツは、mdサイズを基点にカラム<-->フルスクリーンを切り替える。
             if (this._viewport.is('<=md')) {
                 this._content.ContentToFullscreen();
             }
