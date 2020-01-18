@@ -75,6 +75,7 @@ export default class PlaylistList extends SelectionListBase<Playlist, PlaylistSt
 
     private static readonly PageLength: number = 30;
 
+    protected readonly isMultiSelect: boolean = false;
     protected readonly tabId: string = 'subtab-playlists';
     protected readonly linkId: string = 'nav-playlists';
     protected store: PlaylistStore = new PlaylistStore();
@@ -139,13 +140,13 @@ export default class PlaylistList extends SelectionListBase<Playlist, PlaylistSt
         return super.OnSelectionOrdered(args);
     }
     protected OnSelectionChanged(args: ISelectionChangedArgs<Playlist>): void {
-        if (args.Selected === true) {
-            _.each(this.Items, (si): void => {
-                if (si.GetEntity() !== args.Entity && si.GetSelected()) {
-                    si.SetSelected(false);
-                }
-            });
-        }
+        //if (args.Selected === true) {
+        //    _.each(this.Items, (si): void => {
+        //        if (si.GetEntity() !== args.Entity && si.GetSelected()) {
+        //            si.SetSelected(false);
+        //        }
+        //    });
+        //}
 
         super.OnSelectionChanged(args);
     }

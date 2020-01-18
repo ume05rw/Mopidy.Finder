@@ -9,7 +9,7 @@ import { ContentDetailEvents, ContentDetails, IContentSwipeArgs, SwipeDirection 
 import SelectionListBase from '../../Bases/SelectionListBase';
 import { SwipeEvents } from '../../Events/HammerEvents';
 import Filterbox from '../../Shared/Filterboxes/Filterbox';
-import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/SelectionItem';
+import { default as SelectionItem, ISelectionChangedArgs, ISelectionOrderedArgs } from '../../Shared/SelectionItem';
 
 @Component({
     template: `<div class="col-lg-3">
@@ -60,6 +60,7 @@ import { default as SelectionItem, ISelectionChangedArgs } from '../../Shared/Se
 })
 export default class GenreList extends SelectionListBase<Genre, GenreStore> {
 
+    protected readonly isMultiSelect: boolean = false;
     protected readonly tabId: string = 'subtab-genres';
     protected readonly linkId: string = 'nav-genres';
     protected store: GenreStore = new GenreStore();

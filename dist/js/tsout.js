@@ -2780,6 +2780,7 @@ define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Librar
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.page = 1;
             _this.viewport = Libraries_4.default.ResponsiveBootstrapToolkit;
+            _this.refreshTimer = null;
             return _this;
         }
         Object.defineProperty(SelectionListBase.prototype, "Page", {
@@ -2850,19 +2851,37 @@ define("Views/Bases/SelectionListBase", ["require", "exports", "lodash", "Librar
         };
         SelectionListBase.prototype.OnSelectionChanged = function (args) {
             var _this = this;
+            if (!this.isMultiSelect
+                && args.Selected
+                && this.$refs.Items instanceof Array
+                && this.$refs.Items.length >= 1
+                && this.$refs.Items[0] instanceof SelectionItem_2.default) {
+                _.each(this.$refs.Items, function (si) {
+                    if (si.GetEntity() !== args.Entity && si.GetSelected()) {
+                        si.SetSelected(false);
+                    }
+                });
+            }
             _.delay(function () {
                 _this.$emit(exports.SelectionEvents.SelectionChanged, args);
             }, 300);
         };
         SelectionListBase.prototype.Refresh = function () {
             var _this = this;
-            this.page = 1;
-            this.entities = [];
-            this.$nextTick(function () {
-                _this.InfiniteLoading.stateChanger.reset();
-                _this.InfiniteLoading.attemptLoad();
-            });
+            if (this.refreshTimer !== null) {
+                clearTimeout(this.refreshTimer);
+                this.refreshTimer = null;
+            }
+            this.refreshTimer = setTimeout(function () {
+                _this.page = 1;
+                _this.entities = [];
+                _this.$nextTick(function () {
+                    _this.InfiniteLoading.stateChanger.reset();
+                    _this.InfiniteLoading.attemptLoad();
+                });
+            }, SelectionListBase.RefreshWaitMsec);
         };
+        SelectionListBase.RefreshWaitMsec = 100;
         return SelectionListBase;
     }(ContentDetailBase_1.default));
     exports.default = SelectionListBase;
@@ -4247,6 +4266,7 @@ define("Views/Finders/Lists/Albums/AlbumList", ["require", "exports", "lodash", 
         __extends(AlbumList, _super);
         function AlbumList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isMultiSelect = false;
             _this.tabId = 'subtab-albumtracks';
             _this.linkId = 'nav-albumtracks';
             _this.store = new AlbumTracksStore_1.default();
@@ -4567,6 +4587,7 @@ define("Views/Finders/Lists/ArtistList", ["require", "exports", "lodash", "vue-c
         __extends(ArtistList, _super);
         function ArtistList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isMultiSelect = false;
             _this.tabId = 'subtab-artists';
             _this.linkId = 'nav-artists';
             _this.store = new ArtistStore_2.default();
@@ -4706,6 +4727,7 @@ define("Views/Finders/Lists/GenreList", ["require", "exports", "vue-class-compon
         __extends(GenreList, _super);
         function GenreList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isMultiSelect = false;
             _this.tabId = 'subtab-genres';
             _this.linkId = 'nav-genres';
             _this.store = new GenreStore_2.default();
@@ -5395,7 +5417,7 @@ define("Views/Playlists/Lists/Playlists/AddModal", ["require", "exports", "vue-c
     }(ViewBase_8.default));
     exports.default = AddModal;
 });
-define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "lodash", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Utils/Delay", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, _, vue_class_component_12, vue_infinite_loading_4, Libraries_13, PlaylistStore_2, Delay_5, IContent_5, IContentDetail_7, SelectionListBase_4, HammerEvents_4, Filterbox_4, SelectionItem_5, AddModal_1) {
+define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "vue-class-component", "vue-infinite-loading", "Libraries", "Models/Playlists/PlaylistStore", "Utils/Delay", "Views/Bases/IContent", "Views/Bases/IContentDetail", "Views/Bases/SelectionListBase", "Views/Events/HammerEvents", "Views/Shared/Filterboxes/Filterbox", "Views/Shared/SelectionItem", "Views/Playlists/Lists/Playlists/AddModal"], function (require, exports, vue_class_component_12, vue_infinite_loading_4, Libraries_13, PlaylistStore_2, Delay_5, IContent_5, IContentDetail_7, SelectionListBase_4, HammerEvents_4, Filterbox_4, SelectionItem_5, AddModal_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PlaylistListEvents = {
@@ -5406,6 +5428,7 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
         __extends(PlaylistList, _super);
         function PlaylistList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isMultiSelect = false;
             _this.tabId = 'subtab-playlists';
             _this.linkId = 'nav-playlists';
             _this.store = new PlaylistStore_2.default();
@@ -5489,13 +5512,13 @@ define("Views/Playlists/Lists/Playlists/PlaylistList", ["require", "exports", "l
             });
         };
         PlaylistList.prototype.OnSelectionChanged = function (args) {
-            if (args.Selected === true) {
-                _.each(this.Items, function (si) {
-                    if (si.GetEntity() !== args.Entity && si.GetSelected()) {
-                        si.SetSelected(false);
-                    }
-                });
-            }
+            //if (args.Selected === true) {
+            //    _.each(this.Items, (si): void => {
+            //        if (si.GetEntity() !== args.Entity && si.GetSelected()) {
+            //            si.SetSelected(false);
+            //        }
+            //    });
+            //}
             _super.prototype.OnSelectionChanged.call(this, args);
         };
         PlaylistList.prototype.GetPagenatedList = function () {
@@ -5874,6 +5897,7 @@ define("Views/Playlists/Lists/Tracks/TrackList", ["require", "exports", "lodash"
         __extends(TrackList, _super);
         function TrackList() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isMultiSelect = false;
             _this.tabId = 'subtab-playlisttracks';
             _this.linkId = 'nav-playlisttracks';
             _this.store = new PlaylistStore_3.default();

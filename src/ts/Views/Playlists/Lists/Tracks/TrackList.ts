@@ -107,6 +107,7 @@ enum ListMode {
 })
 export default class TrackList extends SelectionListBase<Track, PlaylistStore> {
 
+    protected readonly isMultiSelect: boolean = false;
     protected readonly tabId: string = 'subtab-playlisttracks';
     protected readonly linkId: string = 'nav-playlisttracks';
     private static readonly PageLength: number = 20;

@@ -4,7 +4,7 @@ import Libraries from '../../Libraries';
 import { IPagenatedResult } from '../../Models/Bases/StoreBase';
 import Exception from '../../Utils/Exception';
 import ContentDetailBase from '../Bases/ContentDetailBase';
-import { ISelectionChangedArgs, ISelectionOrderedArgs, SelectionItemEvents } from '../Shared/SelectionItem';
+import SelectionItem, { ISelectionChangedArgs, ISelectionOrderedArgs, SelectionItemEvents } from '../Shared/SelectionItem';
 
 export interface IListUpdatedArgs<TEntity> {
     Entities: TEntity[];
@@ -20,6 +20,9 @@ export const SelectionEvents = {
 
 export default abstract class SelectionListBase<TEntity, TStore> extends ContentDetailBase {
 
+    private static readonly RefreshWaitMsec: number = 100;
+
+    protected abstract readonly isMultiSelect: boolean;
     protected abstract readonly tabId: string;
     protected abstract readonly linkId: string;
     protected abstract store: TStore;
@@ -27,6 +30,7 @@ export default abstract class SelectionListBase<TEntity, TStore> extends Content
 
     private page: number = 1;
     private viewport = Libraries.ResponsiveBootstrapToolkit;
+    private refreshTimer: number = null;
 
     protected get Page(): number {
         return this.page;
@@ -81,6 +85,20 @@ export default abstract class SelectionListBase<TEntity, TStore> extends Content
     }
 
     protected OnSelectionChanged(args: ISelectionChangedArgs<TEntity>): void {
+        if (
+            !this.isMultiSelect
+            && args.Selected
+            && this.$refs.Items instanceof Array
+            && this.$refs.Items.length >= 1
+            && this.$refs.Items[0] instanceof SelectionItem
+        ) {
+            _.each(this.$refs.Items, (si: SelectionItem<TEntity>): void => {
+                if (si.GetEntity() !== args.Entity && si.GetSelected()) {
+                    si.SetSelected(false);
+                }
+            });
+        }
+
         _.delay((): void => {
             this.$emit(SelectionEvents.SelectionChanged, args);
         }, 300);
@@ -89,11 +107,18 @@ export default abstract class SelectionListBase<TEntity, TStore> extends Content
     protected abstract async GetPagenatedList(): Promise<IPagenatedResult<TEntity>>;
 
     protected Refresh(): void {
-        this.page = 1;
-        this.entities = [];
-        this.$nextTick((): void => {
-            this.InfiniteLoading.stateChanger.reset();
-            (this.InfiniteLoading as any).attemptLoad();
-        });
+        if (this.refreshTimer !== null) {
+            clearTimeout(this.refreshTimer);
+            this.refreshTimer = null;
+        }
+
+        this.refreshTimer = setTimeout(() => {
+            this.page = 1;
+            this.entities = [];
+            this.$nextTick((): void => {
+                this.InfiniteLoading.stateChanger.reset();
+                (this.InfiniteLoading as any).attemptLoad();
+            });
+        }, SelectionListBase.RefreshWaitMsec);
     }
 }

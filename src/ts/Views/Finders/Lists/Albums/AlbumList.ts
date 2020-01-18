@@ -67,6 +67,7 @@ export const AlbumListEvents = {
 })
 export default class AlbumList extends SelectionListBase<AlbumTracks, AlbumTracksStore> {
 
+    protected readonly isMultiSelect: boolean = false;
     protected readonly tabId: string = 'subtab-albumtracks';
     protected readonly linkId: string = 'nav-albumtracks';
     protected store: AlbumTracksStore = new AlbumTracksStore();
