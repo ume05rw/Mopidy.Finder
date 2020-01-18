@@ -26,7 +26,7 @@ You will soon find the song you are looking for!　　
 * Mopidy-Local-Sqlite (recommended, not required)
 
 ## Installation on Windows
-1. [Download Zip-Archived Installer.](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/win-x64-installer-v1.2.zip)  
+1. [Download Zip-Archived Installer.](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.3/win-x64-installer-v1.3.zip)  
 2. Unzip archived-files. 
 3. Run 'setup.exe', to Install your system.
 4. Run 'Start Mopidy Finder' on your Desktop Shoptcut and little wait, it wake up Browser.
@@ -37,18 +37,18 @@ You will soon find the song you are looking for!　　
 
 ## Installation on Linux
 1. [Download Tar-Archive for your platform.](https://github.com/ume05rw/Mopidy.Finder/releases)  
-for Raspberry-Pi: [linux-arm-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz)  
-for any linux-x64: [linux-x64-v1.2.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-x64-v1.2.tar.gz)
+for Raspberry-Pi: [linux-arm-v1.3.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.3/linux-arm-v1.3.tar.gz)  
+for any linux-x64: [linux-x64-v1.3.tar.gz](https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.3/linux-x64-v1.3.tar.gz)
 
 ```sh
-# wget https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.2/linux-arm-v1.2.tar.gz 
+# wget https://github.com/ume05rw/Mopidy.Finder/releases/download/v1.3/linux-arm-v1.3.tar.gz 
 ```
 
 2. Extract archive to your Install Folder: ex) /var/mopidyfinder
 
 ```sh     
 # sudo mkdir /var/mopidyfinder
-# sudo tar xvzf ./linux-arm-v1.2.tar.gz -C /var/mopidyfinder
+# sudo tar xvzf ./linux-arm-v1.3.tar.gz -C /var/mopidyfinder
 # sudo chown pi:pi -R /var/mopidyfinder
 # sudo chmod 755 -R /var/mopidyfinder
 ```     
